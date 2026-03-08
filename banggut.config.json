@@ -1,0 +1,358 @@
+{
+  "name": "banggut",
+  "displayName": "방긋",
+  "meaning": "방금 그은 문장 + 방긋(미소)",
+  "tagline": "읽고, 긋고, 방긋.",
+  "subtitle": "방금 그은 문장에서 대화가 시작돼요",
+  "domain": "banggut.kr",
+  "version": "1.0.0",
+
+  "stack": {
+    "framework": "next@14",
+    "router": "app",
+    "ui": "shadcn/ui",
+    "styling": "tailwindcss",
+    "database": "supabase",
+    "auth": ["kakao", "email"],
+    "ai": {
+      "provider": "anthropic",
+      "discussion": "claude-sonnet-4-20250514",
+      "utility": "claude-haiku-4-5-20251001"
+    },
+    "mobile": "capacitor",
+    "deploy": "vercel",
+    "graph": "d3"
+  },
+
+  "design": {
+    "aesthetic": "texthip",
+    "description": "종이 질감, 잉크 느낌, 독립서점 감성. 미니멀하되 따뜻함. 그라데이션 금지, 단색 플랫.",
+    "font": {
+      "primary": "'Noto Serif KR', Georgia, serif",
+      "weight": {
+        "headline": 900,
+        "body": 400,
+        "label": 600
+      },
+      "lineHeight": {
+        "chat": 1.8,
+        "body": 1.7,
+        "tight": 1.4
+      }
+    },
+    "colors": {
+      "paper": "#F7F3ED",
+      "warmWhite": "#FFFDF8",
+      "inkGreen": "#2B4C3F",
+      "mediumGreen": "#3D6B5A",
+      "lightGreen": "#5A8A72",
+      "mutedGreen": "#8BA896",
+      "oldGold": "#C4A35A",
+      "terracotta": "#B86B4A",
+      "brown": "#5C3D2E",
+      "ink": "#2C2C2C",
+      "warmGray": "#8B7E74",
+      "lightWarmGray": "#B5A99A",
+      "fadeWarm": "#C5B9AB",
+      "dimWarm": "#D5CBBE"
+    },
+    "radius": {
+      "card": "12px",
+      "button": "8px",
+      "input": "8px",
+      "avatar": "10px",
+      "badge": "6px"
+    },
+    "shadow": {
+      "card": "0 1px 4px rgba(43,76,63,0.04)",
+      "none": "none"
+    },
+    "border": {
+      "card": "1px solid rgba(43,76,63,0.08)",
+      "input": "1px solid rgba(43,76,63,0.15)",
+      "inputFocus": "rgba(43,76,63,0.3)",
+      "subtle": "1px solid rgba(43,76,63,0.06)"
+    },
+    "selection": "rgba(196,163,90,0.2)"
+  },
+
+  "designReferences": [
+    {
+      "file": "ref-calendar-life-log.png",
+      "source": "생활 기록 앱 캘린더",
+      "useFor": "독서 캘린더 — 날짜별 썸네일/이모지 표시, 카테고리 필터 칩"
+    },
+    {
+      "file": "ref-repov-card.png",
+      "source": "Repov(리포브)",
+      "useFor": "서평 카드, 글귀 스크랩 카드 — 크림 배경, 넉넉한 여백, 별점, 깔끔한 타이포"
+    },
+    {
+      "file": "ref-book-grid.png",
+      "source": "독서 기록 앱",
+      "useFor": "서재 화면 — 책 표지 3열 그리드, 별점, 검색바+카메라, 쌓아보기/리스트 토글"
+    },
+    {
+      "file": "ref-emotion-calendar.png",
+      "source": "감정 캘린더 앱",
+      "useFor": "독서 캘린더 — 이모지 감정 표시, 녹색 톤, 활동 아이콘 선택 UI"
+    }
+  ],
+
+  "logo": {
+    "symbol": "‿",
+    "color": "#C4A35A",
+    "description": "곡선 = 펼친 책 + 미소 + 밑줄"
+  },
+
+  "navigation": [
+    { "id": "library", "label": "서재", "icon": "📚", "route": "/" },
+    { "id": "scrap", "label": "스크랩", "icon": "✏️", "route": "/scrap" },
+    { "id": "groups", "label": "모임", "icon": "💬", "route": "/groups" },
+    { "id": "profile", "label": "MY", "icon": "👤", "route": "/profile" }
+  ],
+
+  "phases": [
+    {
+      "id": "explore",
+      "label": "탐색",
+      "icon": "🌱",
+      "description": "첫인상과 감정 나누기",
+      "color": "#2B4C3F",
+      "turnRange": [0, 7],
+      "guide": "감정, 첫인상, 기억에 남는 장면"
+    },
+    {
+      "id": "deepen",
+      "label": "심화",
+      "icon": "🔍",
+      "description": "주제와 의미 파고들기",
+      "color": "#3D6B5A",
+      "turnRange": [8, 15],
+      "guide": "주제, 상징, 작가 의도, 구조"
+    },
+    {
+      "id": "connect",
+      "label": "연결",
+      "icon": "🔗",
+      "description": "내 삶과 세계에 연결하기",
+      "color": "#5A8A72",
+      "turnRange": [16, 23],
+      "guide": "내 삶, 사회, 다른 작품과의 연결"
+    },
+    {
+      "id": "review",
+      "label": "서평",
+      "icon": "✍️",
+      "description": "나만의 서평 완성하기",
+      "color": "#2B4C3F",
+      "turnRange": [24, null],
+      "guide": "총정리, 추천 여부, 핵심 메시지"
+    }
+  ],
+
+  "diagnosis": {
+    "dimensions": [
+      { "id": "emotional", "label": "감정적 몰입", "icon": "❤️" },
+      { "id": "analytical", "label": "분석적 사고", "icon": "🧠" },
+      { "id": "personal", "label": "개인적 연결", "icon": "🪞" },
+      { "id": "critical", "label": "비판적 시각", "icon": "⚖️" },
+      { "id": "creative", "label": "창의적 해석", "icon": "💡" }
+    ],
+    "scoreRange": [1, 5]
+  },
+
+  "ontology": {
+    "nodeTypes": {
+      "theme": { "color": "#2B4C3F", "label": "주제" },
+      "character": { "color": "#5C3D2E", "label": "인물" },
+      "idea": { "color": "#3D6B5A", "label": "개념" },
+      "symbol": { "color": "#C4A35A", "label": "상징" },
+      "emotion": { "color": "#B86B4A", "label": "감정" }
+    },
+    "linkTypes": {
+      "book": { "stroke": "#2B4C3F", "dash": "" },
+      "user": { "stroke": "#3D6B5A", "dash": "" },
+      "shared": { "stroke": "#8BA896", "dash": "4,2" }
+    }
+  },
+
+  "avatars": ["🦊","🐻","🐰","🦉","🐱","🐸","🦋","🌿","🍀","🌻","📖","✨","🎭","🎪"],
+
+  "ai": {
+    "persona": {
+      "name": "방긋",
+      "personality": "따뜻하고 지적인 독서토론 파트너",
+      "style": [
+        "소크라테스식 대화 (질문으로 이끌기)",
+        "2-4문장으로 짧게",
+        "한국어 존댓말",
+        "이모지 가끔",
+        "밑줄 친 글귀를 자연스럽게 언급"
+      ]
+    },
+    "systemPromptTemplate": "당신은 따뜻하고 지적인 독서토론 파트너 '방긋'입니다.\n책 정보: {bookInfo}{quotesInfo}{contextInfo}\n역할: 1)공감하며 경청 2)깊이 있는 후속 질문 3)다양한 관점 제시\n규칙: 2-4문장으로 짧게. 한국어 존댓말. 이모지 가끔.\n현재 단계: {phase} ({phaseGuide})\n\n[토론 방식 자동 전환]\n대화 맥락에 따라 아래 방식을 자연스럽게 섞어 사용하세요. 유저에게 모드를 알리지 마세요.\n- 소크라테스: 유저가 의견을 말하면 → '왜?' '그렇다면?' 꼬리 질문\n- 악마의 변호인: 유저가 확신에 차면 → 반론 제기, 다른 가능성 제시\n- 관점 역할극: 인물/저자 언급 시 → 캐릭터 시점으로 대화\n- 정리자: 유저가 혼란스러워하면 → 논점 구조화, 요약\n- 하브루타: 토론이 깊어지면 → 질문과 반박을 교대\n- 감정 탐색: 감정 표현 감지 시 → 내면 반응 탐색",
+    "discussionModes": {
+      "type": "ai-adaptive",
+      "userSelection": false,
+      "description": "AI가 대화 맥락을 분석해서 6가지 방식을 자연스럽게 전환. 유저는 모드 존재를 모름.",
+      "modes": [
+        {
+          "id": "socratic",
+          "label": "소크라테스",
+          "trigger": "유저가 의견이나 해석을 말할 때",
+          "behavior": "꼬리 질문으로 사고를 깊이 이끔"
+        },
+        {
+          "id": "devils_advocate",
+          "label": "악마의 변호인",
+          "trigger": "유저가 확신에 찬 해석을 할 때",
+          "behavior": "정중하지만 날카롭게 반론 제기"
+        },
+        {
+          "id": "roleplay",
+          "label": "관점 역할극",
+          "trigger": "인물이나 저자가 언급될 때",
+          "behavior": "캐릭터/저자 시점으로 빙의 대화"
+        },
+        {
+          "id": "organizer",
+          "label": "정리자",
+          "trigger": "유저가 혼란스러워하거나 정리를 원할 때",
+          "behavior": "논점 구조화, 지금까지 요약"
+        },
+        {
+          "id": "havruta",
+          "label": "하브루타",
+          "trigger": "토론이 깊어지고 논리적 검증이 필요할 때",
+          "behavior": "질문→반박 교대로 논리 단련"
+        },
+        {
+          "id": "emotion",
+          "label": "감정 탐색",
+          "trigger": "감정 표현이 감지될 때",
+          "behavior": "내면의 감정 반응 탐색"
+        }
+      ]
+    },
+    "bookSearch": {
+      "model": "claude-haiku-4-5-20251001",
+      "timeout": 12000,
+      "prompt": "도서 검색 요청: '{query}'. 제목과 저자가 포함되어 있습니다. 이 검색어와 가장 일치하는 실제 도서 1-5권을 찾아주세요. JSON 배열로만 응답: [{title, author, publisher, year}]"
+    },
+    "ocr": {
+      "model": "claude-haiku-4-5-20251001",
+      "prompt": "이 책 페이지 사진에서 형광펜/밑줄/동그라미 등으로 강조된 텍스트를 추출하세요. 강조 없으면 가장 인상적인 문장 1-2개를 추출하세요. 추출된 텍스트만 출력하세요. 설명 없이 원문 텍스트만."
+    }
+  },
+
+  "review": {
+    "modes": [
+      {
+        "id": "essay",
+        "label": "에세이형",
+        "icon": "📝",
+        "description": "자유 형식의 감성 서평"
+      },
+      {
+        "id": "structured",
+        "label": "구조형",
+        "icon": "📋",
+        "description": "한줄평 + 키워드 + 추천대상 + 본문"
+      }
+    ]
+  },
+
+  "scrap": {
+    "maxForDiscussion": 3,
+    "sources": ["manual", "camera"],
+    "fields": {
+      "required": ["text"],
+      "optional": ["memo", "bookTitle", "bookAuthor"]
+    }
+  },
+
+  "calendar": {
+    "type": "emotion-heatmap",
+    "reference": "ref-emotion-calendar.png",
+    "view": "monthly",
+    "activityMetric": "messageCount",
+    "emotionEmojis": ["😊","😢","🤔","💡","🔥","😤"],
+    "emotionPrompt": "오늘 독서는 어떤 느낌이었나요?",
+    "colors": {
+      "empty": "rgba(43,76,63,0.04)",
+      "low": "#8BA896",
+      "medium": "#3D6B5A",
+      "high": "#2B4C3F"
+    }
+  },
+
+  "library": {
+    "reference": ["ref-book-grid.png", "ref-repov-card.png"],
+    "viewModes": ["grid", "list"],
+    "defaultView": "grid",
+    "bookCard": {
+      "collectionMode": {
+        "icon": "✏️",
+        "label": "수집중",
+        "badgeStyle": "greenGradient",
+        "clickAction": "goToSetup"
+      },
+      "discussionMode": {
+        "icon": "phaseIcon",
+        "label": "phaseLabel",
+        "badgeStyle": "phaseColor",
+        "clickAction": "goToDiscuss"
+      },
+      "info": ["author", "scrapCount", "messageCount"]
+    }
+  },
+
+  "pwa": {
+    "name": "방긋",
+    "shortName": "방긋",
+    "description": "방금 그은 문장에서 대화가 시작돼요",
+    "themeColor": "#2B4C3F",
+    "backgroundColor": "#F7F3ED",
+    "display": "standalone",
+    "orientation": "portrait"
+  },
+
+  "capacitor": {
+    "appId": "kr.banggut.app",
+    "appName": "방긋",
+    "platforms": ["ios", "android"]
+  },
+
+  "appStore": {
+    "category": "Books",
+    "subtitle": "AI 독서토론 & 서평 앱",
+    "keywords": ["독서", "토론", "서평", "밑줄", "글귀", "독서노트", "AI", "텍스트힙", "북클럽"],
+    "primaryLanguage": "ko"
+  },
+
+  "mvp": {
+    "v1.0": [
+      "auth-kakao",
+      "book-search",
+      "scrap-manual",
+      "scrap-camera-ocr",
+      "scrap-import-to-discussion",
+      "ai-discussion-4phases",
+      "ai-discussion-adaptive-modes",
+      "review-dual-mode",
+      "library-calendar",
+      "pwa",
+      "capacitor-ios-android"
+    ],
+    "v1.1": [
+      "ontology-graph",
+      "ai-diagnosis",
+      "social-friends",
+      "social-public-reviews",
+      "group-discussions",
+      "share-card-image",
+      "push-daily-question"
+    ]
+  }
+}
