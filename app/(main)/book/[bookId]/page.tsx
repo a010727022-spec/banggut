@@ -453,6 +453,13 @@ export default function BookDetailPage() {
   const [activeTab, setActiveTab] = useState<Tab>("scraps");
   const [isLoading, setIsLoading] = useState(true);
 
+  // Context preparation state
+  const [contextStatus, setContextStatus] = useState<"idle" | "fetching" | "done" | "failed">("idle");
+  const [contextLabel, setContextLabel] = useState("");
+  const [contextProgress, setContextProgress] = useState(0);
+  const [contextTotal, setContextTotal] = useState(6);
+  const contextStartedRef = useRef(false);
+
   // Editable fields (local state for controlled inputs)
   const [currentPage, setCurrentPage] = useState("");
   const [totalPages, setTotalPages] = useState("");
@@ -480,6 +487,72 @@ export default function BookDetailPage() {
         setTotalPages(bookData.total_pages?.toString() ?? "");
         setRating(bookData.rating ?? 0);
         setOneLiner(bookData.one_liner ?? "");
+
+        // 컨텍스트 상태 확인 + 필요 시 SSE 파이프라인 시작
+        if (bookData.context_status === "done" && bookData.context_data) {
+          setContextStatus("done");
+        } else if (!contextStartedRef.current) {
+          contextStartedRef.current = true;
+          setContextStatus("fetching");
+          setContextLabel("방긋이 책을 읽고 있어요...");
+
+          fetchWithAuth("/api/book-context/stream", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              title: bookData.title,
+              author: bookData.author,
+              bookId,
+            }),
+          })
+            .then(async (res) => {
+              const reader = res.body?.getReader();
+              const decoder = new TextDecoder();
+              let buffer = "";
+
+              if (reader) {
+                while (true) {
+                  const { done, value } = await reader.read();
+                  if (done) break;
+                  buffer += decoder.decode(value, { stream: true });
+                  const lines = buffer.split("\n");
+                  buffer = lines.pop() || "";
+                  for (const line of lines) {
+                    const trimmed = line.trim();
+                    if (trimmed.startsWith("data: ")) {
+                      try {
+                        const data = JSON.parse(trimmed.slice(6));
+                        if (data.step === "done") {
+                          setContextStatus("done");
+                          setContextLabel("");
+                          if (data.context) {
+                            setBook((prev) =>
+                              prev
+                                ? { ...prev, context_data: data.context, context_status: "done" }
+                                : prev,
+                            );
+                          }
+                        } else if (data.step === "failed") {
+                          setContextStatus("failed");
+                          setContextLabel("준비에 실패했어요");
+                        } else {
+                          setContextLabel(data.label || "");
+                          setContextProgress(data.progress || 0);
+                          setContextTotal(data.total || 6);
+                        }
+                      } catch {
+                        // incomplete JSON
+                      }
+                    }
+                  }
+                }
+              }
+            })
+            .catch(() => {
+              setContextStatus("failed");
+              setContextLabel("준비에 실패했어요");
+            });
+        }
       }
 
       setIsLoading(false);
@@ -705,6 +778,100 @@ export default function BookDetailPage() {
         </div>
       </div>
 
+      {/* ── Context Preparation Banner ── */}
+      {contextStatus === "fetching" && (
+        <div className="px-4 mt-3">
+          <div className="bg-warm rounded-card border border-ink-green/20 shadow-card p-4">
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-2xl animate-bounce">😊</span>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-ink-green">방긋이 책을 읽고 있어요...</p>
+                <p className="text-xs text-warmgray mt-0.5">{contextLabel}</p>
+              </div>
+            </div>
+            <div className="w-full h-2 bg-ink-green/10 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-ink-green rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${Math.round((contextProgress / contextTotal) * 100)}%` }}
+              />
+            </div>
+            <p className="text-[10px] text-warmgray mt-1.5 text-right">
+              {contextProgress}/{contextTotal}
+            </p>
+          </div>
+        </div>
+      )}
+      {contextStatus === "failed" && (
+        <div className="px-4 mt-3">
+          <div className="bg-warm rounded-card border border-terra/20 shadow-card p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">😥</span>
+                <p className="text-sm text-terra font-medium">준비에 실패했어요</p>
+              </div>
+              <button
+                onClick={() => {
+                  contextStartedRef.current = false;
+                  setContextStatus("idle");
+                  // re-trigger by simulating reload
+                  if (book) {
+                    contextStartedRef.current = true;
+                    setContextStatus("fetching");
+                    setContextLabel("방긋이 책을 읽고 있어요...");
+                    setContextProgress(0);
+                    fetchWithAuth("/api/book-context/stream", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ title: book.title, author: book.author, bookId }),
+                    })
+                      .then(async (res) => {
+                        const reader = res.body?.getReader();
+                        const decoder = new TextDecoder();
+                        let buffer = "";
+                        if (reader) {
+                          while (true) {
+                            const { done, value } = await reader.read();
+                            if (done) break;
+                            buffer += decoder.decode(value, { stream: true });
+                            const lines = buffer.split("\n");
+                            buffer = lines.pop() || "";
+                            for (const line of lines) {
+                              const trimmed = line.trim();
+                              if (trimmed.startsWith("data: ")) {
+                                try {
+                                  const data = JSON.parse(trimmed.slice(6));
+                                  if (data.step === "done") {
+                                    setContextStatus("done");
+                                    if (data.context) {
+                                      setBook((prev) =>
+                                        prev ? { ...prev, context_data: data.context, context_status: "done" } : prev,
+                                      );
+                                    }
+                                  } else if (data.step === "failed") {
+                                    setContextStatus("failed");
+                                  } else {
+                                    setContextLabel(data.label || "");
+                                    setContextProgress(data.progress || 0);
+                                    setContextTotal(data.total || 6);
+                                  }
+                                } catch { /* skip */ }
+                              }
+                            }
+                          }
+                        }
+                      })
+                      .catch(() => setContextStatus("failed"));
+                  }
+                }}
+                className="text-xs text-terra font-semibold bg-terra/10 px-3 py-1.5 rounded-btn hover:bg-terra/20"
+              >
+                다시 시도
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Tab bar ── */}
       <div className="px-4 mt-5">
         <div className="flex border-b border-[rgba(43,76,63,0.08)]">
@@ -746,6 +913,7 @@ export default function BookDetailPage() {
             messages={messages}
             scrapsCount={scraps.length}
             phaseIndex={phaseIndex}
+            contextReady={contextStatus === "done"}
           />
         )}
         {activeTab === "review" && (
@@ -995,11 +1163,13 @@ function DiscussionTab({
   messages,
   scrapsCount,
   phaseIndex,
+  contextReady,
 }: {
   bookId: string;
   messages: Message[];
   scrapsCount: number;
   phaseIndex: number;
+  contextReady: boolean;
 }) {
   const [summaryText, setSummaryText] = useState<string | null>(null);
   const [summaryLoading, setSummaryLoading] = useState(false);
@@ -1027,18 +1197,32 @@ function DiscussionTab({
     return (
       <div className="text-center py-12">
         <div className="text-3xl mb-3">💬</div>
-        <p className="text-warmgray text-sm mb-2">아직 토론을 시작하지 않았어요</p>
-        {scrapsCount > 0 && (
-          <p className="text-sm text-[#C4A35A] mb-4">
-            글귀가 {scrapsCount}개! 토론을 시작해볼까요?
-          </p>
+        {contextReady ? (
+          <>
+            <p className="text-warmgray text-sm mb-2">방긋이 준비됐어요!</p>
+            {scrapsCount > 0 && (
+              <p className="text-sm text-[#C4A35A] mb-4">
+                글귀가 {scrapsCount}개! 토론을 시작해볼까요?
+              </p>
+            )}
+            <Link
+              href={`/discuss/${bookId}`}
+              className="inline-flex items-center gap-2 bg-ink-green text-paper text-sm font-semibold px-5 py-2.5 rounded-btn hover:bg-ink-green/90 transition-colors"
+            >
+              토론 시작하기
+            </Link>
+          </>
+        ) : (
+          <>
+            <p className="text-warmgray text-sm mb-2">방긋이 아직 책을 읽고 있어요</p>
+            <p className="text-xs text-warmgray/70">준비가 끝나면 토론을 시작할 수 있어요</p>
+            <div className="mt-4">
+              <span className="inline-flex items-center gap-2 bg-warmgray/10 text-warmgray text-sm font-semibold px-5 py-2.5 rounded-btn cursor-not-allowed">
+                토론 준비 중...
+              </span>
+            </div>
+          </>
         )}
-        <Link
-          href={`/discuss/${bookId}`}
-          className="inline-flex items-center gap-2 bg-ink-green text-paper text-sm font-semibold px-5 py-2.5 rounded-btn hover:bg-ink-green/90 transition-colors"
-        >
-          토론 시작하기
-        </Link>
       </div>
     );
   }

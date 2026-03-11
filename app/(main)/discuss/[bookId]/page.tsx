@@ -189,24 +189,11 @@ export default function DiscussPage() {
           const ulTexts = uls.map((u) => ({ text: u.text }));
           const needsGreeting = msgs.length === 0 || isResume;
 
-          if (needsGreeting) {
-            // 책 정보를 백그라운드로 가져와서 인사에 활용
-            let ctxData = b.context_data || null;
-            if (!ctxData) {
-              try {
-                const ctxRes = await fetchWithAuth("/api/book-context", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ title: b.title, author: b.author, bookId: b.id }),
-                });
-                const ctxJson = await ctxRes.json();
-                ctxData = ctxJson.context;
-              } catch {
-                // context 없어도 인사는 가능
-              }
-            }
-            setBookContextData(ctxData);
+          // 사전 수집된 컨텍스트 사용 (book detail 페이지에서 이미 준비됨)
+          const ctxData = b.context_data || null;
+          setBookContextData(ctxData);
 
+          if (needsGreeting) {
             if (msgs.length === 0) {
               sendAIGreeting(b, [], ulTexts, "start", ctxData);
             } else {
@@ -217,20 +204,6 @@ export default function DiscussPage() {
                 "resume",
                 ctxData,
               );
-            }
-          } else {
-            // 기존 대화 보기만 — 캐시 있으면 사용, 없으면 백그라운드로 가져옴
-            if (b.context_data) {
-              setBookContextData(b.context_data);
-            } else {
-              fetchWithAuth("/api/book-context", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ title: b.title, author: b.author, bookId: b.id }),
-              })
-                .then((r) => r.json())
-                .then((d) => setBookContextData(d.context))
-                .catch(() => {});
             }
           }
         }

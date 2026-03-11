@@ -31,6 +31,7 @@ export interface Book {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   context_data: any | null;
   context_fetched_at: string | null;
+  context_status: "fetching" | "done" | "failed" | null;
   created_at: string;
   updated_at: string;
   // joined fields
