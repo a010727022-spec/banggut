@@ -112,7 +112,8 @@ confidence 기준:
 
 // --- Step 2a: Gemini 웹 검색 (줄거리 + 등장인물 심층) ---
 
-async function fetchGeminiDeepSearch(bookLabel: string, title: string, author: string | undefined) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function fetchGeminiDeepSearch(bookLabel: string, title: string, _author: string | undefined) {
   try {
     const genAI = getGenAI();
     const model = genAI.getGenerativeModel({
@@ -260,7 +261,7 @@ async function verifyAndMerge(
   claudeKnowledge: Record<string, unknown> | null,
   geminiData: Record<string, unknown> | null,
   grokData: Record<string, unknown> | null,
-  isDeepSearch: boolean,
+  _isDeepSearch: boolean,
 ) {
   try {
     const claude = getClaude();
