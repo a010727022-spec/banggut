@@ -112,8 +112,8 @@ confidence 기준:
 
 // --- Step 2a: Gemini 웹 검색 (줄거리 + 등장인물 심층) ---
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function fetchGeminiDeepSearch(bookLabel: string, title: string, _author: string | undefined) {
+async function fetchGeminiDeepSearch(bookLabel: string, title: string, author: string | undefined) {
+  void author; // used in bookLabel
   try {
     const genAI = getGenAI();
     const model = genAI.getGenerativeModel({
@@ -261,7 +261,6 @@ async function verifyAndMerge(
   claudeKnowledge: Record<string, unknown> | null,
   geminiData: Record<string, unknown> | null,
   grokData: Record<string, unknown> | null,
-  _isDeepSearch: boolean,
 ) {
   try {
     const claude = getClaude();
@@ -393,7 +392,6 @@ export async function POST(req: Request) {
 
     let geminiResult = null;
     let grokResult = null;
-    let isDeepSearch = false;
 
     if (claudeKnown && claudeConfidence === "high") {
       // --- Step 2b: 자체 지식 충분 → 서평 + X 반응만 ---
@@ -403,7 +401,6 @@ export async function POST(req: Request) {
       ]);
     } else {
       // --- Step 2a: 자체 지식 부족 → 풀 서치 ---
-      isDeepSearch = true;
       [geminiResult, grokResult] = await Promise.all([
         fetchGeminiDeepSearch(bookLabel, title, author),
         fetchGrokXReactions(title, author),
@@ -424,7 +421,6 @@ export async function POST(req: Request) {
       claudeKnown ? claudeResult : null,
       geminiFound ? geminiResult : null,
       grokFound ? grokResult : null,
-      isDeepSearch,
     );
 
     const finalContext = merged || { known: false };
