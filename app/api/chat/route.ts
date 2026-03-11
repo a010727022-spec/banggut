@@ -578,87 +578,116 @@ ${lastTopic}
     ? detectInfoRequest(lastUserMessage)
     : { isInfoRequest: false, keywords: [] as string[] };
 
-  // 정보 요청 감지 시: 기존 컨텍스트에 검색 정보가 부족하면 실시간 검색
-  const needsLiveSearch = isInfoRequest && !bookContextData?.known;
-
   // bookInfo에서 title/author 추출
   const titleMatch = (bookInfo || "").match(/제목:\s*(.+?)(?:,|$)/);
   const authorMatch = (bookInfo || "").match(/저자:\s*(.+?)(?:,|$)/);
   const bookTitle = titleMatch?.[1]?.trim() || "";
   const bookAuthor = authorMatch?.[1]?.trim();
 
-  if (needsLiveSearch && bookTitle) {
-    // 실시간 검색 수행 → 시스템 프롬프트에 추가 주입
-    const liveResult = await liveSearchGemini(bookTitle, bookAuthor, keywords);
-    if (liveResult) {
-      systemPrompt += `\n\n[실시간 검색 결과 — 방금 검색한 정보, 자신있게 활용하세요]
-유저가 "${keywords.join(", ")}"에 대해 물어봤습니다. 아래 정보를 활용해 답변하세요.
-절대 "모른다"고 하지 마세요. 아래 정보를 자연스럽게 정리해서 알려주세요.
+  // 실시간 검색이 필요한 3가지 경우:
+  // 1. 유저가 정보를 명시적으로 요청 (줄거리, 등장인물 등)
+  // 2. 컨텍스트가 아예 없는 상태에서 토론 진행
+  // 3. 컨텍스트는 있지만 유저 질문에 관련된 세부 정보가 부족할 수 있을 때
+  const hasContext = !!bookContextData?.known;
+  const contextIsThin = hasContext && !(bookContextData.medium?.characters?.length > 0);
+  const needsLiveSearch = bookTitle && (
+    (isInfoRequest) ||                     // 정보 명시 요청 → 항상 검색
+    (!hasContext && !greeting) ||           // 컨텍스트 없이 토론 진행
+    (contextIsThin && !greeting)            // 컨텍스트 얕으면 보강 검색
+  );
 
-${liveResult}`;
-    }
-  } else if (isInfoRequest && bookContextData?.known) {
-    // 컨텍스트는 있지만 정보 요청 → 확실하게 답변하라는 강조
-    systemPrompt += `\n\n[정보 요청 감지]
-유저가 "${keywords.join(", ")}"에 대해 물어보고 있습니다.
-위 [이 책에 대한 내 지식] 섹션의 정보를 총동원해서 자신있게 답변하세요.
-절대 "모른다", "확인이 어렵다"라고 하지 마세요.
-부족하면 기억이 가물가물한 척은 OK: "제가 기억하기론..." 식으로 부드럽게 시작.`;
-  }
-
-  // 단계별 최적 프로바이더 선택 + 실패 시 폴백
+  // 단계별 최적 프로바이더 선택
   const provider = pickProvider(phase);
-
-  // 정보 요청 시에는 Claude 고정 (가장 정확)
-  const effectiveProvider = isInfoRequest ? "claude" as Provider : provider;
-
-  const streamFns: Record<Provider, () => Promise<ReadableStream>> = {
-    claude: () => streamClaude(systemPrompt, chatMessages),
-    openai: () => streamOpenAI(systemPrompt, chatMessages),
-    gemini: () => streamGemini(systemPrompt, chatMessages),
-  };
+  // 정보 요청 or 컨텍스트 부족 시 Claude 고정
+  const effectiveProvider = (isInfoRequest || !hasContext) ? "claude" as Provider : provider;
 
   const encoder = new TextEncoder();
 
-  // 선택된 프로바이더 시도 → 실패 시 나머지 순서대로 폴백
-  const order = [effectiveProvider, ...PROVIDERS.filter((p) => p !== effectiveProvider)];
-  let aiStream: ReadableStream | null = null;
+  // SSE 연결을 즉시 열고, 스트림 안에서 검색 → AI 응답 순서로 처리
+  const readable = new ReadableStream({
+    async start(controller) {
+      try {
+        let finalSystemPrompt = systemPrompt;
 
-  for (const p of order) {
-    try {
-      aiStream = await streamFns[p]();
-      break;
-    } catch (err) {
-      console.error(`[chat] ${p} failed:`, err);
-    }
-  }
+        // --- 실시간 검색 (SSE 안에서 실행) ---
+        if (needsLiveSearch) {
+          // 1. 즉시 "검색 중" 알림 → 유저가 바로 "잠깐, 정리해볼게요..." 볼 수 있음
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ searching: true })}\n\n`));
 
-  if (!aiStream) {
-    return new Response(JSON.stringify({ error: "모든 AI 서비스에 연결할 수 없습니다" }), { status: 502 });
-  }
+          // 2. Gemini 검색 (2-3초)
+          const searchKeywords = isInfoRequest ? keywords : ["줄거리", "등장인물", "주제"];
+          const liveResult = await liveSearchGemini(bookTitle, bookAuthor, searchKeywords);
 
-  // 실시간 검색했으면 "searching" → "searching_done" SSE 이벤트를 앞에 붙여서 전송
-  let readable: ReadableStream;
-  if (needsLiveSearch) {
-    readable = new ReadableStream({
-      async start(controller) {
-        // 검색 중 알림 (이미 검색 완료 후이므로 바로 done도 보냄)
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ searching: true })}\n\n`));
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ searching: false })}\n\n`));
+          // 3. 검색 완료 알림
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ searching: false })}\n\n`));
 
-        // AI 스트림 전달
-        const reader = aiStream!.getReader();
+          // 4. 검색 결과를 시스템 프롬프트에 주입
+          if (liveResult) {
+            if (isInfoRequest) {
+              finalSystemPrompt += `\n\n[실시간 검색 결과 — 방금 검색한 정보]
+유저가 "${searchKeywords.join(", ")}"에 대해 물어봤습니다.
+아래 정보를 활용해 자신있게 답변하세요. 절대 "모른다"고 하지 마세요.
+자연스러운 독서토론 파트너답게 정리해서 알려주세요.
+
+${liveResult}`;
+            } else {
+              finalSystemPrompt += `\n\n[보충 검색 결과 — 배경 지식으로 활용]
+아래 정보가 이 책에 대해 검색된 내용입니다. 유저가 물어보면 활용하되, 먼저 꺼내지는 마세요.
+
+${liveResult}`;
+            }
+          }
+        } else if (isInfoRequest) {
+          // 검색 불필요하지만 정보 요청 → 컨텍스트 총동원 강조
+          finalSystemPrompt += `\n\n[정보 요청 감지]
+유저가 "${keywords.join(", ")}"에 대해 물어보고 있습니다.
+위 [이 책에 대한 내 지식]의 정보를 총동원해서 자신있게 답변하세요.
+절대 "모른다", "확인이 어렵다"라고 하지 마세요.
+자연스럽게: "제가 기억하기론..." 식으로 시작해도 OK.`;
+        }
+
+        // --- AI 스트리밍 (프로바이더 폴백) ---
+        const streamFns: Record<Provider, () => Promise<ReadableStream>> = {
+          claude: () => streamClaude(finalSystemPrompt, chatMessages),
+          openai: () => streamOpenAI(finalSystemPrompt, chatMessages),
+          gemini: () => streamGemini(finalSystemPrompt, chatMessages),
+        };
+
+        const order = [effectiveProvider, ...PROVIDERS.filter((p) => p !== effectiveProvider)];
+        let aiStream: ReadableStream | null = null;
+
+        for (const p of order) {
+          try {
+            aiStream = await streamFns[p]();
+            break;
+          } catch (err) {
+            console.error(`[chat] ${p} failed:`, err);
+          }
+        }
+
+        if (!aiStream) {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: "모든 AI 서비스에 연결할 수 없습니다" })}\n\n`));
+          controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+          controller.close();
+          return;
+        }
+
+        // AI 스트림을 SSE로 전달
+        const reader = aiStream.getReader();
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
           controller.enqueue(value);
         }
         controller.close();
-      },
-    });
-  } else {
-    readable = aiStream;
-  }
+      } catch (err) {
+        console.error("[chat] Stream error:", err);
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: "스트림 오류" })}\n\n`));
+        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+        controller.close();
+      }
+    },
+  });
 
   return new Response(readable, {
     headers: {
