@@ -125,9 +125,9 @@ export default function SetupPage() {
         })
         .catch(() => {});
 
-      // 🔥 책 등록 즉시 book-context 파이프라인 시작 (SSE fire-and-forget)
-      // book detail 페이지에서 context_status를 체크하여 완료될 때까지 토론 버튼 비활성화
-      fetchWithAuth("/api/book-context/stream", {
+      // 🔥 책 등록 즉시 book-context fetch 시작 (fire-and-forget)
+      // book detail 페이지에서 context_status를 폴링하여 완료될 때까지 토론 버튼 비활성화
+      fetchWithAuth("/api/book-context", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -135,18 +135,7 @@ export default function SetupPage() {
           author: selected.author,
           bookId: book.id,
         }),
-      })
-        .then(async (res) => {
-          // SSE 스트림을 끝까지 소비해야 서버 파이프라인이 완료됨
-          const reader = res.body?.getReader();
-          if (reader) {
-            while (true) {
-              const { done } = await reader.read();
-              if (done) break;
-            }
-          }
-        })
-        .catch(() => {});
+      }).catch(() => {});
 
       router.push(`/book/${book.id}`);
     } catch (err) {

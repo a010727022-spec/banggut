@@ -455,10 +455,8 @@ export default function BookDetailPage() {
 
   // Context preparation state
   const [contextStatus, setContextStatus] = useState<"idle" | "fetching" | "done" | "failed">("idle");
-  const [contextLabel, setContextLabel] = useState("");
-  const [contextProgress, setContextProgress] = useState(0);
-  const [contextTotal, setContextTotal] = useState(6);
   const contextStartedRef = useRef(false);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Editable fields (local state for controlled inputs)
   const [currentPage, setCurrentPage] = useState("");
@@ -488,71 +486,52 @@ export default function BookDetailPage() {
         setRating(bookData.rating ?? 0);
         setOneLiner(bookData.one_liner ?? "");
 
-        // 컨텍스트 상태 확인 + 필요 시 SSE 파이프라인 시작
-        // setup에서 이미 시작했을 수 있음 → "fetching"이면 폴링 모드로 대기
+        // 컨텍스트 상태 확인
         if (bookData.context_status === "done" && bookData.context_data) {
           setContextStatus("done");
+        } else if (bookData.context_status === "failed") {
+          setContextStatus("failed");
         } else if (!contextStartedRef.current) {
           contextStartedRef.current = true;
-          setContextStatus("fetching");
-          setContextLabel("방긋이 책을 읽고 있어요...");
 
-          fetchWithAuth("/api/book-context/stream", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              title: bookData.title,
-              author: bookData.author,
-              bookId,
-            }),
-          })
-            .then(async (res) => {
-              const reader = res.body?.getReader();
-              const decoder = new TextDecoder();
-              let buffer = "";
+          if (bookData.context_status === "fetching") {
+            // setup에서 이미 시작됨 → 폴링으로 대기
+            setContextStatus("fetching");
+          } else {
+            // 아직 시작 안 됨 → API 호출 + 폴링
+            setContextStatus("fetching");
+            fetchWithAuth("/api/book-context", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                title: bookData.title,
+                author: bookData.author,
+                bookId,
+              }),
+            }).catch(() => {});
+          }
 
-              if (reader) {
-                while (true) {
-                  const { done, value } = await reader.read();
-                  if (done) break;
-                  buffer += decoder.decode(value, { stream: true });
-                  const lines = buffer.split("\n");
-                  buffer = lines.pop() || "";
-                  for (const line of lines) {
-                    const trimmed = line.trim();
-                    if (trimmed.startsWith("data: ")) {
-                      try {
-                        const data = JSON.parse(trimmed.slice(6));
-                        if (data.step === "done") {
-                          setContextStatus("done");
-                          setContextLabel("");
-                          if (data.context) {
-                            setBook((prev) =>
-                              prev
-                                ? { ...prev, context_data: data.context, context_status: "done" }
-                                : prev,
-                            );
-                          }
-                        } else if (data.step === "failed") {
-                          setContextStatus("failed");
-                          setContextLabel("준비에 실패했어요");
-                        } else {
-                          setContextLabel(data.label || "");
-                          setContextProgress(data.progress || 0);
-                          setContextTotal(data.total || 6);
-                        }
-                      } catch {
-                        // incomplete JSON
-                      }
-                    }
-                  }
-                }
-              }
-            })
-            .catch(() => {
+          // 2초 간격 폴링: context_status가 done/failed 될 때까지
+          pollRef.current = setInterval(async () => {
+            const { data: check } = await supabase
+              .from("books")
+              .select("context_data, context_status")
+              .eq("id", bookId)
+              .single();
+
+            if (check?.context_status === "done" && check.context_data) {
+              setContextStatus("done");
+              setBook((prev) =>
+                prev
+                  ? { ...prev, context_data: check.context_data, context_status: "done" }
+                  : prev,
+              );
+              if (pollRef.current) clearInterval(pollRef.current);
+            } else if (check?.context_status === "failed") {
               setContextStatus("failed");
-              setContextLabel("준비에 실패했어요");
-            });
+              if (pollRef.current) clearInterval(pollRef.current);
+            }
+          }, 2000);
         }
       }
 
@@ -560,6 +539,10 @@ export default function BookDetailPage() {
     }
 
     load();
+
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
   }, [bookId]);
 
   const saveField = useCallback(
@@ -783,22 +766,18 @@ export default function BookDetailPage() {
       {contextStatus === "fetching" && (
         <div className="px-4 mt-3">
           <div className="bg-warm rounded-card border border-ink-green/20 shadow-card p-4">
-            <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center gap-3">
               <span className="text-2xl animate-bounce">😊</span>
               <div className="flex-1">
                 <p className="text-sm font-semibold text-ink-green">방긋이 책을 읽고 있어요...</p>
-                <p className="text-xs text-warmgray mt-0.5">{contextLabel}</p>
+                <p className="text-xs text-warmgray mt-0.5">토론 준비가 끝나면 알려드릴게요</p>
+              </div>
+              <div className="flex gap-1">
+                <span className="w-1.5 h-1.5 bg-ink-green/50 rounded-full animate-bounce" />
+                <span className="w-1.5 h-1.5 bg-ink-green/50 rounded-full animate-bounce [animation-delay:0.15s]" />
+                <span className="w-1.5 h-1.5 bg-ink-green/50 rounded-full animate-bounce [animation-delay:0.3s]" />
               </div>
             </div>
-            <div className="w-full h-2 bg-ink-green/10 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-ink-green rounded-full transition-all duration-500 ease-out"
-                style={{ width: `${Math.round((contextProgress / contextTotal) * 100)}%` }}
-              />
-            </div>
-            <p className="text-[10px] text-warmgray mt-1.5 text-right">
-              {contextProgress}/{contextTotal}
-            </p>
           </div>
         </div>
       )}
@@ -812,57 +791,32 @@ export default function BookDetailPage() {
               </div>
               <button
                 onClick={() => {
-                  contextStartedRef.current = false;
-                  setContextStatus("idle");
-                  // re-trigger by simulating reload
-                  if (book) {
-                    contextStartedRef.current = true;
-                    setContextStatus("fetching");
-                    setContextLabel("방긋이 책을 읽고 있어요...");
-                    setContextProgress(0);
-                    fetchWithAuth("/api/book-context/stream", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ title: book.title, author: book.author, bookId }),
-                    })
-                      .then(async (res) => {
-                        const reader = res.body?.getReader();
-                        const decoder = new TextDecoder();
-                        let buffer = "";
-                        if (reader) {
-                          while (true) {
-                            const { done, value } = await reader.read();
-                            if (done) break;
-                            buffer += decoder.decode(value, { stream: true });
-                            const lines = buffer.split("\n");
-                            buffer = lines.pop() || "";
-                            for (const line of lines) {
-                              const trimmed = line.trim();
-                              if (trimmed.startsWith("data: ")) {
-                                try {
-                                  const data = JSON.parse(trimmed.slice(6));
-                                  if (data.step === "done") {
-                                    setContextStatus("done");
-                                    if (data.context) {
-                                      setBook((prev) =>
-                                        prev ? { ...prev, context_data: data.context, context_status: "done" } : prev,
-                                      );
-                                    }
-                                  } else if (data.step === "failed") {
-                                    setContextStatus("failed");
-                                  } else {
-                                    setContextLabel(data.label || "");
-                                    setContextProgress(data.progress || 0);
-                                    setContextTotal(data.total || 6);
-                                  }
-                                } catch { /* skip */ }
-                              }
-                            }
-                          }
-                        }
-                      })
-                      .catch(() => setContextStatus("failed"));
-                  }
+                  if (!book) return;
+                  setContextStatus("fetching");
+                  fetchWithAuth("/api/book-context", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ title: book.title, author: book.author, bookId }),
+                  }).catch(() => {});
+                  // 폴링 재시작
+                  if (pollRef.current) clearInterval(pollRef.current);
+                  pollRef.current = setInterval(async () => {
+                    const { data: check } = await supabaseRef.current
+                      .from("books")
+                      .select("context_data, context_status")
+                      .eq("id", bookId)
+                      .single();
+                    if (check?.context_status === "done" && check.context_data) {
+                      setContextStatus("done");
+                      setBook((prev) =>
+                        prev ? { ...prev, context_data: check.context_data, context_status: "done" } : prev,
+                      );
+                      if (pollRef.current) clearInterval(pollRef.current);
+                    } else if (check?.context_status === "failed") {
+                      setContextStatus("failed");
+                      if (pollRef.current) clearInterval(pollRef.current);
+                    }
+                  }, 2000);
                 }}
                 className="text-xs text-terra font-semibold bg-terra/10 px-3 py-1.5 rounded-btn hover:bg-terra/20"
               >
