@@ -489,6 +489,7 @@ export default function BookDetailPage() {
         setOneLiner(bookData.one_liner ?? "");
 
         // 컨텍스트 상태 확인 + 필요 시 SSE 파이프라인 시작
+        // setup에서 이미 시작했을 수 있음 → "fetching"이면 폴링 모드로 대기
         if (bookData.context_status === "done" && bookData.context_data) {
           setContextStatus("done");
         } else if (!contextStartedRef.current) {

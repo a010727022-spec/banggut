@@ -99,7 +99,7 @@ export default function SetupPage() {
         }
       }
 
-      // 백그라운드: 주제 지도 + 커버 이미지 가져오기 (실패해도 OK)
+      // 백그라운드 병렬: 주제 지도 + 커버 이미지 + book context 파이프라인 (실패해도 OK)
       fetchWithAuth("/api/topic-map", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -121,6 +121,29 @@ export default function SetupPage() {
           if (data.page_count) updates.total_pages = data.page_count;
           if (Object.keys(updates).length > 0) {
             updateBook(supabase, book.id, updates);
+          }
+        })
+        .catch(() => {});
+
+      // 🔥 책 등록 즉시 book-context 파이프라인 시작 (SSE fire-and-forget)
+      // book detail 페이지에서 context_status를 체크하여 완료될 때까지 토론 버튼 비활성화
+      fetchWithAuth("/api/book-context/stream", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: selected.title,
+          author: selected.author,
+          bookId: book.id,
+        }),
+      })
+        .then(async (res) => {
+          // SSE 스트림을 끝까지 소비해야 서버 파이프라인이 완료됨
+          const reader = res.body?.getReader();
+          if (reader) {
+            while (true) {
+              const { done } = await reader.read();
+              if (done) break;
+            }
           }
         })
         .catch(() => {});

@@ -113,8 +113,8 @@ confidence 기준:
 // --- Step 2a: Gemini 웹 검색 (줄거리 + 등장인물 심층) ---
 
 async function fetchGeminiDeepSearch(bookLabel: string, title: string, author: string | undefined) {
-  void author; // used in bookLabel
   try {
+    const searchQuery = `${title} ${author || ""} 나무위키`;
     const genAI = getGenAI();
     const model = genAI.getGenerativeModel({
       model: "gemini-2.0-flash",
@@ -122,10 +122,9 @@ async function fetchGeminiDeepSearch(bookLabel: string, title: string, author: s
     });
 
     const result = await model.generateContent(
-      `당신은 독서토론 앱의 웹 검색 엔진입니다.
-아래 책에 대한 상세 정보를 웹에서 검색해 정리해주세요.
+      `다음 검색어로 웹을 검색하여 책 정보를 정리해주세요: "${searchQuery}"
 
-검색 대상: ${bookLabel}
+대상 책: ${bookLabel}
 
 ⚠️ 오직 "${title}" 한 권에 대한 정보만. 다른 책 혼동 금지.
 확실하지 않으면 해당 필드를 null로.
@@ -170,8 +169,9 @@ JSON 응답:
 
 // --- Step 2b: Gemini 서평만 검색 (Claude 지식이 충분할 때) ---
 
-async function fetchGeminiReviewsOnly(bookLabel: string, title: string) {
+async function fetchGeminiReviewsOnly(bookLabel: string, title: string, author: string | undefined) {
   try {
+    const searchQuery = `${title} ${author || ""} 서평`;
     const genAI = getGenAI();
     const model = genAI.getGenerativeModel({
       model: "gemini-2.0-flash",
@@ -179,8 +179,11 @@ async function fetchGeminiReviewsOnly(bookLabel: string, title: string) {
     });
 
     const result = await model.generateContent(
-      `"${title}" 이 책에 대한 웹상의 서평/리뷰 정보를 정리해주세요.
+      `다음 검색어로 웹을 검색하여 서평/리뷰 정보를 정리해주세요: "${searchQuery}"
+
 대상 책: ${bookLabel}
+
+⚠️ 오직 "${title}" 한 권에 대한 서평만.
 
 JSON 응답:
 {
@@ -396,7 +399,7 @@ export async function POST(req: Request) {
     if (claudeKnown && claudeConfidence === "high") {
       // --- Step 2b: 자체 지식 충분 → 서평 + X 반응만 ---
       [geminiResult, grokResult] = await Promise.all([
-        fetchGeminiReviewsOnly(bookLabel, title),
+        fetchGeminiReviewsOnly(bookLabel, title, author),
         fetchGrokXReactions(title, author),
       ]);
     } else {

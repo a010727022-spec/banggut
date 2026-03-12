@@ -120,8 +120,9 @@ confidence 기준:
 
 // --- Step 2a: Gemini 나무위키/줄거리/등장인물 ---
 
-async function fetchGeminiNamuwiki(bookLabel: string, title: string) {
+async function fetchGeminiNamuwiki(bookLabel: string, title: string, author: string | undefined) {
   try {
+    const searchQuery = `${title} ${author || ""} 나무위키`;
     const genAI = getGenAI();
     const model = genAI.getGenerativeModel({
       model: "gemini-2.0-flash",
@@ -129,12 +130,14 @@ async function fetchGeminiNamuwiki(bookLabel: string, title: string) {
     });
 
     const result = await model.generateContent(
-      `"${title}" 책의 상세 줄거리, 등장인물, 인물 관계도를 정리해주세요.
-검색 대상: ${bookLabel}
+      `다음 검색어로 웹을 검색하여 책 정보를 정리해주세요: "${searchQuery}"
 
-나무위키, 위키백과 등 상세 정보를 참고하세요.
+대상 책: ${bookLabel}
+
+나무위키, 위키백과, 리브로피아 등 상세 정보 페이지를 참고하세요.
 
 ⚠️ 오직 "${title}" 한 권에 대한 정보만. 다른 책 혼동 금지.
+⚠️ 확실하지 않은 정보는 절대 포함하지 마세요.
 
 JSON 응답:
 {
@@ -163,8 +166,9 @@ JSON 응답:
 
 // --- Step 2b: Gemini 서평/독자 해석 ---
 
-async function fetchGeminiReviews(bookLabel: string, title: string) {
+async function fetchGeminiReviews(bookLabel: string, title: string, author: string | undefined) {
   try {
+    const searchQuery = `${title} ${author || ""} 서평`;
     const genAI = getGenAI();
     const model = genAI.getGenerativeModel({
       model: "gemini-2.0-flash",
@@ -172,10 +176,13 @@ async function fetchGeminiReviews(bookLabel: string, title: string) {
     });
 
     const result = await model.generateContent(
-      `"${title}" 책에 대한 서평, 독자 반응, 비평을 정리해주세요.
+      `다음 검색어로 웹을 검색하여 서평/독자 반응을 정리해주세요: "${searchQuery}"
+
 대상 책: ${bookLabel}
 
-블로그, 서평 사이트, 독서 커뮤니티 등의 다양한 독자 의견을 참고하세요.
+블로그, 서평 사이트, 독서 커뮤니티, YES24/교보문고 리뷰 등을 참고하세요.
+
+⚠️ 오직 "${title}" 한 권에 대한 서평만. 다른 책 혼동 금지.
 
 JSON 응답:
 {
@@ -206,19 +213,24 @@ async function fetchGeminiAuthorInterview(
   author: string | undefined,
 ) {
   try {
+    const searchQuery = author
+      ? `${author} 인터뷰 ${title}`
+      : `작가 인터뷰 ${title}`;
     const genAI = getGenAI();
     const model = genAI.getGenerativeModel({
       model: "gemini-2.0-flash",
       generationConfig: { responseMimeType: "application/json" },
     });
 
-    const authorQuery = author ? `${author} 작가` : "작가";
-
     const result = await model.generateContent(
-      `"${title}" 책에 대한 ${authorQuery} 인터뷰, 집필 배경, 창작 의도를 찾아주세요.
+      `다음 검색어로 웹을 검색하여 작가 인터뷰/집필 배경을 정리해주세요: "${searchQuery}"
+
 대상 책: ${bookLabel}
 
-작가 인터뷰, 강연, 에세이, 출판사 서문 등을 참고하세요.
+작가 인터뷰, 강연, 에세이, 출판사 서문, 북토크 영상 등을 참고하세요.
+
+⚠️ 오직 "${title}" 한 권에 대한 작가 발언만. 다른 책 혼동 금지.
+⚠️ 확실하지 않은 인용은 절대 포함하지 마세요.
 
 JSON 응답:
 {
@@ -551,7 +563,7 @@ export async function POST(req: Request) {
 
         // 4개 병렬 실행, 각각 완료 시 progress 전송
         const promises = [
-          fetchGeminiNamuwiki(bookLabel, title).then((r) => {
+          fetchGeminiNamuwiki(bookLabel, title, author).then((r) => {
             controller.enqueue(
               sseEvent(encoder, {
                 step: "gemini_reviews",
@@ -562,7 +574,7 @@ export async function POST(req: Request) {
             );
             return r;
           }),
-          fetchGeminiReviews(bookLabel, title),
+          fetchGeminiReviews(bookLabel, title, author),
           fetchGeminiAuthorInterview(bookLabel, title, author).then((r) => {
             controller.enqueue(
               sseEvent(encoder, {
