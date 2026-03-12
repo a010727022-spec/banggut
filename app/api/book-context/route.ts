@@ -74,6 +74,9 @@ export async function POST(req: Request) {
     });
 
     const searchQuery = `${title} ${author || ""} 줄거리 등장인물`;
+    console.log("[book-context] ═══ STEP 1: Gemini 검색 시작 ═══");
+    console.log("[book-context] 검색어:", searchQuery);
+    console.log("[book-context] bookId:", bookId);
 
     const result = await model.generateContent(
       `다음 검색어로 웹을 검색하여 이 책의 정보를 정리해주세요: "${searchQuery}"
@@ -113,10 +116,19 @@ JSON 응답:
     );
 
     const text = result.response.text();
+    console.log("[book-context] ═══ STEP 2: Gemini 응답 원본 ═══");
+    console.log("[book-context] raw text:", text);
+
     const contextData = JSON.parse(text);
+    console.log("[book-context] ═══ STEP 3: 파싱된 데이터 ═══");
+    console.log("[book-context] known:", contextData.known);
+    console.log("[book-context] characters:", JSON.stringify(contextData.medium?.characters, null, 2));
+    console.log("[book-context] plot_summary:", contextData.plot_summary);
+    console.log("[book-context] themes:", contextData.themes);
+    console.log("[book-context] discussion_hooks:", contextData.discussion_hooks);
 
     // DB 저장
-    await supabase
+    const { error: updateError } = await supabase
       .from("books")
       .update({
         context_data: contextData,
@@ -124,6 +136,10 @@ JSON 응답:
         context_fetched_at: new Date().toISOString(),
       })
       .eq("id", bookId);
+
+    console.log("[book-context] ═══ STEP 4: DB 저장 결과 ═══");
+    console.log("[book-context] context_status:", contextData.known ? "done" : "failed");
+    console.log("[book-context] DB update error:", updateError || "없음 (성공)");
 
     return NextResponse.json({ context: contextData });
   } catch (err) {

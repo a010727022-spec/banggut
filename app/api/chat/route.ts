@@ -499,6 +499,12 @@ export async function POST(req: Request) {
     bookContextSection = parts.join("\n\n");
   }
 
+  console.log("[chat] ═══ 시스템 프롬프트 컨텍스트 주입 ═══");
+  console.log("[chat] bookContextData 존재:", !!bookContextData);
+  console.log("[chat] bookContextData.known:", bookContextData?.known);
+  console.log("[chat] bookContextSection 길이:", bookContextSection.length, "자");
+  console.log("[chat] bookContextSection 내용:\n", bookContextSection.slice(0, 500));
+
   const currentPhase = PHASES.find((p) => p.label === phase) || PHASES[0];
   let systemPrompt = SYSTEM_PROMPT_TEMPLATE
     .replace("{bookInfo}", bookInfo || "미입력")
