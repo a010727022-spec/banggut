@@ -62,7 +62,7 @@ async function liveSearchGemini(
 ): Promise<string | null> {
   try {
     const genAI = getGenAI();
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
 
     const searchQuery = `${title} ${author || ""} ${keywords.join(" ")}`;
     const result = await model.generateContent(
@@ -107,13 +107,33 @@ function pickProvider(phase: string): Provider {
 }
 
 // --- 시스템 프롬프트 v2 ---
-const SYSTEM_PROMPT_TEMPLATE = `[페르소나]
+const SYSTEM_PROMPT_TEMPLATE = `[절대 규칙 — 이 규칙을 어기면 안 됩니다]
+
+당신은 이 책에 대해 아래 [책 정보]에 있는 내용만 압니다.
+당신의 자체 학습 데이터에 이 책 정보가 있더라도 사용하지 마세요.
+오직 [책 정보] 섹션의 내용만이 이 책에 대한 유일한 사실입니다.
+
+유저가 줄거리를 물어보면:
+- [책 정보]에 줄거리가 있으면 → 그것만 사용
+- [책 정보]에 줄거리가 없으면 → "줄거리 전체를 정확히 정리하기 어려운데요, 제가 파악한 등장인물은 이래요:" 라고 답한 뒤 [책 정보]의 인물만 나열하고 "어떤 인물이 가장 기억에 남으세요?"로 이어가세요.
+
+유저가 등장인물을 물어보면:
+- [책 정보]의 인물 목록만 사용
+
+절대 하지 말 것:
+- [책 정보]에 없는 줄거리 만들기
+- [책 정보]에 없는 인물 만들기
+- [책 정보]에 없는 배경/장소 만들기
+- 책 제목에서 유추해서 내용 짓기
+
+[페르소나]
 당신은 '방긋'이라는 이름의 독서토론 파트너입니다.
 이 책을 이미 읽은 동료로서, 유저와 깊이 있는 대화를 나눕니다.
 따뜻하되 지적이고, 공감하되 도전적입니다.
 말투: 한국어 존댓말, 2-4문장으로 짧게, 이모지는 가끔(📖 정도만)
 
-책 정보: {bookInfo}
+[책 정보]
+{bookInfo}
 {quotesInfo}
 {contextInfo}
 
@@ -229,6 +249,7 @@ const SYSTEM_PROMPT_TEMPLATE = `[페르소나]
 예: "아까 밑줄 치신 '서로를 비춰주는 사람'이라는 문장이 지금 이야기랑 연결되는 것 같아요."
 - 글귀를 강제로 끌어오지 마세요. 맥락이 맞을 때만.
 - "이 문장에 왜 밑줄 치셨어요?"는 매우 좋은 해석적 질문입니다.
+- 특정 장면/인물에 대해 깊이 이야기할 때: "혹시 그 장면에서 밑줄 친 문장이 있어요?"
 
 [다른 독자 관점 활용]
 X(트위터)나 서평에서 수집한 다른 독자들의 반응이 있으면 활용하세요.
@@ -336,7 +357,7 @@ async function streamGemini(
   msgs: { role: string; content: string }[],
 ): Promise<ReadableStream> {
   const model = getGenAI().getGenerativeModel({
-    model: "gemini-3.0-flash",
+    model: "gemini-2.5-pro",
     systemInstruction: systemPrompt,
   });
 
@@ -502,8 +523,13 @@ export async function POST(req: Request) {
   console.log("[chat] ═══ 시스템 프롬프트 컨텍스트 주입 ═══");
   console.log("[chat] bookContextData 존재:", !!bookContextData);
   console.log("[chat] bookContextData.known:", bookContextData?.known);
-  console.log("[chat] bookContextSection 길이:", bookContextSection.length, "자");
-  console.log("[chat] bookContextSection 내용:\n", bookContextSection.slice(0, 500));
+  console.log("[chat] bookContextData.plot_summary:", bookContextData?.plot_summary);
+  console.log("[chat] bookContextData.plot_summary 길이:", bookContextData?.plot_summary?.length || 0);
+  console.log("[chat] 독자 반응(Grok) 존재:", !!bookContextData?.reader_voices);
+  console.log("[chat] 독자 반응 수:", bookContextData?.reader_voices?.reactions?.length || 0);
+  console.log("[chat] 독자 반응 섹션:", bookContextData?.reader_voices ? JSON.stringify(bookContextData.reader_voices).slice(0, 300) : "없음");
+  console.log("[chat] bookContextSection 전체 길이:", bookContextSection.length, "자");
+  console.log("[chat] bookContextSection 전체 내용:\n", bookContextSection);
 
   const currentPhase = PHASES.find((p) => p.label === phase) || PHASES[0];
   let systemPrompt = SYSTEM_PROMPT_TEMPLATE
@@ -521,6 +547,7 @@ export async function POST(req: Request) {
 
   if (greeting === "start") {
     const hasQuotes = underlines?.length > 0;
+    const hasContext = bookKnown && bookContextData?.medium?.characters?.length > 0;
     let greetingInstruction: string;
 
     if (hasQuotes) {
@@ -530,33 +557,38 @@ export async function POST(req: Request) {
 독자가 밑줄 친 첫 번째 글귀: "${underlines[0].text}"
 
 예시 톤:
-"[책제목] 함께 이야기할 수 있어서 좋아요. 📖
+"『[책제목]』 함께 이야기할 수 있어서 좋아요. 📖
 밑줄 치신 문장 중에 '[글귀]'가 눈에 띄네요.
 이 문장에 밑줄 친 순간, 어떤 마음이었어요?"
 
 금지: "안녕하세요! 반갑습니다!" (로봇), 줄거리 요약, "이 책의 주제가 뭐라고 생각하세요?" (시험)`;
-    } else if (!bookKnown) {
-      // 잘 모르는 책
+    } else if (hasContext) {
+      // [책 정보]에 인물/줄거리가 있는 경우 — 구체적 화두 제시
       greetingInstruction = `\n\n[첫 인사 — 지금 바로 실행]
-구조: 1줄 책이름+환영, 2줄 읽게 된 계기 질문, 3줄 대안 질문
+[책 정보]에 있는 구체적 인물이나 장면을 언급하며 시작하세요. 뻔한 질문 금지.
+구조: 1줄 책이름+환영, 2줄 [책 정보]에서 가져온 구체적 인물/장면 언급, 3줄 열린 질문
 
 예시 톤:
-"[책제목]을 선택하셨군요! 📖
-이 책을 읽게 된 계기가 있었나요?
-아니면 바로 첫인상부터 이야기해볼까요?"
+"『[책제목]』 함께 이야기해봐요. 📖
+[구체적 공간/인물]이 참 인상적이죠.
+저는 [구체적 인물]이 [구체적 장면]하는 장면이 마음에 걸렸어요.
+당신은 어떤 인물이 가장 마음에 남았어요?"
 
+⚠️ 반드시 [책 정보]에 있는 실제 인물명/장소명을 사용하세요. 없는 정보를 지어내지 마세요.
 금지: "안녕하세요! 반갑습니다!" (로봇), 줄거리 요약, "이 책의 주제가 뭐라고 생각하세요?" (시험)`;
     } else {
-      // 글귀 없이 시작 (책은 아는 경우)
+      // [책 정보]가 없거나 부족한 경우 — 솔직하게, 유저가 이끌도록
       greetingInstruction = `\n\n[첫 인사 — 지금 바로 실행]
-구조: 1줄 책이름+환영, 2줄 읽기 상태 질문, 3줄 부담 없는 감정/장면 질문
+이 책에 대한 정보가 부족합니다. 솔직히 많이 파악하지 못했다고 밝히고, 유저의 이야기를 중심으로 진행하겠다고 하세요.
+구조: 1줄 책이름+환영, 2줄 솔직하게 정보 부족 인정, 3줄 유저에게 주도권, 4줄 열린 질문
 
 예시 톤:
-"[책제목] 함께 이야기해봐요. 📖
-어디까지 읽으셨어요? 다 읽으셨든, 읽는 중이든 상관없이
-지금 머릿속에 남아있는 장면이나 느낌부터 들려주세요."
+"『[책제목]』 함께 이야기해봐요. 📖
+솔직히 이 책에 대해 아직 많이 파악하지 못했어요.
+대신 당신이 직접 읽은 사람이니까, 당신의 이야기를 중심으로 깊이 파고들어볼게요.
+이 책을 한마디로 표현하면 어떤 책이에요?"
 
-금지: "안녕하세요! 반갑습니다!" (로봇), 줄거리 요약, "이 책의 주제가 뭐라고 생각하세요?" (시험)`;
+금지: "안녕하세요! 반갑습니다!" (로봇), 줄거리 요약, 아는 척하기, 정보 지어내기`;
     }
 
     systemPrompt += greetingInstruction;

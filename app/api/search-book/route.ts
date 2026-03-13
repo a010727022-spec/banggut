@@ -1,10 +1,8 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 import { getApiUser, unauthorized, tooManyRequests } from "@/lib/supabase/api-auth";
 import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
   const user = await getApiUser(req);
   if (!user) return unauthorized();
 
@@ -18,18 +16,56 @@ export async function POST(req: Request) {
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-    const result = await model.generateContent(
-      `도서 검색 요청: '${query}'. 제목과 저자가 포함되어 있습니다. 이 검색어와 가장 일치하는 실제 도서 1-5권을 찾아주세요. JSON 배열로만 응답하세요. 다른 텍스트 없이 JSON만: [{"title":"...","author":"...","publisher":"...","year":2024}]`
-    );
+    const ttbKey = process.env.ALADIN_TTB_KEY;
+    if (!ttbKey) {
+      console.error("[search-book] ALADIN_TTB_KEY not set");
+      return NextResponse.json({ books: [] }, { status: 500 });
+    }
 
-    const text = result.response.text();
-    const jsonMatch = text.match(/\[[\s\S]*\]/);
-    const books = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
+    const url =
+      `http://www.aladin.co.kr/ttb/api/ItemSearch.aspx?` +
+      `ttbkey=${ttbKey}` +
+      `&Query=${encodeURIComponent(query)}` +
+      `&QueryType=Keyword` +
+      `&MaxResults=5` +
+      `&output=js` +
+      `&Version=20131101`;
+
+    const res = await fetch(url);
+    if (!res.ok) {
+      console.error("[search-book] Aladin API error:", res.status);
+      return NextResponse.json({ books: [] }, { status: 500 });
+    }
+
+    const data = await res.json();
+    const items = data.item || [];
+
+    const books = items.map(
+      (book: {
+        title: string;
+        author: string;
+        publisher: string;
+        pubDate: string;
+        cover: string;
+        description: string;
+        isbn13: string;
+        isbn: string;
+        categoryName: string;
+      }) => ({
+        title: book.title,
+        author: book.author,
+        publisher: book.publisher,
+        pubDate: book.pubDate,
+        cover: book.cover,
+        description: book.description,
+        isbn: book.isbn13 || book.isbn,
+        category: book.categoryName,
+      }),
+    );
 
     return NextResponse.json({ books });
   } catch (error) {
-    console.error("Book search error:", error);
+    console.error("[search-book] error:", error);
     return NextResponse.json({ books: [] }, { status: 500 });
   }
 }

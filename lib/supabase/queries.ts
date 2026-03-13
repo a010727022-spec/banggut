@@ -64,6 +64,15 @@ export async function updateBook(supabase: SupabaseClient, bookId: string, updat
   return data as Book;
 }
 
+export async function deleteBook(supabase: SupabaseClient, bookId: string) {
+  // 관련 데이터도 cascade 또는 수동 삭제
+  await supabase.from("messages").delete().eq("book_id", bookId);
+  await supabase.from("underlines").delete().eq("book_id", bookId);
+  await supabase.from("reviews").delete().eq("book_id", bookId);
+  const { error } = await supabase.from("books").delete().eq("id", bookId);
+  if (error) throw error;
+}
+
 // --- Messages ---
 export async function getMessages(supabase: SupabaseClient, bookId: string) {
   const { data } = await supabase
@@ -115,6 +124,17 @@ export async function createScrap(supabase: SupabaseClient, scrap: Omit<Scrap, "
 export async function deleteScrap(supabase: SupabaseClient, scrapId: string) {
   const { error } = await supabase.from("scraps").delete().eq("id", scrapId);
   if (error) throw error;
+}
+
+export async function updateScrap(supabase: SupabaseClient, scrapId: string, updates: Partial<Pick<Scrap, "text" | "memo" | "page_number">>) {
+  const { data, error } = await supabase
+    .from("scraps")
+    .update(updates)
+    .eq("id", scrapId)
+    .select()
+    .single();
+  if (error) throw error;
+  return data as Scrap;
 }
 
 export async function getScrapsByBook(supabase: SupabaseClient, bookId: string) {

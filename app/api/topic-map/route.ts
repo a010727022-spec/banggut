@@ -18,7 +18,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
     const prompt = `당신은 독서토론 전문가입니다. 아래 책의 핵심 토론 주제를 추출해주세요.
 
 책: 「${title}」 ${author ? `— ${author}` : ""}

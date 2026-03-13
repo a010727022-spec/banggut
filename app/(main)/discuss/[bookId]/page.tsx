@@ -57,6 +57,7 @@ export default function DiscussPage() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const greetingSentRef = useRef(false);
+  const greetingInProgressRef = useRef(false);
 
   // --- AI greeting / resume ---
   const sendAIGreeting = useCallback(
@@ -68,6 +69,10 @@ export default function DiscussPage() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ctxData?: any,
     ) => {
+      // 중복 호출 방지
+      if (greetingInProgressRef.current) return;
+      greetingInProgressRef.current = true;
+
       const supabase = createClient();
       setStreaming(true);
       setStreamContent("");
@@ -157,6 +162,7 @@ export default function DiscussPage() {
 
       setStreaming(false);
       setStreamContent("");
+      greetingInProgressRef.current = false;
     },
     [addMsg, appendStreamContent, setStreaming, setStreamContent],
   );
@@ -167,6 +173,7 @@ export default function DiscussPage() {
     reset();
     setBook(null);
     greetingSentRef.current = false;
+    greetingInProgressRef.current = false;
 
     if (!bookId || !user) return;
     setLoadError(false);

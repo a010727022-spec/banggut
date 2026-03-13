@@ -10,13 +10,14 @@ import {
   createScrap,
   getReview,
   updateBook,
+  deleteBook,
 } from "@/lib/supabase/queries";
 import { PHASES, getPhaseIndex } from "@/lib/types";
 import type { Book, Message, Scrap, Review, ReadingStatus, Diagnosis } from "@/lib/types";
 import { fetchWithAuth } from "@/lib/fetch-with-auth";
 import { useAuthStore } from "@/stores/useAuthStore";
 import Link from "next/link";
-import { ArrowLeft, Star, Camera, Eye, EyeOff, Check, RotateCcw, X } from "lucide-react";
+import { ArrowLeft, Star, Camera, Eye, EyeOff, Check, RotateCcw, X, Trash2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -453,6 +454,10 @@ export default function BookDetailPage() {
   const [activeTab, setActiveTab] = useState<Tab>("scraps");
   const [isLoading, setIsLoading] = useState(true);
 
+  // Delete state
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
   // Context preparation state
   const [contextStatus, setContextStatus] = useState<"idle" | "fetching" | "done" | "failed">("idle");
   const contextStartedRef = useRef(false);
@@ -595,6 +600,19 @@ export default function BookDetailPage() {
     }
   }
 
+  async function handleDeleteBook() {
+    setDeleting(true);
+    try {
+      await deleteBook(supabaseRef.current, bookId);
+      toast.success("책을 삭제했어요");
+      router.push("/");
+    } catch {
+      toast.error("삭제에 실패했어요");
+      setDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  }
+
   /* ── Loading / Not found ── */
 
   if (isLoading) {
@@ -647,6 +665,12 @@ export default function BookDetailPage() {
           <h1 className="text-sm font-semibold text-ink-green truncate flex-1">
             책 정보
           </h1>
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            className="w-9 h-9 flex items-center justify-center rounded-btn hover:bg-red-50 active:bg-red-100"
+          >
+            <Trash2 className="w-4.5 h-4.5 text-warmgray hover:text-red-500" />
+          </button>
         </div>
       </div>
 
@@ -766,11 +790,11 @@ export default function BookDetailPage() {
       {contextStatus === "fetching" && (
         <div className="px-4 mt-3">
           <div className="bg-warm rounded-card border border-ink-green/20 shadow-card p-4">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 mb-3">
               <span className="text-2xl animate-bounce">😊</span>
               <div className="flex-1">
-                <p className="text-sm font-semibold text-ink-green">방긋이 책을 읽고 있어요...</p>
-                <p className="text-xs text-warmgray mt-0.5">토론 준비가 끝나면 알려드릴게요</p>
+                <p className="text-sm font-semibold text-ink-green">방긋이 토론을 준비 중이에요</p>
+                <p className="text-xs text-warmgray mt-0.5">웹에서 책 정보를 모으고 있어요</p>
               </div>
               <div className="flex gap-1">
                 <span className="w-1.5 h-1.5 bg-ink-green/50 rounded-full animate-bounce" />
@@ -778,6 +802,21 @@ export default function BookDetailPage() {
                 <span className="w-1.5 h-1.5 bg-ink-green/50 rounded-full animate-bounce [animation-delay:0.3s]" />
               </div>
             </div>
+            {/* Step indicators (from context_data.steps during fetching) */}
+            {(() => {
+              const steps = book?.context_data?.steps;
+              if (!steps) return null;
+              const stepIcon = (s: string) => s === "success" ? "✅" : s === "warning" ? "⚠️" : s === "failed" ? "❌" : s === "pending" ? "⏳" : "⬜";
+              return (
+                <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-warmgray">
+                  <span>{stepIcon(steps.plot)} 줄거리</span>
+                  <span>{stepIcon(steps.characters)} 등장인물</span>
+                  <span>{stepIcon(steps.reviews)} 서평</span>
+                  <span>{stepIcon(steps.grok)} SNS</span>
+                  <span>{stepIcon(steps.structure)} 정리</span>
+                </div>
+              );
+            })()}
           </div>
         </div>
       )}
@@ -798,7 +837,6 @@ export default function BookDetailPage() {
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ title: book.title, author: book.author, bookId }),
                   }).catch(() => {});
-                  // 폴링 재시작
                   if (pollRef.current) clearInterval(pollRef.current);
                   pollRef.current = setInterval(async () => {
                     const { data: check } = await supabaseRef.current
@@ -814,6 +852,9 @@ export default function BookDetailPage() {
                       if (pollRef.current) clearInterval(pollRef.current);
                     } else if (check?.context_status === "failed") {
                       setContextStatus("failed");
+                      setBook((prev) =>
+                        prev ? { ...prev, context_data: check.context_data, context_status: "failed" } : prev,
+                      );
                       if (pollRef.current) clearInterval(pollRef.current);
                     }
                   }, 2000);
@@ -868,7 +909,8 @@ export default function BookDetailPage() {
             messages={messages}
             scrapsCount={scraps.length}
             phaseIndex={phaseIndex}
-            contextReady={contextStatus === "done"}
+            contextStatus={contextStatus}
+            contextData={book?.context_data}
           />
         )}
         {activeTab === "review" && (
@@ -883,6 +925,35 @@ export default function BookDetailPage() {
           />
         )}
       </div>
+
+      {/* ── Delete Confirmation Dialog ── */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-6">
+          <div className="bg-paper rounded-card shadow-lg p-6 w-full max-w-xs text-center">
+            <p className="text-base font-semibold text-ink mb-2">책을 삭제할까요?</p>
+            <p className="text-xs text-warmgray mb-5">
+              토론 내역, 스크랩, 서평이 모두 삭제돼요.
+              <br />이 작업은 되돌릴 수 없어요.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={deleting}
+                className="flex-1 rounded-btn border border-warmgray/30 text-warmgray text-sm font-semibold py-2.5 hover:bg-warmgray/5"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleDeleteBook}
+                disabled={deleting}
+                className="flex-1 rounded-btn bg-red-500 text-paper text-sm font-semibold py-2.5 hover:bg-red-500/90 disabled:opacity-50"
+              >
+                {deleting ? "삭제 중..." : "삭제"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1118,13 +1189,15 @@ function DiscussionTab({
   messages,
   scrapsCount,
   phaseIndex,
-  contextReady,
+  contextStatus,
+  contextData,
 }: {
   bookId: string;
   messages: Message[];
   scrapsCount: number;
   phaseIndex: number;
-  contextReady: boolean;
+  contextStatus: string | null;
+  contextData: Record<string, unknown> | null;
 }) {
   const [summaryText, setSummaryText] = useState<string | null>(null);
   const [summaryLoading, setSummaryLoading] = useState(false);
@@ -1149,16 +1222,34 @@ function DiscussionTab({
   }
 
   if (messages.length === 0) {
+    const quality = (contextData?.quality as string) || null;
+    const found = (contextData?.found as { plot?: boolean; characters?: boolean; themes?: boolean }) || {};
+    const isSufficient = contextStatus === "done" && quality === "sufficient";
+    const isPartial = contextStatus === "done" && quality === "partial";
+    const isFetching = contextStatus === "fetching";
+
+    // 스크랩 메시지
+    const scrapMessage = scrapsCount === 0
+      ? null
+      : scrapsCount <= 2
+      ? "글귀가 더 있으면 더 깊은 토론이 가능해요"
+      : scrapsCount <= 4
+      ? `글귀가 ${scrapsCount}개! 토론을 시작해볼까요?`
+      : "문장 수준까지 파고들 수 있어요";
+
     return (
       <div className="text-center py-12">
         <div className="text-3xl mb-3">💬</div>
-        {contextReady ? (
+        {isSufficient ? (
           <>
-            <p className="text-warmgray text-sm mb-2">방긋이 준비됐어요!</p>
-            {scrapsCount > 0 && (
-              <p className="text-sm text-[#C4A35A] mb-4">
-                글귀가 {scrapsCount}개! 토론을 시작해볼까요?
-              </p>
+            <p className="text-ink-green text-sm font-semibold mb-1">준비 완료!</p>
+            <div className="flex justify-center gap-2 text-xs text-warmgray mb-3">
+              <span>{found.plot ? "✅" : "❌"} 줄거리</span>
+              <span>{found.characters ? "✅" : "❌"} 등장인물</span>
+              <span>{found.themes ? "✅" : "❌"} 독자 반응</span>
+            </div>
+            {scrapMessage && (
+              <p className="text-sm text-[#C4A35A] mb-4">{scrapMessage}</p>
             )}
             <Link
               href={`/discuss/${bookId}`}
@@ -1167,15 +1258,49 @@ function DiscussionTab({
               토론 시작하기
             </Link>
           </>
-        ) : (
+        ) : isPartial ? (
           <>
-            <p className="text-warmgray text-sm mb-2">방긋이 아직 책을 읽고 있어요</p>
-            <p className="text-xs text-warmgray/70">준비가 끝나면 토론을 시작할 수 있어요</p>
+            <p className="text-[#C4A35A] text-sm font-semibold mb-1">일부 정보 부족, 토론은 가능해요</p>
+            <div className="flex justify-center gap-2 text-xs text-warmgray mb-3">
+              <span>{found.plot ? "✅" : "⚠️"} 줄거리</span>
+              <span>{found.characters ? "✅" : "⚠️"} 등장인물</span>
+              <span>{found.themes ? "✅" : "⚠️"} 독자 반응</span>
+            </div>
+            {scrapMessage && (
+              <p className="text-sm text-[#C4A35A] mb-4">{scrapMessage}</p>
+            )}
+            <Link
+              href={`/discuss/${bookId}`}
+              className="inline-flex items-center gap-2 bg-ink-green text-paper text-sm font-semibold px-5 py-2.5 rounded-btn hover:bg-ink-green/90 transition-colors"
+            >
+              토론 시작하기
+            </Link>
+          </>
+        ) : isFetching ? (
+          <>
+            <p className="text-warmgray text-sm mb-2">방긋이 토론을 준비 중이에요</p>
+            <p className="text-xs text-warmgray/70">웹에서 책 정보를 모으고 있어요</p>
             <div className="mt-4">
               <span className="inline-flex items-center gap-2 bg-warmgray/10 text-warmgray text-sm font-semibold px-5 py-2.5 rounded-btn cursor-not-allowed">
                 토론 준비 중...
               </span>
             </div>
+          </>
+        ) : (
+          <>
+            <p className="text-terra text-sm font-semibold mb-1">정보가 부족해요</p>
+            <div className="flex justify-center gap-2 text-xs text-warmgray mb-3">
+              <span>❌ 줄거리</span>
+              <span>❌ 등장인물</span>
+              <span>❌ 독자 반응</span>
+            </div>
+            <p className="text-xs text-warmgray/70 mb-4">글귀를 추가하면 토론이 더 풍부해져요</p>
+            <Link
+              href={`/discuss/${bookId}`}
+              className="inline-flex items-center gap-2 bg-warmgray/20 text-warmgray text-sm font-semibold px-5 py-2.5 rounded-btn hover:bg-warmgray/30 transition-colors"
+            >
+              그래도 토론 시작하기
+            </Link>
           </>
         )}
       </div>

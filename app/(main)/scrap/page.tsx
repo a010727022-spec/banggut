@@ -4,11 +4,11 @@ import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useScrapStore } from "@/stores/useScrapStore";
-import { getScraps, getBooks, createScrap, deleteScrap } from "@/lib/supabase/queries";
+import { getScraps, getBooks, createScrap, deleteScrap, updateScrap } from "@/lib/supabase/queries";
 import type { Book, Scrap } from "@/lib/types";
 import { fetchWithAuth } from "@/lib/fetch-with-auth";
 import { Button } from "@/components/ui/button";
-import { Camera, Plus, Trash2, X, Search, Check, ChevronDown, RotateCcw } from "lucide-react";
+import { Camera, Plus, Trash2, X, Search, Check, ChevronDown, RotateCcw, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
 // ─── 전자책 스타일 하이라이트 컴포넌트 ───
@@ -242,7 +242,7 @@ const STATUS_LABELS: Record<string, string> = {
 // ─── 메인 스크랩 페이지 ───
 export default function ScrapPage() {
   const user = useAuthStore((s) => s.user);
-  const { scraps, setScraps, addScrap, removeScrap } = useScrapStore();
+  const { scraps, setScraps, addScrap, removeScrap, updateScrap: updateScrapInStore } = useScrapStore();
 
   // Books
   const [books, setBooks] = useState<Book[]>([]);
@@ -259,6 +259,13 @@ export default function ScrapPage() {
   // Bottom sheet (9+ books dropdown)
   const [showBookSheet, setShowBookSheet] = useState(false);
   const [bookSearchQuery, setBookSearchQuery] = useState("");
+
+  // Edit
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editText, setEditText] = useState("");
+  const [editMemo, setEditMemo] = useState("");
+  const [editPage, setEditPage] = useState("");
+  const [editSaving, setEditSaving] = useState(false);
 
   // Loading / UI
   const [loading, setLoading] = useState(false);
@@ -401,6 +408,41 @@ export default function ScrapPage() {
       toast.error("삭제에 실패했어요");
     }
     setDeleteTarget(null);
+  };
+
+  const startEdit = (scrap: Scrap) => {
+    setEditingId(scrap.id);
+    setEditText(scrap.text);
+    setEditMemo(scrap.memo || "");
+    setEditPage(scrap.page_number?.toString() || "");
+    setSwipedId(null);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditText("");
+    setEditMemo("");
+    setEditPage("");
+  };
+
+  const saveEdit = async () => {
+    if (!editingId || !editText.trim()) return;
+    setEditSaving(true);
+    try {
+      const supabase = createClient();
+      const updates: { text: string; memo: string | null; page_number: number | null } = {
+        text: editText.trim(),
+        memo: editMemo.trim() || null,
+        page_number: editPage ? parseInt(editPage, 10) : null,
+      };
+      const updated = await updateScrap(supabase, editingId, updates);
+      updateScrapInStore(editingId, updated);
+      cancelEdit();
+      toast.success("수정했어요");
+    } catch {
+      toast.error("수정에 실패했어요");
+    }
+    setEditSaving(false);
   };
 
   const handleCamera = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -568,41 +610,94 @@ export default function ScrapPage() {
           <div className="space-y-3">
             {filteredScraps.map((scrap) => (
               <div key={scrap.id} className="relative overflow-hidden rounded-card">
-                {/* Swipe delete bg */}
-                <div className="absolute inset-0 bg-red-500 flex items-center justify-end pr-6 rounded-card">
-                  <button
-                    onClick={() => setDeleteTarget(scrap.id)}
-                    className="text-paper text-xs font-semibold flex items-center gap-1"
-                  >
-                    <Trash2 className="w-4 h-4" /> 삭제
-                  </button>
-                </div>
-                {/* Card */}
-                <div
-                  className="bg-warm border border-[rgba(43,76,63,0.08)] shadow-card p-4 relative rounded-card transition-transform duration-200"
-                  style={{ transform: swipedId === scrap.id ? "translateX(-80px)" : "translateX(0)" }}
-                  onTouchStart={handleTouchStart}
-                  onTouchEnd={(e) => handleTouchEnd(e, scrap.id)}
-                  onClick={() => swipedId === scrap.id && setSwipedId(null)}
-                >
-                  {/* 문장 */}
-                  <p className="text-sm leading-relaxed text-ink mb-2 line-clamp-6" style={{ fontFamily: "serif" }}>
-                    &ldquo;{scrap.text}&rdquo;
-                  </p>
-                  {/* 책 + 페이지 */}
-                  <p className="text-[11px] text-warmgray mb-1">
-                    📖 {getBookDisplayName(scrap)}
-                    {scrap.page_number && <span className="ml-1.5">p.{scrap.page_number}</span>}
-                  </p>
-                  {/* 메모 */}
-                  {scrap.memo && (
-                    <p className="text-xs text-warmgray italic mb-1 line-clamp-2">💭 {scrap.memo}</p>
-                  )}
-                  {/* 날짜 */}
-                  <p className="text-[10px] text-warmgray/60 mt-2">
-                    {new Date(scrap.created_at).toLocaleDateString("ko")}
-                  </p>
-                </div>
+                {editingId === scrap.id ? (
+                  /* ── Edit mode ── */
+                  <div className="bg-warm border-2 border-ink-green/30 shadow-card p-4 rounded-card space-y-3">
+                    <textarea
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      rows={3}
+                      maxLength={1000}
+                      className="w-full bg-paper border border-[rgba(43,76,63,0.15)] rounded-btn px-3 py-2.5 text-sm text-ink resize-none leading-relaxed focus:outline-none focus:ring-1 focus:ring-ink-green/30"
+                    />
+                    <div className="flex gap-2">
+                      <input
+                        type="number"
+                        value={editPage}
+                        onChange={(e) => setEditPage(e.target.value)}
+                        placeholder="페이지"
+                        className="w-20 bg-paper border border-[rgba(43,76,63,0.15)] rounded-btn px-3 py-2 text-sm text-ink focus:outline-none focus:ring-1 focus:ring-ink-green/30"
+                      />
+                      <input
+                        value={editMemo}
+                        onChange={(e) => setEditMemo(e.target.value)}
+                        placeholder="메모 (선택)"
+                        maxLength={200}
+                        className="flex-1 bg-paper border border-[rgba(43,76,63,0.15)] rounded-btn px-3 py-2 text-sm text-ink focus:outline-none focus:ring-1 focus:ring-ink-green/30"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={cancelEdit}
+                        disabled={editSaving}
+                        className="flex-1 rounded-btn border border-warmgray/30 text-warmgray text-sm font-semibold py-2 hover:bg-warmgray/5"
+                      >
+                        취소
+                      </button>
+                      <button
+                        onClick={saveEdit}
+                        disabled={editSaving || !editText.trim()}
+                        className="flex-1 rounded-btn bg-ink-green text-paper text-sm font-semibold py-2 hover:bg-ink-green/90 disabled:opacity-50"
+                      >
+                        {editSaving ? "저장 중..." : "저장"}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {/* Swipe action bg */}
+                    <div className="absolute inset-0 bg-red-500 flex items-center justify-end pr-4 gap-2 rounded-card">
+                      <button
+                        onClick={() => startEdit(scrap)}
+                        className="text-paper text-xs font-semibold flex items-center gap-1 bg-ink-green/80 rounded-btn px-3 py-1.5"
+                      >
+                        <Pencil className="w-3.5 h-3.5" /> 수정
+                      </button>
+                      <button
+                        onClick={() => setDeleteTarget(scrap.id)}
+                        className="text-paper text-xs font-semibold flex items-center gap-1"
+                      >
+                        <Trash2 className="w-4 h-4" /> 삭제
+                      </button>
+                    </div>
+                    {/* Card */}
+                    <div
+                      className="bg-warm border border-[rgba(43,76,63,0.08)] shadow-card p-4 relative rounded-card transition-transform duration-200"
+                      style={{ transform: swipedId === scrap.id ? "translateX(-110px)" : "translateX(0)" }}
+                      onTouchStart={handleTouchStart}
+                      onTouchEnd={(e) => handleTouchEnd(e, scrap.id)}
+                      onClick={() => swipedId === scrap.id && setSwipedId(null)}
+                    >
+                      {/* 문장 */}
+                      <p className="text-sm leading-relaxed text-ink mb-2 line-clamp-6" style={{ fontFamily: "serif" }}>
+                        &ldquo;{scrap.text}&rdquo;
+                      </p>
+                      {/* 책 + 페이지 */}
+                      <p className="text-[11px] text-warmgray mb-1">
+                        📖 {getBookDisplayName(scrap)}
+                        {scrap.page_number && <span className="ml-1.5">p.{scrap.page_number}</span>}
+                      </p>
+                      {/* 메모 */}
+                      {scrap.memo && (
+                        <p className="text-xs text-warmgray italic mb-1 line-clamp-2">💭 {scrap.memo}</p>
+                      )}
+                      {/* 날짜 */}
+                      <p className="text-[10px] text-warmgray/60 mt-2">
+                        {new Date(scrap.created_at).toLocaleDateString("ko")}
+                      </p>
+                    </div>
+                  </>
+                )}
               </div>
             ))}
           </div>

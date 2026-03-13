@@ -16,7 +16,11 @@ interface BookResult {
   title: string;
   author: string;
   publisher?: string;
-  year?: number;
+  pubDate?: string;
+  cover?: string;
+  description?: string;
+  isbn?: string;
+  category?: string;
 }
 
 export default function SetupPage() {
@@ -83,6 +87,7 @@ export default function SetupPage() {
         user_id: user.id,
         title: selected.title,
         author: selected.author || null,
+        ...(selected.cover ? { cover_url: selected.cover } : {}),
       });
 
       // Import selected scraps as underlines
@@ -113,17 +118,20 @@ export default function SetupPage() {
         })
         .catch(() => {});
 
-      fetch(`/api/book-cover?title=${encodeURIComponent(selected.title)}&author=${encodeURIComponent(selected.author || "")}`)
-        .then((res) => res.json())
-        .then((data) => {
-          const updates: Record<string, unknown> = {};
-          if (data.cover_url) updates.cover_url = data.cover_url;
-          if (data.page_count) updates.total_pages = data.page_count;
-          if (Object.keys(updates).length > 0) {
-            updateBook(supabase, book.id, updates);
-          }
-        })
-        .catch(() => {});
+      // 알라딘 커버가 없을 때만 book-cover API로 폴백
+      if (!selected.cover) {
+        fetch(`/api/book-cover?title=${encodeURIComponent(selected.title)}&author=${encodeURIComponent(selected.author || "")}`)
+          .then((res) => res.json())
+          .then((data) => {
+            const updates: Record<string, unknown> = {};
+            if (data.cover_url) updates.cover_url = data.cover_url;
+            if (data.page_count) updates.total_pages = data.page_count;
+            if (Object.keys(updates).length > 0) {
+              updateBook(supabase, book.id, updates);
+            }
+          })
+          .catch(() => {});
+      }
 
       // 🔥 책 등록 즉시 book-context fetch 시작 (fire-and-forget)
       // book detail 페이지에서 context_status를 폴링하여 완료될 때까지 토론 버튼 비활성화
@@ -134,6 +142,7 @@ export default function SetupPage() {
           title: selected.title,
           author: selected.author,
           bookId: book.id,
+          description: selected.description || null,
         }),
       }).catch(() => {});
 
@@ -204,10 +213,21 @@ export default function SetupPage() {
               onClick={() => setSelected(book)}
               className="w-full text-left bg-warm rounded-card border border-[rgba(43,76,63,0.08)] shadow-card p-3 hover:border-ink-green/30 transition-colors"
             >
-              <p className="text-sm font-semibold text-ink">{book.title}</p>
-              <p className="text-xs text-warmgray">
-                {book.author} {book.publisher && `· ${book.publisher}`} {book.year && `· ${book.year}`}
-              </p>
+              <div className="flex gap-3">
+                {book.cover && (
+                  <img
+                    src={book.cover}
+                    alt={book.title}
+                    className="w-10 h-14 rounded object-cover flex-shrink-0"
+                  />
+                )}
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-ink truncate">{book.title}</p>
+                  <p className="text-xs text-warmgray">
+                    {book.author} {book.publisher && `· ${book.publisher}`} {book.pubDate && `· ${book.pubDate.slice(0, 4)}`}
+                  </p>
+                </div>
+              </div>
             </button>
           ))}
           <button
@@ -226,12 +246,19 @@ export default function SetupPage() {
       {selected && (
         <div className="bg-warm rounded-card border border-ink-green/20 shadow-card p-4 mb-4">
           <div className="flex items-start gap-3">
-            <div className="w-14 h-18 bg-ink-green/10 rounded-md flex items-center justify-center flex-shrink-0">
-              <BookOpen className="w-6 h-6 text-ink-green" />
-            </div>
+            {selected.cover ? (
+              <img src={selected.cover} alt={selected.title} className="w-14 h-20 rounded-md object-cover flex-shrink-0" />
+            ) : (
+              <div className="w-14 h-20 bg-ink-green/10 rounded-md flex items-center justify-center flex-shrink-0">
+                <BookOpen className="w-6 h-6 text-ink-green" />
+              </div>
+            )}
             <div>
               <p className="text-base font-semibold text-ink">{selected.title}</p>
               <p className="text-sm text-warmgray">{selected.author}</p>
+              {selected.publisher && (
+                <p className="text-xs text-warmgray/70 mt-0.5">{selected.publisher} {selected.pubDate && `· ${selected.pubDate.slice(0, 4)}`}</p>
+              )}
             </div>
           </div>
         </div>
