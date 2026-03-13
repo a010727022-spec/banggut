@@ -10,7 +10,7 @@ export interface TopicMap {
   topics: string[];
 }
 
-export type ReadingStatus = "to_read" | "reading" | "finished" | "dropped";
+export type ReadingStatus = "want_to_read" | "to_read" | "reading" | "finished" | "dropped" | "abandoned";
 
 export interface Book {
   id: string;
@@ -28,6 +28,11 @@ export interface Book {
   rating: number | null;
   one_liner: string | null;
   cover_url: string | null;
+  want_memo: string | null;
+  recommended_by: string | null;
+  abandoned_at: string | null;
+  abandon_note: string | null;
+  genre: string | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   context_data: any | null;
   context_fetched_at: string | null;
@@ -162,6 +167,15 @@ AI 행동: 사고 변화 정리, 핵심 인사이트 요약, 서평 유도.
 - 대화가 무르익으면: "오늘 이야기한 걸 글로 정리해보면 어떨까요? 오른쪽 위 ✍️ 버튼을 눌러보세요."`,
   },
 ];
+
+export interface ReadingSession {
+  id: string;
+  book_id: string;
+  user_id: string;
+  date: string; // YYYY-MM-DD
+  pages_read: number | null;
+  created_at: string;
+}
 
 export const AVATARS = ["🦊","🐻","🐰","🦉","🐱","🐸","🦋","🌿","🍀","🌻","📖","✨","🎭","🎪"];
 

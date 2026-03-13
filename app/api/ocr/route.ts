@@ -11,11 +11,20 @@ export async function POST(req: Request) {
   const { success } = rateLimit(`ocr:${user.id}`, 10);
   if (!success) return tooManyRequests();
 
-  const { image } = await req.json();
+  const { image, mode } = await req.json();
 
   if (!image || typeof image !== "string" || image.length > 10_000_000) {
     return NextResponse.json({ error: "Invalid image data" }, { status: 400 });
   }
+
+  const prompt = mode === "highlight"
+    ? `이 이미지는 전자책(e-book) 캡처 화면입니다.
+하이라이트(형광펜, 밑줄, 색상 강조 등)가 되어 있는 문장만 정확하게 추출하세요.
+하이라이트되지 않은 일반 텍스트는 무시하세요.
+하이라이트된 문장이 여러 개면 줄바꿈으로 구분하세요.
+설명, 해석, 요약 없이 하이라이트된 원문 텍스트만 출력하세요.
+만약 하이라이트가 없으면 이미지의 전체 텍스트를 출력하세요.`
+    : "이 이미지에 있는 텍스트를 정확하게 읽어서 그대로 출력하세요. 설명, 해석, 요약 없이 원문 텍스트만 출력하세요. 줄바꿈은 원본과 동일하게 유지하세요.";
 
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
@@ -26,7 +35,7 @@ export async function POST(req: Request) {
           data: image,
         },
       },
-      "이 이미지에 있는 텍스트를 정확하게 읽어서 그대로 출력하세요. 설명, 해석, 요약 없이 원문 텍스트만 출력하세요. 줄바꿈은 원본과 동일하게 유지하세요.",
+      prompt,
     ]);
 
     const text = result.response.text();

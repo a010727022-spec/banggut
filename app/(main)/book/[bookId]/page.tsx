@@ -17,7 +17,7 @@ import type { Book, Message, Scrap, Review, ReadingStatus, Diagnosis } from "@/l
 import { fetchWithAuth } from "@/lib/fetch-with-auth";
 import { useAuthStore } from "@/stores/useAuthStore";
 import Link from "next/link";
-import { ArrowLeft, Star, Camera, Eye, EyeOff, Check, RotateCcw, X, Trash2 } from "lucide-react";
+import { ArrowLeft, Star, Camera, Eye, EyeOff, Check, RotateCcw, X, Trash2, ImagePlus } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -26,10 +26,11 @@ import { ko } from "date-fns/locale";
 type Tab = "scraps" | "discussion" | "review";
 
 const STATUS_OPTIONS: { value: ReadingStatus; label: string }[] = [
+  { value: "want_to_read", label: "읽고 싶은" },
   { value: "to_read", label: "읽을 책" },
   { value: "reading", label: "읽는 중" },
   { value: "finished", label: "읽은 책" },
-  { value: "dropped", label: "중단" },
+  { value: "abandoned", label: "중단" },
 ];
 
 /* ═══════════════════════ Star Rating ═══════════════════════ */
@@ -458,6 +459,10 @@ export default function BookDetailPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
+  // Abandon state
+  const [showAbandonDialog, setShowAbandonDialog] = useState(false);
+  const [abandonNote, setAbandonNote] = useState("");
+
   // Context preparation state
   const [contextStatus, setContextStatus] = useState<"idle" | "fetching" | "done" | "failed">("idle");
   const contextStartedRef = useRef(false);
@@ -566,6 +571,10 @@ export default function BookDetailPage() {
   /* ── Event handlers ── */
 
   function handleStatusChange(newStatus: ReadingStatus) {
+    if (newStatus === "abandoned") {
+      setShowAbandonDialog(true);
+      return;
+    }
     const updates: Partial<Book> = { reading_status: newStatus };
     const today = new Date().toISOString().split("T")[0];
 
@@ -574,6 +583,11 @@ export default function BookDetailPage() {
     }
     if (newStatus === "finished" && !book?.finished_at) {
       updates.finished_at = today;
+    }
+    // 중단 → 읽는 중 재개 시 abandoned_at 초기화
+    if (newStatus === "reading" && book?.reading_status === "abandoned") {
+      updates.abandoned_at = null;
+      updates.abandon_note = null;
     }
 
     saveField(updates);
@@ -716,6 +730,48 @@ export default function BookDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* ── Want to Read Info ── */}
+      {book.reading_status === "want_to_read" && (book.want_memo || book.recommended_by) && (
+        <div className="px-4 mt-3">
+          <div className="bg-[#C4A35A]/5 rounded-card border border-[#C4A35A]/20 p-4">
+            {book.want_memo && (
+              <p className="text-sm text-ink leading-relaxed mb-2">
+                💭 {book.want_memo}
+              </p>
+            )}
+            {book.recommended_by && (
+              <p className="text-xs text-warmgray">
+                👤 {book.recommended_by}님의 추천
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Abandoned Info ── */}
+      {book.reading_status === "abandoned" && (
+        <div className="px-4 mt-3">
+          <div className="bg-terra/5 rounded-card border border-terra/20 p-4">
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-terra font-semibold">
+                📕 {book.abandoned_at ? `${new Date(book.abandoned_at).toLocaleDateString("ko")} 중단` : "중단됨"}
+              </p>
+              <button
+                onClick={() => handleStatusChange("reading")}
+                className="text-xs text-ink-green font-semibold hover:underline"
+              >
+                다시 읽기
+              </button>
+            </div>
+            {book.abandon_note && (
+              <p className="text-sm text-ink mt-2 leading-relaxed">
+                &ldquo;{book.abandon_note}&rdquo;
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ── Page Progress ── */}
       {showProgress && (
@@ -954,6 +1010,47 @@ export default function BookDetailPage() {
           </div>
         </div>
       )}
+
+      {/* ── Abandon Dialog ── */}
+      {showAbandonDialog && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-6">
+          <div className="bg-paper rounded-card shadow-lg p-6 w-full max-w-xs">
+            <p className="text-base font-semibold text-ink mb-2 text-center">독서를 중단할까요?</p>
+            <p className="text-xs text-warmgray mb-4 text-center">나중에 다시 &quot;읽는 중&quot;으로 재개할 수 있어요.</p>
+            <textarea
+              value={abandonNote}
+              onChange={(e) => setAbandonNote(e.target.value)}
+              placeholder="한줄평 (선택)"
+              rows={2}
+              maxLength={200}
+              className="w-full bg-warm border border-[rgba(43,76,63,0.15)] rounded-btn px-3 py-2.5 text-sm text-ink resize-none mb-4 focus:outline-none focus:ring-1 focus:ring-ink-green/30"
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setShowAbandonDialog(false); setAbandonNote(""); }}
+                className="flex-1 rounded-btn border border-warmgray/30 text-warmgray text-sm font-semibold py-2.5 hover:bg-warmgray/5"
+              >
+                취소
+              </button>
+              <button
+                onClick={() => {
+                  const today = new Date().toISOString().split("T")[0];
+                  saveField({
+                    reading_status: "abandoned",
+                    abandoned_at: today,
+                    abandon_note: abandonNote.trim() || null,
+                  });
+                  setShowAbandonDialog(false);
+                  setAbandonNote("");
+                }}
+                className="flex-1 rounded-btn bg-terra text-paper text-sm font-semibold py-2.5 hover:bg-terra/90"
+              >
+                중단하기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -982,6 +1079,7 @@ function ScrapTab({
   const [ocrLoading, setOcrLoading] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const galleryRef = useRef<HTMLInputElement>(null);
 
   async function handleSave() {
     if (!text.trim()) return;
@@ -1017,6 +1115,48 @@ function ScrapTab({
     reader.onloadend = () => setCapturedImage(reader.result as string);
     reader.readAsDataURL(file);
     e.target.value = "";
+  }
+
+  function handleGallery(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const dataUrl = reader.result as string;
+      const base64 = dataUrl.split(",")[1];
+      if (base64) handleHighlightOCR(base64);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  }
+
+  async function handleHighlightOCR(base64: string) {
+    setOcrLoading(true);
+    try {
+      const res = await fetchWithAuth("/api/ocr", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: base64, mode: "highlight" }),
+      });
+      if (res.status === 401) {
+        toast.error("로그인이 필요해요");
+        setOcrLoading(false);
+        return;
+      }
+      const data = await res.json();
+      if (data.text) {
+        setText(data.text);
+        setShowForm(true);
+        toast.success("하이라이트 문장을 추출했어요!");
+      } else {
+        toast.error("하이라이트를 인식하지 못했어요");
+        setShowForm(true);
+      }
+    } catch {
+      toast.error("OCR 처리에 실패했어요");
+      setShowForm(true);
+    }
+    setOcrLoading(false);
   }
 
   async function handleCrop(croppedBase64: string) {
@@ -1073,8 +1213,17 @@ function ScrapTab({
             onClick={() => fileRef.current?.click()}
             disabled={ocrLoading}
             className="w-12 flex items-center justify-center text-ink-green bg-ink-green/5 border border-dashed border-ink-green/20 rounded-card hover:bg-ink-green/10 transition-colors disabled:opacity-50"
+            title="카메라 촬영"
           >
             <Camera className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => galleryRef.current?.click()}
+            disabled={ocrLoading}
+            className="w-12 flex items-center justify-center text-[#C4A35A] bg-[#C4A35A]/5 border border-dashed border-[#C4A35A]/20 rounded-card hover:bg-[#C4A35A]/10 transition-colors disabled:opacity-50"
+            title="캡처에서 하이라이트 추출"
+          >
+            <ImagePlus className="w-5 h-5" />
           </button>
           <input
             ref={fileRef}
@@ -1082,6 +1231,13 @@ function ScrapTab({
             accept="image/*"
             capture="environment"
             onChange={handleCamera}
+            className="hidden"
+          />
+          <input
+            ref={galleryRef}
+            type="file"
+            accept="image/*"
+            onChange={handleGallery}
             className="hidden"
           />
         </div>

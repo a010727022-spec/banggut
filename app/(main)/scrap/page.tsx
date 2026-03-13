@@ -8,7 +8,7 @@ import { getScraps, getBooks, createScrap, deleteScrap, updateScrap } from "@/li
 import type { Book, Scrap } from "@/lib/types";
 import { fetchWithAuth } from "@/lib/fetch-with-auth";
 import { Button } from "@/components/ui/button";
-import { Camera, Plus, Trash2, X, Search, Check, ChevronDown, RotateCcw, Pencil } from "lucide-react";
+import { Camera, Plus, Trash2, X, Search, Check, ChevronDown, RotateCcw, Pencil, ImagePlus } from "lucide-react";
 import { toast } from "sonner";
 
 // ─── 전자책 스타일 하이라이트 컴포넌트 ───
@@ -235,8 +235,10 @@ function ImageHighlighter({
 const STATUS_LABELS: Record<string, string> = {
   reading: "읽는 중",
   finished: "읽은 책",
+  want_to_read: "읽고 싶은",
   to_read: "읽을 책",
-  dropped: "그만 읽은 책",
+  abandoned: "중단",
+  dropped: "중단",
 };
 
 // ─── 메인 스크랩 페이지 ───
@@ -273,6 +275,7 @@ export default function ScrapPage() {
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [initialLoading, setInitialLoading] = useState(true);
   const fileRef = useRef<HTMLInputElement>(null);
+  const galleryRef = useRef<HTMLInputElement>(null);
   const [swipedId, setSwipedId] = useState<string | null>(null);
   const touchStartX = useRef(0);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
@@ -454,6 +457,48 @@ export default function ScrapPage() {
     e.target.value = "";
   };
 
+  const handleGallery = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const dataUrl = reader.result as string;
+      const base64 = dataUrl.split(",")[1];
+      if (base64) handleHighlightOCR(base64);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
+  const handleHighlightOCR = async (base64: string) => {
+    setOcrLoading(true);
+    try {
+      const res = await fetchWithAuth("/api/ocr", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: base64, mode: "highlight" }),
+      });
+      if (res.status === 401) {
+        toast.error("로그인이 필요해요");
+        setOcrLoading(false);
+        return;
+      }
+      const data = await res.json();
+      if (data.text) {
+        setText(data.text);
+        setShowForm(true);
+        toast.success("하이라이트 문장을 추출했어요! 확인 후 저장하세요");
+      } else {
+        toast.error("하이라이트를 인식하지 못했어요. 직접 입력해주세요.");
+        setShowForm(true);
+      }
+    } catch {
+      toast.error("OCR 처리에 실패했어요. 직접 입력해주세요.");
+      setShowForm(true);
+    }
+    setOcrLoading(false);
+  };
+
   const handleCrop = async (croppedBase64: string) => {
     setCapturedImage(null);
     setOcrLoading(true);
@@ -591,7 +636,7 @@ export default function ScrapPage() {
         {/* ─── OCR Loading ─── */}
         {ocrLoading && (
           <div className="bg-warm rounded-card border border-[rgba(43,76,63,0.08)] shadow-card p-4 mb-4 text-center text-sm text-warmgray">
-            📸 형광펜 친 부분을 텍스트로 변환 중...
+            ✨ 이미지에서 텍스트를 추출하고 있어요...
           </div>
         )}
 
@@ -707,7 +752,7 @@ export default function ScrapPage() {
       {/* ─── FAB Button ─── */}
       <button
         onClick={() => setShowForm(true)}
-        className="fixed right-4 bottom-20 z-30 w-14 h-14 rounded-full bg-ink-green text-paper shadow-lg flex items-center justify-center hover:bg-ink-green/90 active:scale-95 transition-transform"
+        className="fixed right-4 bottom-[calc(3.5rem+env(safe-area-inset-bottom)+0.75rem)] z-30 w-14 h-14 rounded-full bg-ink-green text-paper shadow-lg flex items-center justify-center hover:bg-ink-green/90 active:scale-95 transition-transform"
       >
         <Plus className="w-6 h-6" />
       </button>
@@ -719,7 +764,7 @@ export default function ScrapPage() {
           <div className="absolute inset-0 bg-black/40" />
           {/* panel */}
           <div
-            className="absolute bottom-0 left-0 right-0 bg-paper rounded-t-2xl shadow-lg p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] animate-slide-up"
+            className="absolute bottom-0 left-0 right-0 bg-paper rounded-t-2xl shadow-lg p-5 pb-[calc(3.5rem+env(safe-area-inset-bottom)+1.25rem)] animate-slide-up"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
@@ -775,10 +820,10 @@ export default function ScrapPage() {
                 <button
                   onClick={() => fileRef.current?.click()}
                   disabled={ocrLoading}
-                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-btn bg-warm border border-[rgba(43,76,63,0.15)] text-sm text-ink-green font-medium hover:bg-ink-green/5 transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-2.5 rounded-btn bg-warm border border-[rgba(43,76,63,0.15)] text-sm text-ink-green font-medium hover:bg-ink-green/5 transition-colors"
+                  title="카메라로 촬영"
                 >
                   <Camera className="w-4 h-4" />
-                  📸 카메라
                 </button>
                 <input
                   ref={fileRef}
@@ -786,6 +831,21 @@ export default function ScrapPage() {
                   accept="image/*"
                   capture="environment"
                   onChange={handleCamera}
+                  className="hidden"
+                />
+                <button
+                  onClick={() => galleryRef.current?.click()}
+                  disabled={ocrLoading}
+                  className="flex items-center gap-1.5 px-3 py-2.5 rounded-btn bg-[#C4A35A]/10 border border-[#C4A35A]/30 text-sm text-[#C4A35A] font-medium hover:bg-[#C4A35A]/15 transition-colors"
+                  title="전자책 캡처에서 하이라이트 추출"
+                >
+                  <ImagePlus className="w-4 h-4" />
+                </button>
+                <input
+                  ref={galleryRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleGallery}
                   className="hidden"
                 />
                 <Button
@@ -878,7 +938,7 @@ export default function ScrapPage() {
               )}
 
               {/* Grouped by reading_status */}
-              {(["reading", "finished", "to_read", "dropped"] as const).map((status) => {
+              {(["reading", "finished", "want_to_read", "to_read", "abandoned", "dropped"] as const).map((status) => {
                 const group = sheetGrouped[status];
                 if (!group || group.length === 0) return null;
                 return (

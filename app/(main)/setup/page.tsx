@@ -9,8 +9,9 @@ import { useRouter } from "next/navigation";
 import { fetchWithAuth } from "@/lib/fetch-with-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, ArrowLeft, Check, BookOpen } from "lucide-react";
+import { Search, ArrowLeft, Check, BookOpen, Heart } from "lucide-react";
 import { toast } from "sonner";
+import { Textarea } from "@/components/ui/textarea";
 
 interface BookResult {
   title: string;
@@ -36,6 +37,11 @@ export default function SetupPage() {
   const [hasSearched, setHasSearched] = useState(false);
   const [showManualAuthor, setShowManualAuthor] = useState(false);
   const [manualAuthor, setManualAuthor] = useState("");
+  // "읽고 싶어요" 모드
+  const [showWantForm, setShowWantForm] = useState(false);
+  const [wantMemo, setWantMemo] = useState("");
+  const [recommendedBy, setRecommendedBy] = useState("");
+  const [savingWant, setSavingWant] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -75,6 +81,45 @@ export default function SetupPage() {
         ? [...prev, id]
         : prev
     );
+  };
+
+  const handleWantToRead = async () => {
+    if (!selected || !user) return;
+    setSavingWant(true);
+    try {
+      const supabase = createClient();
+      const book = await createBook(supabase, {
+        user_id: user.id,
+        title: selected.title,
+        author: selected.author || null,
+        reading_status: "want_to_read",
+        want_memo: wantMemo.trim() || null,
+        recommended_by: recommendedBy.trim() || null,
+        genre: selected.category || null,
+        ...(selected.cover ? { cover_url: selected.cover } : {}),
+      });
+
+      // 커버 없으면 폴백
+      if (!selected.cover) {
+        fetch(`/api/book-cover?title=${encodeURIComponent(selected.title)}&author=${encodeURIComponent(selected.author || "")}`)
+          .then((res) => res.json())
+          .then((data) => {
+            const updates: Record<string, unknown> = {};
+            if (data.cover_url) updates.cover_url = data.cover_url;
+            if (data.page_count) updates.total_pages = data.page_count;
+            if (Object.keys(updates).length > 0) {
+              updateBook(supabase, book.id, updates);
+            }
+          })
+          .catch(() => {});
+      }
+
+      toast.success("읽고 싶은 책에 추가했어요!");
+      router.push("/");
+    } catch {
+      toast.error("저장에 실패했어요");
+    }
+    setSavingWant(false);
   };
 
   const handleStart = async () => {
@@ -322,19 +367,56 @@ export default function SetupPage() {
         </div>
       )}
 
-      {/* Start Button */}
-      {selected && (
-        <Button
-          onClick={handleStart}
-          disabled={creating}
-          className="w-full bg-ink-green text-paper hover:bg-ink-medium rounded-btn h-12 text-base font-semibold"
-        >
-          {creating
-            ? "준비 중..."
-            : selectedScraps.length > 0
-            ? `🎯 글귀 ${selectedScraps.length}개로 토론 시작`
-            : "💬 바로 토론 시작"}
-        </Button>
+      {/* "읽고 싶어요" form */}
+      {selected && showWantForm && (
+        <div className="bg-warm rounded-card border border-[#C4A35A]/30 shadow-card p-4 mb-4 space-y-3">
+          <p className="text-sm font-semibold text-[#C4A35A]">📌 왜 읽고 싶은가요?</p>
+          <Textarea
+            value={wantMemo}
+            onChange={(e) => setWantMemo(e.target.value)}
+            placeholder="읽고 싶은 이유나 기대하는 점 (선택)"
+            rows={2}
+            maxLength={200}
+            className="bg-paper border-[rgba(43,76,63,0.15)] rounded-btn text-sm resize-none"
+          />
+          <Input
+            value={recommendedBy}
+            onChange={(e) => setRecommendedBy(e.target.value)}
+            placeholder="추천해준 사람 (선택)"
+            maxLength={50}
+            className="bg-paper border-[rgba(43,76,63,0.15)] rounded-btn"
+          />
+          <Button
+            onClick={handleWantToRead}
+            disabled={savingWant}
+            className="w-full bg-[#C4A35A] text-[#2C2C2C] hover:bg-[#C4A35A]/90 rounded-btn h-11 font-semibold"
+          >
+            {savingWant ? "저장 중..." : "📌 읽고 싶은 책에 추가"}
+          </Button>
+        </div>
+      )}
+
+      {/* Action Buttons */}
+      {selected && !showWantForm && (
+        <div className="space-y-2">
+          <Button
+            onClick={handleStart}
+            disabled={creating}
+            className="w-full bg-ink-green text-paper hover:bg-ink-medium rounded-btn h-12 text-base font-semibold"
+          >
+            {creating
+              ? "준비 중..."
+              : selectedScraps.length > 0
+              ? `🎯 글귀 ${selectedScraps.length}개로 토론 시작`
+              : "💬 바로 토론 시작"}
+          </Button>
+          <button
+            onClick={() => setShowWantForm(true)}
+            className="w-full flex items-center justify-center gap-2 text-sm text-[#C4A35A] font-semibold py-2.5 rounded-btn border border-[#C4A35A]/30 hover:bg-[#C4A35A]/5 transition-colors"
+          >
+            <Heart className="w-4 h-4" /> 읽고 싶어요
+          </button>
+        </div>
       )}
     </div>
   );

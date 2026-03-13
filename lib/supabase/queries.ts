@@ -1,5 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
-import type { Book, Message, Scrap, Underline, Review, User } from "@/lib/types";
+import type { Book, Message, Scrap, Underline, Review, User, ReadingSession } from "@/lib/types";
 
 // --- Users ---
 export async function getProfile(supabase: SupabaseClient, userId: string) {
@@ -216,6 +216,29 @@ export async function upsertReview(supabase: SupabaseClient, review: Omit<Review
     .single();
   if (error) throw error;
   return data as Review;
+}
+
+// --- Reading Sessions ---
+export async function getReadingSessions(supabase: SupabaseClient, userId: string, from?: string, to?: string) {
+  let query = supabase
+    .from("reading_sessions")
+    .select("*, books(title, author, cover_url)")
+    .eq("user_id", userId)
+    .order("date", { ascending: false });
+  if (from) query = query.gte("date", from);
+  if (to) query = query.lte("date", to);
+  const { data } = await query;
+  return (data || []) as (ReadingSession & { books: Pick<Book, "title" | "author" | "cover_url"> })[];
+}
+
+export async function upsertReadingSession(supabase: SupabaseClient, session: Omit<ReadingSession, "id" | "created_at">) {
+  const { data, error } = await supabase
+    .from("reading_sessions")
+    .upsert(session, { onConflict: "book_id,date" })
+    .select()
+    .single();
+  if (error) throw error;
+  return data as ReadingSession;
 }
 
 // --- Aggregated Queries ---
