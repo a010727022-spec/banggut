@@ -7,14 +7,16 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { useDiscussionStore } from "@/stores/useDiscussionStore";
 import {
   getBook,
+  getBooks,
   getMessages,
   getUnderlines,
+  getScrapsByBook,
   addMessage,
   createUnderline,
-  updateBook,
+  upsertStreak,
 } from "@/lib/supabase/queries";
-import { PHASES, getPhaseByMessageCount, getPhaseIndex } from "@/lib/types";
-import type { Book } from "@/lib/types";
+import { BRANCHES, parseBranchTag } from "@/lib/types";
+import type { Book, Message as MessageType } from "@/lib/types";
 import { fetchWithAuth } from "@/lib/fetch-with-auth";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -22,9 +24,169 @@ import {
   Send,
   PenLine,
   BookOpenCheck,
+  WifiOff,
+  RefreshCw,
 } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
+
+/* ───── 스트리밍 상태 타입 ───── */
+
+type StreamPhase = "idle" | "connecting" | "searching" | "thinking" | "streaming" | "error";
+
+/* ───── 연결 상태 배너 ───── */
+
+function ConnectionBanner({
+  phase,
+  isOffline,
+  onRetry,
+  partialContent,
+}: {
+  phase: StreamPhase;
+  isOffline: boolean;
+  onRetry: () => void;
+  partialContent: string;
+}) {
+  if (isOffline) {
+    return (
+      <div className="mx-4 mb-2 px-3 py-2 bg-[#B86B4A]/10 border border-[#B86B4A]/20 rounded-card flex items-center gap-2">
+        <WifiOff className="w-4 h-4 text-[#B86B4A] flex-shrink-0" />
+        <p className="text-xs text-[#B86B4A] flex-1">인터넷 연결을 확인해주세요</p>
+      </div>
+    );
+  }
+
+  if (phase === "error") {
+    return (
+      <div className="mx-4 mb-2 px-3 py-2 bg-[#B86B4A]/10 border border-[#B86B4A]/20 rounded-card flex items-center gap-2">
+        <WifiOff className="w-4 h-4 text-[#B86B4A] flex-shrink-0" />
+        <p className="text-xs text-[#B86B4A] flex-1">
+          {partialContent ? "연결이 끊겼어요. 일부 응답이 저장되었어요." : "연결이 끊겼어요."}
+        </p>
+        <button
+          onClick={onRetry}
+          className="flex items-center gap-1 text-xs text-[#B86B4A] font-semibold px-2 py-1 rounded-btn bg-[#B86B4A]/10 hover:bg-[#B86B4A]/20 transition-colors flex-shrink-0"
+        >
+          <RefreshCw className="w-3 h-3" />
+          다시 연결
+        </button>
+      </div>
+    );
+  }
+
+  return null;
+}
+
+/* ───── 스트리밍 상태 인디케이터 ───── */
+
+function StreamIndicator({ phase }: { phase: StreamPhase }) {
+  if (phase === "idle" || phase === "error") return null;
+
+  const config = {
+    connecting: { text: "연결 중...", color: "bg-warmgray/40" },
+    searching: { text: "자료를 찾는 중...", color: "bg-gold/60" },
+    thinking: { text: "생각하는 중...", color: "bg-ink-green/40" },
+    streaming: { text: "", color: "" },
+  };
+
+  const c = config[phase];
+  if (!c || phase === "streaming") return null;
+
+  return (
+    <div className="flex justify-start">
+      <div className="px-4 py-3 rounded-card bg-warm border border-[var(--bd)]">
+        <span className="text-[10px] text-ink-muted font-semibold block mb-1">
+          방긋
+        </span>
+        <p className="text-xs text-warmgray mb-2">{c.text}</p>
+        <div className="flex gap-1.5">
+          <span className={`w-1.5 h-1.5 ${c.color} rounded-full animate-bounce`} />
+          <span className={`w-1.5 h-1.5 ${c.color} rounded-full animate-bounce [animation-delay:0.15s]`} />
+          <span className={`w-1.5 h-1.5 ${c.color} rounded-full animate-bounce [animation-delay:0.3s]`} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ───── 토론 갈래 트래커 ───── */
+
+function BranchTracker({
+  messages,
+  expanded,
+  onToggle,
+  onBranchTap,
+}: {
+  messages: MessageType[];
+  expanded: boolean;
+  onToggle: () => void;
+  onBranchTap: (branchId: string) => void;
+}) {
+  // 갈래별 카운트 계산
+  const counts: Record<string, number> = {};
+  for (const b of BRANCHES) counts[b.id] = 0;
+  for (const msg of messages) {
+    if (msg.branch && counts[msg.branch] !== undefined) {
+      counts[msg.branch]++;
+    }
+  }
+
+  return (
+    <div className="px-4 py-2">
+      <button
+        onClick={onToggle}
+        className="flex items-center gap-1.5 w-full"
+      >
+        {BRANCHES.map((b) => {
+          const count = counts[b.id];
+          return (
+            <div key={b.id} className="flex items-center gap-0.5">
+              <span className="text-xs">{b.icon}</span>
+              <div className="flex gap-[2px]">
+                {count > 0 ? (
+                  Array.from({ length: Math.min(count, 5) }).map((_, i) => (
+                    <span key={i} className="w-1.5 h-1.5 rounded-full bg-ink-green" />
+                  ))
+                ) : (
+                  <span className="w-1.5 h-1.5 rounded-full bg-ink-green/15" />
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </button>
+
+      {expanded && (
+        <div className="mt-2 grid grid-cols-3 gap-1.5">
+          {BRANCHES.map((b) => {
+            const count = counts[b.id];
+            return (
+              <button
+                key={b.id}
+                onClick={() => onBranchTap(b.id)}
+                className={`text-left px-2.5 py-2 rounded-btn border transition-colors ${
+                  count > 0
+                    ? "border-ink-green/20 bg-ink-green/5 hover:bg-ink-green/10"
+                    : "border-ink/[0.06] hover:border-ink-green/20 hover:bg-ink-green/5"
+                }`}
+              >
+                <div className="flex items-center gap-1">
+                  <span className="text-xs">{b.icon}</span>
+                  <span className="text-[10px] font-semibold text-ink">{b.label}</span>
+                </div>
+                {count > 0 && (
+                  <span className="text-[9px] text-warmgray mt-0.5 block">{count}턴</span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ───── 메인 컴포넌트 ───── */
 
 export default function DiscussPage() {
   const { bookId } = useParams<{ bookId: string }>();
@@ -51,15 +213,129 @@ export default function DiscussPage() {
   const [underlineText, setUnderlineText] = useState("");
   const [loadError, setLoadError] = useState(false);
   const [lastFailedContent, setLastFailedContent] = useState<string | null>(null);
-  const [isSearching, setIsSearching] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [bookContextData, setBookContextData] = useState<any>(null);
+  const [bookScraps, setBookScraps] = useState<{ text: string; memo?: string | null }[]>([]);
+  const [otherReadingBooks, setOtherReadingBooks] = useState<{ title: string; author: string }[]>([]);
+
+  // 갈래 트래커
+  const [branchExpanded, setBranchExpanded] = useState(false);
+  const [pendingBranchHint, setPendingBranchHint] = useState<string | null>(null);
+
+  // 스트리밍 & 네트워크 상태
+  const [streamPhase, setStreamPhase] = useState<StreamPhase>("idle");
+  const streamPhaseRef = useRef<StreamPhase>("idle");
+  const updateStreamPhase = useCallback((p: StreamPhase) => {
+    streamPhaseRef.current = p;
+    setStreamPhase(p);
+  }, []);
+  const [isOffline, setIsOffline] = useState(false);
+  const [partialSavedContent, setPartialSavedContent] = useState("");
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const greetingSentRef = useRef(false);
   const greetingInProgressRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-  // --- AI greeting / resume ---
+  /* ───── 네트워크 상태 감지 ───── */
+
+  useEffect(() => {
+    const goOffline = () => {
+      setIsOffline(true);
+      // 스트리밍 중이면 에러 상태로 전환
+      if (isStreaming) {
+        updateStreamPhase("error");
+      }
+    };
+    const goOnline = () => {
+      setIsOffline(false);
+    };
+
+    setIsOffline(!navigator.onLine);
+    window.addEventListener("offline", goOffline);
+    window.addEventListener("online", goOnline);
+    return () => {
+      window.removeEventListener("offline", goOffline);
+      window.removeEventListener("online", goOnline);
+    };
+  }, [isStreaming]);
+
+  /* ───── 부분 응답 저장 + 에러 처리 헬퍼 ───── */
+
+  const savePartialResponse = useCallback(async (content: string, bookData: Book) => {
+    if (!content.trim()) return;
+    try {
+      const supabase = createClient();
+      const { cleanContent, branch } = parseBranchTag(content.trim());
+      const assistantMsg = await addMessage(supabase, {
+        book_id: bookData.id,
+        role: "assistant",
+        content: cleanContent,
+        branch,
+      });
+      addMsg(assistantMsg);
+      setPartialSavedContent(content.trim());
+    } catch {
+      // 오프라인이면 저장 실패 — 무시
+    }
+  }, [addMsg]);
+
+  /* ───── SSE 스트림 읽기 공통 로직 ───── */
+
+  const readStream = useCallback(async (
+    res: Response,
+    bookData: Book,
+    onSearching?: (searching: boolean) => void,
+  ): Promise<string> => {
+    const reader = res.body?.getReader();
+    const decoder = new TextDecoder();
+    let fullContent = "";
+    let buffer = "";
+
+    if (!reader) throw new Error("No reader");
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (trimmed.startsWith("data: ") && trimmed !== "data: [DONE]") {
+            try {
+              const data = JSON.parse(trimmed.slice(6));
+              if (data.searching !== undefined) {
+                onSearching?.(data.searching);
+                continue;
+              }
+              if (data.text) {
+                fullContent += data.text;
+                appendStreamContent(data.text);
+                if (streamPhaseRef.current !== "streaming") {
+                  updateStreamPhase("streaming");
+                }
+              }
+            } catch {
+              // incomplete JSON
+            }
+          }
+        }
+      }
+    } catch (err) {
+      if (fullContent.trim()) {
+        await savePartialResponse(fullContent, bookData);
+      }
+      throw err;
+    }
+
+    return fullContent;
+  }, [appendStreamContent, savePartialResponse, updateStreamPhase]);
+
+  /* ───── AI greeting / resume ───── */
+
   const sendAIGreeting = useCallback(
     async (
       bookData: Book,
@@ -68,19 +344,18 @@ export default function DiscussPage() {
       mode: "start" | "resume",
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ctxData?: any,
+      scrapData?: { text: string; memo?: string | null }[],
     ) => {
-      // 중복 호출 방지
       if (greetingInProgressRef.current) return;
       greetingInProgressRef.current = true;
 
       const supabase = createClient();
       setStreaming(true);
       setStreamContent("");
+      updateStreamPhase("connecting");
 
       try {
-        const currentPhase = getPhaseByMessageCount(
-          mode === "start" ? 0 : existingMessages.length,
-        );
+        abortControllerRef.current = new AbortController();
 
         const res = await fetchWithAuth("/api/chat", {
           method: "POST",
@@ -91,118 +366,134 @@ export default function DiscussPage() {
               role: m.role,
               content: m.content,
             })),
-            phase: currentPhase.label,
             underlines: ulTexts,
+            scraps: scrapData || [],
             topicMap: bookData.topic_map,
             greeting: mode,
             bookContextData: ctxData || null,
           }),
+          signal: abortControllerRef.current.signal,
         });
 
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status}`);
-        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-        const reader = res.body?.getReader();
-        const decoder = new TextDecoder();
-        let fullContent = "";
-        let buffer = "";
+        updateStreamPhase("thinking");
 
-        if (reader) {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            buffer += decoder.decode(value, { stream: true });
-            const lines = buffer.split("\n");
-            buffer = lines.pop() || "";
-            for (const line of lines) {
-              const trimmed = line.trim();
-              if (trimmed.startsWith("data: ") && trimmed !== "data: [DONE]") {
-                try {
-                  const data = JSON.parse(trimmed.slice(6));
-                  if (data.searching !== undefined) continue;
-                  if (data.text) {
-                    fullContent += data.text;
-                    appendStreamContent(data.text);
-                  }
-                } catch {
-                  // incomplete JSON
-                }
-              }
-            }
-          }
-        }
+        const fullContent = await readStream(res, bookData, (searching) => {
+          updateStreamPhase(searching ? "searching" : "thinking");
+        });
 
         if (fullContent) {
+          const { cleanContent, branch } = parseBranchTag(fullContent);
           const assistantMsg = await addMessage(supabase, {
             book_id: bookData.id,
             role: "assistant",
-            content: fullContent,
+            content: cleanContent,
+            branch,
           });
           addMsg(assistantMsg);
         } else {
           throw new Error("Empty response");
         }
-      } catch (err) {
-        console.error("Greeting error:", err);
-        // 폴백 메시지
-        const fallbackContent =
-          mode === "resume"
-            ? `다시 만나서 반가워요! 📖\n'${bookData.title}' 이야기를 이어서 나눠볼까요? 그 뒤로 더 읽으셨나요?`
-            : `'${bookData.title}' 이야기를 나눠볼까요? 📖\n읽으면서 가장 먼저 떠오르는 장면이나 느낌이 있나요?`;
 
-        const supabase = createClient();
-        const assistantMsg = await addMessage(supabase, {
-          book_id: bookData.id,
-          role: "assistant",
-          content: fallbackContent,
-        });
-        addMsg(assistantMsg);
+        updateStreamPhase("idle");
+      } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") {
+          updateStreamPhase("idle");
+        } else {
+          console.error("Greeting error:", err);
+          const fallbackContent =
+            mode === "resume"
+              ? `다시 만나서 반가워요!\n'${bookData.title}' 이야기를 이어서 나눠볼까요? 그 뒤로 더 읽으셨나요?`
+              : `'${bookData.title}' 이야기를 나눠볼까요?\n읽으면서 가장 먼저 떠오르는 장면이나 느낌이 있나요?`;
+
+          const supabase2 = createClient();
+          try {
+            const assistantMsg = await addMessage(supabase2, {
+              book_id: bookData.id,
+              role: "assistant",
+              content: fallbackContent,
+              branch: null,
+            });
+            addMsg(assistantMsg);
+          } catch {
+            updateStreamPhase("error");
+          }
+          if (streamPhaseRef.current !== "error") updateStreamPhase("idle");
+        }
       }
 
+      // addMsg → 렌더링 → streamContent 클리어 순서 보장
       setStreaming(false);
-      setStreamContent("");
+      // 짧은 딜레이로 메시지 렌더링 후 스트리밍 내용 클리어
+      requestAnimationFrame(() => setStreamContent(""));
       greetingInProgressRef.current = false;
     },
-    [addMsg, appendStreamContent, setStreaming, setStreamContent],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [addMsg, setStreaming, setStreamContent, readStream],
   );
 
+  const prevBookIdRef = useRef<string | null>(null);
+  const loadedRef = useRef(false);
+  const userId = user?.id;
   useEffect(() => {
-    // 다른 책으로 이동 시 이전 상태 초기화
-    const { reset } = useDiscussionStore.getState();
-    reset();
-    setBook(null);
-    greetingSentRef.current = false;
-    greetingInProgressRef.current = false;
+    if (!bookId || !userId) return;
 
-    if (!bookId || !user) return;
+    // bookId가 바뀔 때만 reset
+    const isNewBook = prevBookIdRef.current !== bookId;
+    if (isNewBook) {
+      const { reset } = useDiscussionStore.getState();
+      reset();
+      setBook(null);
+      greetingSentRef.current = false;
+      greetingInProgressRef.current = false;
+      updateStreamPhase("idle");
+      prevBookIdRef.current = bookId;
+      loadedRef.current = false;
+    }
+
+    // 이미 로드 완료된 상태면 재실행 안 함 (user 참조 변경 방지)
+    if (loadedRef.current && !isNewBook) return;
+
     setLoadError(false);
+    let cancelled = false;
     const supabase = createClient();
     const load = async () => {
       try {
-        const [b, msgs, uls] = await Promise.all([
+        const [b, msgs, uls, scraps, allBooks] = await Promise.all([
           getBook(supabase, bookId),
           getMessages(supabase, bookId),
           getUnderlines(supabase, bookId),
+          getScrapsByBook(supabase, bookId),
+          getBooks(supabase, userId),
         ]);
+        if (cancelled) return;
+        loadedRef.current = true;
         if (b) setBook(b);
         setMessages(msgs);
         setUnderlines(uls);
+        const scrapTexts = (scraps || [])
+          .filter((s) => s.text?.trim())
+          .map((s) => ({ text: s.text, memo: s.memo }));
+        setBookScraps(scrapTexts);
 
-        // AI 자동 인사
+        const others = allBooks
+          .filter((ob) => ob.id !== bookId && ob.reading_status === "reading")
+          .map((ob) => ({ title: ob.title, author: ob.author || "" }));
+        setOtherReadingBooks(others);
+
         if (b && !greetingSentRef.current) {
           greetingSentRef.current = true;
           const isResume = searchParams.get("resume") === "1";
           const ulTexts = uls.map((u) => ({ text: u.text }));
           const needsGreeting = msgs.length === 0 || isResume;
 
-          // 사전 수집된 컨텍스트 사용 (book detail 페이지에서 이미 준비됨)
           const ctxData = b.context_data || null;
           setBookContextData(ctxData);
 
           if (needsGreeting) {
             if (msgs.length === 0) {
-              sendAIGreeting(b, [], ulTexts, "start", ctxData);
+              sendAIGreeting(b, [], ulTexts, "start", ctxData, scrapTexts);
             } else {
               sendAIGreeting(
                 b,
@@ -210,23 +501,24 @@ export default function DiscussPage() {
                 ulTexts,
                 "resume",
                 ctxData,
+                scrapTexts,
               );
             }
           }
         }
       } catch {
-        setLoadError(true);
+        if (!cancelled) setLoadError(true);
       }
     };
     load();
+    return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bookId, user]);
+  }, [bookId, userId]);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, streamContent]);
 
-  // 모바일 키보드 올라올 때 자동 스크롤
   useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
@@ -237,11 +529,23 @@ export default function DiscussPage() {
     return () => vv.removeEventListener("resize", handleResize);
   }, []);
 
-  const currentPhase = getPhaseByMessageCount(messages.length);
-  const phaseIndex = getPhaseIndex(messages.length);
+  /* ───── AbortController 정리 ───── */
+
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort();
+    };
+  }, []);
+
+  /* ───── 메시지 전송 ───── */
 
   const sendMessage = async () => {
     if (!input.trim() || isStreaming || !book) return;
+    if (isOffline) {
+      toast.error("인터넷 연결을 확인해주세요");
+      return;
+    }
+
     const content = input.trim();
     setInput("");
 
@@ -250,15 +554,23 @@ export default function DiscussPage() {
       book_id: book.id,
       role: "user",
       content,
+      branch: null,
     });
     addMsg(userMsg);
+
+    // 스트릭 기록
+    const uid = useAuthStore.getState().user?.id;
+    if (uid) upsertStreak(supabase, uid, { discuss: true }).catch(() => {});
 
     setStreaming(true);
     setStreamContent("");
     setLastFailedContent(null);
-    setIsSearching(false);
+    updateStreamPhase("connecting");
+    setPartialSavedContent("");
 
     try {
+      abortControllerRef.current = new AbortController();
+
       const res = await fetchWithAuth("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -268,16 +580,23 @@ export default function DiscussPage() {
             role: m.role,
             content: m.content,
           })),
-          phase: currentPhase.label,
           underlines: underlines.map((u) => ({ text: u.text })),
+          scraps: bookScraps,
           topicMap: book.topic_map,
           bookContextData,
+          branchHint: pendingBranchHint,
+          otherReadingBooks,
         }),
+        signal: abortControllerRef.current.signal,
       });
+
+      // branchHint 사용 후 초기화
+      setPendingBranchHint(null);
 
       if (res.status === 401) {
         toast.error("로그인이 필요해요. 다시 로그인해주세요.");
         setStreaming(false);
+        updateStreamPhase("idle");
         return;
       }
 
@@ -286,77 +605,64 @@ export default function DiscussPage() {
         toast.error(errData.error || `서버 오류 (${res.status})`);
         setLastFailedContent(content);
         setStreaming(false);
+        updateStreamPhase("error");
         return;
       }
 
-      const reader = res.body?.getReader();
-      const decoder = new TextDecoder();
-      let fullContent = "";
-      let buffer = "";
+      updateStreamPhase("thinking");
 
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split("\n");
-          // 마지막 줄은 아직 완성되지 않았을 수 있으므로 버퍼에 보관
-          buffer = lines.pop() || "";
-          for (const line of lines) {
-            const trimmed = line.trim();
-            if (trimmed.startsWith("data: ") && trimmed !== "data: [DONE]") {
-              try {
-                const data = JSON.parse(trimmed.slice(6));
-                // 실시간 검색 상태 처리
-                if (data.searching === true) {
-                  setIsSearching(true);
-                  continue;
-                }
-                if (data.searching === false) {
-                  setIsSearching(false);
-                  continue;
-                }
-                if (data.text) {
-                  fullContent += data.text;
-                  appendStreamContent(data.text);
-                }
-              } catch {
-                // 불완전한 JSON — 다음 청크에서 처리
-              }
-            }
-          }
-        }
-      }
+      const fullContent = await readStream(res, book, (searching) => {
+        updateStreamPhase(searching ? "searching" : "thinking");
+      });
 
       if (fullContent) {
+        const { cleanContent, branch } = parseBranchTag(fullContent);
         const assistantMsg = await addMessage(supabase, {
           book_id: book.id,
           role: "assistant",
-          content: fullContent,
+          content: cleanContent,
+          branch,
         });
         addMsg(assistantMsg);
-
-        // Update phase
-        const newPhaseIndex = getPhaseIndex(messages.length + 2);
-        if (newPhaseIndex !== phaseIndex) {
-          await updateBook(supabase, book.id, { phase: newPhaseIndex });
-          setBook({ ...book, phase: newPhaseIndex });
-        }
       }
+
+      updateStreamPhase("idle");
     } catch (err) {
-      console.error("Chat error:", err);
-      toast.error("응답을 받지 못했어요. 다시 시도해주세요.");
-      setLastFailedContent(content);
+      if (err instanceof DOMException && err.name === "AbortError") {
+        updateStreamPhase("idle");
+      } else {
+        console.error("Chat error:", err);
+        updateStreamPhase("error");
+        setLastFailedContent(content);
+      }
     }
 
     setStreaming(false);
-    setStreamContent("");
+    requestAnimationFrame(() => setStreamContent(""));
   };
 
   const retryLastMessage = () => {
-    if (!lastFailedContent) return;
-    setInput(lastFailedContent);
-    setLastFailedContent(null);
+    if (isOffline) {
+      toast.error("인터넷 연결을 확인해주세요");
+      return;
+    }
+    if (lastFailedContent) {
+      setInput(lastFailedContent);
+      setLastFailedContent(null);
+      updateStreamPhase("idle");
+    }
+  };
+
+  const retryConnection = () => {
+    if (isOffline) {
+      toast.error("인터넷 연결을 확인해주세요");
+      return;
+    }
+    updateStreamPhase("idle");
+    if (lastFailedContent) {
+      setInput(lastFailedContent);
+      setLastFailedContent(null);
+    }
   };
 
   const handleAddUnderline = async () => {
@@ -411,21 +717,13 @@ export default function DiscussPage() {
   return (
     <div className="flex flex-col h-screen bg-paper">
       {/* Header */}
-      <header className="flex items-center gap-3 px-4 py-3 bg-warm border-b border-[rgba(43,76,63,0.08)]">
+      <header className="flex items-center gap-3 px-4 py-3 bg-warm border-b border-[var(--bd)]">
         <button onClick={() => router.push(`/book/${bookId}`)} className="text-ink-green">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-ink truncate">{book.title}</p>
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] text-warmgray truncate max-w-[120px] inline-block align-middle">{book.author}</span>
-            <span
-              className="text-[9px] px-1.5 py-0.5 rounded-badge font-semibold text-paper"
-              style={{ backgroundColor: currentPhase.color }}
-            >
-              {currentPhase.icon} {currentPhase.label}
-            </span>
-          </div>
+          <span className="text-[10px] text-warmgray truncate max-w-[120px] inline-block align-middle">{book.author}</span>
         </div>
         <div className="flex gap-1">
           <button
@@ -445,29 +743,31 @@ export default function DiscussPage() {
         </div>
       </header>
 
-      {/* Phase Progress */}
-      <div className="flex px-4 py-2 gap-1">
-        {PHASES.map((p, i) => (
-          <div
-            key={p.id}
-            className="flex-1 h-1 rounded-full transition-colors"
-            style={{
-              backgroundColor: i <= phaseIndex ? p.color : "rgba(43,76,63,0.08)",
-            }}
-          />
-        ))}
-      </div>
+      {/* Branch Tracker */}
+      <BranchTracker
+        messages={messages}
+        expanded={branchExpanded}
+        onToggle={() => setBranchExpanded(!branchExpanded)}
+        onBranchTap={(branchId) => {
+          const branch = BRANCHES.find((b) => b.id === branchId);
+          if (branch) {
+            setPendingBranchHint(branchId);
+            setBranchExpanded(false);
+            setInput(`${branch.label}에 대해 이야기해볼까요?`);
+          }
+        }}
+      />
 
       {/* Underline Input */}
       {showUnderlineInput && (
-        <div className="px-4 py-2 bg-warm border-b border-[rgba(43,76,63,0.08)]">
+        <div className="px-4 py-2 bg-warm border-b border-[var(--bd)]">
           <div className="flex gap-2">
             <input
               value={underlineText}
               onChange={(e) => setUnderlineText(e.target.value)}
               placeholder="밑줄 친 문장을 입력하세요"
               maxLength={500}
-              className="flex-1 text-sm bg-paper border border-[rgba(43,76,63,0.15)] rounded-btn px-3 py-1.5"
+              className="flex-1 text-sm bg-paper border border-[var(--bd2)] rounded-btn px-3 py-1.5"
             />
             <button
               onClick={handleAddUnderline}
@@ -480,6 +780,14 @@ export default function DiscussPage() {
         </div>
       )}
 
+      {/* Connection / Offline Banner */}
+      <ConnectionBanner
+        phase={streamPhase}
+        isOffline={isOffline}
+        onRetry={retryConnection}
+        partialContent={partialSavedContent}
+      />
+
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         {messages.map((msg) => (
@@ -491,7 +799,7 @@ export default function DiscussPage() {
               className={`max-w-[80%] px-4 py-3 rounded-card ${
                 msg.role === "user"
                   ? "bg-ink-green text-paper"
-                  : "bg-warm border border-[rgba(43,76,63,0.08)]"
+                  : "bg-warm border border-[var(--bd)]"
               }`}
             >
               {msg.role === "assistant" && (
@@ -506,50 +814,28 @@ export default function DiscussPage() {
           </div>
         ))}
 
+        {/* 스트리밍 중 텍스트 표시 (branch 태그 숨김) */}
         {isStreaming && streamContent && (
           <div className="flex justify-start">
-            <div className="max-w-[80%] px-4 py-3 rounded-card bg-warm border border-[rgba(43,76,63,0.08)]">
+            <div className="max-w-[80%] px-4 py-3 rounded-card bg-warm border border-[var(--bd)]">
               <span className="text-[10px] text-ink-muted font-semibold block mb-1">
                 방긋
               </span>
               <p className="text-sm leading-chat whitespace-pre-wrap">
-                {streamContent}
+                {streamContent.replace(/\s*\[branch:\s*[\w]+\]\s*$/, "")}
                 <span className="inline-block w-1.5 h-4 bg-ink-green/40 animate-pulse ml-0.5" />
               </p>
             </div>
           </div>
         )}
 
+        {/* 스트리밍 상태 인디케이터 (텍스트 아직 안 왔을 때) */}
         {isStreaming && !streamContent && (
-          <div className="flex justify-start">
-            <div className="px-4 py-3 rounded-card bg-warm border border-[rgba(43,76,63,0.08)]">
-              <span className="text-[10px] text-ink-muted font-semibold block mb-1">
-                방긋
-              </span>
-              {isSearching ? (
-                <>
-                  <p className="text-xs text-warmgray mb-2">잠깐, 정리해볼게요... 📚</p>
-                  <div className="flex gap-1.5 items-center">
-                    <span className="w-1.5 h-1.5 bg-gold/60 rounded-full animate-bounce" />
-                    <span className="w-1.5 h-1.5 bg-gold/60 rounded-full animate-bounce [animation-delay:0.15s]" />
-                    <span className="w-1.5 h-1.5 bg-gold/60 rounded-full animate-bounce [animation-delay:0.3s]" />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <p className="text-xs text-warmgray mb-2">생각하는 중...</p>
-                  <div className="flex gap-1.5">
-                    <span className="w-1.5 h-1.5 bg-ink-green/40 rounded-full animate-bounce" />
-                    <span className="w-1.5 h-1.5 bg-ink-green/40 rounded-full animate-bounce [animation-delay:0.15s]" />
-                    <span className="w-1.5 h-1.5 bg-ink-green/40 rounded-full animate-bounce [animation-delay:0.3s]" />
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
+          <StreamIndicator phase={streamPhase} />
         )}
 
-        {lastFailedContent && !isStreaming && (
+        {/* 실패 시 재시도 버튼 */}
+        {lastFailedContent && !isStreaming && streamPhase !== "error" && (
           <div className="flex justify-center py-2">
             <button
               onClick={retryLastMessage}
@@ -564,21 +850,22 @@ export default function DiscussPage() {
       </div>
 
       {/* Input */}
-      <div className="px-4 py-3 bg-warm border-t border-[rgba(43,76,63,0.08)] pb-[env(safe-area-inset-bottom)]">
+      <div className="px-4 py-3 bg-warm border-t border-[var(--bd)] pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-end gap-2">
           <Textarea
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="이야기를 나눠보세요..."
+            placeholder={isOffline ? "인터넷 연결을 확인해주세요..." : "이야기를 나눠보세요..."}
             rows={1}
             maxLength={2000}
-            className="flex-1 bg-paper border-[rgba(43,76,63,0.15)] rounded-btn resize-none leading-body min-h-[40px] max-h-[120px]"
+            disabled={isOffline}
+            className="flex-1 bg-paper border-[var(--bd2)] rounded-btn resize-none leading-body min-h-[40px] max-h-[120px] disabled:opacity-50"
           />
           <button
             onClick={sendMessage}
-            disabled={!input.trim() || isStreaming}
+            disabled={!input.trim() || isStreaming || isOffline}
             className="w-11 h-11 bg-ink-green text-paper rounded-btn flex items-center justify-center hover:bg-ink-medium active:bg-ink-dark transition-colors disabled:opacity-50 flex-shrink-0"
           >
             <Send className="w-4 h-4" />

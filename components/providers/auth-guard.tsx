@@ -3,6 +3,7 @@
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
+import { BookOpen } from "lucide-react";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const user = useAuthStore((s) => s.user);
@@ -31,7 +32,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-paper">
         <div className="text-center">
-          <div className="text-3xl mb-3">📖</div>
+          <BookOpen size={32} strokeWidth={1.3} className="mb-3 mx-auto" style={{ color: "var(--ac)", opacity: 0.55 }} />
           <p className="text-warmgray text-sm">불러오는 중...</p>
         </div>
       </div>

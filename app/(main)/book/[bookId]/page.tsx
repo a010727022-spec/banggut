@@ -1681,7 +1681,7 @@ export default function BookDetailPage() {
       {show100Confirm && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-6">
           <div className="bg-paper rounded-card shadow-lg p-6 w-full max-w-xs text-center">
-            <p className="text-3xl mb-3">📖</p>
+            <BookOpen size={32} strokeWidth={1.3} className="mb-3 mx-auto" style={{ color: "var(--ac)", opacity: 0.55 }} />
             <p className="text-base font-bold text-ink mb-4">혹시 다 읽으신 거예요?</p>
             <div className="flex gap-2">
               <button
