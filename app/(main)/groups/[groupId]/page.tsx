@@ -191,10 +191,10 @@ export default function GroupDetailPage() {
   const nextSchedule = schedules.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).find(s => new Date(s.date) >= new Date());
   const nextDaysLeft = nextSchedule ? Math.max(0, Math.ceil((new Date(nextSchedule.date).getTime() - Date.now()) / 86400000)) : null;
 
-  // 불씨 온도 계산
-  const bonfireTemp = memberProgress.length > 0
-    ? Math.round(memberProgress.reduce((s, m) => s + m.pct, 0) / memberProgress.length * 0.7 + 20)
-    : 30;
+  // 불씨 온도 계산 (TODO: UI에서 사용 예정)
+  // const bonfireTemp = memberProgress.length > 0
+  //   ? Math.round(memberProgress.reduce((s, m) => s + m.pct, 0) / memberProgress.length * 0.7 + 20)
+  //   : 30;
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", paddingBottom: 100, transition: "background 0.4s" }}>
@@ -674,7 +674,7 @@ export default function GroupDetailPage() {
               />
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {filtered.map((s, i) => {
+                {filtered.map((s) => {
                   const isMine = s.user_id === user?.id;
                   const liked = likedScraps[s.id];
                   const colorIdx = memberProgress.findIndex((m) => m.nickname === s.author_nickname);
