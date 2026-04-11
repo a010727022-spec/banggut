@@ -1,64 +1,288 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 34 33% 95%;
-    --foreground: 0 0% 17%;
-    --card: 40 100% 98%;
-    --card-foreground: 0 0% 17%;
-    --popover: 40 100% 98%;
-    --popover-foreground: 0 0% 17%;
-    --primary: 158 29% 24%;
-    --primary-foreground: 34 33% 95%;
-    --secondary: 34 33% 95%;
-    --secondary-foreground: 158 29% 24%;
-    --muted: 32 18% 81%;
-    --muted-foreground: 26 10% 50%;
-    --accent: 40 44% 56%;
-    --accent-foreground: 40 100% 98%;
-    --destructive: 18 45% 50%;
-    --destructive-foreground: 40 100% 98%;
-    --border: 158 29% 24% / 0.08;
-    --input: 158 29% 24% / 0.15;
-    --ring: 158 29% 24% / 0.3;
-    --radius: 0.75rem;
-  }
+/* ═══════════════════════════════════════════
+   방긋 v4 디자인 시스템 — 5 테마
+   ═══════════════════════════════════════════ */
 
+/* ── 밤숲 (기본 다크) ── */
+:root,
+[data-theme="dark"] {
+  --bg: #0c0f0d;
+  --sf: #131916;
+  --sf2: #1a1f1c;
+  --sf3: #242a26;
+  --bd: rgba(107,158,138,0.11);
+  --bd2: rgba(107,158,138,0.24);
+  --tp: #eeeae4;
+  --ts: #7a9186;
+  --tm: #3d5049;
+  --ac: #6B9E8A;
+  --ac2: #8FB8A4;
+  --ac3: #B5D4C4;
+  --acc: #0c1a12;
+}
+
+/* ── 크림 ── */
+[data-theme="cream"] {
+  --bg: #F4EFE8;
+  --sf: #EAE4DC;
+  --sf2: #DDD6CC;
+  --sf3: #D0C8BC;
+  --bd: rgba(90,110,95,0.13);
+  --bd2: rgba(90,110,95,0.26);
+  --tp: #1c201d;
+  --ts: #556058;
+  --tm: #9aab9e;
+  --ac: #4d8a72;
+  --ac2: #6B9E8A;
+  --ac3: #8FB8A4;
+  --acc: #f4eee8;
+}
+
+/* ── 네이비 ── */
+[data-theme="navy"] {
+  --bg: #080c18;
+  --sf: #0e1422;
+  --sf2: #161c2e;
+  --sf3: #1e263c;
+  --bd: rgba(80,130,200,0.12);
+  --bd2: rgba(80,130,200,0.26);
+  --tp: #e4eaf8;
+  --ts: #6080a8;
+  --tm: #2e4060;
+  --ac: #5b9bd5;
+  --ac2: #7ab5e8;
+  --ac3: #a0ccf0;
+  --acc: #080c18;
+}
+
+/* ── 세피아 ── */
+[data-theme="sepia"] {
+  --bg: #191410;
+  --sf: #231c16;
+  --sf2: #2e251c;
+  --sf3: #392e24;
+  --bd: rgba(180,140,70,0.12);
+  --bd2: rgba(180,140,70,0.26);
+  --tp: #ede0cc;
+  --ts: #9a8060;
+  --tm: #564535;
+  --ac: #c8903a;
+  --ac2: #dfa850;
+  --ac3: #efc070;
+  --acc: #1a1008;
+}
+
+/* ── 블러썸 ── */
+[data-theme="blossom"] {
+  --bg: #fdf0f5;
+  --sf: #f5e3ee;
+  --sf2: #ead1e6;
+  --sf3: #debfda;
+  --bd: rgba(180,80,130,0.1);
+  --bd2: rgba(180,80,130,0.24);
+  --tp: #1a0f16;
+  --ts: #7a3860;
+  --tm: #c090b0;
+  --ac: #b84880;
+  --ac2: #d068a0;
+  --ac3: #e090bc;
+  --acc: #fdf0f5;
+}
+
+/* ═══ Base ═══ */
+@layer base {
   * {
     @apply border-border;
     -webkit-tap-highlight-color: transparent;
   }
-
   html {
     touch-action: manipulation;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-
   body {
-    @apply bg-paper text-ink font-serif antialiased;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    color: var(--tp);
+    background: var(--bg);
+    transition: background 0.4s cubic-bezier(0.22,1,0.36,1), color 0.4s;
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
   }
-
-  ::selection {
-    background: rgba(196, 163, 90, 0.2);
-  }
+  ::selection { background: color-mix(in srgb, var(--ac) 30%, transparent); }
 }
 
-/* 성능: 카드/메시지 렌더링 최적화 */
+/* ═══ 컴포넌트 ═══ */
+@layer components {
+  .card-tap {
+    transition: transform 0.1s ease, border-color 0.2s;
+    cursor: pointer;
+  }
+  .card-tap:active { transform: scale(0.98); }
+  .card-tap:hover { border-color: var(--bd2); }
+
+  .btn-main {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    background: var(--ac);
+    color: var(--acc);
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .btn-main:active { transform: scale(0.96); }
+
+  .btn-secondary {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    background: transparent;
+    border: 0.5px solid var(--bd2);
+    color: var(--ac2);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .btn-secondary:hover { background: var(--sf); }
+  .btn-secondary:active { transform: scale(0.97); }
+
+  .btn-text { background: none; border: none; color: var(--tm); font-size: 12px; font-weight: 500; cursor: pointer; padding: 8px; }
+  .btn-danger { background: none; border: none; color: #e05028; font-size: 12px; font-weight: 500; cursor: pointer; padding: 8px; }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 20px;
+    text-align: center;
+  }
+  .empty-state svg { color: var(--ac3); margin-bottom: 16px; }
+  .empty-state p { color: var(--tm); font-size: 13px; line-height: 1.6; margin-bottom: 16px; }
+
+  .progress-premium {
+    height: 3px;
+    background: var(--sf3);
+    border-radius: 2px;
+    overflow: hidden;
+    transition: background 0.4s;
+  }
+  .progress-premium > div {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--ac), var(--ac2));
+    transition: width 0.6s ease, background 0.4s;
+  }
+
+  /* 섹션 라벨 */
+  .slbl {
+    padding: 4px 20px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--tm);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    transition: color 0.4s;
+  }
+
+  /* 구분선 */
+  .divider { height: 0.5px; background: var(--bd); transition: background 0.4s; }
+
+  /* 탭 */
+  .tab-pill {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    cursor: pointer;
+    border: 0.5px solid transparent;
+    transition: all 0.2s cubic-bezier(0.22,1,0.36,1);
+    user-select: none;
+  }
+  .tab-pill:active { transform: scale(0.95); }
+  .tab-pill.on { background: var(--ac); color: var(--acc); border-color: var(--ac); }
+  .tab-pill.off { background: transparent; color: var(--tm); border-color: var(--bd2); }
+  .tab-pill.off:hover { color: var(--ac2); background: var(--sf); }
+  .tab-pill .cnt {
+    font-size: 10px;
+    font-weight: 800;
+    background: rgba(0,0,0,0.15);
+    border-radius: 100px;
+    padding: 1px 6px;
+    min-width: 18px;
+    text-align: center;
+  }
+  .tab-pill.off .cnt { background: var(--sf2); color: var(--tm); }
+
+  /* 아이콘 박스 */
+  .icon-box {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .icon-box-ac { background: linear-gradient(135deg, var(--ac), var(--ac2)); }
+}
+
+/* ═══ 유틸리티 ═══ */
 @layer utilities {
-  .contain-layout {
-    contain: layout style;
-  }
-  .contain-paint {
-    contain: layout style paint;
-  }
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .glass {
+    background: color-mix(in srgb, var(--sf) 60%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 0.5px solid var(--bd);
   }
 }
+
+/* ═══ 키프레임 ═══ */
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(100%); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--sf) 25%, var(--sf2) 50%, var(--sf) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+/* 글로벌 폰트 */
+* { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
