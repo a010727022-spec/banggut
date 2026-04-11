@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Storyset Illustrations Preview</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Pretendard',sans-serif;background:#0a0d0b;color:#e8e4de;}
+.wrap{max-width:390px;margin:0 auto;padding:20px;display:flex;flex-direction:column;gap:24px;}
+h1{font-size:18px;font-weight:700;letter-spacing:-0.3px;padding-top:8px;}
+p.sub{font-size:12px;color:rgba(232,228,222,0.4);margin-top:4px;}
+
+.empty{background:rgba(255,255,255,0.03);border-radius:20px;padding:32px 24px;border:0.5px solid rgba(107,158,138,0.08);text-align:center;position:relative;overflow:hidden;}
+.empty::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:80px;height:1px;background:linear-gradient(90deg,transparent,#6B9E8A,transparent);opacity:0.3;}
+.empty::after{content:'';position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:180px;height:100px;background:radial-gradient(ellipse,rgba(107,158,138,0.04),transparent 70%);pointer-events:none;}
+.empty img{width:180px;height:auto;margin:0 auto;display:block;position:relative;z-index:1;opacity:0.85;}
+.empty-t{font-size:14px;font-weight:600;color:#e8e4de;margin-top:16px;position:relative;}
+.empty-d{font-size:12px;font-weight:300;color:rgba(232,228,222,0.4);margin-top:8px;line-height:1.8;position:relative;}
+.empty-btn{display:inline-flex;align-items:center;gap:5px;margin-top:20px;background:#6B9E8A;color:#0a0d0b;padding:10px 22px;border-radius:11px;font-size:13px;font-weight:600;border:none;cursor:pointer;position:relative;box-shadow:0 2px 16px rgba(107,158,138,0.12);}
+.label{font-size:10px;font-weight:600;color:#6B9E8A;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div>
+    <h1>Storyset Rafiki - Preview</h1>
+    <p class="sub">color: #6B9E8A (dark theme accent)</p>
+  </div>
+
+  <div>
+    <div class="label">Book Lover</div>
+    <div class="empty">
+      <img src="/illustrations/empty-books.svg" alt="">
+      <div class="empty-t">아직 읽는 책이 없어요</div>
+      <div class="empty-d">첫 번째 책을 추가하고<br>독서 여정을 시작해보세요</div>
+      <div class="empty-btn">+ 책 추가하기</div>
+    </div>
+  </div>
+
+  <div>
+    <div class="label">Bibliophile</div>
+    <div class="empty">
+      <img src="/illustrations/empty-scraps.svg" alt="">
+      <div class="empty-t">아직 밑줄 친 문장이 없어요</div>
+      <div class="empty-d">마음에 남는 문장을 스크랩하면<br>나만의 문장 서랍이 채워져요</div>
+      <div class="empty-btn">+ 스크랩하기</div>
+    </div>
+  </div>
+
+  <div>
+    <div class="label">Learning</div>
+    <div class="empty">
+      <img src="/illustrations/empty-reviews.svg" alt="">
+      <div class="empty-t">아직 서평이 없어요</div>
+      <div class="empty-d">대화를 나눈 뒤 느낌을 정리하면<br>더 오래 기억에 남아요</div>
+      <div class="empty-btn">서평 쓰기</div>
+    </div>
+  </div>
+
+  <div>
+    <div class="label">Knowledge</div>
+    <div class="empty">
+      <img src="/illustrations/empty-groups.svg" alt="">
+      <div class="empty-t">아직 함께 읽은 책이 없어요</div>
+      <div class="empty-d">함께 읽으면 더 깊어지는 독서,<br>모임을 만들거나 참여해보세요</div>
+      <div class="empty-btn">모임 둘러보기</div>
+    </div>
+  </div>
+
+  <div>
+    <div class="label">Education</div>
+    <div class="empty">
+      <img src="/illustrations/empty-education.svg" alt="">
+      <div class="empty-t">아직 글귀가 없어요</div>
+      <div class="empty-d">책을 읽으며 마음에 드는<br>문장을 발견해보세요</div>
+      <div class="empty-btn">+ 글귀 추가</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

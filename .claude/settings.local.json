@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -l \"row level\\\\|enable row\\\\|policy\" supabase/*.sql)",
+      "Bash(npx tsc:*)",
+      "Bash(python3 \"C:\\\\Users\\\\kimjisun\\\\.claude\\\\skills\\\\sector-analyst\\\\scripts\\\\analyze_sector_rotation.py\")",
+      "Bash(git clone:*)",
+      "Bash(bash C:/Users/kimjisun/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/brainstorming/scripts/start-server.sh --project-dir c:/Users/kimjisun/Desktop/banggut)",
+      "Bash(cat c:/Users/kimjisun/Desktop/banggut/.superpowers/brainstorm/*/state/server-info)"
+    ]
+  }
+}

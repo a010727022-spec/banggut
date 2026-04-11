@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>방긋 — Refined</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Pretendard',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+
+/* ═══ THEMES ═══ */
+[data-theme="dark"]{--bg:#0a0d0b;--bg2:#0e120f;--sf:rgba(255,255,255,0.03);--sf2:rgba(255,255,255,0.05);--sf3:rgba(255,255,255,0.08);--bd:rgba(107,158,138,0.08);--bd2:rgba(107,158,138,0.18);--tp:#e8e4de;--ts:rgba(232,228,222,0.55);--tm:rgba(232,228,222,0.25);--ac:#6B9E8A;--ac2:#8FB8A4;--ac3:#B5D4C4;--acc:#0a0d0b;--glow:107,158,138;--noise-opacity:0.03;}
+[data-theme="cream"]{--bg:#F2EDE6;--bg2:#EDE7DF;--sf:rgba(0,0,0,0.03);--sf2:rgba(0,0,0,0.05);--sf3:rgba(0,0,0,0.07);--bd:rgba(90,110,95,0.1);--bd2:rgba(90,110,95,0.2);--tp:#1a1e1b;--ts:rgba(26,30,27,0.55);--tm:rgba(26,30,27,0.25);--ac:#4d8a72;--ac2:#3d7a62;--ac3:#2d6a52;--acc:#F2EDE6;--glow:77,138,114;--noise-opacity:0.04;}
+[data-theme="navy"]{--bg:#060a16;--bg2:#0a0e1a;--sf:rgba(255,255,255,0.03);--sf2:rgba(255,255,255,0.05);--sf3:rgba(255,255,255,0.08);--bd:rgba(80,130,200,0.08);--bd2:rgba(80,130,200,0.18);--tp:#dce2f0;--ts:rgba(220,226,240,0.5);--tm:rgba(220,226,240,0.2);--ac:#5b9bd5;--ac2:#7ab5e8;--ac3:#a0ccf0;--acc:#060a16;--glow:91,155,213;--noise-opacity:0.03;}
+[data-theme="sepia"]{--bg:#14100c;--bg2:#181410;--sf:rgba(255,255,255,0.03);--sf2:rgba(255,255,255,0.05);--sf3:rgba(255,255,255,0.08);--bd:rgba(180,140,70,0.08);--bd2:rgba(180,140,70,0.18);--tp:#e8dcc8;--ts:rgba(232,220,200,0.5);--tm:rgba(232,220,200,0.2);--ac:#c8903a;--ac2:#dfa850;--ac3:#efc070;--acc:#14100c;--glow:200,144,58;--noise-opacity:0.03;}
+[data-theme="blossom"]{--bg:#faf0f4;--bg2:#f5eaef;--sf:rgba(0,0,0,0.03);--sf2:rgba(0,0,0,0.04);--sf3:rgba(0,0,0,0.06);--bd:rgba(180,80,130,0.08);--bd2:rgba(180,80,130,0.18);--tp:#1a0f16;--ts:rgba(26,15,22,0.5);--tm:rgba(26,15,22,0.2);--ac:#b84880;--ac2:#d068a0;--ac3:#e090bc;--acc:#faf0f4;--glow:184,72,128;--noise-opacity:0.04;}
+
+.phone{max-width:390px;margin:0 auto;min-height:100vh;background:var(--bg);color:var(--tp);transition:background 0.5s,color 0.5s;position:relative;overflow:hidden;}
+
+/* Noise texture */
+.phone::before{content:'';position:fixed;inset:0;opacity:var(--noise-opacity);pointer-events:none;z-index:100;
+background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+background-repeat:repeat;background-size:180px;}
+
+/* Ambient glow */
+.ambient{position:absolute;width:300px;height:300px;border-radius:50%;filter:blur(80px);opacity:0.07;pointer-events:none;z-index:0;transition:background 0.5s;}
+.ambient-1{top:-60px;right:-80px;background:rgba(var(--glow),1);}
+.ambient-2{bottom:200px;left:-120px;background:rgba(var(--glow),0.6);}
+
+/* Theme switcher */
+.themes{display:flex;gap:6px;padding:10px 20px;position:sticky;top:0;z-index:50;background:var(--bg);}
+.themes::after{content:'';position:absolute;bottom:0;left:0;right:0;height:20px;background:linear-gradient(var(--bg),transparent);pointer-events:none;transform:translateY(100%);}
+.tb{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--bd);cursor:pointer;transition:all 0.3s;position:relative;}
+.tb.on{border-color:var(--ac);box-shadow:0 0 0 2px var(--bg),0 0 0 3.5px var(--ac);}
+.tb::after{content:'';position:absolute;inset:3px;border-radius:50%;}
+.tb[data-t="dark"]::after{background:#0a0d0b;}
+.tb[data-t="cream"]::after{background:#F2EDE6;}
+.tb[data-t="navy"]::after{background:#060a16;}
+.tb[data-t="sepia"]::after{background:#14100c;}
+.tb[data-t="blossom"]::after{background:#faf0f4;}
+
+/* ── HEADER ── */
+.hdr{padding:16px 20px 0;position:relative;z-index:1;}
+.hdr-top{display:flex;justify-content:space-between;align-items:center;}
+.hdr-left{display:flex;align-items:center;gap:12px;}
+.av{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--acc);position:relative;}
+.av-streak{position:absolute;bottom:-3px;right:-3px;background:var(--ac);color:var(--acc);font-size:7px;font-weight:800;padding:2px 4px;border-radius:6px;border:1.5px solid var(--bg);line-height:1;}
+.hdr-name{font-size:15px;font-weight:600;color:var(--tp);}
+.hdr-sub{font-size:11px;font-weight:400;color:var(--ts);margin-top:1px;}
+.hdr-actions{display:flex;gap:6px;}
+.hdr-btn{width:34px;height:34px;border-radius:10px;background:var(--sf2);border:0.5px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background 0.2s;}
+.hdr-btn:hover{background:var(--sf3);}
+.hdr-btn svg{width:16px;height:16px;stroke:var(--ts);stroke-width:1.8;fill:none;}
+
+/* Stats bar */
+.stats{display:flex;gap:0;margin:18px 20px 0;background:var(--sf);border-radius:14px;border:0.5px solid var(--bd);overflow:hidden;}
+.stat{flex:1;padding:14px 0;text-align:center;position:relative;}
+.stat+.stat::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:0.5px;background:var(--bd2);}
+.stat-n{font-size:18px;font-weight:700;color:var(--tp);letter-spacing:-0.5px;}
+.stat-l{font-size:10px;font-weight:400;color:var(--ts);margin-top:2px;}
+
+/* ── SECTIONS ── */
+.s{margin-top:32px;position:relative;z-index:1;}
+.s-head{display:flex;justify-content:space-between;align-items:baseline;padding:0 20px;margin-bottom:16px;}
+.s-title{font-size:16px;font-weight:700;color:var(--tp);letter-spacing:-0.3px;}
+.s-more{font-size:11px;font-weight:500;color:var(--ac);opacity:0.7;cursor:pointer;transition:opacity 0.2s;}
+.s-more:hover{opacity:1;}
+
+/* ── FEATURED CARD ── */
+.feat{margin:0 20px;border-radius:20px;padding:20px;position:relative;overflow:hidden;
+background:linear-gradient(135deg,var(--sf2),var(--sf));border:0.5px solid var(--bd);}
+.feat-glow{position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:radial-gradient(circle,rgba(var(--glow),0.12),transparent 70%);pointer-events:none;}
+.feat-row{display:flex;gap:16px;position:relative;}
+.cover{width:72px;height:105px;border-radius:4px;overflow:hidden;flex-shrink:0;position:relative;}
+.cover-spine{position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--ac),var(--ac2));z-index:2;}
+.cover-face{position:absolute;inset:0;left:3px;background:linear-gradient(155deg,var(--sf3),var(--sf2));display:flex;align-items:center;justify-content:center;}
+.cover-text{font-size:9px;font-weight:300;color:var(--tm);writing-mode:vertical-rl;letter-spacing:3px;}
+.cover-shadow{position:absolute;bottom:-8px;left:8px;right:8px;height:16px;background:rgba(0,0,0,0.15);filter:blur(8px);border-radius:50%;}
+.feat-info{flex:1;display:flex;flex-direction:column;min-width:0;}
+.feat-status{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:500;color:var(--ac2);align-self:flex-start;}
+.feat-dot{width:4px;height:4px;border-radius:50%;background:var(--ac);animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.feat-t{font-size:18px;font-weight:700;color:var(--tp);margin-top:8px;letter-spacing:-0.4px;line-height:1.2;}
+.feat-a{font-size:12px;font-weight:400;color:var(--ts);margin-top:4px;}
+.feat-prog{margin-top:auto;padding-top:14px;}
+.feat-prow{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
+.feat-pct{font-size:12px;font-weight:700;color:var(--ac);}
+.feat-pg{font-size:10px;font-weight:300;color:var(--tm);}
+.pbar{height:2px;background:var(--sf3);border-radius:1px;overflow:visible;position:relative;}
+.pfill{height:100%;border-radius:1px;background:linear-gradient(90deg,var(--ac),var(--ac2));position:relative;}
+.pfill::after{content:'';position:absolute;right:-2px;top:-2px;width:6px;height:6px;border-radius:50%;background:var(--ac2);box-shadow:0 0 10px rgba(var(--glow),0.5);}
+
+/* ── BOOK GRID ── */
+.bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 20px;}
+.btile{border-radius:14px;overflow:hidden;position:relative;aspect-ratio:2/3;cursor:pointer;transition:transform 0.2s;}
+.btile:active{transform:scale(0.96);}
+.btile-bg{position:absolute;inset:0;background:linear-gradient(165deg,var(--sf3) 0%,var(--sf) 100%);}
+.btile-over{position:absolute;bottom:0;left:0;right:0;padding:14px 10px 10px;background:linear-gradient(transparent,rgba(0,0,0,0.5));}
+.btile-t{font-size:12px;font-weight:600;color:#fff;line-height:1.3;}
+.btile-a{font-size:9px;font-weight:300;color:rgba(255,255,255,0.6);margin-top:3px;}
+
+/* ── SCRAP ── */
+.scrap{margin:0 20px;border-radius:18px;padding:22px 20px;position:relative;overflow:hidden;
+background:var(--sf);border:0.5px solid var(--bd);}
+.scrap-line{position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--ac),transparent);opacity:0.6;}
+.scrap-mark{position:absolute;top:14px;left:14px;font-size:36px;font-weight:200;color:var(--ac);opacity:0.12;line-height:1;}
+.scrap-txt{font-size:15px;font-weight:300;color:var(--tp);line-height:2;padding-left:14px;position:relative;}
+.scrap-from{display:flex;align-items:center;gap:6px;padding-left:14px;margin-top:14px;}
+.scrap-book{font-size:11px;font-weight:600;color:var(--ts);}
+.scrap-pg{font-size:10px;font-weight:300;color:var(--tm);}
+.sdot{width:2px;height:2px;border-radius:50%;background:var(--tm);}
+
+/* ── STAT CARDS ── */
+.scards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 20px;}
+.sc{background:var(--sf);border-radius:14px;padding:16px 10px;border:0.5px solid var(--bd);text-align:center;position:relative;overflow:hidden;}
+.sc-bar{position:absolute;top:0;left:50%;transform:translateX(-50%);width:20px;height:1.5px;background:var(--ac);border-radius:0 0 2px 2px;opacity:0.4;}
+.sc-n{font-size:22px;font-weight:800;color:var(--tp);letter-spacing:-0.5px;}
+.sc-d{font-size:9px;font-weight:500;color:var(--ac2);margin-top:1px;}
+.sc-l{font-size:10px;font-weight:400;color:var(--tm);margin-top:6px;}
+
+/* ── GROUP CARD ── */
+.gc{margin:0 20px;background:var(--sf);border-radius:18px;padding:18px;border:0.5px solid var(--bd);}
+.gc-top{display:flex;align-items:center;gap:12px;}
+.gc-icon{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,rgba(var(--glow),0.15),rgba(var(--glow),0.05));border:0.5px solid var(--bd2);display:flex;align-items:center;justify-content:center;}
+.gc-icon svg{width:18px;height:18px;stroke:var(--ac);stroke-width:1.5;fill:none;}
+.gc-name{font-size:15px;font-weight:700;color:var(--tp);}
+.gc-meta{font-size:11px;font-weight:400;color:var(--tm);margin-top:1px;}
+.gc-members{display:flex;align-items:center;margin-top:14px;}
+.gc-av{width:28px;height:28px;border-radius:50%;border:2px solid var(--bg);margin-left:-6px;}
+.gc-av:first-child{margin-left:0;}
+.gc-more{margin-left:8px;font-size:10px;font-weight:500;color:var(--tm);}
+.gc-divider{height:0.5px;background:var(--bd);margin:14px 0;}
+.gc-book{display:flex;align-items:center;gap:10px;}
+.gc-bcover{width:30px;height:44px;border-radius:3px;background:var(--sf3);}
+.gc-bt{font-size:12px;font-weight:600;color:var(--tp);}
+.gc-bs{font-size:10px;font-weight:300;color:var(--tm);margin-top:2px;}
+
+/* ── EMPTY STATES ── */
+.empty{margin:0 20px;border-radius:20px;padding:40px 24px;border:0.5px solid var(--bd);text-align:center;position:relative;overflow:hidden;
+background:linear-gradient(180deg,var(--sf2),var(--sf));}
+.empty-glow{position:absolute;top:0;left:50%;transform:translateX(-50%);width:200px;height:100px;background:radial-gradient(ellipse,rgba(var(--glow),0.06),transparent 70%);pointer-events:none;}
+
+/* Abstract line art */
+.empty-art{position:relative;z-index:1;width:80px;height:80px;margin:0 auto;}
+.empty-art svg{width:100%;height:100%;}
+
+.empty-t{font-size:14px;font-weight:600;color:var(--tp);margin-top:16px;position:relative;}
+.empty-d{font-size:12px;font-weight:300;color:var(--ts);margin-top:8px;line-height:1.8;position:relative;}
+.empty-btn{display:inline-flex;align-items:center;gap:5px;margin-top:22px;background:var(--ac);color:var(--acc);padding:10px 22px;border-radius:11px;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;position:relative;box-shadow:0 2px 12px rgba(var(--glow),0.15);}
+.empty-btn:active{transform:scale(0.96);}
+.empty-btn:hover{box-shadow:0 4px 20px rgba(var(--glow),0.25);}
+
+/* ── BOTTOM NAV ── */
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:390px;z-index:40;padding:0 12px 8px;}
+.bnav-inner{background:color-mix(in srgb,var(--bg) 80%,transparent);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:16px;border:0.5px solid var(--bd);padding:8px 4px;display:flex;}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;cursor:pointer;position:relative;}
+.bnav-ico{width:20px;height:20px;display:flex;align-items:center;justify-content:center;}
+.bnav-ico svg{width:18px;height:18px;stroke:var(--tm);stroke-width:1.8;fill:none;transition:stroke 0.2s;}
+.bnav-label{font-size:10px;font-weight:400;color:var(--tm);transition:color 0.2s,font-weight 0.2s;}
+.bnav-item.on .bnav-ico svg{stroke:var(--ac);}
+.bnav-item.on .bnav-label{color:var(--ac);font-weight:600;}
+.bnav-item.on::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:16px;height:2px;background:var(--ac);border-radius:0 0 2px 2px;}
+
+.spacer{height:90px;}
+
+/* ── ANIMATIONS ── */
+@keyframes rise{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.s{animation:rise 0.5s cubic-bezier(0.22,1,0.36,1) both;}
+.s:nth-child(2){animation-delay:0.05s;}
+.s:nth-child(3){animation-delay:0.1s;}
+.s:nth-child(4){animation-delay:0.15s;}
+.s:nth-child(5){animation-delay:0.2s;}
+.s:nth-child(6){animation-delay:0.25s;}
+.s:nth-child(7){animation-delay:0.3s;}
+.s:nth-child(8){animation-delay:0.35s;}
+
+/* Line art animation */
+@keyframes draw{from{stroke-dashoffset:200;}to{stroke-dashoffset:0;}}
+.draw-line{stroke-dasharray:200;stroke-dashoffset:200;animation:draw 1.5s ease forwards;}
+
+/* Float animation for empty art */
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
+.empty-art{animation:float 4s ease-in-out infinite;}
+</style>
+</head>
+<body>
+<div class="phone" data-theme="dark" id="p">
+<div class="ambient ambient-1"></div>
+<div class="ambient ambient-2"></div>
+
+<!-- Themes -->
+<div class="themes">
+  <div class="tb on" data-t="dark" onclick="setT('dark',this)"></div>
+  <div class="tb" data-t="cream" onclick="setT('cream',this)"></div>
+  <div class="tb" data-t="navy" onclick="setT('navy',this)"></div>
+  <div class="tb" data-t="sepia" onclick="setT('sepia',this)"></div>
+  <div class="tb" data-t="blossom" onclick="setT('blossom',this)"></div>
+</div>
+
+<!-- Header -->
+<div class="hdr">
+  <div class="hdr-top">
+    <div class="hdr-left">
+      <div class="av">J<span class="av-streak">7</span></div>
+      <div><div class="hdr-name">지선님의 서재</div><div class="hdr-sub">오늘도 좋은 하루</div></div>
+    </div>
+    <div class="hdr-actions">
+      <div class="hdr-btn"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
+      <div class="hdr-btn"><svg viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364-.707-.707M6.343 6.343l-.707-.707m12.728 0-.707.707M6.343 17.657l-.707.707"/></svg></div>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-n">12</div><div class="stat-l">완독</div></div>
+    <div class="stat"><div class="stat-n">3</div><div class="stat-l">읽는 중</div></div>
+    <div class="stat"><div class="stat-n">8</div><div class="stat-l">위시</div></div>
+  </div>
+</div>
+
+<!-- Featured -->
+<div class="s">
+  <div class="s-head"><span class="s-title">이어서 읽기</span><span class="s-more">전체 &rarr;</span></div>
+  <div class="feat">
+    <div class="feat-glow"></div>
+    <div class="feat-row">
+      <div style="position:relative;">
+        <div class="cover-shadow"></div>
+        <div class="cover">
+          <div class="cover-spine"></div>
+          <div class="cover-face"><span class="cover-text">데미안</span></div>
+        </div>
+      </div>
+      <div class="feat-info">
+        <div class="feat-status"><span class="feat-dot"></span>읽는 중</div>
+        <div class="feat-t">데미안</div>
+        <div class="feat-a">헤르만 헤세</div>
+        <div class="feat-prog">
+          <div class="feat-prow"><span class="feat-pct">65%</span><span class="feat-pg">p.142 / 218</span></div>
+          <div class="pbar"><div class="pfill" style="width:65%;"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Completed -->
+<div class="s">
+  <div class="s-head"><span class="s-title">완독한 책</span><span class="s-more">12권 &rarr;</span></div>
+  <div class="bgrid">
+    <div class="btile"><div class="btile-bg"></div><div class="btile-over"><div class="btile-t">노르웨이의 숲</div><div class="btile-a">무라카미 하루키</div></div></div>
+    <div class="btile"><div class="btile-bg" style="background:linear-gradient(165deg,var(--sf3),transparent);"></div><div class="btile-over"><div class="btile-t">1984</div><div class="btile-a">조지 오웰</div></div></div>
+    <div class="btile"><div class="btile-bg" style="background:linear-gradient(165deg,var(--sf2),var(--sf3));"></div><div class="btile-over"><div class="btile-t">어린 왕자</div><div class="btile-a">생텍쥐페리</div></div></div>
+  </div>
+</div>
+
+<!-- Scrap -->
+<div class="s">
+  <div class="s-head"><span class="s-title">최근 스크랩</span></div>
+  <div class="scrap">
+    <div class="scrap-line"></div>
+    <div class="scrap-mark">&ldquo;</div>
+    <div class="scrap-txt">새는 알에서 나오려고 투쟁한다. 알은 세계이다. 태어나려는 자는 하나의 세계를 깨뜨려야 한다.</div>
+    <div class="scrap-from">
+      <span class="scrap-book">데미안</span><span class="sdot"></span>
+      <span class="scrap-pg">p.89</span><span class="sdot"></span>
+      <span class="scrap-pg">제5장</span>
+    </div>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="s">
+  <div class="s-head"><span class="s-title">4월 기록</span></div>
+  <div class="scards">
+    <div class="sc"><div class="sc-bar"></div><div class="sc-n">3</div><div class="sc-d">+1</div><div class="sc-l">완독</div></div>
+    <div class="sc"><div class="sc-bar"></div><div class="sc-n">24</div><div class="sc-d">+8</div><div class="sc-l">스크랩</div></div>
+    <div class="sc"><div class="sc-bar"></div><div class="sc-n">7</div><div class="sc-d">+3</div><div class="sc-l">대화</div></div>
+  </div>
+</div>
+
+<!-- Group -->
+<div class="s">
+  <div class="s-head"><span class="s-title">내 모임</span><span class="s-more">전체 &rarr;</span></div>
+  <div class="gc">
+    <div class="gc-top">
+      <div class="gc-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+      <div><div class="gc-name">문학 산책 모임</div><div class="gc-meta">4명 &middot; 매주 토요일</div></div>
+    </div>
+    <div class="gc-members">
+      <div class="gc-av" style="background:linear-gradient(135deg,var(--ac),var(--ac2));"></div>
+      <div class="gc-av" style="background:linear-gradient(135deg,var(--ac2),var(--ac3));"></div>
+      <div class="gc-av" style="background:linear-gradient(135deg,var(--ac3),var(--sf3));"></div>
+      <div class="gc-more">+1명</div>
+    </div>
+    <div class="gc-divider"></div>
+    <div class="gc-book">
+      <div class="gc-bcover"></div>
+      <div><div class="gc-bt">코스모스</div><div class="gc-bs">칼 세이건 &middot; 3주차</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Empty: Wishlist -->
+<div class="s">
+  <div class="s-head"><span class="s-title">읽고 싶은 책</span></div>
+  <div class="empty">
+    <div class="empty-glow"></div>
+    <div class="empty-art">
+      <svg viewBox="0 0 80 80" fill="none">
+        <!-- Abstract open book with gentle curves -->
+        <path d="M16 58 C16 58 20 24 40 22 C60 24 64 58 64 58" stroke="var(--ac)" stroke-width="1" opacity="0.25" class="draw-line" style="animation-delay:0.2s;"/>
+        <path d="M40 22 L40 58" stroke="var(--ac)" stroke-width="0.8" opacity="0.2"/>
+        <!-- Page lines left -->
+        <path d="M22 36 C28 35 34 34 38 34" stroke="var(--ac2)" stroke-width="0.5" opacity="0.2" class="draw-line" style="animation-delay:0.5s;"/>
+        <path d="M24 42 C29 41 34 40 38 40" stroke="var(--ac2)" stroke-width="0.5" opacity="0.15" class="draw-line" style="animation-delay:0.7s;"/>
+        <path d="M23 48 C28 47 34 46 38 46" stroke="var(--ac2)" stroke-width="0.5" opacity="0.1" class="draw-line" style="animation-delay:0.9s;"/>
+        <!-- Page lines right -->
+        <path d="M42 34 C46 34 52 35 58 36" stroke="var(--ac2)" stroke-width="0.5" opacity="0.2" class="draw-line" style="animation-delay:0.6s;"/>
+        <path d="M42 40 C46 40 51 41 56 42" stroke="var(--ac2)" stroke-width="0.5" opacity="0.15" class="draw-line" style="animation-delay:0.8s;"/>
+        <path d="M42 46 C46 46 52 47 57 48" stroke="var(--ac2)" stroke-width="0.5" opacity="0.1" class="draw-line" style="animation-delay:1s;"/>
+        <!-- Soft circle accent -->
+        <circle cx="40" cy="40" r="32" stroke="var(--ac)" stroke-width="0.3" opacity="0.06"/>
+      </svg>
+    </div>
+    <div class="empty-t">읽고 싶은 책을 모아보세요</div>
+    <div class="empty-d">발견한 책을 저장해두면<br>잊지 않고 만날 수 있어요</div>
+    <div class="empty-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      책 추가하기
+    </div>
+  </div>
+</div>
+
+<!-- Empty: Reviews -->
+<div class="s">
+  <div class="s-head"><span class="s-title">서평</span></div>
+  <div class="empty">
+    <div class="empty-glow"></div>
+    <div class="empty-art">
+      <svg viewBox="0 0 80 80" fill="none">
+        <!-- Abstract pen stroke / writing -->
+        <path d="M22 56 C26 44 34 28 52 20" stroke="var(--ac)" stroke-width="1" opacity="0.25" stroke-linecap="round" class="draw-line" style="animation-delay:0.3s;"/>
+        <path d="M52 20 L54 18 L56 22 L52 20z" fill="var(--ac)" opacity="0.2"/>
+        <!-- Underline strokes -->
+        <path d="M20 62 C30 61 50 60 60 62" stroke="var(--ac2)" stroke-width="0.5" opacity="0.15" class="draw-line" style="animation-delay:0.8s;"/>
+        <path d="M26 66 C34 65 46 65 54 66" stroke="var(--ac2)" stroke-width="0.5" opacity="0.1" class="draw-line" style="animation-delay:1s;"/>
+        <circle cx="40" cy="42" r="26" stroke="var(--ac)" stroke-width="0.3" opacity="0.06"/>
+      </svg>
+    </div>
+    <div class="empty-t">아직 서평이 없어요</div>
+    <div class="empty-d">대화를 나눈 뒤 느낌을 정리하면<br>더 오래 기억에 남아요</div>
+    <div class="empty-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+      서평 쓰기
+    </div>
+  </div>
+</div>
+
+<!-- Empty: Discussion -->
+<div class="s">
+  <div class="s-head"><span class="s-title">대화</span></div>
+  <div class="empty">
+    <div class="empty-glow"></div>
+    <div class="empty-art">
+      <svg viewBox="0 0 80 80" fill="none">
+        <!-- Abstract speech ripples -->
+        <ellipse cx="40" cy="40" rx="12" ry="10" stroke="var(--ac)" stroke-width="0.8" opacity="0.25" class="draw-line" style="animation-delay:0.3s;"/>
+        <ellipse cx="40" cy="40" rx="22" ry="18" stroke="var(--ac)" stroke-width="0.5" opacity="0.12" class="draw-line" style="animation-delay:0.6s;"/>
+        <ellipse cx="40" cy="40" rx="32" ry="26" stroke="var(--ac)" stroke-width="0.3" opacity="0.06" class="draw-line" style="animation-delay:0.9s;"/>
+        <!-- Three dots in center -->
+        <circle cx="34" cy="40" r="1.5" fill="var(--ac2)" opacity="0.3"/>
+        <circle cx="40" cy="40" r="1.5" fill="var(--ac2)" opacity="0.4"/>
+        <circle cx="46" cy="40" r="1.5" fill="var(--ac2)" opacity="0.3"/>
+      </svg>
+    </div>
+    <div class="empty-t">대화를 시작해보세요</div>
+    <div class="empty-d">책에 대해 궁금한 것을 물어보면<br>함께 생각을 나눌 수 있어요</div>
+    <div class="empty-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      대화 시작하기
+    </div>
+  </div>
+</div>
+
+<div class="spacer"></div>
+
+<!-- Bottom Nav -->
+<div class="bnav">
+  <div class="bnav-inner">
+    <div class="bnav-item on">
+      <div class="bnav-ico"><svg viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg></div>
+      <div class="bnav-label">서재</div>
+    </div>
+    <div class="bnav-item">
+      <div class="bnav-ico"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+      <div class="bnav-label">모임</div>
+    </div>
+    <div class="bnav-item">
+      <div class="bnav-ico"><svg viewBox="0 0 24 24"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></div>
+      <div class="bnav-label">서평</div>
+    </div>
+    <div class="bnav-item">
+      <div class="bnav-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg></div>
+      <div class="bnav-label">MY</div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function setT(t,el){
+  document.getElementById('p').setAttribute('data-theme',t);
+  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  document.body.style.background=getComputedStyle(document.getElementById('p')).getPropertyValue('--bg');
+}
+</script>
+</body>
+</html>

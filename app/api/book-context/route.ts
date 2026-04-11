@@ -262,6 +262,18 @@ JSON 응답:
   return JSON.parse(text);
 }
 
+// ── 제목/저자 정규화 (캐시 키 생성용) ──
+function normalizeBookKey(text: string): string {
+  return text
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ")           // 다중 공백 → 단일
+    .replace(/[()（）[\]「」『』《》〈〉""'']/g, "") // 괄호/따옴표 제거
+    .replace(/\s*:\s*/g, " ")       // 콜론 → 공백
+    .replace(/[.,·\-–—_]/g, "")     // 구두점 제거
+    .trim();
+}
+
 // ── 품질 평가 ──
 function assessQuality(data: Record<string, unknown>): {
   quality: "sufficient" | "partial" | "insufficient";
@@ -298,7 +310,8 @@ export async function POST(req: Request) {
   }
 
   const supabase = getSupabase();
-  const authorNorm = author || null;
+  const titleNorm = normalizeBookKey(title);
+  const authorNorm = normalizeBookKey(author || "");
 
   // 1) 이 book row 자체 확인
   const { data: bookRow } = await supabase
@@ -318,35 +331,63 @@ export async function POST(req: Request) {
   // 2) book_contexts 글로벌 캐시 확인 (같은 책을 다른 유저가 이미 검색한 경우)
   const { data: cached } = await supabase
     .from("book_contexts")
-    .select("context_data")
-    .eq("title", title)
-    .eq("author", authorNorm ?? "")
+    .select("context_data, fetch_status")
+    .eq("title_normalized", titleNorm)
+    .eq("author_normalized", authorNorm)
     .single();
 
-  if (cached?.context_data) {
-    console.log("[book-context] 글로벌 캐시 히트! title:", title);
-    // books 테이블에 복사
-    await supabase
-      .from("books")
-      .update({
-        context_data: cached.context_data,
-        context_status: "done",
-        context_fetched_at: new Date().toISOString(),
-      })
-      .eq("id", bookId);
+  if (cached?.context_data && cached.fetch_status === "done") {
+    console.log("[book-context] 글로벌 캐시 히트! title:", title, "(₩0, 즉시)");
+    // books 테이블에 복사 + 히트 카운트 증가
+    await Promise.all([
+      supabase
+        .from("books")
+        .update({
+          context_data: cached.context_data,
+          context_status: "done",
+          context_fetched_at: new Date().toISOString(),
+        })
+        .eq("id", bookId),
+      supabase.rpc("increment_book_context_hits", {
+        p_title: titleNorm,
+        p_author: authorNorm,
+      }).then(() => {}, () => {}),
+    ]);
     return NextResponse.json({ context: cached.context_data, cached: true });
   }
 
-  // Lock: fetching 상태
-  await supabase
-    .from("books")
-    .update({
-      context_status: "fetching",
-      context_data: {
-        steps: { plot: "pending", characters: "pending", reviews: "pending", grok: "pending", structure: "pending" },
-      },
-    })
-    .eq("id", bookId);
+  // 다른 유저가 이미 fetching 중이면 기다리지 않고 books row만 마킹
+  if (cached?.fetch_status === "fetching") {
+    console.log("[book-context] 다른 유저가 이미 fetching 중:", title);
+    return NextResponse.json({ context: null, status: "already_fetching" });
+  }
+
+  // Lock: fetching 상태 (books + 글로벌 캐시 동시)
+  await Promise.all([
+    supabase
+      .from("books")
+      .update({
+        context_status: "fetching",
+        context_data: {
+          steps: { plot: "pending", characters: "pending", reviews: "pending", grok: "pending", structure: "pending" },
+        },
+      })
+      .eq("id", bookId),
+    supabase
+      .from("book_contexts")
+      .upsert(
+        {
+          title_normalized: titleNorm,
+          author_normalized: authorNorm,
+          title_original: title,
+          author_original: author || null,
+          context_data: {},
+          fetch_status: "fetching",
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "title_normalized,author_normalized" },
+      ),
+  ]);
 
   try {
     // ═══ STEP 1: 4개 검색 병렬 실행 ═══
@@ -429,20 +470,23 @@ export async function POST(req: Request) {
     const finalStatus = quality === "insufficient" ? "failed" : "done";
 
     // 글로벌 캐시 저장 (book_contexts 테이블)
-    if (finalStatus === "done") {
-      const { error: cacheError } = await supabase
-        .from("book_contexts")
-        .upsert(
-          {
-            title,
-            author: authorNorm ?? "",
-            context_data: finalData,
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: "title,author" },
-        );
-      console.log("[book-context] 글로벌 캐시 저장:", cacheError ? `실패 - ${cacheError.message}` : "성공");
-    }
+    const cacheStatus = finalStatus === "done" ? "done" : "failed";
+    const { error: cacheError } = await supabase
+      .from("book_contexts")
+      .upsert(
+        {
+          title_normalized: titleNorm,
+          author_normalized: authorNorm,
+          title_original: title,
+          author_original: author || null,
+          context_data: finalData,
+          fetch_status: cacheStatus,
+          hit_count: 1,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "title_normalized,author_normalized" },
+      );
+    console.log("[book-context] 글로벌 캐시 저장:", cacheError ? `실패 - ${cacheError.message}` : `성공 (${cacheStatus})`);
 
     // books 테이블 업데이트
     const { error: updateError } = await supabase
@@ -461,17 +505,23 @@ export async function POST(req: Request) {
   } catch (err) {
     console.error("[book-context] Pipeline error:", err);
 
-    await supabase
-      .from("books")
-      .update({
-        context_status: "failed",
-        context_data: {
-          steps: { plot: "failed", characters: "failed", reviews: "failed", grok: "failed", structure: "failed" },
-          quality: "insufficient",
-          found: { plot: false, characters: false, themes: false },
-        },
-      })
-      .eq("id", bookId);
+    const failedData = {
+      steps: { plot: "failed", characters: "failed", reviews: "failed", grok: "failed", structure: "failed" },
+      quality: "insufficient",
+      found: { plot: false, characters: false, themes: false },
+    };
+
+    await Promise.all([
+      supabase
+        .from("books")
+        .update({ context_status: "failed", context_data: failedData })
+        .eq("id", bookId),
+      supabase
+        .from("book_contexts")
+        .update({ fetch_status: "failed", updated_at: new Date().toISOString() })
+        .eq("title_normalized", titleNorm)
+        .eq("author_normalized", authorNorm),
+    ]);
 
     return NextResponse.json({ context: null, error: "failed" }, { status: 500 });
   }

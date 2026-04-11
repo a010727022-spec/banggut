@@ -1,0 +1,171 @@
+<h2>방긋 디자인 방향성</h2>
+<p class="subtitle">같은 BookCard를 3가지 감성으로 구현했습니다. 클릭해서 골라주세요.</p>
+
+<div class="options" style="display:flex; flex-direction:column; gap:24px;">
+
+  <!-- Option A: 서점·서재 -->
+  <div class="option" data-choice="a" onclick="toggleSelect(this)" style="padding:0; overflow:hidden; border-radius:16px;">
+    <div class="letter">A</div>
+    <div class="content" style="width:100%;">
+      <h3>서점 · 서재 감성</h3>
+      <p style="color:#7a9186; margin-bottom:16px;">종이 질감, 책등 디테일, 활자 타이포 — 교보문고/츠타야</p>
+
+      <div style="background:#1a1810; border-radius:12px; padding:20px; border:1px solid rgba(160,140,100,0.15); position:relative; overflow:hidden;">
+        <!-- paper texture overlay -->
+        <div style="position:absolute; inset:0; opacity:0.03; background:repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(200,180,140,0.3) 2px, rgba(200,180,140,0.3) 3px);"></div>
+
+        <div style="display:flex; gap:16px; position:relative;">
+          <!-- Book spine + cover -->
+          <div style="position:relative;">
+            <div style="width:4px; height:110px; background:linear-gradient(180deg,#8B6F5C,#6B5040); position:absolute; left:0; top:0; border-radius:2px 0 0 2px;"></div>
+            <div style="width:72px; height:110px; margin-left:4px; background:linear-gradient(135deg,#2a2418 0%,#1a1810 100%); border-radius:0 4px 4px 0; border:1px solid rgba(160,140,100,0.2); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
+              <div style="position:absolute; inset:0; opacity:0.06; background:repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(200,180,140,0.4) 8px, rgba(200,180,140,0.4) 9px);"></div>
+              <span style="color:rgba(200,180,140,0.4); font-size:9px; writing-mode:vertical-rl; letter-spacing:2px; font-weight:300;">표 지</span>
+            </div>
+          </div>
+
+          <div style="flex:1; padding-top:4px;">
+            <div style="font-size:11px; color:rgba(200,180,140,0.35); letter-spacing:3px; text-transform:uppercase; font-weight:300;">NOW READING</div>
+            <div style="font-family:serif; font-size:17px; font-weight:600; color:#ede0cc; margin-top:6px; letter-spacing:-0.3px;">데미안</div>
+            <div style="font-size:12px; color:rgba(200,180,140,0.5); margin-top:3px; font-style:italic;">헤르만 헤세</div>
+
+            <div style="margin-top:16px; display:flex; align-items:center; gap:10px;">
+              <div style="flex:1; height:2px; background:rgba(200,180,140,0.1); border-radius:1px; overflow:hidden;">
+                <div style="width:65%; height:100%; background:linear-gradient(90deg,#8B6F5C,#c8903a); border-radius:1px;"></div>
+              </div>
+              <div style="font-size:10px; color:rgba(200,180,140,0.4); font-variant-numeric:tabular-nums;">p.142</div>
+            </div>
+
+            <div style="margin-top:12px; display:flex; gap:6px;">
+              <span style="font-size:9px; color:rgba(200,180,140,0.4); border:0.5px solid rgba(200,180,140,0.15); padding:3px 8px; border-radius:2px; letter-spacing:0.5px;">소설</span>
+              <span style="font-size:9px; color:rgba(200,180,140,0.4); border:0.5px solid rgba(200,180,140,0.15); padding:3px 8px; border-radius:2px; letter-spacing:0.5px;">성장</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mini scrap card -->
+      <div style="background:#1a1810; border-radius:10px; padding:16px; border:1px solid rgba(160,140,100,0.1); margin-top:12px; position:relative;">
+        <div style="position:absolute; left:16px; top:12px; bottom:12px; width:1.5px; background:rgba(200,180,140,0.15);"></div>
+        <div style="padding-left:16px;">
+          <div style="font-family:serif; font-size:13px; font-style:italic; color:#ede0cc; line-height:1.8; letter-spacing:0.2px;">"새는 알에서 나오려고 투쟁한다."</div>
+          <div style="font-size:10px; color:rgba(200,180,140,0.3); margin-top:8px;">p.89 &middot; 제5장</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option B: 문학 잡지 -->
+  <div class="option" data-choice="b" onclick="toggleSelect(this)" style="padding:0; overflow:hidden; border-radius:16px;">
+    <div class="letter">B</div>
+    <div class="content" style="width:100%;">
+      <h3>문학 잡지 · 에디토리얼 감성</h3>
+      <p style="color:#7a9186; margin-bottom:16px;">넉넉한 여백, 큰 서체, 매거진 레이아웃 — 킨포크/매거진 B</p>
+
+      <div style="background:#0e1210; border-radius:12px; padding:28px 24px; border:1px solid rgba(107,158,138,0.08);">
+        <div style="font-size:9px; color:rgba(107,158,138,0.4); letter-spacing:4px; text-transform:uppercase; font-weight:500;">Currently Reading</div>
+        <div style="margin-top:20px; display:flex; gap:24px; align-items:flex-start;">
+          <div style="width:80px; height:115px; background:linear-gradient(160deg,#1a2420,#0e1210); border-radius:3px; border:0.5px solid rgba(107,158,138,0.12); flex-shrink:0;"></div>
+          <div style="flex:1;">
+            <div style="font-size:26px; font-weight:300; color:#eeeae4; letter-spacing:-0.5px; line-height:1.15;">데미안</div>
+            <div style="font-size:13px; color:rgba(107,158,138,0.5); margin-top:6px; font-weight:300;">헤르만 헤세</div>
+            <div style="width:40px; height:0.5px; background:rgba(107,158,138,0.2); margin:16px 0;"></div>
+            <div style="font-size:11px; color:rgba(107,158,138,0.35); line-height:1.7; font-weight:300;">142 / 218 pages</div>
+          </div>
+        </div>
+
+        <div style="margin-top:24px;">
+          <div style="height:1px; background:rgba(107,158,138,0.06);"></div>
+          <div style="display:flex; justify-content:space-between; margin-top:16px;">
+            <div style="text-align:center;">
+              <div style="font-size:22px; font-weight:200; color:#eeeae4;">65<span style="font-size:12px; color:rgba(107,158,138,0.4);">%</span></div>
+              <div style="font-size:9px; color:rgba(107,158,138,0.3); letter-spacing:1px; margin-top:2px;">PROGRESS</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-size:22px; font-weight:200; color:#eeeae4;">7</div>
+              <div style="font-size:9px; color:rgba(107,158,138,0.3); letter-spacing:1px; margin-top:2px;">SCRAPS</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-size:22px; font-weight:200; color:#eeeae4;">3</div>
+              <div style="font-size:9px; color:rgba(107,158,138,0.3); letter-spacing:1px; margin-top:2px;">TALKS</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Magazine scrap -->
+      <div style="background:#0e1210; border-radius:10px; padding:24px; border:1px solid rgba(107,158,138,0.06); margin-top:12px;">
+        <div style="font-size:9px; color:rgba(107,158,138,0.3); letter-spacing:3px; text-transform:uppercase; margin-bottom:16px;">Highlight</div>
+        <div style="font-size:18px; font-weight:300; font-style:italic; color:rgba(238,234,228,0.85); line-height:1.7; letter-spacing:-0.2px;">"새는 알에서 나오려고<br>투쟁한다."</div>
+        <div style="width:24px; height:0.5px; background:rgba(107,158,138,0.2); margin:16px 0;"></div>
+        <div style="font-size:10px; color:rgba(107,158,138,0.3); font-weight:300;">Chapter 5, p.89</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option C: 프리미엄 앱 -->
+  <div class="option" data-choice="c" onclick="toggleSelect(this)" style="padding:0; overflow:hidden; border-radius:16px;">
+    <div class="letter">C</div>
+    <div class="content" style="width:100%;">
+      <h3>프리미엄 앱 · 모던 감성</h3>
+      <p style="color:#7a9186; margin-bottom:16px;">글래스모피즘, 그라데이션, 미니멀 — 노션/Things</p>
+
+      <div style="background:linear-gradient(135deg,rgba(107,158,138,0.08),rgba(107,158,138,0.02)); border-radius:16px; padding:20px; border:1px solid rgba(107,158,138,0.12); backdrop-filter:blur(20px); position:relative; overflow:hidden;">
+        <!-- Glow -->
+        <div style="position:absolute; top:-20px; right:-20px; width:100px; height:100px; background:radial-gradient(circle, rgba(107,158,138,0.15) 0%, transparent 70%);"></div>
+
+        <div style="display:flex; gap:14px; position:relative;">
+          <div style="width:68px; height:98px; background:linear-gradient(145deg,#1e2a24,#0c1a12); border-radius:10px; border:1px solid rgba(107,158,138,0.15); display:flex; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(0,0,0,0.3);">
+            <div style="width:48px; height:68px; background:linear-gradient(135deg,rgba(107,158,138,0.1),transparent); border-radius:6px;"></div>
+          </div>
+
+          <div style="flex:1; padding-top:2px;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="background:linear-gradient(135deg,rgba(107,158,138,0.2),rgba(143,184,164,0.1)); color:#8FB8A4; font-size:10px; font-weight:600; padding:3px 8px; border-radius:8px;">읽는 중</span>
+            </div>
+            <div style="font-size:16px; font-weight:600; color:#eeeae4; margin-top:8px;">데미안</div>
+            <div style="font-size:12px; color:#7a9186; margin-top:2px;">헤르만 헤세</div>
+
+            <div style="margin-top:12px;">
+              <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                <span style="font-size:10px; color:#7a9186;">진행률</span>
+                <span style="font-size:10px; font-weight:600; color:#8FB8A4;">65%</span>
+              </div>
+              <div style="height:4px; background:rgba(107,158,138,0.1); border-radius:4px; overflow:hidden;">
+                <div style="width:65%; height:100%; background:linear-gradient(90deg,#6B9E8A,#8FB8A4); border-radius:4px; box-shadow:0 0 8px rgba(107,158,138,0.3);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:8px; margin-top:16px;">
+          <div style="flex:1; background:rgba(107,158,138,0.06); border-radius:10px; padding:10px 12px; text-align:center; border:0.5px solid rgba(107,158,138,0.08);">
+            <div style="font-size:16px; font-weight:600; color:#eeeae4;">7</div>
+            <div style="font-size:9px; color:#3d5049; margin-top:2px;">스크랩</div>
+          </div>
+          <div style="flex:1; background:rgba(107,158,138,0.06); border-radius:10px; padding:10px 12px; text-align:center; border:0.5px solid rgba(107,158,138,0.08);">
+            <div style="font-size:16px; font-weight:600; color:#eeeae4;">3</div>
+            <div style="font-size:9px; color:#3d5049; margin-top:2px;">대화</div>
+          </div>
+          <div style="flex:1; background:rgba(107,158,138,0.06); border-radius:10px; padding:10px 12px; text-align:center; border:0.5px solid rgba(107,158,138,0.08);">
+            <div style="font-size:16px; font-weight:600; color:#eeeae4;">142</div>
+            <div style="font-size:9px; color:#3d5049; margin-top:2px;">페이지</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Glass scrap -->
+      <div style="background:linear-gradient(135deg,rgba(107,158,138,0.06),rgba(107,158,138,0.02)); border-radius:12px; padding:16px; border:1px solid rgba(107,158,138,0.1); margin-top:12px; position:relative; overflow:hidden;">
+        <div style="position:absolute; top:0; left:0; width:3px; height:100%; background:linear-gradient(180deg,#6B9E8A,#8FB8A4); border-radius:2px;"></div>
+        <div style="padding-left:12px;">
+          <div style="font-size:14px; font-style:italic; color:rgba(238,234,228,0.9); line-height:1.7;">"새는 알에서 나오려고 투쟁한다."</div>
+          <div style="display:flex; align-items:center; gap:6px; margin-top:10px;">
+            <span style="font-size:10px; color:#3d5049;">p.89</span>
+            <span style="width:3px; height:3px; border-radius:50%; background:#3d5049;"></span>
+            <span style="font-size:10px; color:#3d5049;">제5장</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

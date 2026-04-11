@@ -1,19 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Noto_Serif_KR } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { SupabaseProvider } from "@/components/providers/supabase-provider";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "sonner";
-
-const notoSerifKR = Noto_Serif_KR({
-  subsets: ["latin"],
-  weight: ["400", "600", "900"],
-  variable: "--font-serif",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "방긋 — 읽고, 긋고, 방긋.",
-  description: "방금 그은 문장에서 대화가 시작돼요. AI와 1:1 독서토론을 하고 나만의 서평을 완성하세요.",
+  description:
+    "방금 그은 문장에서 대화가 시작돼요. AI와 1:1 독서토론을 하고 나만의 서평을 완성하세요.",
   manifest: "/manifest.json",
 };
 
@@ -23,7 +18,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
-  themeColor: "#2B4C3F",
+  themeColor: "#0c0f0d",
 };
 
 export default function RootLayout({
@@ -32,20 +27,56 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko" className={notoSerifKR.variable}>
-      <body className="font-serif antialiased">
+    <html lang="ko" suppressHydrationWarning>
+      <head>
+        <link
+          rel="stylesheet"
+          as="style"
+          crossOrigin="anonymous"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
+        {/* 테마 플래시 방지: hydrate 전에 localStorage에서 테마를 읽어 즉시 적용 */}
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function(){
+            try {
+              var s = localStorage.getItem('banggut-theme');
+              if (s) {
+                var p = JSON.parse(s);
+                var t = p && p.state && p.state.theme;
+                if (t && ['dark','cream','navy','sepia','blossom'].indexOf(t) !== -1) {
+                  document.documentElement.setAttribute('data-theme', t);
+                }
+              }
+            } catch(e) {}
+          })();
+        `}} />
+      </head>
+      <body>
+        <Script
+          src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js"
+          strategy="afterInteractive"
+        />
+        <Script id="kakao-init" strategy="afterInteractive">
+          {`if(window.Kakao&&!window.Kakao.isInitialized()){window.Kakao.init("${process.env.NEXT_PUBLIC_KAKAO_KEY||""}")}`}
+        </Script>
         <SupabaseProvider>
-          <div className="mx-auto max-w-lg min-h-screen bg-paper">
+          <ThemeProvider />
+          <div className="mx-auto max-w-lg min-h-screen" style={{ background: "var(--bg)", transition: "background 0.4s" }}>
             {children}
           </div>
           <Toaster
             position="top-center"
             toastOptions={{
               style: {
-                background: "#FFFDF8",
-                border: "1px solid rgba(43,76,63,0.08)",
-                color: "#2C2C2C",
-                fontFamily: "'Noto Serif KR', Georgia, serif",
+                background: "var(--sf)",
+                border: "0.5px solid var(--bd2)",
+                color: "var(--tp)",
+                fontFamily: "'Pretendard', sans-serif",
+                borderRadius: "100px",
+                fontSize: "12px",
+                fontWeight: 700,
+                boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+                padding: "9px 18px",
               },
             }}
           />

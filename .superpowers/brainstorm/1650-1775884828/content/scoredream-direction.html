@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>방긋 — S-Core Dream Upgrade</title>
+<style>
+@font-face { font-family:'S-CoreDream'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-1Thin.woff') format('woff'); font-weight:100; }
+@font-face { font-family:'S-CoreDream'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-2ExtraLight.woff') format('woff'); font-weight:200; }
+@font-face { font-family:'S-CoreDream'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff'); font-weight:300; }
+@font-face { font-family:'S-CoreDream'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-4Regular.woff') format('woff'); font-weight:400; }
+@font-face { font-family:'S-CoreDream'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-5Medium.woff') format('woff'); font-weight:500; }
+@font-face { font-family:'S-CoreDream'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-6Bold.woff') format('woff'); font-weight:600; }
+@font-face { font-family:'S-CoreDream'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-7ExtraBold.woff') format('woff'); font-weight:700; }
+@font-face { font-family:'S-CoreDream'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-8Heavy.woff') format('woff'); font-weight:800; }
+@font-face { font-family:'S-CoreDream'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-9Black.woff') format('woff'); font-weight:900; }
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'S-CoreDream',sans-serif; background:#0c0f0d; color:#eeeae4; }
+
+.themes { display:flex; gap:8px; padding:16px 20px; overflow-x:auto; position:sticky; top:0; z-index:10; background:#0c0f0d; }
+.theme-btn { padding:6px 14px; border-radius:20px; border:1px solid rgba(255,255,255,0.1); font-size:11px; font-weight:500; cursor:pointer; font-family:'S-CoreDream',sans-serif; transition:all 0.3s; }
+.theme-btn.active { border-color:var(--ac); color:var(--acc); background:var(--ac); }
+
+.phone { max-width:390px; margin:0 auto; min-height:100vh; position:relative; transition:background 0.4s, color 0.4s; }
+
+/* Themes */
+[data-theme="dark"] { --bg:#0c0f0d; --sf:#131916; --sf2:#1a1f1c; --sf3:#242a26; --bd:rgba(107,158,138,0.11); --bd2:rgba(107,158,138,0.24); --tp:#eeeae4; --ts:#7a9186; --tm:#3d5049; --ac:#6B9E8A; --ac2:#8FB8A4; --ac3:#B5D4C4; --acc:#0c1a12; }
+[data-theme="cream"] { --bg:#F4EFE8; --sf:#EAE4DC; --sf2:#DDD6CC; --sf3:#D0C8BC; --bd:rgba(90,110,95,0.13); --bd2:rgba(90,110,95,0.26); --tp:#1c201d; --ts:#556058; --tm:#9aab9e; --ac:#4d8a72; --ac2:#6B9E8A; --ac3:#8FB8A4; --acc:#f4eee8; }
+[data-theme="navy"] { --bg:#080c18; --sf:#0e1422; --sf2:#161c2e; --sf3:#1e263c; --bd:rgba(80,130,200,0.12); --bd2:rgba(80,130,200,0.26); --tp:#e4eaf8; --ts:#6080a8; --tm:#2e4060; --ac:#5b9bd5; --ac2:#7ab5e8; --ac3:#a0ccf0; --acc:#080c18; }
+[data-theme="sepia"] { --bg:#191410; --sf:#231c16; --sf2:#2e251c; --sf3:#392e24; --bd:rgba(180,140,70,0.12); --bd2:rgba(180,140,70,0.26); --tp:#ede0cc; --ts:#9a8060; --tm:#564535; --ac:#c8903a; --ac2:#dfa850; --ac3:#efc070; --acc:#1a1008; }
+[data-theme="blossom"] { --bg:#fdf0f5; --sf:#f5e3ee; --sf2:#ead1e6; --sf3:#debfda; --bd:rgba(180,80,130,0.1); --bd2:rgba(180,80,130,0.24); --tp:#1a0f16; --ts:#7a3860; --tm:#c090b0; --ac:#b84880; --ac2:#d068a0; --ac3:#e090bc; --acc:#fdf0f5; }
+
+.phone { background:var(--bg); color:var(--tp); }
+
+/* Weight showcase */
+.weight-bar { padding:20px; border-bottom:0.5px solid var(--bd); }
+.weight-row { display:flex; align-items:baseline; gap:12px; margin-bottom:8px; }
+.weight-label { font-size:9px; font-weight:500; color:var(--tm); width:50px; letter-spacing:1px; }
+
+/* Page content */
+.page-content { padding:0 20px; }
+
+/* Header */
+.app-header { padding:24px 20px 0; }
+.greeting { font-size:13px; font-weight:200; color:var(--ts); letter-spacing:0.5px; }
+.user-name { font-size:24px; font-weight:700; color:var(--tp); margin-top:4px; letter-spacing:-0.5px; }
+.stats-row { display:flex; gap:16px; margin-top:16px; }
+.stat-item { }
+.stat-num { font-size:20px; font-weight:800; color:var(--ac); }
+.stat-label { font-size:10px; font-weight:300; color:var(--tm); margin-top:2px; letter-spacing:0.5px; }
+
+/* Section */
+.section { margin-top:28px; }
+.section-header { display:flex; justify-content:space-between; align-items:center; padding:0 20px; margin-bottom:14px; }
+.section-label { font-size:9px; font-weight:600; color:var(--tm); letter-spacing:2px; text-transform:uppercase; }
+.section-title { font-size:16px; font-weight:600; color:var(--tp); margin-top:3px; }
+.section-action { font-size:11px; font-weight:400; color:var(--ac); }
+
+/* Featured Book Card */
+.featured-card { margin:0 20px; background:var(--sf); border-radius:16px; padding:20px; border:0.5px solid var(--bd); position:relative; overflow:hidden; }
+.featured-card::after { content:''; position:absolute; top:-30px; right:-30px; width:120px; height:120px; background:radial-gradient(circle,var(--ac) 0%,transparent 70%); opacity:0.04; }
+.featured-row { display:flex; gap:16px; position:relative; }
+.book-cover { width:72px; height:106px; border-radius:4px; position:relative; overflow:hidden; flex-shrink:0; }
+.book-spine { position:absolute; left:0; top:0; bottom:0; width:4px; border-radius:2px 0 0 2px; }
+.book-face { position:absolute; left:4px; top:0; right:0; bottom:0; border-radius:0 4px 4px 0; display:flex; align-items:center; justify-content:center; }
+.book-info { flex:1; display:flex; flex-direction:column; justify-content:center; }
+.book-status { font-size:10px; font-weight:300; color:var(--ac2); letter-spacing:1px; }
+.book-title { font-size:18px; font-weight:700; color:var(--tp); margin-top:6px; letter-spacing:-0.3px; line-height:1.3; }
+.book-author { font-size:12px; font-weight:300; color:var(--ts); margin-top:4px; }
+.progress-wrap { margin-top:14px; }
+.progress-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+.progress-pct { font-size:11px; font-weight:600; color:var(--ac); }
+.progress-page { font-size:10px; font-weight:200; color:var(--tm); }
+.progress-track { height:3px; background:var(--sf3); border-radius:2px; overflow:hidden; }
+.progress-fill { height:100%; border-radius:2px; background:linear-gradient(90deg,var(--ac),var(--ac2)); }
+
+/* Book Grid */
+.book-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; padding:0 20px; }
+.book-tile { border-radius:12px; overflow:hidden; position:relative; aspect-ratio:2/3; background:var(--sf); border:0.5px solid var(--bd); }
+.book-tile-overlay { position:absolute; bottom:0; left:0; right:0; padding:10px; background:linear-gradient(transparent,rgba(0,0,0,0.7)); }
+.book-tile-title { font-size:12px; font-weight:600; color:#fff; line-height:1.3; }
+.book-tile-author { font-size:10px; font-weight:200; color:rgba(255,255,255,0.6); margin-top:2px; }
+
+/* Scrap Card */
+.scrap-card { margin:0 20px; background:var(--sf); border-radius:14px; padding:18px; border:0.5px solid var(--bd); position:relative; }
+.scrap-line { position:absolute; left:18px; top:16px; bottom:16px; width:2px; border-radius:1px; background:linear-gradient(180deg,var(--ac),var(--ac3)); }
+.scrap-body { padding-left:16px; }
+.scrap-text { font-size:14px; font-weight:300; font-style:italic; color:var(--tp); line-height:1.9; letter-spacing:0.2px; }
+.scrap-meta { font-size:10px; font-weight:300; color:var(--tm); margin-top:10px; display:flex; align-items:center; gap:6px; }
+.scrap-dot { width:3px; height:3px; border-radius:50%; background:var(--tm); }
+
+/* Stat Cards */
+.stat-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; padding:0 20px; }
+.stat-card { background:var(--sf); border-radius:12px; padding:14px; border:0.5px solid var(--bd); text-align:center; }
+.stat-card-num { font-size:22px; font-weight:800; color:var(--ac); }
+.stat-card-label { font-size:9px; font-weight:300; color:var(--tm); margin-top:4px; letter-spacing:0.5px; }
+
+/* Empty State */
+.empty-card { margin:0 20px; background:var(--sf); border-radius:16px; padding:32px 20px; border:0.5px solid var(--bd); text-align:center; }
+.empty-icon { font-size:36px; margin-bottom:14px; }
+.empty-title { font-size:15px; font-weight:500; color:var(--tp); }
+.empty-desc { font-size:12px; font-weight:300; color:var(--tm); margin-top:6px; line-height:1.6; }
+.empty-cta { display:inline-block; margin-top:18px; background:var(--ac); color:var(--acc); padding:10px 24px; border-radius:10px; font-size:13px; font-weight:600; }
+
+/* Bottom Nav */
+.bottom-nav { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:390px; background:var(--sf); border-top:0.5px solid var(--bd); padding:8px 0 env(safe-area-inset-bottom,8px); display:flex; justify-content:space-around; backdrop-filter:blur(20px); }
+.nav-item { display:flex; flex-direction:column; align-items:center; gap:4px; padding:4px 0; }
+.nav-icon { width:22px; height:22px; border-radius:4px; background:var(--sf3); }
+.nav-label { font-size:10px; font-weight:400; color:var(--tm); }
+.nav-item.active .nav-label { color:var(--ac); font-weight:600; }
+.nav-item.active .nav-icon { background:var(--ac); }
+.nav-dot { width:4px; height:4px; border-radius:50%; background:var(--ac); margin-top:1px; }
+
+.spacer { height:80px; }
+</style>
+</head>
+<body>
+<div class="phone" data-theme="dark" id="phone">
+
+  <!-- Theme Switcher -->
+  <div class="themes">
+    <div class="theme-btn active" onclick="setTheme('dark')" style="background:#0c0f0d; color:#6B9E8A; border-color:#6B9E8A;">밤숲</div>
+    <div class="theme-btn" onclick="setTheme('cream')" style="background:#F4EFE8; color:#4d8a72;">크림</div>
+    <div class="theme-btn" onclick="setTheme('navy')" style="background:#080c18; color:#5b9bd5;">네이비</div>
+    <div class="theme-btn" onclick="setTheme('sepia')" style="background:#191410; color:#c8903a;">세피아</div>
+    <div class="theme-btn" onclick="setTheme('blossom')" style="background:#fdf0f5; color:#b84880;">블러썸</div>
+  </div>
+
+  <!-- Weight Showcase -->
+  <div class="weight-bar">
+    <div style="font-size:10px; font-weight:500; color:var(--tm); letter-spacing:2px; text-transform:uppercase; margin-bottom:12px;">S-Core Dream Weights</div>
+    <div class="weight-row"><span class="weight-label">100</span><span style="font-size:20px; font-weight:100;">방긋, 책과 함께하는 시간</span></div>
+    <div class="weight-row"><span class="weight-label">200</span><span style="font-size:20px; font-weight:200;">방긋, 책과 함께하는 시간</span></div>
+    <div class="weight-row"><span class="weight-label">300</span><span style="font-size:20px; font-weight:300;">방긋, 책과 함께하는 시간</span></div>
+    <div class="weight-row"><span class="weight-label">500</span><span style="font-size:20px; font-weight:500;">방긋, 책과 함께하는 시간</span></div>
+    <div class="weight-row"><span class="weight-label">700</span><span style="font-size:20px; font-weight:700;">방긋, 책과 함께하는 시간</span></div>
+    <div class="weight-row"><span class="weight-label">900</span><span style="font-size:20px; font-weight:900;">방긋, 책과 함께하는 시간</span></div>
+  </div>
+
+  <!-- Header -->
+  <div class="app-header">
+    <div class="greeting">오늘도 좋은 하루,</div>
+    <div class="user-name">지선님의 서재</div>
+    <div class="stats-row">
+      <div class="stat-item">
+        <div class="stat-num">12</div>
+        <div class="stat-label">완독</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">3</div>
+        <div class="stat-label">읽는 중</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">8</div>
+        <div class="stat-label">위시</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Featured Book -->
+  <div class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-label">NOW READING</div>
+        <div class="section-title">이어서 읽기</div>
+      </div>
+      <div class="section-action">전체 &rarr;</div>
+    </div>
+    <div class="featured-card">
+      <div class="featured-row">
+        <div class="book-cover">
+          <div class="book-spine" style="background:linear-gradient(180deg,var(--ac),var(--ac2));"></div>
+          <div class="book-face" style="background:var(--sf2);">
+            <span style="font-size:10px; font-weight:200; color:var(--tm); writing-mode:vertical-rl;">데미안</span>
+          </div>
+        </div>
+        <div class="book-info">
+          <div class="book-status">읽는 중</div>
+          <div class="book-title">데미안</div>
+          <div class="book-author">헤르만 헤세</div>
+          <div class="progress-wrap">
+            <div class="progress-top">
+              <span class="progress-pct">65%</span>
+              <span class="progress-page">p.142 / 218</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" style="width:65%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Completed Grid -->
+  <div class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-label">COMPLETED</div>
+        <div class="section-title">완독한 책</div>
+      </div>
+      <div class="section-action">12권 &rarr;</div>
+    </div>
+    <div class="book-grid">
+      <div class="book-tile" style="background:linear-gradient(135deg,var(--sf2),var(--sf));">
+        <div class="book-tile-overlay">
+          <div class="book-tile-title">노르웨이의 숲</div>
+          <div class="book-tile-author">무라카미 하루키</div>
+        </div>
+      </div>
+      <div class="book-tile" style="background:linear-gradient(135deg,var(--sf3),var(--sf));">
+        <div class="book-tile-overlay">
+          <div class="book-tile-title">1984</div>
+          <div class="book-tile-author">조지 오웰</div>
+        </div>
+      </div>
+      <div class="book-tile" style="background:linear-gradient(135deg,var(--sf2),var(--sf3));">
+        <div class="book-tile-overlay">
+          <div class="book-tile-title">어린 왕자</div>
+          <div class="book-tile-author">생텍쥐페리</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scrap -->
+  <div class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-label">HIGHLIGHT</div>
+        <div class="section-title">최근 스크랩</div>
+      </div>
+    </div>
+    <div class="scrap-card">
+      <div class="scrap-line"></div>
+      <div class="scrap-body">
+        <div class="scrap-text">"새는 알에서 나오려고 투쟁한다. 알은 세계이다. 태어나려는 자는 하나의 세계를 깨뜨려야 한다."</div>
+        <div class="scrap-meta">
+          <span>데미안</span>
+          <span class="scrap-dot"></span>
+          <span>p.89</span>
+          <span class="scrap-dot"></span>
+          <span>제5장</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-label">THIS MONTH</div>
+        <div class="section-title">4월 기록</div>
+      </div>
+    </div>
+    <div class="stat-cards">
+      <div class="stat-card">
+        <div class="stat-card-num">3</div>
+        <div class="stat-card-label">완독</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-num">24</div>
+        <div class="stat-card-label">스크랩</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-num">7</div>
+        <div class="stat-card-label">대화</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-label">GROUPS</div>
+        <div class="section-title">모임</div>
+      </div>
+    </div>
+    <div class="empty-card">
+      <div class="empty-icon">&#128214;</div>
+      <div class="empty-title">아직 참여 중인 모임이 없어요</div>
+      <div class="empty-desc">함께 읽으면 더 깊어지는 독서,<br>모임을 만들거나 참여해보세요</div>
+      <div class="empty-cta">모임 둘러보기</div>
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <div class="nav-item active">
+      <div class="nav-icon"></div>
+      <div class="nav-label">서재</div>
+      <div class="nav-dot"></div>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon"></div>
+      <div class="nav-label">모임</div>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon"></div>
+      <div class="nav-label">서평</div>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon"></div>
+      <div class="nav-label">MY</div>
+    </div>
+  </div>
+</div>
+
+<script>
+function setTheme(t) {
+  document.getElementById('phone').setAttribute('data-theme', t);
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.body.style.background = getComputedStyle(document.getElementById('phone')).getPropertyValue('--bg');
+}
+document.body.style.background = '#0c0f0d';
+</script>
+</body>
+</html>

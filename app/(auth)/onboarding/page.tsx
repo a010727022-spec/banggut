@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { upsertProfile } from "@/lib/supabase/queries";
 import { useRouter, useSearchParams } from "next/navigation";
-import { AVATARS } from "@/lib/types";
+import { AVATAR_IMAGES, EMOJI_AVATARS, getAvatarSrc } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -21,7 +21,7 @@ function OnboardingContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nickname, setNickname] = useState("");
-  const [emoji, setEmoji] = useState("🦊");
+  const [emoji, setEmoji] = useState("hemingway");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const supabase = createClient();
@@ -102,22 +102,52 @@ function OnboardingContent() {
   if (step === "profile") {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen px-6">
-        <div className="text-6xl mb-6">{emoji}</div>
+        <div className="mb-5">
+          {(() => {
+            const src = getAvatarSrc(emoji);
+            return src ? (
+              <img src={src} alt="" className="w-20 h-20 rounded-full mx-auto object-cover" />
+            ) : (
+              <div className="text-6xl text-center">{emoji}</div>
+            );
+          })()}
+        </div>
         <h1 className="text-2xl font-black text-ink-green mb-2">프로필 설정</h1>
-        <p className="text-warmgray text-sm mb-8">나를 표현할 이모지와 닉네임을 골라주세요</p>
+        <p className="text-warmgray text-sm mb-5">나를 표현할 아바타와 닉네임을 골라주세요</p>
 
-        <div className="flex flex-wrap justify-center gap-3 mb-8 max-w-xs">
-          {AVATARS.map((av) => (
+        {/* 작가 아바타 */}
+        <p className="text-xs font-semibold text-warmgray mb-2">작가 아바타</p>
+        <div className="grid grid-cols-3 gap-2.5 mb-5 max-w-[280px]">
+          {AVATAR_IMAGES.map((av) => (
             <button
-              key={av}
-              onClick={() => setEmoji(av)}
-              className={`text-2xl w-11 h-11 rounded-avatar flex items-center justify-center transition-all ${
-                emoji === av
+              key={av.id}
+              onClick={() => setEmoji(av.id)}
+              className={`flex flex-col items-center gap-1.5 p-2 rounded-xl transition-all ${
+                emoji === av.id
+                  ? "bg-ink-green/10 ring-2 ring-ink-green scale-105"
+                  : "bg-warm hover:bg-warmgray-dim"
+              }`}
+            >
+              <img src={av.src} alt={av.label} className="w-14 h-14 rounded-full object-cover" />
+              <span className="text-[10px] font-medium text-warmgray">{av.label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* 이모지 */}
+        <p className="text-xs font-semibold text-warmgray mb-2">이모지</p>
+        <div className="flex flex-wrap justify-center gap-2 mb-6 max-w-[280px]">
+          {EMOJI_AVATARS.map((em) => (
+            <button
+              key={em}
+              onClick={() => setEmoji(em)}
+              className={`text-2xl w-11 h-11 rounded-full flex items-center justify-center transition-all ${
+                emoji === em
                   ? "bg-ink-green/10 ring-2 ring-ink-green scale-110"
                   : "bg-warm hover:bg-warmgray-dim"
               }`}
             >
-              {av}
+              {em}
             </button>
           ))}
         </div>
@@ -127,7 +157,7 @@ function OnboardingContent() {
           onChange={(e) => setNickname(e.target.value)}
           placeholder="닉네임"
           maxLength={12}
-          className="mb-4 w-full max-w-xs text-center bg-warm border-[rgba(43,76,63,0.15)] rounded-btn focus:border-ink-green"
+          className="mb-4 w-full max-w-xs text-center bg-warm border-[var(--bd2)] rounded-btn focus:border-ink-green"
         />
 
         <Button
@@ -172,14 +202,14 @@ function OnboardingContent() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="이메일 주소"
-          className="bg-warm border-[rgba(43,76,63,0.15)] rounded-btn focus:border-ink-green"
+          className="bg-warm border-[var(--bd2)] rounded-btn focus:border-ink-green"
         />
         <Input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="비밀번호 (6자 이상)"
-          className="bg-warm border-[rgba(43,76,63,0.15)] rounded-btn focus:border-ink-green"
+          className="bg-warm border-[var(--bd2)] rounded-btn focus:border-ink-green"
         />
         <Button
           onClick={handleEmailAuth}

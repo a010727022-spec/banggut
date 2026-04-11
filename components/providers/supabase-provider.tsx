@@ -3,120 +3,81 @@
 import { createClient } from "@/lib/supabase/client";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { getProfile } from "@/lib/supabase/queries";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
-// getProfile에 3초 타임아웃 (Promise.race로 강제)
-function getProfileWithTimeout(
-  supabase: ReturnType<typeof createClient>,
-  userId: string
-) {
-  return Promise.race([
-    getProfile(supabase, userId).catch((err) => {
-      console.error("[Auth] getProfile threw:", err);
-      return null;
-    }),
-    new Promise<null>((resolve) =>
-      setTimeout(() => {
-        console.warn("[Auth] getProfile timed out after 3s");
-        resolve(null);
-      }, 3000)
-    ),
-  ]);
+function makeFallbackUser(userId: string, email?: string | null) {
+  return {
+    id: userId,
+    nickname: email?.split("@")[0] || "사용자",
+    emoji: "hemingway" as const,
+    created_at: new Date().toISOString(),
+  };
 }
 
 export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   const setUser = useAuthStore((s) => s.setUser);
   const setLoading = useAuthStore((s) => s.setLoading);
-  const initialized = useRef(false);
 
   useEffect(() => {
-    if (initialized.current) return;
-    initialized.current = true;
-
-    console.log("[Auth] SupabaseProvider init started");
     const supabase = createClient();
+    let resolved = false;
 
-    // 8초 안에 로딩 안 끝나면 강제로 로딩 해제
-    const timeout = setTimeout(() => {
+    // 5초 안전장치 — 어떤 이유로든 로딩이 안 끝나면 강제 해제
+    const safetyTimeout = setTimeout(() => {
       const { isLoading } = useAuthStore.getState();
       if (isLoading) {
-        console.warn("[Auth] timeout — forcing loading end");
+        console.warn("[Auth] safety timeout — forcing loading=false");
         setLoading(false);
       }
-    }, 8000);
+    }, 5000);
 
-    const resolveUser = async (
-      userId: string,
-      email: string | undefined,
-      source: string
-    ) => {
-      console.log(`[Auth] resolveUser from ${source}, userId:`, userId);
+    const resolveUser = async (userId: string, email: string | undefined) => {
+      if (resolved) return;
+      resolved = true;
 
-      const profile = await getProfileWithTimeout(supabase, userId);
-      console.log(
-        `[Auth] profile result from ${source}:`,
-        profile ? `found (${profile.nickname})` : "null"
-      );
+      try {
+        // getProfile에 3초 타임아웃
+        const profile = await Promise.race([
+          getProfile(supabase, userId),
+          new Promise<null>((r) => setTimeout(() => r(null), 3000)),
+        ]);
 
-      if (profile) {
-        setUser(profile);
-      } else {
-        // 프로필이 없거나 조회 실패 → 세션은 유효하므로 최소한의 유저 정보 사용
-        // (AuthGuard가 로그아웃으로 판단하지 않도록)
-        console.log("[Auth] Using fallback user from session");
-        setUser({
-          id: userId,
-          nickname: email?.split("@")[0] || "사용자",
-          emoji: "🦊",
-          created_at: new Date().toISOString(),
-        });
+        setUser(profile || makeFallbackUser(userId, email));
+      } catch {
+        setUser(makeFallbackUser(userId, email));
+      } finally {
+        clearTimeout(safetyTimeout);
+        setLoading(false);
       }
     };
 
-    // onAuthStateChange가 모든 인증 상태를 처리
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log("[Auth] onAuthStateChange:", event, {
-          hasSession: !!session,
-          userId: session?.user?.id,
-        });
-
         try {
           if (session?.user) {
-            await resolveUser(
-              session.user.id,
-              session.user.email,
-              `onAuthStateChange:${event}`
-            );
+            await resolveUser(session.user.id, session.user.email);
           } else if (event === "INITIAL_SESSION") {
-            // 쿠키에서 세션을 못 읽었을 때 → 서버 검증 시도
-            console.log("[Auth] No session on INITIAL_SESSION, trying getUser...");
-            const { data: { user }, error } = await supabase.auth.getUser();
-            console.log("[Auth] getUser fallback:", {
-              hasUser: !!user,
-              error: error?.message,
-            });
+            const { data: { user } } = await supabase.auth.getUser();
             if (user) {
-              await resolveUser(user.id, user.email, "getUser-fallback");
+              await resolveUser(user.id, user.email);
             } else {
               setUser(null);
+              setLoading(false);
             }
-          } else {
-            console.log("[Auth] No session, setting user null");
+          } else if (event === "SIGNED_OUT") {
+            resolved = false;
             setUser(null);
+            setLoading(false);
           }
-        } catch (err) {
-          console.error("[Auth] error:", err);
+        } catch {
           setUser(null);
-        } finally {
-          clearTimeout(timeout);
           setLoading(false);
         }
       }
     );
 
     return () => {
-      clearTimeout(timeout);
+      clearTimeout(safetyTimeout);
       subscription.unsubscribe();
     };
   }, [setUser, setLoading]);

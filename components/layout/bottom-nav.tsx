@@ -2,44 +2,59 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, PenLine, MessageCircle, User } from "lucide-react";
+import { BookOpen, Users, PenLine, User } from "lucide-react";
 
 const NAV_ITEMS = [
-  { id: "library", label: "서재", icon: BookOpen, route: "/" },
-  { id: "scrap", label: "스크랩", icon: PenLine, route: "/scrap" },
-  { id: "groups", label: "모임", icon: MessageCircle, route: "/groups" },
-  { id: "profile", label: "MY", icon: User, route: "/profile" },
+  { id: "library", label: "서재",  icon: BookOpen, route: "/" },
+  { id: "groups",  label: "모임",  icon: Users,    route: "/groups" },
+  { id: "reviews", label: "서평",  icon: PenLine,  route: "/scrap" },
+  { id: "profile", label: "MY",    icon: User,     route: "/profile" },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
 
-  // 토론/서평 페이지에서는 자체 레이아웃을 사용하므로 하단 네비 숨김
-  if (pathname.startsWith("/discuss") || pathname.startsWith("/review") || pathname.startsWith("/book/")) {
-    return null;
-  }
+  if (
+    pathname.startsWith("/discuss/") ||
+    pathname.startsWith("/review/") ||
+    pathname.startsWith("/book/")
+  ) return null;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-warm border-t border-[rgba(43,76,63,0.08)]">
-      <div className="mx-auto max-w-lg flex items-center justify-around h-14 pb-[env(safe-area-inset-bottom)]">
+    <nav className="fixed bottom-0 left-0 right-0 z-50" style={{
+      borderTop: "0.5px solid var(--bd)",
+      background: "color-mix(in srgb, var(--bg) 92%, transparent)",
+      backdropFilter: "blur(20px)",
+      WebkitBackdropFilter: "blur(20px)",
+      transition: "all 0.4s",
+    }}>
+      <div className="mx-auto max-w-lg flex items-center justify-around"
+        style={{ paddingTop: 10, paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 10px)" }}>
         {NAV_ITEMS.map((item) => {
-          const isActive =
-            item.route === "/"
-              ? pathname === "/"
-              : pathname.startsWith(item.route);
+          const isActive = item.route === "/" ? pathname === "/" : pathname.startsWith(item.route);
           const Icon = item.icon;
           return (
-            <Link
-              key={item.id}
-              href={item.route}
-              className={`flex flex-col items-center justify-center gap-0.5 min-w-[48px] min-h-[44px] px-3 py-1 transition-colors ${
-                isActive
-                  ? "text-ink-green"
-                  : "text-warmgray-light hover:text-warmgray"
-              }`}
-            >
-              <Icon className="w-5 h-5" strokeWidth={isActive ? 2.2 : 1.6} />
-              <span className="text-[10px] font-semibold">{item.label}</span>
+            <Link key={item.id} href={item.route}
+              className="flex flex-col items-center gap-1"
+              style={{ cursor: "pointer", padding: "4px 0", minWidth: 56 }}>
+              <Icon style={{
+                width: 22, height: 22,
+                stroke: isActive ? "var(--ac)" : "var(--tm)",
+                strokeWidth: isActive ? 2 : 1.8,
+                transition: "stroke 0.4s",
+              }} />
+              <span style={{
+                fontSize: 9, fontWeight: 700,
+                color: isActive ? "var(--ac)" : "var(--tm)",
+                letterSpacing: "0.8px", textTransform: "uppercase",
+                transition: "color 0.4s",
+              }}>{item.label}</span>
+              <div style={{
+                width: 4, height: 4, borderRadius: "50%",
+                background: "var(--ac)",
+                opacity: isActive ? 1 : 0,
+                transition: "opacity 0.2s, background 0.4s",
+              }} />
             </Link>
           );
         })}

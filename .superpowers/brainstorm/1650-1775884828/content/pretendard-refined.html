@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>방긋 — Pretendard Refined</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-serif; }
+
+/* Themes */
+[data-theme="dark"] { --bg:#0c0f0d; --sf:#131916; --sf2:#1a1f1c; --sf3:#242a26; --bd:rgba(107,158,138,0.11); --bd2:rgba(107,158,138,0.24); --tp:#eeeae4; --ts:#7a9186; --tm:#3d5049; --ac:#6B9E8A; --ac2:#8FB8A4; --ac3:#B5D4C4; --acc:#0c1a12; --glow:rgba(107,158,138,0.06); }
+[data-theme="cream"] { --bg:#F4EFE8; --sf:#EAE4DC; --sf2:#DDD6CC; --sf3:#D0C8BC; --bd:rgba(90,110,95,0.13); --bd2:rgba(90,110,95,0.26); --tp:#1c201d; --ts:#556058; --tm:#9aab9e; --ac:#4d8a72; --ac2:#6B9E8A; --ac3:#8FB8A4; --acc:#f4eee8; --glow:rgba(77,138,114,0.06); }
+[data-theme="navy"] { --bg:#080c18; --sf:#0e1422; --sf2:#161c2e; --sf3:#1e263c; --bd:rgba(80,130,200,0.12); --bd2:rgba(80,130,200,0.26); --tp:#e4eaf8; --ts:#6080a8; --tm:#2e4060; --ac:#5b9bd5; --ac2:#7ab5e8; --ac3:#a0ccf0; --acc:#080c18; --glow:rgba(91,155,213,0.06); }
+[data-theme="sepia"] { --bg:#191410; --sf:#231c16; --sf2:#2e251c; --sf3:#392e24; --bd:rgba(180,140,70,0.12); --bd2:rgba(180,140,70,0.26); --tp:#ede0cc; --ts:#9a8060; --tm:#564535; --ac:#c8903a; --ac2:#dfa850; --ac3:#efc070; --acc:#1a1008; --glow:rgba(200,144,58,0.06); }
+[data-theme="blossom"] { --bg:#fdf0f5; --sf:#f5e3ee; --sf2:#ead1e6; --sf3:#debfda; --bd:rgba(180,80,130,0.1); --bd2:rgba(180,80,130,0.24); --tp:#1a0f16; --ts:#7a3860; --tm:#c090b0; --ac:#b84880; --ac2:#d068a0; --ac3:#e090bc; --acc:#fdf0f5; --glow:rgba(184,72,128,0.06); }
+
+.phone { max-width:390px; margin:0 auto; min-height:100vh; background:var(--bg); color:var(--tp); transition:background 0.4s cubic-bezier(0.22,1,0.36,1), color 0.4s; overflow-x:hidden; }
+
+/* Theme bar */
+.themes { display:flex; gap:6px; padding:12px 20px; overflow-x:auto; position:sticky; top:0; z-index:10; background:var(--bg); }
+.themes::-webkit-scrollbar { display:none; }
+.tbtn { padding:5px 12px; border-radius:16px; border:1px solid var(--bd); font-size:11px; font-weight:500; cursor:pointer; font-family:inherit; background:transparent; color:var(--ts); transition:all 0.2s; }
+.tbtn.on { background:var(--ac); color:var(--acc); border-color:var(--ac); }
+
+/* ── HEADER ── */
+.header { padding:20px 20px 0; }
+.header-top { display:flex; justify-content:space-between; align-items:flex-start; }
+.avatar { width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,var(--ac),var(--ac2)); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:var(--acc); position:relative; }
+.streak { position:absolute; bottom:-2px; right:-4px; background:var(--ac); color:var(--acc); font-size:8px; font-weight:800; padding:2px 5px; border-radius:8px; border:2px solid var(--bg); }
+.header-actions { display:flex; gap:8px; }
+.header-btn { width:34px; height:34px; border-radius:10px; background:var(--sf); border:0.5px solid var(--bd); display:flex; align-items:center; justify-content:center; color:var(--ts); font-size:14px; }
+
+.greeting { margin-top:16px; }
+.greeting-sub { font-size:13px; font-weight:300; color:var(--ts); letter-spacing:0.2px; }
+.greeting-name { font-size:22px; font-weight:800; color:var(--tp); margin-top:2px; letter-spacing:-0.5px; }
+
+/* Stats pills */
+.stat-pills { display:flex; gap:8px; margin-top:14px; }
+.pill { display:flex; align-items:center; gap:5px; background:var(--sf); padding:6px 12px; border-radius:20px; border:0.5px solid var(--bd); }
+.pill-num { font-size:14px; font-weight:700; color:var(--ac); }
+.pill-label { font-size:11px; font-weight:400; color:var(--ts); }
+
+/* ── SECTIONS ── */
+.sec { margin-top:28px; }
+.sec-head { display:flex; justify-content:space-between; align-items:flex-end; padding:0 20px; margin-bottom:14px; }
+.sec-left {}
+.sec-tag { font-size:9px; font-weight:700; color:var(--ac2); letter-spacing:1.5px; text-transform:uppercase; }
+.sec-title { font-size:17px; font-weight:700; color:var(--tp); margin-top:2px; letter-spacing:-0.3px; }
+.sec-more { font-size:12px; font-weight:500; color:var(--ac); opacity:0.8; }
+
+/* ── FEATURED CARD ── */
+.feat { margin:0 20px; background:var(--sf); border-radius:18px; padding:18px; border:0.5px solid var(--bd); position:relative; overflow:hidden; }
+.feat::before { content:''; position:absolute; top:-40px; right:-40px; width:140px; height:140px; background:radial-gradient(circle,var(--glow),transparent 70%); pointer-events:none; }
+.feat-row { display:flex; gap:14px; position:relative; z-index:1; }
+.cover { width:70px; height:102px; border-radius:6px; overflow:hidden; flex-shrink:0; position:relative; box-shadow:0 4px 12px rgba(0,0,0,0.2); }
+.cover-spine { position:absolute; left:0; top:0; bottom:0; width:3px; background:linear-gradient(180deg,var(--ac),var(--ac3)); }
+.cover-face { position:absolute; inset:0; left:3px; background:linear-gradient(145deg,var(--sf2),var(--sf3)); display:flex; align-items:center; justify-content:center; }
+.cover-inner { font-size:9px; font-weight:300; color:var(--tm); writing-mode:vertical-rl; letter-spacing:2px; }
+.feat-info { flex:1; display:flex; flex-direction:column; }
+.feat-badge { display:inline-flex; align-items:center; gap:4px; background:rgba(107,158,138,0.08); padding:3px 8px; border-radius:6px; font-size:10px; font-weight:600; color:var(--ac2); align-self:flex-start; border:0.5px solid rgba(107,158,138,0.1); }
+.feat-badge::before { content:''; width:5px; height:5px; border-radius:50%; background:var(--ac); }
+.feat-title { font-size:17px; font-weight:700; color:var(--tp); margin-top:8px; letter-spacing:-0.3px; line-height:1.25; }
+.feat-author { font-size:12px; font-weight:400; color:var(--ts); margin-top:3px; }
+.feat-progress { margin-top:auto; padding-top:12px; }
+.feat-prow { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:5px; }
+.feat-pct { font-size:13px; font-weight:700; color:var(--ac); }
+.feat-pages { font-size:10px; font-weight:300; color:var(--tm); }
+.pbar { height:3px; background:var(--sf3); border-radius:2px; overflow:hidden; }
+.pfill { height:100%; border-radius:2px; background:linear-gradient(90deg,var(--ac),var(--ac2)); position:relative; }
+.pfill::after { content:''; position:absolute; right:0; top:-1px; width:5px; height:5px; border-radius:50%; background:var(--ac2); box-shadow:0 0 6px var(--ac); }
+
+/* ── BOOK GRID ── */
+.bgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; padding:0 20px; }
+.btile { border-radius:14px; overflow:hidden; position:relative; aspect-ratio:2/3; background:var(--sf); border:0.5px solid var(--bd); cursor:pointer; transition:transform 0.15s; }
+.btile:active { transform:scale(0.97); }
+.btile-grad { position:absolute; inset:0; background:linear-gradient(160deg,var(--sf2) 0%,var(--sf) 100%); }
+.btile-over { position:absolute; bottom:0; left:0; right:0; padding:12px 10px; background:linear-gradient(transparent 0%,rgba(0,0,0,0.55) 100%); }
+.btile-t { font-size:12px; font-weight:600; color:#fff; line-height:1.3; }
+.btile-a { font-size:10px; font-weight:300; color:rgba(255,255,255,0.65); margin-top:2px; }
+.btile-rating { display:flex; gap:1px; margin-top:4px; }
+.btile-star { font-size:8px; color:var(--ac3); }
+
+/* ── SCRAP CARD ── */
+.scrap { margin:0 20px; background:var(--sf); border-radius:16px; padding:20px; border:0.5px solid var(--bd); position:relative; overflow:hidden; }
+.scrap-accent { position:absolute; left:0; top:0; bottom:0; width:3px; background:linear-gradient(180deg,var(--ac),transparent); border-radius:2px; }
+.scrap-q { font-size:15px; font-weight:300; color:var(--tp); line-height:1.9; letter-spacing:-0.1px; position:relative; padding-left:16px; }
+.scrap-q::before { content:'\201C'; position:absolute; left:-2px; top:-8px; font-size:32px; font-weight:200; color:var(--ac3); opacity:0.4; }
+.scrap-from { display:flex; align-items:center; gap:6px; margin-top:14px; padding-left:16px; }
+.scrap-book { font-size:11px; font-weight:600; color:var(--ts); }
+.scrap-pg { font-size:10px; font-weight:300; color:var(--tm); }
+.sdot { width:3px; height:3px; border-radius:50%; background:var(--bd2); }
+
+/* ── STAT ROW ── */
+.srow { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:0 20px; }
+.scard { background:var(--sf); border-radius:14px; padding:16px 12px; border:0.5px solid var(--bd); text-align:center; position:relative; overflow:hidden; }
+.scard::before { content:''; position:absolute; top:0; left:50%; transform:translateX(-50%); width:24px; height:2px; background:var(--ac); border-radius:0 0 2px 2px; opacity:0.5; }
+.scard-n { font-size:24px; font-weight:800; color:var(--tp); letter-spacing:-0.5px; }
+.scard-sub { font-size:10px; font-weight:500; color:var(--ac2); margin-top:1px; }
+.scard-l { font-size:10px; font-weight:400; color:var(--tm); margin-top:6px; letter-spacing:0.3px; }
+
+/* ── EMPTY STATE ── */
+.empty { margin:0 20px; background:var(--sf); border-radius:18px; padding:36px 24px; border:0.5px solid var(--bd); text-align:center; position:relative; overflow:hidden; }
+.empty::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at center top,var(--glow),transparent 60%); pointer-events:none; }
+.empty-ico { font-size:40px; position:relative; z-index:1; }
+.empty-t { font-size:15px; font-weight:600; color:var(--tp); margin-top:14px; position:relative; }
+.empty-d { font-size:12px; font-weight:300; color:var(--tm); margin-top:6px; line-height:1.7; position:relative; }
+.empty-btn { display:inline-flex; align-items:center; gap:6px; margin-top:20px; background:var(--ac); color:var(--acc); padding:11px 24px; border-radius:12px; font-size:13px; font-weight:600; position:relative; border:none; cursor:pointer; transition:transform 0.1s; }
+.empty-btn:active { transform:scale(0.96); }
+
+/* ── GROUP CARD ── */
+.gcard { margin:0 20px; background:var(--sf); border-radius:16px; padding:18px; border:0.5px solid var(--bd); }
+.gcard-top { display:flex; align-items:center; gap:10px; }
+.gcard-icon { width:40px; height:40px; border-radius:12px; background:linear-gradient(135deg,var(--ac),var(--ac3)); display:flex; align-items:center; justify-content:center; font-size:18px; }
+.gcard-name { font-size:15px; font-weight:700; color:var(--tp); }
+.gcard-meta { font-size:11px; font-weight:400; color:var(--tm); margin-top:2px; }
+.gcard-members { display:flex; margin-top:14px; padding-left:2px; }
+.gcard-av { width:30px; height:30px; border-radius:50%; border:2.5px solid var(--sf); margin-left:-8px; }
+.gcard-av:first-child { margin-left:0; }
+.gcard-count { display:flex; align-items:center; justify-content:center; background:var(--sf3); font-size:10px; font-weight:600; color:var(--ts); }
+.gcard-book { margin-top:14px; padding-top:14px; border-top:0.5px solid var(--bd); display:flex; align-items:center; gap:10px; }
+.gcard-bcover { width:32px; height:46px; border-radius:4px; background:var(--sf2); flex-shrink:0; }
+.gcard-btitle { font-size:12px; font-weight:600; color:var(--tp); }
+.gcard-bsub { font-size:10px; font-weight:300; color:var(--tm); margin-top:2px; }
+
+/* ── BOTTOM NAV ── */
+.bnav { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:390px; background:color-mix(in srgb, var(--sf) 85%, transparent); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border-top:0.5px solid var(--bd); padding:6px 0 12px; display:flex; z-index:40; }
+.bnav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding:4px 0; cursor:pointer; }
+.bnav-ico { width:20px; height:20px; border-radius:5px; background:var(--sf3); transition:background 0.2s; }
+.bnav-label { font-size:10px; font-weight:500; color:var(--tm); transition:color 0.2s; }
+.bnav-item.on .bnav-ico { background:var(--ac); }
+.bnav-item.on .bnav-label { color:var(--ac); font-weight:700; }
+.bnav-dot { width:4px; height:4px; border-radius:50%; background:var(--ac); opacity:0; transition:opacity 0.2s; }
+.bnav-item.on .bnav-dot { opacity:1; }
+
+.spacer { height:80px; }
+
+/* Animations */
+@keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+.sec { animation:fadeUp 0.4s ease-out both; }
+.sec:nth-child(2) { animation-delay:0.05s; }
+.sec:nth-child(3) { animation-delay:0.1s; }
+.sec:nth-child(4) { animation-delay:0.15s; }
+.sec:nth-child(5) { animation-delay:0.2s; }
+.sec:nth-child(6) { animation-delay:0.25s; }
+.sec:nth-child(7) { animation-delay:0.3s; }
+</style>
+</head>
+<body style="background:#0c0f0d;">
+<div class="phone" data-theme="dark" id="phone">
+
+  <div class="themes">
+    <div class="tbtn on" onclick="setT('dark',this)">밤숲</div>
+    <div class="tbtn" onclick="setT('cream',this)">크림</div>
+    <div class="tbtn" onclick="setT('navy',this)">네이비</div>
+    <div class="tbtn" onclick="setT('sepia',this)">세피아</div>
+    <div class="tbtn" onclick="setT('blossom',this)">블러썸</div>
+  </div>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-top">
+      <div class="avatar">J<span class="streak">7</span></div>
+      <div class="header-actions">
+        <div class="header-btn">&#128269;</div>
+        <div class="header-btn">&#9881;</div>
+      </div>
+    </div>
+    <div class="greeting">
+      <div class="greeting-sub">오늘도 좋은 하루,</div>
+      <div class="greeting-name">지선님의 서재</div>
+    </div>
+    <div class="stat-pills">
+      <div class="pill"><span class="pill-num">12</span><span class="pill-label">완독</span></div>
+      <div class="pill"><span class="pill-num">3</span><span class="pill-label">읽는 중</span></div>
+      <div class="pill"><span class="pill-num">8</span><span class="pill-label">위시</span></div>
+    </div>
+  </div>
+
+  <!-- Featured -->
+  <div class="sec">
+    <div class="sec-head">
+      <div class="sec-left"><div class="sec-tag">NOW READING</div><div class="sec-title">이어서 읽기</div></div>
+      <div class="sec-more">전체 &rarr;</div>
+    </div>
+    <div class="feat">
+      <div class="feat-row">
+        <div class="cover">
+          <div class="cover-spine"></div>
+          <div class="cover-face"><span class="cover-inner">데미안</span></div>
+        </div>
+        <div class="feat-info">
+          <div class="feat-badge">읽는 중</div>
+          <div class="feat-title">데미안</div>
+          <div class="feat-author">헤르만 헤세</div>
+          <div class="feat-progress">
+            <div class="feat-prow">
+              <span class="feat-pct">65%</span>
+              <span class="feat-pages">p.142 / 218</span>
+            </div>
+            <div class="pbar"><div class="pfill" style="width:65%;"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Completed -->
+  <div class="sec">
+    <div class="sec-head">
+      <div class="sec-left"><div class="sec-tag">COMPLETED</div><div class="sec-title">완독한 책</div></div>
+      <div class="sec-more">12권 &rarr;</div>
+    </div>
+    <div class="bgrid">
+      <div class="btile"><div class="btile-grad"></div><div class="btile-over"><div class="btile-t">노르웨이의 숲</div><div class="btile-a">무라카미 하루키</div><div class="btile-rating"><span class="btile-star">&#9733;</span><span class="btile-star">&#9733;</span><span class="btile-star">&#9733;</span><span class="btile-star">&#9733;</span><span class="btile-star" style="opacity:0.3;">&#9733;</span></div></div></div>
+      <div class="btile"><div class="btile-grad" style="background:linear-gradient(160deg,var(--sf3),var(--sf));"></div><div class="btile-over"><div class="btile-t">1984</div><div class="btile-a">조지 오웰</div><div class="btile-rating"><span class="btile-star">&#9733;</span><span class="btile-star">&#9733;</span><span class="btile-star">&#9733;</span><span class="btile-star">&#9733;</span><span class="btile-star">&#9733;</span></div></div></div>
+      <div class="btile"><div class="btile-grad" style="background:linear-gradient(160deg,var(--sf2),var(--sf3));"></div><div class="btile-over"><div class="btile-t">어린 왕자</div><div class="btile-a">생텍쥐페리</div><div class="btile-rating"><span class="btile-star">&#9733;</span><span class="btile-star">&#9733;</span><span class="btile-star">&#9733;</span><span class="btile-star">&#9733;</span><span class="btile-star" style="opacity:0.3;">&#9733;</span></div></div></div>
+    </div>
+  </div>
+
+  <!-- Scrap -->
+  <div class="sec">
+    <div class="sec-head">
+      <div class="sec-left"><div class="sec-tag">HIGHLIGHT</div><div class="sec-title">최근 스크랩</div></div>
+    </div>
+    <div class="scrap">
+      <div class="scrap-accent"></div>
+      <div class="scrap-q">새는 알에서 나오려고 투쟁한다. 알은 세계이다. 태어나려는 자는 하나의 세계를 깨뜨려야 한다.</div>
+      <div class="scrap-from">
+        <span class="scrap-book">데미안</span>
+        <span class="sdot"></span>
+        <span class="scrap-pg">p.89</span>
+        <span class="sdot"></span>
+        <span class="scrap-pg">제5장</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="sec">
+    <div class="sec-head">
+      <div class="sec-left"><div class="sec-tag">THIS MONTH</div><div class="sec-title">4월 기록</div></div>
+    </div>
+    <div class="srow">
+      <div class="scard"><div class="scard-n">3</div><div class="scard-sub">+1</div><div class="scard-l">완독</div></div>
+      <div class="scard"><div class="scard-n">24</div><div class="scard-sub">+8</div><div class="scard-l">스크랩</div></div>
+      <div class="scard"><div class="scard-n">7</div><div class="scard-sub">+3</div><div class="scard-l">대화</div></div>
+    </div>
+  </div>
+
+  <!-- Group Card -->
+  <div class="sec">
+    <div class="sec-head">
+      <div class="sec-left"><div class="sec-tag">GROUPS</div><div class="sec-title">내 모임</div></div>
+      <div class="sec-more">전체 &rarr;</div>
+    </div>
+    <div class="gcard">
+      <div class="gcard-top">
+        <div class="gcard-icon">&#128214;</div>
+        <div>
+          <div class="gcard-name">문학 산책 모임</div>
+          <div class="gcard-meta">4명 &middot; 매주 토요일</div>
+        </div>
+      </div>
+      <div class="gcard-members">
+        <div class="gcard-av" style="background:linear-gradient(135deg,var(--ac),var(--ac2));"></div>
+        <div class="gcard-av" style="background:linear-gradient(135deg,var(--ac2),var(--ac3));"></div>
+        <div class="gcard-av" style="background:linear-gradient(135deg,var(--ac3),var(--sf3));"></div>
+        <div class="gcard-av gcard-count">+1</div>
+      </div>
+      <div class="gcard-book">
+        <div class="gcard-bcover"></div>
+        <div><div class="gcard-btitle">코스모스</div><div class="gcard-bsub">칼 세이건 &middot; 3주차</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty -->
+  <div class="sec">
+    <div class="sec-head">
+      <div class="sec-left"><div class="sec-tag">WISHLIST</div><div class="sec-title">읽고 싶은 책</div></div>
+    </div>
+    <div class="empty">
+      <div class="empty-ico">&#128218;</div>
+      <div class="empty-t">아직 위시리스트가 비어있어요</div>
+      <div class="empty-d">읽고 싶은 책을 저장해두면<br>잊지 않고 만날 수 있어요</div>
+      <div class="empty-btn">+ 책 추가하기</div>
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+
+  <div class="bnav">
+    <div class="bnav-item on"><div class="bnav-ico"></div><div class="bnav-label">서재</div><div class="bnav-dot"></div></div>
+    <div class="bnav-item"><div class="bnav-ico"></div><div class="bnav-label">모임</div><div class="bnav-dot"></div></div>
+    <div class="bnav-item"><div class="bnav-ico"></div><div class="bnav-label">서평</div><div class="bnav-dot"></div></div>
+    <div class="bnav-item"><div class="bnav-ico"></div><div class="bnav-label">MY</div><div class="bnav-dot"></div></div>
+  </div>
+</div>
+
+<script>
+function setT(t,el){
+  document.getElementById('phone').setAttribute('data-theme',t);
+  document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  const s=getComputedStyle(document.getElementById('phone'));
+  document.body.style.background=s.getPropertyValue('--bg');
+}
+</script>
+</body>
+</html>

@@ -28,7 +28,7 @@ export async function upsertProfile(supabase: SupabaseClient, user: Partial<User
 export async function getBooks(supabase: SupabaseClient, userId: string) {
   const { data } = await supabase
     .from("books")
-    .select("*")
+    .select("*, group_books(id, group_id, weeks_data, start_date, end_date, round_number, status, reading_groups(id, name))")
     .eq("user_id", userId)
     .order("updated_at", { ascending: false });
   return (data || []) as Book[];
@@ -218,6 +218,11 @@ export async function upsertReview(supabase: SupabaseClient, review: Omit<Review
   return data as Review;
 }
 
+export async function deleteReview(supabase: SupabaseClient, bookId: string) {
+  const { error } = await supabase.from("reviews").delete().eq("book_id", bookId);
+  if (error) throw error;
+}
+
 // --- Reading Sessions ---
 export async function getReadingSessions(supabase: SupabaseClient, userId: string, from?: string, to?: string) {
   let query = supabase
@@ -239,6 +244,90 @@ export async function upsertReadingSession(supabase: SupabaseClient, session: Om
     .single();
   if (error) throw error;
   return data as ReadingSession;
+}
+
+// --- Reading Streaks ---
+export async function getStreaks(supabase: SupabaseClient, userId: string, from: string, to: string) {
+  const { data } = await supabase
+    .from("reading_streaks")
+    .select("date, activities")
+    .eq("user_id", userId)
+    .gte("date", from)
+    .lte("date", to);
+  return (data || []) as { date: string; activities: Record<string, unknown> }[];
+}
+
+export async function getAllStreakDates(supabase: SupabaseClient, userId: string) {
+  const since = new Date();
+  since.setDate(since.getDate() - 60);
+  const sinceStr = since.toISOString().split("T")[0];
+  const { data } = await supabase
+    .from("reading_streaks")
+    .select("date")
+    .eq("user_id", userId)
+    .gte("date", sinceStr)
+    .order("date", { ascending: false });
+  return (data || []).map((d) => d.date as string);
+}
+
+export async function upsertStreak(
+  supabase: SupabaseClient,
+  userId: string,
+  activity: Record<string, unknown>,
+) {
+  const today = new Date().toISOString().split("T")[0];
+
+  // 먼저 upsert로 row 확보 (race condition 방지)
+  const { data: row } = await supabase
+    .from("reading_streaks")
+    .upsert(
+      { user_id: userId, date: today, activities: activity },
+      { onConflict: "user_id,date", ignoreDuplicates: true },
+    )
+    .select("activities")
+    .single();
+
+  // ignoreDuplicates=true면 기존 row가 있으면 insert 안 됨 → 병합 필요
+  if (row) {
+    const prev = (row.activities || {}) as Record<string, unknown>;
+    // 이미 새로 insert된 경우 prev === activity → 병합 불필요
+    const needsMerge = prev !== activity && Object.keys(prev).length > 0 &&
+      JSON.stringify(prev) !== JSON.stringify(activity);
+    if (!needsMerge) return;
+  }
+
+  // 기존 데이터 가져와서 병합
+  const { data: existing } = await supabase
+    .from("reading_streaks")
+    .select("activities")
+    .eq("user_id", userId)
+    .eq("date", today)
+    .single();
+
+  if (!existing) return;
+
+  const prev = (existing.activities || {}) as Record<string, unknown>;
+  const merged = { ...prev, ...activity };
+
+  if (Array.isArray(activity.read) && Array.isArray(prev.read)) {
+    merged.read = Array.from(new Set((prev.read as string[]).concat(activity.read as string[])));
+  }
+  if (Array.isArray(activity.books)) {
+    const prevBooks = Array.isArray(prev.books) ? [...(prev.books as { bookId: string }[])] : [];
+    const newBooks = activity.books as { bookId: string }[];
+    for (const nb of newBooks) {
+      const idx = prevBooks.findIndex((b) => b.bookId === nb.bookId);
+      if (idx >= 0) prevBooks[idx] = { ...prevBooks[idx], ...nb };
+      else prevBooks.push(nb);
+    }
+    merged.books = prevBooks;
+  }
+
+  await supabase
+    .from("reading_streaks")
+    .update({ activities: merged })
+    .eq("user_id", userId)
+    .eq("date", today);
 }
 
 // --- Aggregated Queries ---
@@ -281,18 +370,426 @@ export async function getBookStats(supabase: SupabaseClient, userId: string) {
     getReviewsByUser(supabase, userId),
   ]);
 
-  const totalBooks = books.length;
-  const booksByPhase = {
-    0: books.filter((b) => b.phase === 0).length,
-    1: books.filter((b) => b.phase === 1).length,
-    2: books.filter((b) => b.phase === 2).length,
-    3: books.filter((b) => b.phase === 3).length,
-  };
-
   return {
-    totalBooks,
-    booksByPhase,
+    totalBooks: books.length,
     totalMessageCount,
     reviewCount: reviews.length,
   };
+}
+
+/* ═══ 독서 모임 ═══ */
+
+import type { ReadingGroup, GroupMember, GroupBook, GroupSchedule } from "@/lib/types";
+
+export async function getMyGroups(supabase: SupabaseClient, userId: string) {
+  const { data } = await supabase
+    .from("group_members")
+    .select("group_id, role, reading_groups(*)")
+    .eq("user_id", userId);
+  return (data || []).map((d) => ({
+    ...(d.reading_groups as unknown as ReadingGroup),
+    myRole: d.role as string,
+  }));
+}
+
+export async function getGroup(supabase: SupabaseClient, groupId: string) {
+  const { data } = await supabase
+    .from("reading_groups")
+    .select("*")
+    .eq("id", groupId)
+    .single();
+  return data as ReadingGroup | null;
+}
+
+export async function getGroupByInviteCode(supabase: SupabaseClient, code: string) {
+  const { data } = await supabase
+    .from("reading_groups")
+    .select("*")
+    .eq("invite_code", code.toUpperCase())
+    .single();
+  return data as ReadingGroup | null;
+}
+
+export async function createGroup(supabase: SupabaseClient, group: Omit<ReadingGroup, "id" | "invite_code" | "created_at">) {
+  const { data, error } = await supabase
+    .from("reading_groups")
+    .insert(group)
+    .select()
+    .single();
+  if (error) throw error;
+  return data as ReadingGroup;
+}
+
+export async function joinGroup(supabase: SupabaseClient, groupId: string, userId: string, role: string = "member") {
+  const { error } = await supabase
+    .from("group_members")
+    .upsert({ group_id: groupId, user_id: userId, role }, { onConflict: "group_id,user_id" });
+  if (error) throw error;
+
+  // 현재 진행 중인 책이 있으면 서재에 자동 추가
+  const { data: currentBook } = await supabase
+    .from("group_books")
+    .select("*")
+    .eq("group_id", groupId)
+    .eq("status", "reading")
+    .single();
+
+  if (currentBook) {
+    await addGroupBookToUserLibrary(supabase, userId, currentBook as GroupBook);
+  }
+}
+
+export async function leaveGroup(supabase: SupabaseClient, groupId: string, userId: string) {
+  // group_book_id만 null로 (데이터 보존, 개인 책으로 계속 읽기 가능)
+  const { data: groupBooks } = await supabase
+    .from("group_books")
+    .select("id")
+    .eq("group_id", groupId);
+  if (groupBooks?.length) {
+    const gbIds = groupBooks.map((gb) => gb.id);
+    await supabase
+      .from("books")
+      .update({ group_book_id: null })
+      .eq("user_id", userId)
+      .in("group_book_id", gbIds);
+  }
+
+  const { error } = await supabase
+    .from("group_members")
+    .delete()
+    .eq("group_id", groupId)
+    .eq("user_id", userId);
+  if (error) throw error;
+}
+
+export async function getGroupMembers(supabase: SupabaseClient, groupId: string) {
+  const { data } = await supabase
+    .from("group_members")
+    .select("*, profiles(id, nickname, emoji)")
+    .eq("group_id", groupId)
+    .order("joined_at");
+  return (data || []) as GroupMember[];
+}
+
+export async function getGroupBooks(supabase: SupabaseClient, groupId: string) {
+  const { data } = await supabase
+    .from("group_books")
+    .select("*")
+    .eq("group_id", groupId)
+    .order("round_number", { ascending: false });
+  return (data || []) as GroupBook[];
+}
+
+export async function createGroupBook(supabase: SupabaseClient, book: Omit<GroupBook, "id" | "created_at">) {
+  const { data, error } = await supabase
+    .from("group_books")
+    .insert(book)
+    .select()
+    .single();
+  if (error) throw error;
+
+  const groupBook = data as GroupBook;
+
+  // 멤버 전원 서재에 책 자동 추가
+  const { data: members } = await supabase
+    .from("group_members")
+    .select("user_id")
+    .eq("group_id", book.group_id);
+
+  if (members) {
+    await Promise.all(
+      members.map((m) => addGroupBookToUserLibrary(supabase, m.user_id, groupBook))
+    );
+  }
+
+  return groupBook;
+}
+
+/** 모임 책을 유저 서재에 추가 (이미 있으면 연결만) */
+async function addGroupBookToUserLibrary(
+  supabase: SupabaseClient,
+  userId: string,
+  groupBook: GroupBook,
+) {
+  // ISBN으로 이미 서재에 있는지 체크
+  let existing = null;
+  if (groupBook.book_isbn) {
+    const { data } = await supabase
+      .from("books")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("isbn", groupBook.book_isbn)
+      .single();
+    existing = data;
+  }
+  // 제목+저자로도 체크
+  if (!existing) {
+    const { data } = await supabase
+      .from("books")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("title", groupBook.book_title)
+      .single();
+    existing = data;
+  }
+
+  if (existing) {
+    // 이미 있으면 group_book_id 연결 + 읽는 중으로
+    await supabase
+      .from("books")
+      .update({ group_book_id: groupBook.id, reading_status: "reading" })
+      .eq("id", existing.id);
+  } else {
+    // 없으면 새로 추가
+    await supabase.from("books").insert({
+      user_id: userId,
+      title: groupBook.book_title,
+      author: groupBook.book_author,
+      cover_url: groupBook.book_cover_url,
+      total_pages: (groupBook as GroupBook & { total_pages?: number }).total_pages || null,
+      current_page: 0,
+      reading_status: "reading",
+      started_at: groupBook.start_date || new Date().toISOString().split("T")[0],
+      group_book_id: groupBook.id,
+      format: "paper",
+    });
+  }
+}
+
+export async function getGroupSchedules(supabase: SupabaseClient, groupId: string) {
+  const { data } = await supabase
+    .from("group_schedules")
+    .select("*")
+    .eq("group_id", groupId)
+    .order("date");
+  return (data || []) as GroupSchedule[];
+}
+
+export async function createGroupSchedule(supabase: SupabaseClient, schedule: Omit<GroupSchedule, "id" | "created_at">) {
+  const { data, error } = await supabase
+    .from("group_schedules")
+    .insert(schedule)
+    .select()
+    .single();
+  if (error) throw error;
+  return data as GroupSchedule;
+}
+
+export async function getMemberCount(supabase: SupabaseClient, groupId: string) {
+  const { count } = await supabase
+    .from("group_members")
+    .select("user_id", { count: "exact", head: true })
+    .eq("group_id", groupId);
+  return count || 0;
+}
+
+/* ═══ 라이브 독서 ═══ */
+
+export interface LiveReader {
+  user_id: string;
+  book_id: string | null;
+  group_id: string | null;
+  current_page: number | null;
+  total_pages: number | null;
+  started_at: string;
+  last_active_at: string;
+  profiles?: { id: string; nickname: string; emoji: string };
+}
+
+// 라이브 시작/업데이트
+export async function upsertLive(
+  supabase: SupabaseClient,
+  userId: string,
+  bookId: string | null,
+  groupId: string | null,
+  currentPage: number | null,
+  totalPages: number | null,
+) {
+  const { data, error } = await supabase
+    .from("reading_live")
+    .upsert({
+      user_id: userId,
+      book_id: bookId,
+      group_id: groupId,
+      current_page: currentPage,
+      total_pages: totalPages,
+      last_active_at: new Date().toISOString(),
+    }, { onConflict: "user_id" })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+// 라이브 종료
+export async function removeLive(supabase: SupabaseClient, userId: string) {
+  await supabase.from("reading_live").delete().eq("user_id", userId);
+}
+
+// 그룹의 라이브 리더 목록 (5분 이내 활동)
+export async function getGroupLiveReaders(supabase: SupabaseClient, groupId: string) {
+  const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+  const { data } = await supabase
+    .from("reading_live")
+    .select("*, profiles(id, nickname, emoji)")
+    .eq("group_id", groupId)
+    .gte("last_active_at", fiveMinAgo)
+    .order("last_active_at", { ascending: false });
+  return (data || []) as LiveReader[];
+}
+
+// ─── 모임 스크랩 피드 ───
+// group_book_id를 공유하는 모든 멤버 책의 scraps + 작성자
+export async function getGroupScraps(supabase: SupabaseClient, groupBookId: string) {
+  // group_book_id를 가진 멤버 책 id들 모으기
+  const { data: bookRows } = await supabase
+    .from("books")
+    .select("id, user_id, title, profiles(nickname, emoji)")
+    .eq("group_book_id", groupBookId);
+  if (!bookRows || bookRows.length === 0) return [];
+  const bookIds = bookRows.map((b) => b.id);
+  const bookMap = new Map(bookRows.map((b) => [b.id, b]));
+
+  const { data: scraps } = await supabase
+    .from("scraps")
+    .select("*")
+    .in("book_id", bookIds)
+    .order("created_at", { ascending: false })
+    .limit(100);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (scraps || []).map((s: any) => {
+    const b = bookMap.get(s.book_id);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const prof: any = b ? (Array.isArray(b.profiles) ? b.profiles[0] : b.profiles) : null;
+    return {
+      id: s.id as string,
+      text: s.text as string,
+      memo: s.memo as string | null,
+      page_number: s.page_number as number | null,
+      created_at: s.created_at as string,
+      user_id: (b?.user_id as string) || "",
+      author_nickname: prof?.nickname || "멤버",
+      author_emoji: prof?.emoji || "",
+    };
+  });
+}
+
+// ─── 모임 토론 ───
+export interface GroupDiscussion {
+  id: string;
+  group_id: string;
+  group_book_id: string | null;
+  author_id: string;
+  question: string;
+  created_at: string;
+  author_nickname?: string;
+  author_emoji?: string;
+  reply_count?: number;
+}
+
+export interface GroupDiscussionReply {
+  id: string;
+  discussion_id: string;
+  author_id: string;
+  content: string;
+  created_at: string;
+  author_nickname?: string;
+  author_emoji?: string;
+}
+
+export async function getGroupDiscussions(supabase: SupabaseClient, groupId: string) {
+  const { data } = await supabase
+    .from("group_discussions")
+    .select("*, profiles!group_discussions_author_id_fkey(nickname, emoji), group_discussion_replies(id)")
+    .eq("group_id", groupId)
+    .order("created_at", { ascending: false });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data || []).map((d: any) => {
+    const prof = Array.isArray(d.profiles) ? d.profiles[0] : d.profiles;
+    return {
+      id: d.id,
+      group_id: d.group_id,
+      group_book_id: d.group_book_id,
+      author_id: d.author_id,
+      question: d.question,
+      created_at: d.created_at,
+      author_nickname: prof?.nickname || "멤버",
+      author_emoji: prof?.emoji || "",
+      reply_count: Array.isArray(d.group_discussion_replies) ? d.group_discussion_replies.length : 0,
+    } as GroupDiscussion;
+  });
+}
+
+export async function createGroupDiscussion(
+  supabase: SupabaseClient,
+  payload: { group_id: string; group_book_id: string | null; author_id: string; question: string }
+) {
+  const { data, error } = await supabase
+    .from("group_discussions")
+    .insert(payload)
+    .select()
+    .single();
+  if (error) throw error;
+  return data as GroupDiscussion;
+}
+
+export async function getDiscussionReplies(supabase: SupabaseClient, discussionId: string) {
+  const { data } = await supabase
+    .from("group_discussion_replies")
+    .select("*, profiles!group_discussion_replies_author_id_fkey(nickname, emoji)")
+    .eq("discussion_id", discussionId)
+    .order("created_at", { ascending: true });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data || []).map((r: any) => {
+    const prof = Array.isArray(r.profiles) ? r.profiles[0] : r.profiles;
+    return {
+      id: r.id,
+      discussion_id: r.discussion_id,
+      author_id: r.author_id,
+      content: r.content,
+      created_at: r.created_at,
+      author_nickname: prof?.nickname || "멤버",
+      author_emoji: prof?.emoji || "",
+    } as GroupDiscussionReply;
+  });
+}
+
+export async function createDiscussionReply(
+  supabase: SupabaseClient,
+  payload: { discussion_id: string; author_id: string; content: string }
+) {
+  const { data, error } = await supabase
+    .from("group_discussion_replies")
+    .insert(payload)
+    .select()
+    .single();
+  if (error) throw error;
+  return data as GroupDiscussionReply;
+}
+
+// 그룹 멤버의 책 진행률 (books 테이블에서 직접)
+export async function getGroupMemberProgress(supabase: SupabaseClient, groupBookId: string) {
+  const { data } = await supabase
+    .from("books")
+    .select("user_id, current_page, total_pages, reading_status, started_at, updated_at, profiles(id, nickname, emoji)")
+    .eq("group_book_id", groupBookId);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data || []).map((d: any) => ({
+    user_id: d.user_id as string,
+    current_page: d.current_page as number | null,
+    total_pages: d.total_pages as number | null,
+    reading_status: d.reading_status as string,
+    started_at: d.started_at as string | null,
+    updated_at: d.updated_at as string | null,
+    profiles: Array.isArray(d.profiles) ? d.profiles[0] || null : d.profiles || null,
+  })) as {
+    user_id: string;
+    current_page: number | null;
+    total_pages: number | null;
+    reading_status: string;
+    started_at: string | null;
+    updated_at: string | null;
+    profiles: { id: string; nickname: string; emoji: string } | null;
+  }[];
 }

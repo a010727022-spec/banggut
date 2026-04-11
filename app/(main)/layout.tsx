@@ -8,7 +8,7 @@ export default function MainLayout({
 }) {
   return (
     <AuthGuard>
-      <main className="pb-16">{children}</main>
+      <main className="pb-14">{children}</main>
       <BottomNav />
     </AuthGuard>
   );

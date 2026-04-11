@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>방긋 — Empty States</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Pretendard',sans-serif; background:#0c0f0d; color:#eeeae4; }
+
+:root { --bg:#0c0f0d; --sf:#131916; --sf2:#1a1f1c; --sf3:#242a26; --bd:rgba(107,158,138,0.11); --tp:#eeeae4; --ts:#7a9186; --tm:#3d5049; --ac:#6B9E8A; --ac2:#8FB8A4; --ac3:#B5D4C4; --acc:#0c1a12; --glow:rgba(107,158,138,0.06); }
+
+.wrap { max-width:390px; margin:0 auto; padding:20px; display:flex; flex-direction:column; gap:20px; }
+h2 { font-size:16px; font-weight:700; margin-top:12px; color:var(--ts); }
+p.desc { font-size:12px; color:var(--tm); margin-bottom:4px; }
+
+/* Empty Card Base */
+.empty { background:var(--sf); border-radius:18px; padding:36px 24px; border:0.5px solid var(--bd); text-align:center; position:relative; overflow:hidden; }
+.empty::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at center top,var(--glow),transparent 60%); pointer-events:none; }
+.empty-t { font-size:15px; font-weight:600; color:var(--tp); margin-top:16px; position:relative; }
+.empty-d { font-size:12px; font-weight:300; color:var(--tm); margin-top:6px; line-height:1.7; position:relative; }
+.empty-btn { display:inline-flex; align-items:center; gap:6px; margin-top:20px; background:var(--ac); color:var(--acc); padding:11px 24px; border-radius:12px; font-size:13px; font-weight:600; position:relative; border:none; cursor:pointer; }
+
+/* SVG icon area */
+.empty-visual { position:relative; z-index:1; width:64px; height:64px; margin:0 auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h2>위시리스트 빈 상태</h2>
+  <p class="desc">lucide 아이콘 + SVG 도형 조합</p>
+  <div class="empty">
+    <div class="empty-visual">
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- 기하학 원 -->
+        <circle cx="32" cy="32" r="28" stroke="var(--ac)" stroke-width="0.5" opacity="0.15"/>
+        <circle cx="32" cy="32" r="20" stroke="var(--ac2)" stroke-width="0.5" opacity="0.1"/>
+        <!-- lucide bookmark -->
+        <path d="M24 18h16a2 2 0 0 1 2 2v24l-10-6-10 6V20a2 2 0 0 1 2-2z" stroke="var(--ac2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.6"/>
+      </svg>
+    </div>
+    <div class="empty-t">아직 위시리스트가 비어있어요</div>
+    <div class="empty-d">읽고 싶은 책을 저장해두면<br>잊지 않고 만날 수 있어요</div>
+    <div class="empty-btn">+ 책 추가하기</div>
+  </div>
+
+  <h2>스크랩 빈 상태</h2>
+  <div class="empty">
+    <div class="empty-visual">
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+        <line x1="12" y1="32" x2="52" y2="32" stroke="var(--ac)" stroke-width="0.5" opacity="0.1"/>
+        <line x1="32" y1="12" x2="32" y2="52" stroke="var(--ac)" stroke-width="0.5" opacity="0.1"/>
+        <circle cx="32" cy="32" r="22" stroke="var(--ac)" stroke-width="0.5" opacity="0.12"/>
+        <!-- lucide highlighter -->
+        <path d="M22 38l10-10 6 6-10 10H22v-6z" stroke="var(--ac2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.6"/>
+        <path d="M32 28l4-4 6 6-4 4" stroke="var(--ac2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.6"/>
+      </svg>
+    </div>
+    <div class="empty-t">아직 밑줄 친 문장이 없어요</div>
+    <div class="empty-d">마음에 남는 문장을 스크랩하면<br>나만의 문장 서랍이 채워져요</div>
+    <div class="empty-btn">+ 스크랩하기</div>
+  </div>
+
+  <h2>모임 빈 상태</h2>
+  <div class="empty">
+    <div class="empty-visual">
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+        <!-- 기하학 삼각형 -->
+        <polygon points="32,10 54,50 10,50" stroke="var(--ac)" stroke-width="0.5" fill="none" opacity="0.1"/>
+        <polygon points="32,18 48,46 16,46" stroke="var(--ac2)" stroke-width="0.5" fill="none" opacity="0.08"/>
+        <!-- lucide users -->
+        <circle cx="28" cy="28" r="4" stroke="var(--ac2)" stroke-width="1.5" fill="none" opacity="0.6"/>
+        <path d="M20 42v-2a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v2" stroke="var(--ac2)" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+        <circle cx="40" cy="26" r="3" stroke="var(--ac3)" stroke-width="1.2" fill="none" opacity="0.35"/>
+        <path d="M42 42v-1.5a4.5 4.5 0 0 0-3-4.2" stroke="var(--ac3)" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.35"/>
+      </svg>
+    </div>
+    <div class="empty-t">아직 참여 중인 모임이 없어요</div>
+    <div class="empty-d">함께 읽으면 더 깊어지는 독서,<br>모임을 만들거나 참여해보세요</div>
+    <div class="empty-btn">모임 둘러보기</div>
+  </div>
+
+  <h2>서평 빈 상태</h2>
+  <div class="empty">
+    <div class="empty-visual">
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+        <!-- 기하학 다이아몬드 -->
+        <rect x="18" y="18" width="28" height="28" rx="2" transform="rotate(45 32 32)" stroke="var(--ac)" stroke-width="0.5" fill="none" opacity="0.1"/>
+        <rect x="22" y="22" width="20" height="20" rx="1" transform="rotate(45 32 32)" stroke="var(--ac2)" stroke-width="0.5" fill="none" opacity="0.07"/>
+        <!-- lucide pen-line -->
+        <path d="M26 42l-4 4v-4h4z" stroke="var(--ac2)" stroke-width="1.5" fill="none" opacity="0.6"/>
+        <path d="M26 42L40 28l4 4L30 46" stroke="var(--ac2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.6"/>
+        <line x1="24" y1="46" x2="42" y2="46" stroke="var(--ac2)" stroke-width="1.5" stroke-linecap="round" opacity="0.3"/>
+      </svg>
+    </div>
+    <div class="empty-t">아직 작성한 서평이 없어요</div>
+    <div class="empty-d">책을 읽고 나눈 대화를 바탕으로<br>나만의 서평을 남겨보세요</div>
+    <div class="empty-btn">서평 쓰기</div>
+  </div>
+
+  <h2>대화 빈 상태</h2>
+  <div class="empty">
+    <div class="empty-visual">
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+        <!-- 동심원 파문 -->
+        <circle cx="32" cy="32" r="26" stroke="var(--ac)" stroke-width="0.5" opacity="0.08"/>
+        <circle cx="32" cy="32" r="18" stroke="var(--ac)" stroke-width="0.5" opacity="0.12"/>
+        <circle cx="32" cy="32" r="10" stroke="var(--ac2)" stroke-width="0.5" opacity="0.15"/>
+        <!-- lucide message-circle -->
+        <path d="M38 34c0 3.3-2.7 6-6 6h-4l-4 4v-4c-2.2-1-3.5-3.2-3.5-5.7 0-3.5 3.1-6.3 7-6.3h1c4.4 0 7.5 2.5 7.5 5.5v.5z" stroke="var(--ac2)" stroke-width="1.5" fill="none" opacity="0.6"/>
+        <circle cx="29" cy="34" r="1" fill="var(--ac2)" opacity="0.4"/>
+        <circle cx="33" cy="34" r="1" fill="var(--ac2)" opacity="0.4"/>
+        <circle cx="37" cy="34" r="1" fill="var(--ac2)" opacity="0.4"/>
+      </svg>
+    </div>
+    <div class="empty-t">아직 대화를 시작하지 않았어요</div>
+    <div class="empty-d">책에 대해 궁금한 것을 물어보면<br>함께 생각을 나눌 수 있어요</div>
+    <div class="empty-btn">대화 시작하기</div>
+  </div>
+
+</div>
+</body>
+</html>
