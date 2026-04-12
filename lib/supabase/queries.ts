@@ -102,12 +102,14 @@ export async function getTotalMessageCount(supabase: SupabaseClient, userId: str
 }
 
 // --- Scraps ---
-export async function getScraps(supabase: SupabaseClient, userId: string) {
-  const { data } = await supabase
+export async function getScraps(supabase: SupabaseClient, userId: string, limit?: number) {
+  let query = supabase
     .from("scraps")
     .select("*")
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
+  if (limit) query = query.limit(limit);
+  const { data } = await query;
   return (data || []) as Scrap[];
 }
 
@@ -259,7 +261,7 @@ export async function getStreaks(supabase: SupabaseClient, userId: string, from:
 
 export async function getAllStreakDates(supabase: SupabaseClient, userId: string) {
   const since = new Date();
-  since.setDate(since.getDate() - 60);
+  since.setDate(since.getDate() - 30);
   const sinceStr = since.toISOString().split("T")[0];
   const { data } = await supabase
     .from("reading_streaks")

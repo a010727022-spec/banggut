@@ -40,26 +40,14 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (user) {
-    // 프로필 존재 여부 확인
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("id")
-      .eq("id", user.id)
-      .single();
-
-    if (isOnboarding && profile) {
-      // 프로필 있는데 온보딩에 있으면 → 홈으로
+  // 로그인 상태에서 온보딩 접근 → 홈으로
+  // (profiles DB 쿼리 제거 — SupabaseProvider에서 처리)
+  if (user && isOnboarding) {
+    // 쿠키로 프로필 완료 여부 빠르게 확인
+    const hasProfile = request.cookies.get("banggut-has-profile")?.value === "1";
+    if (hasProfile) {
       const url = request.nextUrl.clone();
       url.pathname = "/";
-      return NextResponse.redirect(url);
-    }
-
-    if (!isOnboarding && !isAuthCallback && !isApi && !profile) {
-      // 프로필 없는데 앱을 쓰려고 하면 → 온보딩 프로필 설정으로
-      const url = request.nextUrl.clone();
-      url.pathname = "/onboarding";
-      url.searchParams.set("step", "profile");
       return NextResponse.redirect(url);
     }
   }

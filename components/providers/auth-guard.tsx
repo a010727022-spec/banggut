@@ -1,49 +1,74 @@
 "use client";
 
 import { useAuthStore } from "@/stores/useAuthStore";
-import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { BookOpen } from "lucide-react";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const user = useAuthStore((s) => s.user);
   const isLoading = useAuthStore((s) => s.isLoading);
-  const router = useRouter();
   const redirecting = useRef(false);
 
   useEffect(() => {
-    // 로딩 끝났는데 유저가 없으면 → 온보딩으로 (1회만 시도)
     if (!isLoading && !user && !redirecting.current) {
       redirecting.current = true;
-      // window.location을 사용해 full navigation → 미들웨어가 제대로 실행됨
       window.location.href = "/onboarding";
     }
-  }, [isLoading, user, router]);
+  }, [isLoading, user]);
 
-  // 유저가 복구되면 리다이렉트 취소
   useEffect(() => {
-    if (user) {
-      redirecting.current = false;
-    }
+    if (user) redirecting.current = false;
   }, [user]);
 
-  // 로딩 중
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-paper">
-        <div className="text-center">
-          <BookOpen size={32} strokeWidth={1.3} className="mb-3 mx-auto" style={{ color: "var(--ac)", opacity: 0.55 }} />
-          <p className="text-warmgray text-sm">불러오는 중...</p>
+      <div style={{ minHeight: "100vh", background: "var(--bg)", transition: "background 0.4s" }}>
+        {/* 히어로 스켈레톤 */}
+        <div style={{ height: 180, background: "var(--sf)", transition: "background 0.4s" }} className="skeleton" />
+
+        <div style={{ padding: "0 20px" }}>
+          {/* 프로필 스켈레톤 */}
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 14, marginTop: -30, marginBottom: 16 }}>
+            <div style={{ width: 76, height: 76, borderRadius: "50%", flexShrink: 0 }} className="skeleton" />
+            <div style={{ flex: 1, paddingBottom: 4 }}>
+              <div style={{ width: 100, height: 18, borderRadius: 6, marginBottom: 8 }} className="skeleton" />
+              <div style={{ width: 80, height: 12, borderRadius: 6, marginBottom: 10 }} className="skeleton" />
+              <div style={{ display: "flex", gap: 14 }}>
+                <div style={{ width: 50, height: 14, borderRadius: 6 }} className="skeleton" />
+                <div style={{ width: 50, height: 14, borderRadius: 6 }} className="skeleton" />
+                <div style={{ width: 50, height: 14, borderRadius: 6 }} className="skeleton" />
+              </div>
+            </div>
+          </div>
+
+          {/* 버튼 스켈레톤 */}
+          <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+            <div style={{ flex: 1, height: 38, borderRadius: 10 }} className="skeleton" />
+            <div style={{ width: 40, height: 38, borderRadius: 10 }} className="skeleton" />
+            <div style={{ width: 40, height: 38, borderRadius: 10 }} className="skeleton" />
+          </div>
+
+          {/* 체온 스켈레톤 */}
+          <div style={{ height: 90, borderRadius: 14, marginBottom: 16 }} className="skeleton" />
+
+          {/* 탭 스켈레톤 */}
+          <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+            <div style={{ width: 64, height: 30, borderRadius: 100 }} className="skeleton" />
+            <div style={{ width: 64, height: 30, borderRadius: 100 }} className="skeleton" />
+            <div style={{ width: 48, height: 30, borderRadius: 100 }} className="skeleton" />
+          </div>
+
+          {/* 카드 스켈레톤 */}
+          <div style={{ height: 140, borderRadius: 16, marginBottom: 12 }} className="skeleton" />
+          <div style={{ height: 140, borderRadius: 16 }} className="skeleton" />
         </div>
       </div>
     );
   }
 
-  // 유저 없으면 리다이렉트 대기 중 (빈 화면 방지)
   if (!user) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-paper">
-        <p className="text-warmgray text-sm">로그인 페이지로 이동 중...</p>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh", background: "var(--bg)" }}>
+        <p style={{ fontSize: 13, color: "var(--tm)" }}>로그인 페이지로 이동 중...</p>
       </div>
     );
   }

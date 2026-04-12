@@ -22,27 +22,33 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
     const supabase = createClient();
     let resolved = false;
 
-    // 5초 안전장치 — 어떤 이유로든 로딩이 안 끝나면 강제 해제
+    // 3초 안전장치 (5초 → 3초로 단축)
     const safetyTimeout = setTimeout(() => {
       const { isLoading } = useAuthStore.getState();
       if (isLoading) {
         console.warn("[Auth] safety timeout — forcing loading=false");
         setLoading(false);
       }
-    }, 5000);
+    }, 3000);
 
     const resolveUser = async (userId: string, email: string | undefined) => {
       if (resolved) return;
       resolved = true;
 
       try {
-        // getProfile에 3초 타임아웃
+        // getProfile에 1.5초 타임아웃 (3초 → 1.5초로 단축)
         const profile = await Promise.race([
           getProfile(supabase, userId),
-          new Promise<null>((r) => setTimeout(() => r(null), 3000)),
+          new Promise<null>((r) => setTimeout(() => r(null), 1500)),
         ]);
 
-        setUser(profile || makeFallbackUser(userId, email));
+        const user = profile || makeFallbackUser(userId, email);
+        setUser(user);
+
+        // 미들웨어용 프로필 쿠키 세팅
+        if (profile) {
+          document.cookie = "banggut-has-profile=1;path=/;max-age=31536000;SameSite=Lax";
+        }
       } catch {
         setUser(makeFallbackUser(userId, email));
       } finally {
@@ -57,6 +63,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
           if (session?.user) {
             await resolveUser(session.user.id, session.user.email);
           } else if (event === "INITIAL_SESSION") {
+            // onAuthStateChange가 세션을 못 주면 getUser() 호출
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
               await resolveUser(user.id, user.email);
@@ -68,6 +75,8 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
             resolved = false;
             setUser(null);
             setLoading(false);
+            // 프로필 쿠키 제거
+            document.cookie = "banggut-has-profile=;path=/;max-age=0";
           }
         } catch {
           setUser(null);

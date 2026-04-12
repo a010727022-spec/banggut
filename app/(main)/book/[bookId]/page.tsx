@@ -19,7 +19,7 @@ import type { Book, Message, Scrap, Review, ReadingStatus, Diagnosis } from "@/l
 import { fetchWithAuth } from "@/lib/fetch-with-auth";
 import { useAuthStore } from "@/stores/useAuthStore";
 import Link from "next/link";
-import { ArrowLeft, Star, Camera, Eye, EyeOff, Check, RotateCcw, X, Trash2, ImagePlus, Lock, Sparkles, Pencil, BookOpen, MessageCircle, PenLine, Highlighter } from "lucide-react";
+import { ArrowLeft, Star, Camera, Eye, EyeOff, Check, RotateCcw, X, Trash2, ImagePlus, Lock, Sparkles, Pencil, BookOpen, MessageCircle, PenLine, Highlighter, Bookmark } from "lucide-react";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { countMeaningfulTurns, REQUIRED_MEANINGFUL_TURNS } from "@/lib/meaningful-turns";
 import { Textarea } from "@/components/ui/textarea";
@@ -817,6 +817,254 @@ export default function BookDetailPage() {
     ? { cls: "wish", label: "위시", bg: "rgba(200,160,48,0.85)", color: "#1a1000" }
     : { cls: "abandoned", label: "중단", bg: "var(--sf3)", color: "var(--tm)" };
 
+  const plotSummary = book.context_data?.plot_summary as string | undefined;
+
+  /* ═══════════════════════ WISH 전용 레이아웃 ═══════════════════════ */
+  if (book.reading_status === "want_to_read") {
+    type WishTab = "info" | "review" | "status";
+    const WishContent = () => {
+      const [wishTab, setWishTab] = useState<WishTab>("info");
+      const wishTabs: { key: WishTab; label: string }[] = [
+        { key: "info", label: "책 정보" },
+        { key: "review", label: `서평${review ? " 1" : ""}` },
+        { key: "status", label: "상태 변경" },
+      ];
+      return (
+        <>
+          {/* 탭 바 */}
+          <div style={{ display: "flex", borderBottom: "0.5px solid var(--bd)", margin: "0 18px", transition: "border-color 0.4s" }}>
+            {wishTabs.map((t) => (
+              <button key={t.key} onClick={() => setWishTab(t.key)} style={{
+                flex: 1, padding: "11px 0", fontSize: 12, fontWeight: 700,
+                color: wishTab === t.key ? "var(--ac)" : "var(--tm)",
+                borderBottom: wishTab === t.key ? "2px solid var(--ac)" : "2px solid transparent",
+                background: "none", border: "none", borderBottomStyle: "solid", cursor: "pointer",
+                transition: "color 0.2s",
+              }}>{t.label}</button>
+            ))}
+          </div>
+
+          {/* 탭 콘텐츠 */}
+          <div style={{ padding: "16px 18px" }}>
+            {wishTab === "info" && (
+              <div>
+                {/* 줄거리 */}
+                {plotSummary && (
+                  <div style={{ marginBottom: 20 }}>
+                    <div style={{ fontSize: 10, fontWeight: 800, color: "var(--tm)", letterSpacing: "1px", textTransform: "uppercase", marginBottom: 8, transition: "color 0.4s" }}>줄거리</div>
+                    <p style={{ fontSize: 13, color: "var(--tp)", lineHeight: 1.7, transition: "color 0.4s" }}>{plotSummary}</p>
+                  </div>
+                )}
+
+                {/* 책 정보 그리드 */}
+                <div style={{ fontSize: 10, fontWeight: 800, color: "var(--tm)", letterSpacing: "1px", textTransform: "uppercase", marginBottom: 8, transition: "color 0.4s" }}>책 정보</div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                  {book.total_pages && (
+                    <div style={{ background: "var(--sf)", borderRadius: 12, padding: "12px 14px", border: "0.5px solid var(--bd)", transition: "all 0.4s" }}>
+                      <div style={{ fontSize: 9, fontWeight: 700, color: "var(--tm)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 4, transition: "color 0.4s" }}>페이지수</div>
+                      <div style={{ fontSize: 16, fontWeight: 800, color: "var(--tp)", transition: "color 0.4s" }}>{book.total_pages}<span style={{ fontSize: 10, fontWeight: 500, color: "var(--tm)", marginLeft: 2 }}>쪽</span></div>
+                    </div>
+                  )}
+                  {book.genre && (
+                    <div style={{ background: "var(--sf)", borderRadius: 12, padding: "12px 14px", border: "0.5px solid var(--bd)", transition: "all 0.4s" }}>
+                      <div style={{ fontSize: 9, fontWeight: 700, color: "var(--tm)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 4, transition: "color 0.4s" }}>카테고리</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tp)", transition: "color 0.4s" }}>{book.genre}</div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 태그 */}
+                {book.genre && (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 16 }}>
+                    {book.genre.split(">").map((g) => g.trim()).filter(Boolean).map((tag) => (
+                      <span key={tag} style={{ fontSize: 11, fontWeight: 700, padding: "5px 12px", borderRadius: 100, background: "var(--ac)", color: "var(--acc)", transition: "all 0.4s" }}>{tag}</span>
+                    ))}
+                  </div>
+                )}
+
+                {/* 내 메모 */}
+                {(book.want_memo || book.recommended_by) && (
+                  <div style={{ marginTop: 20, padding: 14, borderRadius: 14, background: "var(--sf)", border: "0.5px solid var(--bd)", transition: "all 0.4s" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                      <span style={{ fontSize: 10, fontWeight: 800, color: "var(--tm)", letterSpacing: "1px", textTransform: "uppercase" }}>내 메모</span>
+                      <button onClick={() => {
+                        const memo = prompt("메모 수정", book.want_memo || "");
+                        if (memo !== null) saveField({ want_memo: memo || null });
+                      }} style={{ fontSize: 11, color: "var(--ts)", background: "none", border: "none", cursor: "pointer" }}>수정</button>
+                    </div>
+                    {book.want_memo && <p style={{ fontSize: 13, color: "var(--tp)", lineHeight: 1.6 }}>{book.want_memo}</p>}
+                    {book.recommended_by && <p style={{ fontSize: 11, color: "var(--ts)", marginTop: 4 }}>{book.recommended_by}님의 추천</p>}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {wishTab === "review" && (
+              <div>
+                {review ? (
+                  <div style={{ padding: 14, borderRadius: 14, background: "var(--sf)", border: "0.5px solid var(--bd)", transition: "all 0.4s" }}>
+                    <p style={{ fontSize: 13, color: "var(--tp)", lineHeight: 1.7 }}>{review.content.body}</p>
+                  </div>
+                ) : (
+                  <EmptyState icon={PenLine} title="아직 서평이 없어요" description="읽기를 시작하면 서평을 작성할 수 있어요" />
+                )}
+              </div>
+            )}
+
+            {wishTab === "status" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <button onClick={() => setShowFormatPicker(true)} style={{ width: "100%", padding: 14, borderRadius: 14, background: "var(--ac)", color: "var(--acc)", fontSize: 14, fontWeight: 700, border: "none", cursor: "pointer", transition: "all 0.15s" }}>
+                  읽기 시작하기
+                </button>
+                <button onClick={() => setShowDeleteConfirm(true)} style={{ width: "100%", padding: 14, borderRadius: 14, background: "var(--sf)", color: "var(--tm)", fontSize: 13, fontWeight: 600, border: "0.5px solid var(--bd)", cursor: "pointer", transition: "all 0.15s" }}>
+                  위시에서 삭제
+                </button>
+              </div>
+            )}
+          </div>
+        </>
+      );
+    };
+
+    return (
+      <div style={{ minHeight: "100vh", background: "var(--bg)", paddingBottom: 100, transition: "background 0.4s" }}>
+
+        {/* ═══ WISH HERO ═══ */}
+        <div style={{ position: "relative", overflow: "hidden" }}>
+          {/* 블러 배경 */}
+          {book.cover_url && (
+            <div style={{ position: "absolute", inset: -20, width: "calc(100% + 40px)", height: "calc(100% + 40px)" }}>
+              <img src={book.cover_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", filter: "blur(30px) brightness(0.25)", opacity: 0.8 }} />
+            </div>
+          )}
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, var(--bg) 0%, rgba(12,15,13,0.4) 60%, rgba(12,15,13,0.2) 100%)", transition: "background 0.4s" }} />
+
+          {/* 상단 네비 */}
+          <div style={{ position: "relative", zIndex: 10, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 18px 0" }}>
+            <button onClick={() => router.back()} style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(0,0,0,0.42)", backdropFilter: "blur(12px)", border: "0.5px solid rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+              <ArrowLeft size={16} color="rgba(255,255,255,0.85)" strokeWidth={2.2} />
+            </button>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(0,0,0,0.42)", backdropFilter: "blur(12px)", border: "0.5px solid rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth={2.2}><circle cx={18} cy={5} r={3}/><circle cx={6} cy={12} r={3}/><circle cx={18} cy={19} r={3}/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              </button>
+              <button style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(0,0,0,0.42)", backdropFilter: "blur(12px)", border: "0.5px solid rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                <svg width={16} height={16} viewBox="0 0 24 24" fill="rgba(255,255,255,0.85)" stroke="rgba(255,255,255,0.85)" strokeWidth={1.5}><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+              </button>
+            </div>
+          </div>
+
+          {/* 센터 커버 */}
+          <div style={{ position: "relative", zIndex: 5, display: "flex", justifyContent: "center", padding: "24px 0 20px" }}>
+            <div style={{ width: 130, height: 190, borderRadius: 10, overflow: "hidden", boxShadow: "0 12px 40px rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.08)" }}>
+              {book.cover_url ? (
+                <img src={book.cover_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              ) : (
+                <div style={{ width: "100%", height: "100%", background: "var(--sf2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <BookOpen size={28} color="var(--tm)" />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 타이틀 영역 */}
+          <div style={{ position: "relative", zIndex: 5, textAlign: "center", padding: "0 24px 24px" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "4px 12px", borderRadius: 100, fontSize: 10, fontWeight: 800, marginBottom: 10, background: "rgba(200,160,48,0.85)", color: "#1a1000" }}>
+              <Bookmark size={10} strokeWidth={2.5} />
+              위시리스트
+            </div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: "#fff", letterSpacing: "-0.5px", lineHeight: 1.3, textShadow: "0 2px 12px rgba(0,0,0,0.6)", marginBottom: 6 }}>{book.title}</div>
+            {book.author && <div style={{ fontSize: 12, color: "rgba(255,255,255,0.6)" }}>{book.author}{book.genre ? ` · ${book.genre.split(">")[0]?.trim()}` : ""}</div>}
+          </div>
+        </div>
+
+        {/* ═══ 별점 미리보기 (있으면) ═══ */}
+        {book.rating && book.rating > 0 && (
+          <div style={{ padding: "10px 18px 6px", display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Star key={i} size={16} strokeWidth={1.5} style={{ color: i <= Math.floor(book.rating!) ? "#C4A35A" : "var(--bd2)", fill: i <= Math.floor(book.rating!) ? "#C4A35A" : "none" }} />
+            ))}
+            <span style={{ fontSize: 12, fontWeight: 700, color: "#C4A35A", marginLeft: 4 }}>{book.rating!.toFixed(1)}</span>
+          </div>
+        )}
+
+        {/* ═══ 읽기 시작하기 CTA ═══ */}
+        <div style={{ padding: "10px 18px 0" }}>
+          <button onClick={() => setShowFormatPicker(true)} style={{
+            width: "100%", padding: 15, borderRadius: 14,
+            background: "var(--ac)", color: "var(--acc)",
+            fontSize: 15, fontWeight: 800, border: "none", cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+            transition: "all 0.15s",
+          }}>
+            <BookOpen size={16} strokeWidth={2.5} />
+            읽기 시작하기
+          </button>
+        </div>
+
+        {/* ═══ 구매/열람 링크 ═══ */}
+        <div style={{ display: "flex", gap: 8, padding: "10px 18px 6px" }}>
+          <a href={`https://www.aladin.co.kr/search/wsearchresult.aspx?SearchWord=${encodeURIComponent(book.title)}`} target="_blank" rel="noopener noreferrer"
+            style={{ flex: 1, padding: "10px 0", borderRadius: 10, border: "0.5px solid var(--bd2)", background: "var(--sf)", fontSize: 11, fontWeight: 700, color: "var(--ac2)", textAlign: "center", textDecoration: "none", cursor: "pointer", transition: "all 0.2s" }}>
+            알라딘 구매
+          </a>
+          <a href={`https://search.kyobobook.co.kr/search?keyword=${encodeURIComponent(book.title)}&gbCode=EBK`} target="_blank" rel="noopener noreferrer"
+            style={{ flex: 1, padding: "10px 0", borderRadius: 10, border: "0.5px solid var(--bd2)", background: "var(--sf)", fontSize: 11, fontWeight: 700, color: "var(--ac2)", textAlign: "center", textDecoration: "none", cursor: "pointer", transition: "all 0.2s" }}>
+            eBook
+          </a>
+          <a href={`https://www.nl.go.kr/seoji/contents/S80100000000.do?schM=intgr_detail_view_isbn&page=1&schStr=${encodeURIComponent(book.title)}`} target="_blank" rel="noopener noreferrer"
+            style={{ flex: 1, padding: "10px 0", borderRadius: 10, border: "0.5px solid var(--bd2)", background: "var(--sf)", fontSize: 11, fontWeight: 700, color: "var(--ac2)", textAlign: "center", textDecoration: "none", cursor: "pointer", transition: "all 0.2s" }}>
+            도서관
+          </a>
+        </div>
+
+        {/* ═══ 탭 + 콘텐츠 ═══ */}
+        <WishContent />
+
+        {/* ═══ 삭제 확인 모달 ═══ */}
+        {showDeleteConfirm && (
+          <>
+            <div onClick={() => setShowDeleteConfirm(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 100 }} />
+            <div style={{ position: "fixed", left: 16, right: 16, top: "50%", transform: "translateY(-50%)", zIndex: 101, background: "var(--sf)", borderRadius: 20, padding: 24, maxWidth: 360, margin: "0 auto", border: "0.5px solid var(--bd2)" }}>
+              <p style={{ fontSize: 14, fontWeight: 700, color: "var(--tp)", textAlign: "center", marginBottom: 6 }}>위시에서 삭제할까요?</p>
+              <p style={{ fontSize: 12, color: "var(--tm)", textAlign: "center", marginBottom: 20 }}>이 책이 서재에서 사라져요</p>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={() => setShowDeleteConfirm(false)} style={{ flex: 1, padding: 12, borderRadius: 12, background: "var(--sf2)", color: "var(--tm)", fontSize: 13, fontWeight: 600, border: "none", cursor: "pointer" }}>취소</button>
+                <button onClick={handleDeleteBook} disabled={deleting} style={{ flex: 1, padding: 12, borderRadius: 12, background: "#e05028", color: "#fff", fontSize: 13, fontWeight: 700, border: "none", cursor: "pointer", opacity: deleting ? 0.6 : 1 }}>{deleting ? "삭제 중..." : "삭제"}</button>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* ═══ 포맷 선택 모달 ═══ */}
+        {showFormatPicker && (
+          <>
+            <div onClick={() => setShowFormatPicker(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 100 }} />
+            <div style={{ position: "fixed", left: 16, right: 16, top: "50%", transform: "translateY(-50%)", zIndex: 101, background: "var(--sf)", borderRadius: 20, padding: 24, maxWidth: 360, margin: "0 auto", border: "0.5px solid var(--bd2)" }}>
+              <p style={{ fontSize: 14, fontWeight: 700, color: "var(--tp)", textAlign: "center", marginBottom: 4 }}>어떤 형태로 읽으세요?</p>
+              <p style={{ fontSize: 12, color: "var(--tm)", textAlign: "center", marginBottom: 20 }}>나중에 변경할 수 있어요</p>
+              <div style={{ display: "flex", gap: 10 }}>
+                {([["paper", "종이책"], ["ebook", "전자책"]] as const).map(([fmt, label]) => (
+                  <button key={fmt} onClick={() => {
+                    setShowFormatPicker(false);
+                    saveField({
+                      reading_status: "reading" as const, format: fmt,
+                      started_at: new Date().toISOString().split("T")[0],
+                      current_page: 0, progress_percent: 0,
+                    });
+                    toast.success("읽기 시작!", { duration: 1500 });
+                  }} style={{ flex: 1, padding: "16px 0", borderRadius: 14, background: "var(--sf2)", color: "var(--tp)", fontSize: 14, fontWeight: 700, border: "0.5px solid var(--bd)", cursor: "pointer", transition: "all 0.15s" }}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", paddingBottom: 100, transition: "background 0.4s" }}>
 
@@ -939,70 +1187,7 @@ export default function BookDetailPage() {
         </div>
       )}
 
-      {/* ── Want to Read: 전용 상세 ── */}
-      {book.reading_status === "want_to_read" && (
-        <div className="px-4 mt-3">
-          {/* 메인 버튼 */}
-          <button
-            onClick={() => setShowFormatPicker(true)}
-            className="w-full py-4 rounded-2xl font-bold text-[15px] text-paper transition-all active:scale-[0.98] mb-4"
-            style={{ background: "var(--c-forest, var(--ac))" }}
-          >
-            읽기 시작하기
-          </button>
-
-          {/* 내 메모 */}
-          {(book.want_memo || book.recommended_by) && (
-            <div style={{ padding: 14, borderRadius: 14, background: "var(--sf)", border: "1px solid var(--bd)", marginBottom: 12 }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-                <span style={{ fontSize: 12, fontWeight: 700, color: "var(--tp)" }}>내 메모</span>
-                <button onClick={() => {
-                  const memo = prompt("메모 수정", book.want_memo || "");
-                  if (memo !== null) saveField({ want_memo: memo || null });
-                }} style={{ fontSize: 11, color: "var(--ts)" }}>수정</button>
-              </div>
-              {book.want_memo && <p style={{ fontSize: 13, color: "var(--tp)", lineHeight: 1.6 }}>{book.want_memo}</p>}
-              {book.recommended_by && <p style={{ fontSize: 11, color: "var(--ts)", marginTop: 4 }}>{book.recommended_by}님의 추천</p>}
-            </div>
-          )}
-
-          {/* 메모가 없을 때 추가 버튼 */}
-          {!book.want_memo && !book.recommended_by && (
-            <button
-              onClick={() => {
-                const memo = prompt("이 책을 담은 이유를 적어보세요");
-                if (memo) saveField({ want_memo: memo });
-              }}
-              style={{ width: "100%", padding: 14, borderRadius: 14, background: "var(--sf)", border: "1px dashed var(--bd)", textAlign: "center", marginBottom: 12 }}
-            >
-              <p style={{ fontSize: 12, color: "var(--ts)" }}>메모 추가하기</p>
-            </button>
-          )}
-
-          {/* 어디서 읽을 수 있어요 */}
-          <div style={{ padding: 14, borderRadius: 14, background: "var(--sf)", border: "1px solid var(--bd)", marginBottom: 12 }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: "var(--tp)", display: "block", marginBottom: 8 }}>어디서 읽을 수 있어요</span>
-            <a
-              href={`https://www.aladin.co.kr/search/wsearchresult.aspx?SearchWord=${encodeURIComponent(book.title)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 10, background: "var(--sf2)" }}
-            >
-              <BookOpen size={14} color="#5A7A52" strokeWidth={1.5} />
-              <span style={{ fontSize: 12, fontWeight: 600, color: "var(--tp)" }}>알라딘에서 찾기</span>
-              <span style={{ fontSize: 11, color: "var(--ts)", marginLeft: "auto" }}>→</span>
-            </a>
-          </div>
-
-          {/* 위시에서 삭제 */}
-          <div style={{ textAlign: "center", marginTop: 16 }}>
-            <button
-              onClick={() => setShowDeleteConfirm(true)}
-              style={{ fontSize: 12, color: "var(--ts)" }}
-            >위시에서 삭제</button>
-          </div>
-        </div>
-      )}
+      {/* 위시 읽기시작은 early return에서 처리 */}
 
       {/* ── 상태별 액션 버튼 ── */}
       {book.reading_status === "reading" && (
@@ -1534,7 +1719,7 @@ export default function BookDetailPage() {
       </div>
 
       {/* ── 하단 중단/삭제 링크 ── */}
-      {(book.reading_status === "reading" || book.reading_status === "want_to_read") && (
+      {book.reading_status === "reading" && (
         <div className="flex justify-center gap-6 mt-6 mb-4">
           {book.reading_status === "reading" && (
             <button

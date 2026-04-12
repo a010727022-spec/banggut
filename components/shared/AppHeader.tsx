@@ -4,6 +4,7 @@ import { useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Flame, Search, Share2 } from "lucide-react";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { useThemeStore } from "@/stores/useThemeStore";
 import { getAvatarSrc } from "@/lib/types";
 import { calcStreak, calcTemp, getTempSeason, getWeekBars } from "@/lib/reading-utils";
 import { format } from "date-fns";
@@ -14,7 +15,11 @@ import { format } from "date-fns";
 function HeroCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const starsRef = useRef<{ x: number; y: number; r: number; a: number; sp: number }[]>([]);
+  const theme = useThemeStore((s) => s.theme);
+  const isBlossom = theme === "blossom";
+
   useEffect(() => {
+    if (isBlossom) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const W = canvas.offsetWidth || 393; const H = 180;
@@ -47,7 +52,20 @@ function HeroCanvas() {
     }
     raf = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(raf);
-  }, []);
+  }, [isBlossom]);
+
+  if (isBlossom) {
+    return (
+      <div style={{ position: "relative", height: 180, overflow: "hidden" }}>
+        <img
+          src="/bg-blossom.png"
+          alt=""
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+        />
+      </div>
+    );
+  }
+
   return (
     <div style={{ position: "relative", height: 180, overflow: "hidden", background: "var(--bg)", transition: "background 0.4s" }}>
       <canvas ref={canvasRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
@@ -110,57 +128,122 @@ export default function AppHeader({
 }) {
   const user = useAuthStore((s) => s.user);
   const router = useRouter();
+  const theme = useThemeStore((s) => s.theme);
+  const isBlossom = theme === "blossom";
   const streak = calcStreak(streakDates);
   const temp = calcTemp(streak, streakDates);
 
   return (
     <>
-      <HeroCanvas />
-      <div style={{ padding: "0 20px" }}>
-        <div style={{ display: "flex", alignItems: "flex-end", gap: 14, marginTop: -30, marginBottom: 12, position: "relative", zIndex: 2 }}>
-          <div style={{ position: "relative", flexShrink: 0 }}>
-            <div style={{ width: 76, height: 76, borderRadius: "50%", background: "linear-gradient(135deg, #1e3d2e, #355c45, var(--ac))", display: "flex", alignItems: "center", justifyContent: "center", border: "3px solid var(--bg)", overflow: "hidden", boxShadow: "0 2px 16px rgba(0,0,0,0.4)", transition: "border-color 0.4s" }}>
-              {(() => {
-                const src = getAvatarSrc(user?.emoji);
-                return src
-                  ? <img src={src} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                  : <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="14" r="8" fill="rgba(200,230,215,0.9)" /><path d="M4 40c0-7.7 6.3-14 14-14s14 6.3 14 14" fill="rgba(200,230,215,0.7)" /></svg>;
-              })()}
-            </div>
-            {streak > 0 && (
-              <div style={{ position: "absolute", bottom: -4, right: -6, background: "linear-gradient(135deg, #c8a030, #e8c040)", borderRadius: 100, padding: "3px 8px", fontSize: 10, fontWeight: 800, color: "#1a1000", border: "2.5px solid var(--bg)", transition: "border-color 0.4s", boxShadow: "0 2px 8px rgba(0,0,0,0.3)" }}>
-                <Flame size={10} strokeWidth={2.5} style={{ display: "inline", verticalAlign: "middle", marginRight: 2 }} />{streak}일
-              </div>
-            )}
-          </div>
-          <div style={{ flex: 1, paddingBottom: 2 }}>
-            <div style={{ fontSize: 19, fontWeight: 800, color: "var(--tp)", letterSpacing: "-0.6px", transition: "color 0.4s" }}>{user?.nickname || "독서가"}</div>
-            <div style={{ fontSize: 11, color: "var(--tm)", marginTop: 3, transition: "color 0.4s" }}>읽고, 긋고, 방긋.</div>
-            <div style={{ display: "flex", gap: 14, marginTop: 8 }}>
-              {[
-                { n: counts.done, l: "완독" },
-                { n: counts.reading, l: "읽는 중" },
-                { n: counts.want, l: "위시" },
-              ].map(({ n, l }) => (
-                <div key={l}>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: "var(--tp)", transition: "color 0.4s" }}>{n}</span>
-                  <span style={{ fontWeight: 400, color: "var(--tm)", fontSize: 11, marginLeft: 2, transition: "color 0.4s" }}>{l}</span>
+      {isBlossom ? (
+        <div style={{ position: "relative", overflow: "hidden" }}>
+          {/* 벚꽃 배경 이미지 — 전체 헤더 커버 (뷰포트 전폭) */}
+          <img
+            src="/bg-blossom.png"
+            alt=""
+            style={{ position: "absolute", top: 0, left: 0, width: "100%", minHeight: "100%", objectFit: "cover", objectPosition: "center 30%" }}
+          />
+          {/* 하단 그라데이션 페이드 */}
+          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "60%", background: "linear-gradient(to top, var(--bg), transparent)", transition: "background 0.4s" }} />
+          {/* 콘텐츠 */}
+          <div style={{ position: "relative", zIndex: 1 }}>
+            <div style={{ height: 150 }} />
+            <div style={{ padding: "0 20px" }}>
+              <div style={{ display: "flex", alignItems: "flex-end", gap: 14, marginBottom: 12 }}>
+                <div style={{ position: "relative", flexShrink: 0 }}>
+                  <div style={{ width: 76, height: 76, borderRadius: "50%", background: "linear-gradient(135deg, #e8b0c8, #d068a0, var(--ac))", display: "flex", alignItems: "center", justifyContent: "center", border: "3px solid rgba(253,240,245,0.8)", overflow: "hidden", boxShadow: "0 2px 16px rgba(180,80,130,0.25)", transition: "border-color 0.4s" }}>
+                    {(() => {
+                      const src = getAvatarSrc(user?.emoji);
+                      return src
+                        ? <img src={src} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        : <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="14" r="8" fill="rgba(230,180,210,0.9)" /><path d="M4 40c0-7.7 6.3-14 14-14s14 6.3 14 14" fill="rgba(230,180,210,0.7)" /></svg>;
+                    })()}
+                  </div>
+                  {streak > 0 && (
+                    <div style={{ position: "absolute", bottom: -4, right: -6, background: "linear-gradient(135deg, #c8a030, #e8c040)", borderRadius: 100, padding: "3px 8px", fontSize: 10, fontWeight: 800, color: "#1a1000", border: "2.5px solid rgba(253,240,245,0.8)", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
+                      <Flame size={10} strokeWidth={2.5} style={{ display: "inline", verticalAlign: "middle", marginRight: 2 }} />{streak}일
+                    </div>
+                  )}
                 </div>
-              ))}
+                <div style={{ flex: 1, paddingBottom: 2 }}>
+                  <div style={{ fontSize: 19, fontWeight: 800, color: "var(--tp)", letterSpacing: "-0.6px", transition: "color 0.4s" }}>{user?.nickname || "독서가"}</div>
+                  <div style={{ fontSize: 11, color: "var(--tm)", marginTop: 3, transition: "color 0.4s" }}>읽고, 긋고, 방긋.</div>
+                  <div style={{ display: "flex", gap: 14, marginTop: 8 }}>
+                    {[
+                      { n: counts.done, l: "완독" },
+                      { n: counts.reading, l: "읽는 중" },
+                      { n: counts.want, l: "위시" },
+                    ].map(({ n, l }) => (
+                      <div key={l}>
+                        <span style={{ fontSize: 13, fontWeight: 800, color: "var(--tp)", transition: "color 0.4s" }}>{n}</span>
+                        <span style={{ fontWeight: 400, color: "var(--tm)", fontSize: 11, marginLeft: 2, transition: "color 0.4s" }}>{l}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+                <button onClick={() => router.push("/profile")} style={{ flex: 1, padding: "9px 0", borderRadius: 10, border: "0.5px solid var(--bd2)", background: "rgba(253,240,245,0.65)", backdropFilter: "blur(8px)", color: "var(--ac2)", fontSize: 12, fontWeight: 700, cursor: "pointer", transition: "all 0.2s" }}>프로필 편집</button>
+                <button onClick={() => router.push("/setup")} style={{ width: 40, flexShrink: 0, borderRadius: 10, border: "0.5px solid var(--bd2)", background: "rgba(253,240,245,0.65)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", padding: 9, transition: "all 0.2s" }}>
+                  <Search size={15} stroke="var(--ac2)" strokeWidth={2.2} />
+                </button>
+                <button style={{ width: 40, flexShrink: 0, borderRadius: 10, border: "0.5px solid var(--bd2)", background: "rgba(253,240,245,0.65)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", padding: 9, transition: "all 0.2s" }}>
+                  <Share2 size={15} stroke="var(--ac2)" strokeWidth={2.2} />
+                </button>
+              </div>
             </div>
           </div>
         </div>
-        <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
-          <button onClick={() => router.push("/profile")} style={{ flex: 1, padding: "9px 0", borderRadius: 10, border: "0.5px solid var(--bd2)", background: "var(--sf)", color: "var(--ac2)", fontSize: 12, fontWeight: 700, cursor: "pointer", transition: "all 0.2s" }}>프로필 편집</button>
-          <button onClick={() => router.push("/setup")} style={{ width: 40, flexShrink: 0, borderRadius: 10, border: "0.5px solid var(--bd2)", background: "var(--sf)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", padding: 9, transition: "all 0.2s" }}>
-            <Search size={15} stroke="var(--ac2)" strokeWidth={2.2} />
-          </button>
-          <button style={{ width: 40, flexShrink: 0, borderRadius: 10, border: "0.5px solid var(--bd2)", background: "var(--sf)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", padding: 9, transition: "all 0.2s" }}>
-            <Share2 size={15} stroke="var(--ac2)" strokeWidth={2.2} />
-          </button>
-        </div>
-        <TempWidget temp={temp} streakDates={streakDates} />
-      </div>
+      ) : (
+        <>
+          <HeroCanvas />
+          <div style={{ padding: "0 20px" }}>
+            <div style={{ display: "flex", alignItems: "flex-end", gap: 14, marginTop: -30, marginBottom: 12, position: "relative", zIndex: 2 }}>
+              <div style={{ position: "relative", flexShrink: 0 }}>
+                <div style={{ width: 76, height: 76, borderRadius: "50%", background: "linear-gradient(135deg, #1e3d2e, #355c45, var(--ac))", display: "flex", alignItems: "center", justifyContent: "center", border: "3px solid var(--bg)", overflow: "hidden", boxShadow: "0 2px 16px rgba(0,0,0,0.4)", transition: "border-color 0.4s" }}>
+                  {(() => {
+                    const src = getAvatarSrc(user?.emoji);
+                    return src
+                      ? <img src={src} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      : <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="14" r="8" fill="rgba(200,230,215,0.9)" /><path d="M4 40c0-7.7 6.3-14 14-14s14 6.3 14 14" fill="rgba(200,230,215,0.7)" /></svg>;
+                  })()}
+                </div>
+                {streak > 0 && (
+                  <div style={{ position: "absolute", bottom: -4, right: -6, background: "linear-gradient(135deg, #c8a030, #e8c040)", borderRadius: 100, padding: "3px 8px", fontSize: 10, fontWeight: 800, color: "#1a1000", border: "2.5px solid var(--bg)", transition: "border-color 0.4s", boxShadow: "0 2px 8px rgba(0,0,0,0.3)" }}>
+                    <Flame size={10} strokeWidth={2.5} style={{ display: "inline", verticalAlign: "middle", marginRight: 2 }} />{streak}일
+                  </div>
+                )}
+              </div>
+              <div style={{ flex: 1, paddingBottom: 2 }}>
+                <div style={{ fontSize: 19, fontWeight: 800, color: "var(--tp)", letterSpacing: "-0.6px", transition: "color 0.4s" }}>{user?.nickname || "독서가"}</div>
+                <div style={{ fontSize: 11, color: "var(--tm)", marginTop: 3, transition: "color 0.4s" }}>읽고, 긋고, 방긋.</div>
+                <div style={{ display: "flex", gap: 14, marginTop: 8 }}>
+                  {[
+                    { n: counts.done, l: "완독" },
+                    { n: counts.reading, l: "읽는 중" },
+                    { n: counts.want, l: "위시" },
+                  ].map(({ n, l }) => (
+                    <div key={l}>
+                      <span style={{ fontSize: 13, fontWeight: 800, color: "var(--tp)", transition: "color 0.4s" }}>{n}</span>
+                      <span style={{ fontWeight: 400, color: "var(--tm)", fontSize: 11, marginLeft: 2, transition: "color 0.4s" }}>{l}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+              <button onClick={() => router.push("/profile")} style={{ flex: 1, padding: "9px 0", borderRadius: 10, border: "0.5px solid var(--bd2)", background: "var(--sf)", color: "var(--ac2)", fontSize: 12, fontWeight: 700, cursor: "pointer", transition: "all 0.2s" }}>프로필 편집</button>
+              <button onClick={() => router.push("/setup")} style={{ width: 40, flexShrink: 0, borderRadius: 10, border: "0.5px solid var(--bd2)", background: "var(--sf)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", padding: 9, transition: "all 0.2s" }}>
+                <Search size={15} stroke="var(--ac2)" strokeWidth={2.2} />
+              </button>
+              <button style={{ width: 40, flexShrink: 0, borderRadius: 10, border: "0.5px solid var(--bd2)", background: "var(--sf)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", padding: 9, transition: "all 0.2s" }}>
+                <Share2 size={15} stroke="var(--ac2)" strokeWidth={2.2} />
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+      <TempWidget temp={temp} streakDates={streakDates} />
     </>
   );
 }

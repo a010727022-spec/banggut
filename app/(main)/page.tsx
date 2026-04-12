@@ -189,11 +189,11 @@ export default function LibraryPage() {
     Promise.all([
       getBooks(supabase, user.id),
       getAllStreakDates(supabase, user.id),
-      getScraps(supabase, user.id),
+      getScraps(supabase, user.id, 4),
     ]).then(([booksData, streakData, scrapsData]) => {
       setBooks(booksData);
       setStreakDatesArr(streakData);
-      setRecentScraps(scrapsData.slice(0, 4));
+      setRecentScraps(scrapsData);
     }).catch(() => setLoading(false));
   }, [user, setBooks, setLoading]);
 
