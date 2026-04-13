@@ -53,10 +53,14 @@
 - 기존 아바타 + 닉네임 UI 유지
 - CTA 버튼 문구 변경: "시작하기" → "첫 번째 책 추가하기 →"
 
-### Step 4: 첫 책 추가 (기존 + 안내 배너)
+### Step 4: 첫 책 추가 (기존 + 안내 배너 + 읽기 상태)
 - 기존 /setup 페이지 재활용
 - 상단에 안내 배너 추가: "지금 읽고 있는 책을 알려주세요 — 추가하면 바로 AI와 이야기할 수 있어요"
-- 온보딩 플래그(query param `onboarding=true`) 시 책 추가 완료 후 `/discuss/[bookId]?welcome=true`로 리다이렉트 (기존: `/book/[bookId]`)
+- 책 선택 후 읽기 상태 질문: "이 책, 어디까지 읽으셨어요?"
+  - 아직 안 읽었어요 → `want_to_read` → AI 읽기 전 대화 (스포일러 완전 차단)
+  - 읽고 있는 중 → `reading` → AI 읽는 중 대화 (현재 감상 중심)
+  - 다 읽었어요 → `finished` → AI 완독 대화 (스포일러 자유, 전체 분석)
+- 온보딩 플래그(query param `onboarding=true`) 시 책 추가 완료 후 `/discuss/[bookId]?welcome=true&readingStatus=...`로 리다이렉트
 
 ### Step 5: AI 첫 대화 (Aha Moment)
 - 기존 /discuss/[bookId] 페이지 재활용
