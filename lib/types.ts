@@ -3,6 +3,10 @@ export interface User {
   nickname: string;
   emoji: string;
   created_at: string;
+  preferred_genres?: string[];
+  reading_frequency?: string;
+  discussion_style?: string;
+  onboarding_completed?: boolean;
 }
 
 export interface TopicMap {
