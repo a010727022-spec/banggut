@@ -15,8 +15,7 @@ import { format } from "date-fns";
 import { calcStreak, calcTemp, getTempSeason, getWeekBars } from "@/lib/reading-utils";
 
 /* ── 알림 설정 타입 ── */
-const NOTIF_KEYS = ["subway", "cafe", "bedtime", "social", "tempDrop"] as const;
-type NotifKey = typeof NOTIF_KEYS[number];
+type NotifKey = "subway" | "cafe" | "bedtime" | "social" | "tempDrop";
 interface NotifSettings {
   subway: boolean;
   cafe: boolean;
