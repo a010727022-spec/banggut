@@ -477,7 +477,7 @@ export async function POST(req: Request) {
   }
 
   const body = await req.json();
-  const { bookInfo, messages, underlines, scraps, bookContext, topicMap, greeting, bookContextData, branchHint, otherReadingBooks } = body;
+  const { bookInfo, messages, underlines, scraps, bookContext, topicMap, greeting, bookContextData, branchHint, otherReadingBooks, readingStatus } = body;
 
   // greeting 모드: 메시지 없이 AI가 먼저 말하기
   if (greeting && (!Array.isArray(messages) || messages.length === 0)) {
@@ -643,40 +643,60 @@ ${otherReadingBooks.map((b: { title: string; author: string }) => `- ${b.title} 
     const hasContext = bookKnown && bookContextData?.medium?.characters?.length > 0;
     let greetingInstruction: string;
 
-    if (hasQuotes) {
-      // 글귀가 있을 때
+    // Reading status determines greeting mode
+    if (readingStatus === "want_to_read") {
+      greetingInstruction = `\n\n[첫 인사 — 읽기 전 모드]
+유저는 이 책을 아직 읽지 않았습니다. 읽기 전 대화를 진행하세요.
+구조: 1줄 책이름+환영, 2줄 선택한 이유 질문, 3줄 기대감 열린 질문
+
+예시 톤:
+"『[책제목]』을 고르셨군요!
+이 책을 왜 골랐는지 궁금해요.
+제목에서 어떤 이야기를 기대하세요?"
+
+핵심 규칙:
+- 줄거리, 인물, 결말 등 어떤 내용도 절대 언급하지 마세요
+- 선택 이유, 기대감, 제목/표지 인상 중심으로 대화하세요
+- "읽기 시작하면 다시 이야기 나눠요!"로 리텐션 유도 가능
+금지: 스포일러, 내용 언급, 줄거리 요약, 인물 이름`;
+    } else if (readingStatus === "finished") {
+      greetingInstruction = `\n\n[첫 인사 — 완독 모드]
+유저는 이 책을 다 읽었습니다. 전체 내용에 대해 자유롭게 토론할 수 있습니다.
+구조: 1줄 책이름+환영, 2줄 완독 축하+감정 질문, 3줄 열린 질문
+
+예시 톤:
+"『[책제목]』을 다 읽으셨군요!
+책을 덮은 순간, 가장 먼저 떠오른 생각이나 감정이 있었어요?"
+
+핵심 규칙:
+- 결말, 반전 등 자유롭게 이야기할 수 있습니다
+- 전체 구조 분석, 작가 의도, 다른 작품과 비교 가능
+- 깊이 있는 토론으로 바로 들어가도 됩니다
+금지: "안녕하세요! 반갑습니다!" (로봇)`;
+    } else if (hasQuotes) {
       greetingInstruction = `\n\n[첫 인사 — 지금 바로 실행]
 구조: 1줄 책이름+환영, 2줄 글귀 연결, 3줄 열린 질문
 독자가 밑줄 친 첫 번째 글귀: "${underlines[0].text}"
 
 예시 톤:
-"『[책제목]』 함께 이야기할 수 있어서 좋아요. 📖
+"『[책제목]』 함께 이야기할 수 있어서 좋아요.
 밑줄 치신 문장 중에 '[글귀]'가 눈에 띄네요.
 이 문장에 밑줄 친 순간, 어떤 마음이었어요?"
 
 금지: "안녕하세요! 반갑습니다!" (로봇), 줄거리 요약, "이 책의 주제가 뭐라고 생각하세요?" (시험)`;
     } else if (hasContext) {
-      // [책 정보]에 인물/줄거리가 있는 경우 — 구체적 화두 제시
       greetingInstruction = `\n\n[첫 인사 — 지금 바로 실행]
 [책 정보]에 있는 구체적 인물이나 장면을 언급하며 시작하세요. 뻔한 질문 금지.
 구조: 1줄 책이름+환영, 2줄 [책 정보]에서 가져온 구체적 인물/장면 언급, 3줄 열린 질문
 
-예시 톤:
-"『[책제목]』 함께 이야기해봐요. 📖
-[구체적 공간/인물]이 참 인상적이죠.
-저는 [구체적 인물]이 [구체적 장면]하는 장면이 마음에 걸렸어요.
-당신은 어떤 인물이 가장 마음에 남았어요?"
-
 ⚠️ 반드시 [책 정보]에 있는 실제 인물명/장소명을 사용하세요. 없는 정보를 지어내지 마세요.
 금지: "안녕하세요! 반갑습니다!" (로봇), 줄거리 요약, "이 책의 주제가 뭐라고 생각하세요?" (시험)`;
     } else {
-      // [책 정보]가 없거나 부족한 경우 — 솔직하게, 유저가 이끌도록
       greetingInstruction = `\n\n[첫 인사 — 지금 바로 실행]
 이 책에 대한 정보가 부족합니다. 솔직히 많이 파악하지 못했다고 밝히고, 유저의 이야기를 중심으로 진행하겠다고 하세요.
-구조: 1줄 책이름+환영, 2줄 솔직하게 정보 부족 인정, 3줄 유저에게 주도권, 4줄 열린 질문
 
 예시 톤:
-"『[책제목]』 함께 이야기해봐요. 📖
+"『[책제목]』 함께 이야기해봐요.
 솔직히 이 책에 대해 아직 많이 파악하지 못했어요.
 대신 당신이 직접 읽은 사람이니까, 당신의 이야기를 중심으로 깊이 파고들어볼게요.
 이 책을 한마디로 표현하면 어떤 책이에요?"

@@ -33,8 +33,10 @@ export default function SetupPage() {
   const [hasSearched, setHasSearched] = useState(false);
   const [showManualAuthor, setShowManualAuthor] = useState(false);
   const [manualAuthor, setManualAuthor] = useState("");
+  const [readingStatus, setReadingStatus] = useState<string>("reading");
   const router = useRouter();
   const searchParams = useSearchParams();
+  const isOnboarding = searchParams.get("onboarding") === "true";
   const submittingRef = useRef(false);
   const autoSearchedRef = useRef(false);
 
@@ -120,6 +122,7 @@ export default function SetupPage() {
         title: selected.title,
         author: selected.author || null,
         genre: selected.category || null,
+        reading_status: isOnboarding ? (readingStatus as "want_to_read" | "reading" | "finished") : "reading",
         ...(selected.cover ? { cover_url: selected.cover } : {}),
         ...(selected.pageCount ? { total_pages: selected.pageCount } : {}),
       });
@@ -166,7 +169,11 @@ export default function SetupPage() {
       }).catch(() => {});
 
       toast.success("서재에 추가했어요!");
-      router.push(`/book/${book.id}`);
+      if (isOnboarding) {
+        router.push(`/discuss/${book.id}?welcome=true&readingStatus=${readingStatus}`);
+      } else {
+        router.push(`/book/${book.id}`);
+      }
     } catch (err) {
       console.error("Book creation failed:", err);
       const e = err as Record<string, string> | null;
@@ -186,6 +193,22 @@ export default function SetupPage() {
         </button>
         <h1 className="font-serif text-xl font-black text-ink tracking-tighter">새 책 등록</h1>
       </div>
+
+      {/* Onboarding Banner */}
+      {isOnboarding && (
+        <div style={{
+          background: "color-mix(in srgb, var(--ac) 8%, transparent)",
+          borderRadius: 12, padding: "12px 14px", marginBottom: 16,
+          borderLeft: "3px solid var(--ac)", transition: "all 0.4s",
+        }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tp)", marginBottom: 4 }}>
+            지금 읽고 있는 책을 알려주세요
+          </div>
+          <div style={{ fontSize: 11, color: "var(--ts)" }}>
+            추가하면 바로 AI와 이 책에 대해 이야기할 수 있어요
+          </div>
+        </div>
+      )}
 
       {/* Search */}
       <div className="flex gap-2 mb-6">
@@ -294,6 +317,30 @@ export default function SetupPage() {
               <X className="w-4 h-4" />
             </button>
           </div>
+          {isOnboarding && selected && (
+            <div style={{ marginTop: 12 }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: "var(--tp)", marginBottom: 8 }}>
+                이 책, 어디까지 읽으셨어요?
+              </p>
+              <div style={{ display: "flex", gap: 8 }}>
+                {[
+                  { id: "want_to_read", label: "아직 안 읽었어요" },
+                  { id: "reading", label: "읽고 있는 중" },
+                  { id: "finished", label: "다 읽었어요" },
+                ].map((opt) => (
+                  <button key={opt.id} onClick={() => setReadingStatus(opt.id)} style={{
+                    flex: 1, padding: "8px 4px", borderRadius: 10, fontSize: 11, fontWeight: 700,
+                    border: `1.5px solid ${readingStatus === opt.id ? "var(--ac)" : "var(--bd2)"}`,
+                    background: readingStatus === opt.id ? "color-mix(in srgb, var(--ac) 10%, var(--sf))" : "var(--sf)",
+                    color: readingStatus === opt.id ? "var(--ac)" : "var(--tm)",
+                    cursor: "pointer", transition: "all 0.15s",
+                  }}>
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 

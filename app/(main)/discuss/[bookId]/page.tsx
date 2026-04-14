@@ -26,6 +26,8 @@ import {
   BookOpenCheck,
   WifiOff,
   RefreshCw,
+  X,
+  Lightbulb,
 } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -222,6 +224,11 @@ export default function DiscussPage() {
   const [branchExpanded, setBranchExpanded] = useState(false);
   const [pendingBranchHint, setPendingBranchHint] = useState<string | null>(null);
 
+  // 온보딩 웰컴 모드
+  const isWelcome = searchParams.get("welcome") === "true";
+  const welcomeReadingStatus = searchParams.get("readingStatus") || "reading";
+  const [showGuide, setShowGuide] = useState(false);
+
   // 스트리밍 & 네트워크 상태
   const [streamPhase, setStreamPhase] = useState<StreamPhase>("idle");
   const streamPhaseRef = useRef<StreamPhase>("idle");
@@ -371,6 +378,7 @@ export default function DiscussPage() {
             topicMap: bookData.topic_map,
             greeting: mode,
             bookContextData: ctxData || null,
+            readingStatus: welcomeReadingStatus,
           }),
           signal: abortControllerRef.current.signal,
         });
@@ -536,6 +544,14 @@ export default function DiscussPage() {
       abortControllerRef.current?.abort();
     };
   }, []);
+
+  /* ───── 온보딩 가이드 툴팁 ───── */
+
+  useEffect(() => {
+    if (isWelcome && !localStorage.getItem("onboarding-guide-shown")) {
+      setShowGuide(true);
+    }
+  }, [isWelcome]);
 
   /* ───── 메시지 전송 ───── */
 
@@ -790,6 +806,18 @@ export default function DiscussPage() {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+        {isWelcome && messages.length <= 1 && (
+          <div style={{ textAlign: "center", marginBottom: 16, animation: "fadeIn 0.3s ease-out" }}>
+            <span style={{
+              display: "inline-block", fontSize: 9, fontWeight: 800,
+              color: "var(--ac)", letterSpacing: 2, textTransform: "uppercase",
+              padding: "4px 12px", border: "1px solid var(--bd2)",
+              borderRadius: 100, transition: "all 0.4s",
+            }}>
+              첫 번째 대화
+            </span>
+          </div>
+        )}
         {messages.map((msg) => (
           <div
             key={msg.id}
@@ -848,6 +876,33 @@ export default function DiscussPage() {
 
         <div ref={scrollRef} />
       </div>
+
+      {/* Guide Tooltip */}
+      {showGuide && (
+        <div style={{
+          background: "color-mix(in srgb, var(--ac) 6%, transparent)",
+          border: "1px solid color-mix(in srgb, var(--ac) 15%, transparent)",
+          borderRadius: 12, padding: "12px 14px", margin: "0 16px 12px",
+          animation: "fadeIn 0.3s ease-out", transition: "all 0.4s",
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 700, color: "var(--ac)" }}>
+              <Lightbulb size={12} />
+              이렇게 대화해보세요
+            </div>
+            <button onClick={() => {
+              setShowGuide(false);
+              localStorage.setItem("onboarding-guide-shown", "1");
+            }} style={{ background: "none", border: "none", cursor: "pointer", padding: 2 }}>
+              <X size={12} style={{ color: "var(--tm)" }} />
+            </button>
+          </div>
+          <div style={{ fontSize: 11, color: "var(--ts)", lineHeight: 1.7 }}>
+            인상 깊었던 장면이나 느낌을 자유롭게 이야기해주세요.
+            정답은 없어요 — 솔직한 감상이 최고의 대화예요.
+          </div>
+        </div>
+      )}
 
       {/* Input */}
       <div className="px-4 py-3 bg-warm border-t border-[var(--bd)] pb-[env(safe-area-inset-bottom)]">
