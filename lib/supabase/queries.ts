@@ -225,6 +225,59 @@ export async function deleteReview(supabase: SupabaseClient, bookId: string) {
   if (error) throw error;
 }
 
+// --- Public Review Feed ---
+export interface PublicReviewItem {
+  id: string;
+  book_id: string;
+  user_id: string;
+  mode: "essay" | "structured";
+  content: Review["content"];
+  is_public: boolean;
+  created_at: string;
+  rating: number | null;
+  book_title: string;
+  book_author: string | null;
+  book_cover_url: string | null;
+  author_nickname: string;
+  author_emoji: string;
+}
+
+export async function getPublicReviews(
+  supabase: SupabaseClient,
+  limit: number = 20,
+  offset: number = 0,
+): Promise<PublicReviewItem[]> {
+  const { data } = await supabase
+    .from("reviews")
+    .select("*, books(title, author, cover_url, rating), profiles!reviews_user_id_fkey(nickname, emoji)")
+    .eq("is_public", true)
+    .order("created_at", { ascending: false })
+    .range(offset, offset + limit - 1);
+
+  if (!data) return [];
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return data.map((d: any) => {
+    const book = Array.isArray(d.books) ? d.books[0] : d.books;
+    const prof = Array.isArray(d.profiles) ? d.profiles[0] : d.profiles;
+    return {
+      id: d.id,
+      book_id: d.book_id,
+      user_id: d.user_id,
+      mode: d.mode,
+      content: d.content,
+      is_public: d.is_public,
+      created_at: d.created_at,
+      rating: book?.rating ?? null,
+      book_title: book?.title ?? "책 제목",
+      book_author: book?.author ?? null,
+      book_cover_url: book?.cover_url ?? null,
+      author_nickname: prof?.nickname ?? "독자",
+      author_emoji: prof?.emoji ?? "",
+    } as PublicReviewItem;
+  });
+}
+
 // --- Reading Sessions ---
 export async function getReadingSessions(supabase: SupabaseClient, userId: string, from?: string, to?: string) {
   let query = supabase
@@ -583,6 +636,60 @@ export async function getMemberCount(supabase: SupabaseClient, groupId: string) 
     .select("user_id", { count: "exact", head: true })
     .eq("group_id", groupId);
   return count || 0;
+}
+
+/** 사용자가 아직 참가하지 않은 공개 모임 목록 */
+export async function getPublicGroups(supabase: SupabaseClient, userId: string) {
+  // 이미 참가 중인 group_id 목록
+  const { data: myMemberships } = await supabase
+    .from("group_members")
+    .select("group_id")
+    .eq("user_id", userId);
+  const myGroupIds = (myMemberships || []).map((m) => m.group_id as string);
+
+  // 모든 그룹 가져오기
+  let query = supabase
+    .from("reading_groups")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  // 이미 참가한 그룹 제외
+  if (myGroupIds.length > 0) {
+    for (const id of myGroupIds) {
+      query = query.neq("id", id);
+    }
+  }
+
+  const { data: groups } = await query;
+  if (!groups || groups.length === 0) return [];
+
+  // 각 그룹의 멤버 수 + 현재 읽는 책 정보
+  const enriched = await Promise.all(
+    (groups as ReadingGroup[]).map(async (g) => {
+      const [countResult, booksResult] = await Promise.all([
+        supabase
+          .from("group_members")
+          .select("user_id", { count: "exact", head: true })
+          .eq("group_id", g.id),
+        supabase
+          .from("group_books")
+          .select("book_title, book_author")
+          .eq("group_id", g.id)
+          .eq("status", "reading")
+          .limit(1),
+      ]);
+      const currentBook = booksResult.data?.[0] as { book_title: string; book_author: string | null } | undefined;
+      return {
+        id: g.id,
+        name: g.name,
+        description: g.description,
+        memberCount: countResult.count || 0,
+        currentBookTitle: currentBook?.book_title || null,
+        currentBookAuthor: currentBook?.book_author || null,
+      };
+    })
+  );
+  return enriched;
 }
 
 /* ═══ 라이브 독서 ═══ */

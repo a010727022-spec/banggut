@@ -11,7 +11,7 @@ import {
   type GroupDiscussion, type GroupDiscussionReply,
 } from "@/lib/supabase/queries";
 import type { ReadingGroup, GroupMember, GroupBook, GroupSchedule } from "@/lib/types";
-import { ArrowLeft, Plus, Flame, Activity, PenLine, MessageCircle, Calendar, Monitor, Heart, MapPin, X, Library } from "lucide-react";
+import { ArrowLeft, Plus, Flame, Activity, PenLine, MessageCircle, Calendar, Monitor, Heart, MapPin, X, Library, Share2 } from "lucide-react";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { toast } from "sonner";
 import InviteBottomSheet from "@/components/InviteBottomSheet";
@@ -215,6 +215,26 @@ export default function GroupDetailPage() {
             <ArrowLeft size={16} color="rgba(255,255,255,0.85)" strokeWidth={2.2} />
           </button>
 
+          {/* 공유하기 */}
+          <button onClick={async () => {
+            if (!group) return;
+            const shareData = {
+              title: `방긋 독서 모임: ${group.name}`,
+              text: `함께 책을 읽어요! 초대 코드: ${group.invite_code}`,
+              url: `${window.location.origin}/groups/join?code=${group.invite_code}`,
+            };
+            if (navigator.share) {
+              try { await navigator.share(shareData); } catch { /* user cancelled */ }
+            } else {
+              try {
+                await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
+                toast("초대 링크가 복사되었어요");
+              } catch { toast.error("복사에 실패했어요"); }
+            }
+          }} style={{ position: "absolute", top: 14, right: 16, zIndex: 10, width: 34, height: 34, borderRadius: "50%", background: "rgba(0,0,0,0.38)", backdropFilter: "blur(12px)", border: "0.5px solid rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+            <Share2 size={15} color="rgba(255,255,255,0.85)" strokeWidth={2.2} />
+          </button>
+
           {/* D-day 칩 */}
           <div style={{ position: "absolute", top: 14, left: "50%", transform: "translateX(-50%)", zIndex: 10, display: "flex", gap: 6 }}>
             {daysLeft != null && (
@@ -237,6 +257,35 @@ export default function GroupDetailPage() {
             <div style={{ fontSize: 22, fontWeight: 800, color: "#fff", letterSpacing: "-0.6px", lineHeight: 1.2, textShadow: "0 2px 12px rgba(0,0,0,0.5)" }}>{currentBook.book_title}</div>
             {currentBook.book_author && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", marginTop: 3 }}>{currentBook.book_author}</div>}
           </div>
+        </div>
+      )}
+
+      {/* ═══ 책 없을 때 그룹 헤더 + 공유 ═══ */}
+      {!currentBook && group && (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", borderBottom: "0.5px solid var(--bd)", transition: "border-color 0.4s" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <button onClick={() => router.back()} style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--sf2)", border: "0.5px solid var(--bd2)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
+              <ArrowLeft size={15} color="var(--tp)" strokeWidth={2.2} />
+            </button>
+            <span style={{ fontSize: 16, fontWeight: 800, color: "var(--tp)", transition: "color 0.4s" }}>{group.name}</span>
+          </div>
+          <button onClick={async () => {
+            const shareData = {
+              title: `방긋 독서 모임: ${group.name}`,
+              text: `함께 책을 읽어요! 초대 코드: ${group.invite_code}`,
+              url: `${window.location.origin}/groups/join?code=${group.invite_code}`,
+            };
+            if (navigator.share) {
+              try { await navigator.share(shareData); } catch { /* user cancelled */ }
+            } else {
+              try {
+                await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
+                toast("초대 링크가 복사되었어요");
+              } catch { toast.error("복사에 실패했어요"); }
+            }
+          }} style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--sf2)", border: "0.5px solid var(--bd2)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
+            <Share2 size={14} color="var(--tp)" strokeWidth={2.2} />
+          </button>
         </div>
       )}
 

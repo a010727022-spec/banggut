@@ -283,6 +283,10 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.2; }
 }
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
 
 .skeleton {
   background: linear-gradient(90deg, var(--sf) 25%, var(--sf2) 50%, var(--sf) 75%);

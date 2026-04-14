@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, BookOpen, Bookmark, PenLine, Clock, AlertTriangle, RefreshCw } from "lucide-react";
+import { Plus, BookOpen, Bookmark, PenLine, Clock, AlertTriangle, RefreshCw, ArrowUpDown } from "lucide-react";
 import AppHeader from "@/components/shared/AppHeader";
 import { EmptyState } from "@/components/shared/EmptyState";
 // date-fns format moved to AppHeader
@@ -180,6 +180,7 @@ export default function LibraryPage() {
   const { books, setBooks, setLoading } = useLibraryStore();
   useThemeStore();
   const [tab, setTab] = useState<LibraryTab>("reading");
+  const [finishedSort, setFinishedSort] = useState<"recent" | "rating" | "title">("recent");
   const [streakDatesArr, setStreakDatesArr] = useState<string[]>([]);
   const [recentScraps, setRecentScraps] = useState<Scrap[]>([]);
   const [loadError, setLoadError] = useState(false);
@@ -213,6 +214,22 @@ export default function LibraryPage() {
     g.reading.sort((a, b) => (b.group_books ? 1 : 0) - (a.group_books ? 1 : 0));
     return g;
   }, [books]);
+
+  const sortedDone = useMemo(() => {
+    const list = [...grouped.done];
+    switch (finishedSort) {
+      case "recent":
+        list.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+        break;
+      case "rating":
+        list.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+        break;
+      case "title":
+        list.sort((a, b) => a.title.localeCompare(b.title, "ko"));
+        break;
+    }
+    return list;
+  }, [grouped.done, finishedSort]);
 
   const counts = { reading: grouped.reading.length, done: grouped.done.length, want: grouped.want.length };
 
@@ -355,7 +372,13 @@ export default function LibraryPage() {
         <div style={{ animation: "pageIn 0.22s cubic-bezier(0.22,1,0.36,1)" }}>
           <div style={{ padding: "8px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontSize: 10, fontWeight: 700, color: "var(--tm)", letterSpacing: "1.2px", textTransform: "uppercase", transition: "color 0.4s" }}>완독 {counts.done}권</span>
-            <span style={{ fontSize: 11, fontWeight: 700, color: "var(--ac)", cursor: "pointer", transition: "color 0.4s" }}>최신순 →</span>
+            <span
+              onClick={() => setFinishedSort((s) => s === "recent" ? "rating" : s === "rating" ? "title" : "recent")}
+              style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 700, color: "var(--ac)", cursor: "pointer", transition: "color 0.4s", userSelect: "none" }}
+            >
+              {finishedSort === "recent" ? "최신순" : finishedSort === "rating" ? "평점순" : "제목순"}
+              <ArrowUpDown size={12} strokeWidth={2.5} />
+            </span>
           </div>
           {counts.done === 0 ? (
             <EmptyState
@@ -365,7 +388,7 @@ export default function LibraryPage() {
             />
           ) : (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 2 }}>
-              {grouped.done.map((b) => <BookTile key={b.id} book={b} />)}
+              {sortedDone.map((b) => <BookTile key={b.id} book={b} />)}
               <div onClick={() => router.push("/setup")}
                 style={{
                   aspectRatio: "2/3", background: "transparent",

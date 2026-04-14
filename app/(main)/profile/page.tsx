@@ -14,6 +14,19 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { calcStreak, calcTemp, getTempSeason, getWeekBars } from "@/lib/reading-utils";
 
+/* ── 알림 설정 타입 ── */
+const NOTIF_KEYS = ["subway", "cafe", "bedtime", "social", "tempDrop"] as const;
+type NotifKey = typeof NOTIF_KEYS[number];
+interface NotifSettings {
+  subway: boolean;
+  cafe: boolean;
+  bedtime: boolean;
+  social: boolean;
+  tempDrop: boolean;
+  bedtimeTime: string;
+}
+const defaultNotif: NotifSettings = { subway: false, cafe: false, bedtime: false, social: false, tempDrop: false, bedtimeTime: "22:00" };
+
 /* 유틸은 @/lib/reading-utils에서 import */
 export default function ProfilePage() {
   const user = useAuthStore((s) => s.user);
@@ -30,6 +43,32 @@ export default function ProfilePage() {
   const [retryCount, setRetryCount] = useState(0);
   const router = useRouter();
   const { theme, setTheme } = useThemeStore();
+
+  /* ── 알림 설정 상태 ── */
+  const [notifSettings, setNotifSettings] = useState<NotifSettings>(defaultNotif);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("banggut-notification-settings");
+      if (raw) setNotifSettings({ ...defaultNotif, ...JSON.parse(raw) });
+    } catch { /* ignore */ }
+  }, []);
+
+  const toggleNotif = (key: NotifKey) => {
+    setNotifSettings((prev) => {
+      const next = { ...prev, [key]: !prev[key] };
+      localStorage.setItem("banggut-notification-settings", JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const setBedtimeTime = (time: string) => {
+    setNotifSettings((prev) => {
+      const next = { ...prev, bedtimeTime: time };
+      localStorage.setItem("banggut-notification-settings", JSON.stringify(next));
+      return next;
+    });
+  };
 
   const streak = calcStreak(streakDates);
   const temp = calcTemp(streak, streakDates);
@@ -247,26 +286,75 @@ export default function ProfilePage() {
           <div style={{ fontSize: 14, fontWeight: 800, color: "var(--tp)", transition: "color 0.4s" }}>스마트 독서 알림</div>
           <div style={{ fontSize: 10, color: "var(--tm)", marginTop: 2, transition: "color 0.4s" }}>위치·시간·소셜 트리거를 설정하세요</div>
         </div>
-        {[
-          { icon: <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#4a7ab8" strokeWidth={2}><rect x={1} y={3} width={15} height={13} rx={2}/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx={5.5} cy={18.5} r={2.5}/><circle cx={18.5} cy={18.5} r={2.5}/></svg>, bg: "rgba(74,122,184,0.15)", title: "지하철 탑승 감지", sub: "이동 중 조용한 알림", tag: "위치·모션", tagBg: "rgba(74,122,184,0.12)", tagColor: "#4a7ab8" },
-          { icon: <MapPin size={18} color="var(--ac)" strokeWidth={2} />, bg: "rgba(107,158,138,0.15)", title: "카페 도착 감지", sub: "즐겨찾기 장소 150m 이내", tag: "장소", tagBg: "color-mix(in srgb, var(--ac) 12%, transparent)", tagColor: "var(--ac)" },
-          { icon: <Clock size={18} color="var(--ac)" strokeWidth={2} />, bg: "rgba(200,160,48,0.1)", title: "취침 전 독서", sub: "매일 밤 10시", tag: "시간", tagBg: "rgba(200,160,48,0.1)", tagColor: "#c8a030" },
-          { icon: <Users size={18} color="#4ade80" strokeWidth={2} />, bg: "rgba(74,222,128,0.1)", title: "모임원 읽기 시작", sub: "리딩 펄스 연동", tag: "소셜", tagBg: "rgba(74,222,128,0.1)", tagColor: "#4ade80" },
-          { icon: <AlertTriangle size={18} color="#e05028" strokeWidth={2} />, bg: "rgba(224,80,40,0.1)", title: "체온 하락 경보", sub: "3일 이상 미독서 시", tag: "체온 연동", tagBg: "rgba(224,80,40,0.1)", tagColor: "#e05028" },
-        ].map((item, i) => (
-          <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderBottom: "0.5px solid var(--bd)", transition: "border-color 0.4s" }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: item.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{item.icon}</div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tp)", transition: "color 0.4s" }}>{item.title}</div>
-              <div style={{ fontSize: 10, color: "var(--tm)", marginTop: 2, transition: "color 0.4s" }}>{item.sub}</div>
-              <span style={{ display: "inline-block", fontSize: 9, fontWeight: 800, padding: "2px 7px", borderRadius: 100, marginTop: 5, background: item.tagBg, color: item.tagColor, transition: "all 0.4s" }}>{item.tag}</span>
+        {([
+          { key: "subway" as NotifKey, icon: <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#4a7ab8" strokeWidth={2}><rect x={1} y={3} width={15} height={13} rx={2}/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx={5.5} cy={18.5} r={2.5}/><circle cx={18.5} cy={18.5} r={2.5}/></svg>, bg: "rgba(74,122,184,0.15)", title: "지하철 탑승 감지", sub: "이동 중 조용한 알림", tag: "위치·모션", tagBg: "rgba(74,122,184,0.12)", tagColor: "#4a7ab8", disabled: true },
+          { key: "cafe" as NotifKey, icon: <MapPin size={18} color="var(--ac)" strokeWidth={2} />, bg: "rgba(107,158,138,0.15)", title: "카페 도착 감지", sub: "즐겨찾기 장소 150m 이내", tag: "장소", tagBg: "color-mix(in srgb, var(--ac) 12%, transparent)", tagColor: "var(--ac)", disabled: true },
+          { key: "bedtime" as NotifKey, icon: <Clock size={18} color="var(--ac)" strokeWidth={2} />, bg: "rgba(200,160,48,0.1)", title: "취침 전 독서", sub: notifSettings.bedtime ? `매일 밤 ${notifSettings.bedtimeTime}` : "매일 밤 10시", tag: "시간", tagBg: "rgba(200,160,48,0.1)", tagColor: "#c8a030", disabled: false },
+          { key: "social" as NotifKey, icon: <Users size={18} color="#4ade80" strokeWidth={2} />, bg: "rgba(74,222,128,0.1)", title: "모임원 읽기 시작", sub: "리딩 펄스 연동", tag: "소셜", tagBg: "rgba(74,222,128,0.1)", tagColor: "#4ade80", disabled: false },
+          { key: "tempDrop" as NotifKey, icon: <AlertTriangle size={18} color="#e05028" strokeWidth={2} />, bg: "rgba(224,80,40,0.1)", title: "체온 하락 경보", sub: "3일 이상 미독서 시", tag: "체온 연동", tagBg: "rgba(224,80,40,0.1)", tagColor: "#e05028", disabled: false },
+        ]).map((item, i) => {
+          const isOn = !item.disabled && notifSettings[item.key];
+          return (
+            <div key={i}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderBottom: item.key === "bedtime" && isOn ? "none" : "0.5px solid var(--bd)", transition: "border-color 0.4s" }}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: item.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, opacity: item.disabled ? 0.5 : 1 }}>{item.icon}</div>
+                <div style={{ flex: 1, opacity: item.disabled ? 0.5 : 1 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: "var(--tp)", transition: "color 0.4s" }}>{item.title}</span>
+                    {item.disabled && <span style={{ fontSize: 9, fontWeight: 600, color: "var(--tm)", transition: "color 0.4s" }}>(앱 출시 후 지원)</span>}
+                  </div>
+                  <div style={{ fontSize: 10, color: "var(--tm)", marginTop: 2, transition: "color 0.4s" }}>{item.sub}</div>
+                  <span style={{ display: "inline-block", fontSize: 9, fontWeight: 800, padding: "2px 7px", borderRadius: 100, marginTop: 5, background: item.tagBg, color: item.tagColor, transition: "all 0.4s" }}>{item.tag}</span>
+                </div>
+                {/* 토글 */}
+                <div
+                  onClick={item.disabled ? undefined : () => toggleNotif(item.key)}
+                  style={{
+                    width: 38, height: 22, borderRadius: 100,
+                    background: item.disabled ? "var(--tm)" : isOn ? "var(--ac)" : "var(--tm)",
+                    position: "relative",
+                    cursor: item.disabled ? "not-allowed" : "pointer",
+                    flexShrink: 0,
+                    opacity: item.disabled ? 0.4 : 1,
+                    transition: "background 0.2s",
+                  }}
+                >
+                  <div style={{
+                    position: "absolute", top: 3,
+                    ...(isOn ? { right: 3 } : { left: 3 }),
+                    width: 16, height: 16, borderRadius: "50%",
+                    background: "var(--acc)",
+                    transition: "all 0.2s, background 0.4s",
+                  }} />
+                </div>
+              </div>
+              {/* 취침 전 독서 시간 선택 */}
+              {item.key === "bedtime" && isOn && (
+                <div style={{
+                  display: "flex", alignItems: "center", gap: 8,
+                  padding: "8px 14px 12px 62px",
+                  borderBottom: "0.5px solid var(--bd)",
+                  transition: "border-color 0.4s",
+                }}>
+                  <Clock size={13} color="var(--tm)" strokeWidth={2} />
+                  <span style={{ fontSize: 11, fontWeight: 600, color: "var(--ts)", transition: "color 0.4s" }}>알림 시간</span>
+                  <input
+                    type="time"
+                    value={notifSettings.bedtimeTime}
+                    onChange={(e) => setBedtimeTime(e.target.value)}
+                    style={{
+                      padding: "4px 8px", borderRadius: 8,
+                      border: "0.5px solid var(--bd)", background: "var(--sf)",
+                      fontSize: 12, fontWeight: 700, color: "var(--tp)",
+                      outline: "none", cursor: "pointer",
+                      transition: "all 0.4s",
+                    }}
+                  />
+                </div>
+              )}
             </div>
-            {/* 토글 */}
-            <div style={{ width: 38, height: 22, borderRadius: 100, background: "var(--ac)", position: "relative", cursor: "pointer", flexShrink: 0, transition: "background 0.2s" }}>
-              <div style={{ position: "absolute", top: 3, right: 3, width: 16, height: 16, borderRadius: "50%", background: "var(--acc)", transition: "all 0.2s, background 0.4s" }} />
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* ═══ 설정 ═══ */}
