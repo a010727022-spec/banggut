@@ -8,6 +8,7 @@ import {
   getMessages,
   getScrapsByBook,
   createScrap,
+  createScraps,
   getReview,
   updateBook,
   deleteBook,
@@ -1929,11 +1930,46 @@ function ScrapTab({
   const [memo, setMemo] = useState("");
   const [saving, setSaving] = useState(false);
   const [ocrLoading, setOcrLoading] = useState(false);
+  const [extractedSentences, setExtractedSentences] = useState<string[]>([]);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const galleryRef = useRef<HTMLInputElement>(null);
 
   async function handleSave() {
+    // Batch save for multiple extracted sentences
+    if (extractedSentences.length > 0) {
+      setSaving(true);
+      try {
+        const scrapsToInsert = extractedSentences.map((sentence) => ({
+          user_id: userId,
+          book_id: bookId,
+          text: sentence.trim(),
+          memo: memo.trim() || null,
+          book_title: bookTitle,
+          book_author: null,
+          page_number: pageNumber ? parseInt(pageNumber, 10) : null,
+          source: "camera" as const,
+        }));
+        const savedScraps = await createScraps(supabaseRef.current, scrapsToInsert);
+        for (const scrap of savedScraps) {
+          onAdd(scrap);
+        }
+        setExtractedSentences([]);
+        setText("");
+        setPageNumber("");
+        setMemo("");
+        setShowForm(false);
+        toast.success(`${savedScraps.length}개 글귀를 저장했어요`, { duration: 1500 });
+        upsertStreak(supabaseRef.current, userId, { scrap: true }).catch(() => {});
+      } catch {
+        toast.error("저장에 실패했어요");
+      } finally {
+        setSaving(false);
+      }
+      return;
+    }
+
+    // Single save
     if (!text.trim()) return;
     setSaving(true);
     try {
@@ -1953,7 +1989,6 @@ function ScrapTab({
       setMemo("");
       setShowForm(false);
       toast.success("글귀를 저장했어요", { duration: 1500 });
-      // 스트릭 기록
       upsertStreak(supabaseRef.current, userId, { scrap: true }).catch(() => {});
     } catch {
       toast.error("저장에 실패했어요");
@@ -1999,9 +2034,18 @@ function ScrapTab({
       }
       const data = await res.json();
       if (data.text) {
-        setText(data.text);
-        setShowForm(true);
-        toast.success("하이라이트 문장을 추출했어요!");
+        const sentences = data.text.split("\n").map((s: string) => s.trim()).filter((s: string) => s.length > 0);
+        if (sentences.length > 1) {
+          setExtractedSentences(sentences);
+          setText("");
+          setShowForm(true);
+          toast.success(`${sentences.length}개의 하이라이트를 찾았어요`);
+        } else {
+          setText(sentences[0] || data.text);
+          setExtractedSentences([]);
+          setShowForm(true);
+          toast.success("하이라이트 문장을 추출했어요!");
+        }
       } else {
         toast.error("하이라이트를 인식하지 못했어요");
         setShowForm(true);
@@ -2103,8 +2147,65 @@ function ScrapTab({
           </div>
         )}
 
-        {/* Inline form */}
-        {showForm && (
+        {/* Extracted sentences list (multi-highlight OCR) */}
+        {showForm && extractedSentences.length > 0 && (
+          <div className="bg-warm rounded-card border border-[var(--bd)] shadow-card p-4 space-y-3">
+            <div className="flex items-center gap-1.5 text-sm font-semibold text-ink">
+              <Sparkles className="w-4 h-4 text-[#C4A35A]" />
+              <span>{extractedSentences.length}개의 하이라이트</span>
+            </div>
+            <div className="space-y-2">
+              {extractedSentences.map((sentence, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-start gap-2 bg-[var(--bg)] rounded-btn border border-[var(--bd)] p-3"
+                >
+                  <Check className="w-4 h-4 mt-0.5 text-ink-green shrink-0" />
+                  <p className="flex-1 text-sm text-[var(--tp)] leading-relaxed" style={{ fontFamily: "serif" }}>
+                    {sentence}
+                  </p>
+                  <button
+                    onClick={() =>
+                      setExtractedSentences((prev) =>
+                        prev.filter((_, i) => i !== idx)
+                      )
+                    }
+                    className="shrink-0 p-0.5 text-[var(--ts)] hover:text-[var(--tp)] transition-colors"
+                    title="제거"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="number"
+                value={pageNumber}
+                onChange={(e) => setPageNumber(e.target.value)}
+                placeholder="페이지"
+                className="w-24 text-sm bg-paper border border-[var(--bd)] rounded-btn px-3 py-2 text-ink focus:outline-none focus:ring-1 focus:ring-ink-green/20"
+              />
+              <input
+                type="text"
+                value={memo}
+                onChange={(e) => setMemo(e.target.value)}
+                placeholder="메모 (선택)"
+                className="flex-1 text-sm bg-paper border border-[var(--bd)] rounded-btn px-3 py-2 text-ink focus:outline-none focus:ring-1 focus:ring-ink-green/20"
+              />
+            </div>
+            <button
+              onClick={handleSave}
+              disabled={extractedSentences.length === 0 || saving}
+              className="w-full bg-ink-green text-paper text-sm font-semibold py-2.5 rounded-btn hover:bg-ink-green/90 transition-colors disabled:opacity-50"
+            >
+              {saving ? "저장 중..." : `전체 저장 (${extractedSentences.length}개)`}
+            </button>
+          </div>
+        )}
+
+        {/* Inline form (single sentence) */}
+        {showForm && extractedSentences.length === 0 && (
           <div className="bg-warm rounded-card border border-[var(--bd)] shadow-card p-4 space-y-3">
             <Textarea
               value={text}

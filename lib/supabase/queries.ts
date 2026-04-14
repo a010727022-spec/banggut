@@ -123,6 +123,15 @@ export async function createScrap(supabase: SupabaseClient, scrap: Omit<Scrap, "
   return data as Scrap;
 }
 
+export async function createScraps(
+  supabase: SupabaseClient,
+  scraps: Omit<Scrap, "id" | "created_at">[],
+) {
+  const { data, error } = await supabase.from("scraps").insert(scraps).select();
+  if (error) throw error;
+  return data as Scrap[];
+}
+
 export async function deleteScrap(supabase: SupabaseClient, scrapId: string) {
   const { error } = await supabase.from("scraps").delete().eq("id", scrapId);
   if (error) throw error;
