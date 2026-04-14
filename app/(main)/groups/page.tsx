@@ -10,7 +10,7 @@ import {
 } from "@/lib/supabase/queries";
 import type { ReadingGroup, MeetingCycle } from "@/lib/types";
 import type { LiveReader } from "@/lib/supabase/queries";
-import { Plus, ChevronRight, Search, ArrowRight, Hash, BookOpen } from "lucide-react";
+import { Plus, ChevronRight, Search, ArrowRight, Hash, BookOpen, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import AppHeader from "@/components/shared/AppHeader";
 import { useLibraryStore } from "@/stores/useLibraryStore";
@@ -355,6 +355,7 @@ export default function GroupsPage() {
   const { books, setBooks } = useLibraryStore();
   const [groups, setGroups] = useState<GroupWithMeta[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
   const [showFab, setShowFab] = useState(false);
@@ -369,6 +370,7 @@ export default function GroupsPage() {
   const loadGroups = useCallback(async () => {
     if (!user) return;
     const supabase = createClient();
+    setLoadError(false);
     try {
       // 공통 데이터 (books, streaks)
       const [booksData, streakData] = await Promise.all([
@@ -428,7 +430,10 @@ export default function GroupsPage() {
         };
       }));
       setGroups(enriched);
-    } catch {} finally { setLoading(false); }
+    } catch (e) {
+      console.error("[Groups] load failed:", e);
+      setLoadError(true);
+    } finally { setLoading(false); }
   }, [user]);
 
   useEffect(() => { loadGroups(); }, [loadGroups]);
@@ -462,6 +467,30 @@ export default function GroupsPage() {
         <div style={{ padding: "0 20px" }}>
           <div className="skeleton" style={{ height: 140, borderRadius: 14, marginBottom: 10 }} />
           <div className="skeleton" style={{ height: 120, borderRadius: 16, marginBottom: 10 }} />
+        </div>
+      ) : loadError ? (
+        <div style={{
+          display: "flex", flexDirection: "column", alignItems: "center",
+          justifyContent: "center", padding: "60px 20px", gap: 14,
+        }}>
+          <AlertTriangle size={36} color="var(--tm)" strokeWidth={1.5} />
+          <p style={{ fontSize: 15, fontWeight: 700, color: "var(--tp)", textAlign: "center" }}>
+            모임을 불러올 수 없어요
+          </p>
+          <p style={{ fontSize: 12, color: "var(--ts)", textAlign: "center" }}>
+            네트워크 상태를 확인하고 다시 시도해 주세요
+          </p>
+          <button
+            onClick={() => { setLoading(true); loadGroups(); }}
+            style={{
+              marginTop: 4, fontSize: 13, fontWeight: 700,
+              color: "var(--acc)", background: "var(--ac)",
+              border: "none", borderRadius: 100, padding: "10px 28px",
+              cursor: "pointer", transition: "opacity 0.2s",
+            }}
+          >
+            다시 시도
+          </button>
         </div>
       ) : groups.length === 0 ? (
         <>

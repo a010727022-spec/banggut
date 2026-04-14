@@ -7,7 +7,7 @@ import { useLibraryStore } from "@/stores/useLibraryStore";
 import { getBooks, upsertProfile, getAllStreakDates } from "@/lib/supabase/queries";
 import { useRouter } from "next/navigation";
 // types moved — reviews/groups no longer fetched here
-import { Settings, Users, ChevronRight, Flame, LogOut, Check, MapPin, Clock, AlertTriangle, User } from "lucide-react";
+import { Settings, Users, ChevronRight, Flame, LogOut, Check, MapPin, Clock, AlertTriangle, User, RefreshCw } from "lucide-react";
 import { useThemeStore } from "@/stores/useThemeStore";
 import { AVATAR_IMAGES, EMOJI_AVATARS, getAvatarSrc } from "@/lib/types";
 import { toast } from "sonner";
@@ -26,6 +26,8 @@ export default function ProfilePage() {
   const [editNickname, setEditNickname] = useState("");
   const [editEmoji, setEditEmoji] = useState("");
   const [saving, setSaving] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
   const router = useRouter();
   const { theme, setTheme } = useThemeStore();
 
@@ -40,12 +42,15 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!user) return;
+    setLoadError(false);
     const supabase = createClient();
     Promise.all([
       getBooks(supabase, user.id).then(setBooks),
       getAllStreakDates(supabase, user.id).then(setStreakDates),
-    ]).catch(() => {}).finally(() => setLoading(false));
-  }, [user, setBooks]);
+    ]).catch(() => {
+      setLoadError(true);
+    }).finally(() => setLoading(false));
+  }, [user, setBooks, retryCount]);
 
   const handleLogout = async () => {
     const supabase = createClient();
@@ -74,6 +79,36 @@ export default function ProfilePage() {
     </div>
   );
 
+  if (loadError) return (
+    <div style={{ minHeight: "100vh", background: "var(--bg)", transition: "background 0.4s" }}>
+      <div style={{
+        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+        padding: "80px 20px", textAlign: "center",
+      }}>
+        <AlertTriangle size={40} color="var(--ts)" strokeWidth={1.5} style={{ marginBottom: 16 }} />
+        <div style={{ fontSize: 16, fontWeight: 700, color: "var(--tp)", marginBottom: 6 }}>
+          프로필을 불러올 수 없어요
+        </div>
+        <div style={{ fontSize: 13, color: "var(--ts)", marginBottom: 20 }}>
+          네트워크 연결을 확인해주세요
+        </div>
+        <button
+          onClick={() => { setLoadError(false); setLoading(true); setRetryCount((c) => c + 1); }}
+          style={{
+            display: "flex", alignItems: "center", gap: 6,
+            padding: "10px 20px", borderRadius: 100,
+            background: "var(--ac)", color: "var(--acc)",
+            fontSize: 13, fontWeight: 700, border: "none", cursor: "pointer",
+            transition: "opacity 0.2s",
+          }}
+        >
+          <RefreshCw size={14} strokeWidth={2.5} />
+          다시 시도
+        </button>
+      </div>
+    </div>
+  );
+
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", paddingBottom: 100, transition: "background 0.4s" }}>
 
@@ -98,8 +133,8 @@ export default function ProfilePage() {
           <div style={{ fontSize: 15, fontWeight: 800, color: "var(--tp)", transition: "color 0.4s" }}>{user?.nickname || "독서가"}</div>
           <div style={{ fontSize: 11, color: "var(--tm)", marginTop: 2, transition: "color 0.4s" }}>
             읽고, 긋고, 방긋.{streak > 0 && <span style={{ marginLeft: 6 }}>
-              <Flame size={10} strokeWidth={2.5} style={{ display: "inline", verticalAlign: "middle", marginRight: 1 }} color="#c8a030" />
-              <span style={{ fontWeight: 800, color: "#c8a030" }}>{streak}일 연속</span>
+              <Flame size={10} strokeWidth={2.5} style={{ display: "inline", verticalAlign: "middle", marginRight: 1 }} color="var(--ac)" />
+              <span style={{ fontWeight: 800, color: "var(--ac)" }}>{streak}일 연속</span>
             </span>}
           </div>
         </div>
@@ -107,7 +142,7 @@ export default function ProfilePage() {
 
       {/* ═══ 체온 상세 (HTML MY 체온 카드) ═══ */}
       <div style={{ fontSize: 10, fontWeight: 700, color: "var(--tm)", letterSpacing: "0.8px", textTransform: "uppercase", padding: "4px 20px 0", transition: "color 0.4s" }}>오늘 독서 체온</div>
-      <div style={{ margin: "8px 20px 14px", background: "var(--sf)", borderRadius: 16, border: "0.5px solid var(--bd)", overflow: "hidden", transition: "all 0.4s" }}>
+      <div style={{ margin: "8px 20px 14px", background: "var(--sf)", borderRadius: 14, border: "0.5px solid var(--bd)", overflow: "hidden", transition: "all 0.4s" }}>
         <div style={{ padding: "14px 16px 10px", display: "flex", alignItems: "flex-end", gap: 14 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 9, fontWeight: 800, color: "var(--tm)", letterSpacing: "1px", textTransform: "uppercase", marginBottom: 4, transition: "color 0.4s" }}>독서 체온 상세</div>
@@ -122,7 +157,7 @@ export default function ProfilePage() {
           </div>
           <div style={{ textAlign: "right" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "var(--tm)", marginBottom: 4, transition: "color 0.4s" }}>어제 대비</div>
-            <div style={{ fontSize: 18, fontWeight: 800, color: diff >= 0 ? "#4ade80" : "#e05028", transition: "color 0.4s" }}>{diff >= 0 ? "↑" : "↓"} {Math.abs(diff)}°</div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: diff >= 0 ? "color-mix(in srgb, var(--ac) 80%, #4ade80)" : "color-mix(in srgb, var(--ac) 30%, #e05028)", transition: "color 0.4s" }}>{diff >= 0 ? "↑" : "↓"} {Math.abs(diff)}°</div>
           </div>
         </div>
         {/* 프로그레스 바 */}
@@ -207,7 +242,7 @@ export default function ProfilePage() {
 
       {/* ═══ 독서 루틴 설정 (HTML .rtn-card) ═══ */}
       <div style={{ fontSize: 10, fontWeight: 700, color: "var(--tm)", letterSpacing: "0.8px", textTransform: "uppercase", padding: "0 20px 8px", transition: "color 0.4s" }}>독서 루틴 설정</div>
-      <div style={{ margin: "0 20px 14px", background: "var(--sf)", borderRadius: 16, border: "0.5px solid var(--bd)", overflow: "hidden", transition: "all 0.4s" }}>
+      <div style={{ margin: "0 20px 14px", background: "var(--sf)", borderRadius: 14, border: "0.5px solid var(--bd)", overflow: "hidden", transition: "all 0.4s" }}>
         <div style={{ padding: "12px 14px", borderBottom: "0.5px solid var(--bd)", transition: "border-color 0.4s" }}>
           <div style={{ fontSize: 14, fontWeight: 800, color: "var(--tp)", transition: "color 0.4s" }}>스마트 독서 알림</div>
           <div style={{ fontSize: 10, color: "var(--tm)", marginTop: 2, transition: "color 0.4s" }}>위치·시간·소셜 트리거를 설정하세요</div>
@@ -215,7 +250,7 @@ export default function ProfilePage() {
         {[
           { icon: <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#4a7ab8" strokeWidth={2}><rect x={1} y={3} width={15} height={13} rx={2}/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx={5.5} cy={18.5} r={2.5}/><circle cx={18.5} cy={18.5} r={2.5}/></svg>, bg: "rgba(74,122,184,0.15)", title: "지하철 탑승 감지", sub: "이동 중 조용한 알림", tag: "위치·모션", tagBg: "rgba(74,122,184,0.12)", tagColor: "#4a7ab8" },
           { icon: <MapPin size={18} color="var(--ac)" strokeWidth={2} />, bg: "rgba(107,158,138,0.15)", title: "카페 도착 감지", sub: "즐겨찾기 장소 150m 이내", tag: "장소", tagBg: "color-mix(in srgb, var(--ac) 12%, transparent)", tagColor: "var(--ac)" },
-          { icon: <Clock size={18} color="#c8a030" strokeWidth={2} />, bg: "rgba(200,160,48,0.1)", title: "취침 전 독서", sub: "매일 밤 10시", tag: "시간", tagBg: "rgba(200,160,48,0.1)", tagColor: "#c8a030" },
+          { icon: <Clock size={18} color="var(--ac)" strokeWidth={2} />, bg: "rgba(200,160,48,0.1)", title: "취침 전 독서", sub: "매일 밤 10시", tag: "시간", tagBg: "rgba(200,160,48,0.1)", tagColor: "#c8a030" },
           { icon: <Users size={18} color="#4ade80" strokeWidth={2} />, bg: "rgba(74,222,128,0.1)", title: "모임원 읽기 시작", sub: "리딩 펄스 연동", tag: "소셜", tagBg: "rgba(74,222,128,0.1)", tagColor: "#4ade80" },
           { icon: <AlertTriangle size={18} color="#e05028" strokeWidth={2} />, bg: "rgba(224,80,40,0.1)", title: "체온 하락 경보", sub: "3일 이상 미독서 시", tag: "체온 연동", tagBg: "rgba(224,80,40,0.1)", tagColor: "#e05028" },
         ].map((item, i) => (

@@ -5,10 +5,10 @@ import { usePathname } from "next/navigation";
 import { BookOpen, Users, PenLine, User } from "lucide-react";
 
 const NAV_ITEMS = [
-  { id: "library", label: "서재",  icon: BookOpen, route: "/" },
-  { id: "groups",  label: "모임",  icon: Users,    route: "/groups" },
-  { id: "reviews", label: "서평",  icon: PenLine,  route: "/scrap" },
-  { id: "profile", label: "MY",    icon: User,     route: "/profile" },
+  { id: "library", label: "서재",  icon: BookOpen, route: "/",        ariaLabel: "내 서재로 이동" },
+  { id: "groups",  label: "모임",  icon: Users,    route: "/groups",  ariaLabel: "독서 모임으로 이동" },
+  { id: "reviews", label: "서평",  icon: PenLine,  route: "/scrap",   ariaLabel: "스크랩 서평으로 이동" },
+  { id: "profile", label: "MY",    icon: User,     route: "/profile", ariaLabel: "내 프로필로 이동" },
 ];
 
 export function BottomNav() {
@@ -21,7 +21,7 @@ export function BottomNav() {
   ) return null;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50" style={{
+    <nav aria-label="하단 내비게이션" className="fixed bottom-0 left-0 right-0 z-50" style={{
       borderTop: "0.5px solid var(--bd)",
       background: "color-mix(in srgb, var(--bg) 92%, transparent)",
       backdropFilter: "blur(20px)",
@@ -35,6 +35,7 @@ export function BottomNav() {
           const Icon = item.icon;
           return (
             <Link key={item.id} href={item.route}
+              aria-label={item.ariaLabel}
               className="flex flex-col items-center gap-1"
               style={{ cursor: "pointer", padding: "4px 0", minWidth: 56 }}>
               <Icon style={{

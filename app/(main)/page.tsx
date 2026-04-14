@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, BookOpen, Bookmark, PenLine, Clock } from "lucide-react";
+import { Plus, BookOpen, Bookmark, PenLine, Clock, AlertTriangle, RefreshCw } from "lucide-react";
 import AppHeader from "@/components/shared/AppHeader";
 import { EmptyState } from "@/components/shared/EmptyState";
 // date-fns format moved to AppHeader
@@ -45,7 +45,7 @@ function FeaturedCard({ book }: { book: Book }) {
     <div onClick={() => router.push(`/book/${book.id}`)}
       style={{
         margin: "0 20px 12px", background: "var(--sf)",
-        borderRadius: 16, border: "0.5px solid var(--bd)",
+        borderRadius: 14, border: "0.5px solid var(--bd)",
         overflow: "hidden", cursor: "pointer",
         transition: "all 0.2s cubic-bezier(0.22,1,0.36,1), background 0.4s, border-color 0.4s",
       }}
@@ -128,7 +128,7 @@ function BookTile({ book }: { book: Book }) {
         display: "flex", flexDirection: "column", justifyContent: "space-between",
         background: "linear-gradient(to top, rgba(0,0,0,0.88) 30%, rgba(0,0,0,0.06) 65%, transparent)",
       }}>
-        <span style={{ alignSelf: "flex-start", fontSize: 8, fontWeight: 800, padding: "3px 7px", borderRadius: 100, background: "rgba(40,160,100,0.9)", color: "#02120a", letterSpacing: "0.6px" }}>완독</span>
+        <span style={{ alignSelf: "flex-start", fontSize: 8, fontWeight: 800, padding: "3px 7px", borderRadius: 100, background: "color-mix(in srgb, var(--ac) 90%, transparent)", color: "var(--acc)", letterSpacing: "0.6px" }}>완독</span>
         <div>
           <div style={{ fontSize: 11, fontWeight: 800, color: "#ede8e0", lineHeight: 1.3, textShadow: "0 1px 6px rgba(0,0,0,0.9)" }}>{book.title}</div>
           {book.author && <div style={{ fontSize: 9, color: "rgba(220,210,200,0.48)", marginTop: 1 }}>{book.author}</div>}
@@ -182,9 +182,12 @@ export default function LibraryPage() {
   const [tab, setTab] = useState<LibraryTab>("reading");
   const [streakDatesArr, setStreakDatesArr] = useState<string[]>([]);
   const [recentScraps, setRecentScraps] = useState<Scrap[]>([]);
+  const [loadError, setLoadError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     if (!user) return;
+    setLoadError(false);
     const supabase = createClient();
     Promise.all([
       getBooks(supabase, user.id),
@@ -194,8 +197,11 @@ export default function LibraryPage() {
       setBooks(booksData);
       setStreakDatesArr(streakData);
       setRecentScraps(scrapsData);
-    }).catch(() => setLoading(false));
-  }, [user, setBooks, setLoading]);
+    }).catch(() => {
+      setLoadError(true);
+      setLoading(false);
+    });
+  }, [user, setBooks, setLoading, retryCount]);
 
   const grouped = useMemo(() => {
     const g = { reading: [] as Book[], done: [] as Book[], want: [] as Book[] };
@@ -223,8 +229,37 @@ export default function LibraryPage() {
       {/* ═══ 공통 헤더 (Hero + 프로필 + 체온) ═══ */}
       <AppHeader streakDates={streakDatesArr} counts={counts} />
 
+      {/* ═══ ERROR STATE ═══ */}
+      {loadError && (
+        <div style={{
+          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+          padding: "60px 20px", textAlign: "center",
+        }}>
+          <AlertTriangle size={40} color="var(--ts)" strokeWidth={1.5} style={{ marginBottom: 16 }} />
+          <div style={{ fontSize: 16, fontWeight: 700, color: "var(--tp)", marginBottom: 6 }}>
+            서재를 불러올 수 없어요
+          </div>
+          <div style={{ fontSize: 13, color: "var(--ts)", marginBottom: 20 }}>
+            네트워크 연결을 확인해주세요
+          </div>
+          <button
+            onClick={() => { setLoadError(false); setRetryCount((c) => c + 1); }}
+            style={{
+              display: "flex", alignItems: "center", gap: 6,
+              padding: "10px 20px", borderRadius: 100,
+              background: "var(--ac)", color: "var(--acc)",
+              fontSize: 13, fontWeight: 700, border: "none", cursor: "pointer",
+              transition: "opacity 0.2s",
+            }}
+          >
+            <RefreshCw size={14} strokeWidth={2.5} />
+            다시 시도
+          </button>
+        </div>
+      )}
+
       {/* ═══ TABS ═══ */}
-      <div style={{ display: "flex", gap: 6, padding: "12px 20px 8px", overflowX: "auto" }} className="scrollbar-hide">
+      {!loadError && (<div style={{ display: "flex", gap: 6, padding: "12px 20px 8px", overflowX: "auto" }} className="scrollbar-hide">
         {TABS.map((t) => {
           const on = tab === t.id;
           return (
@@ -255,10 +290,10 @@ export default function LibraryPage() {
             </button>
           );
         })}
-      </div>
+      </div>)}
 
       {/* ═══ PANELS ═══ */}
-      {tab === "reading" && (
+      {!loadError && tab === "reading" && (
         <div style={{ animation: "pageIn 0.22s cubic-bezier(0.22,1,0.36,1)" }}>
           {grouped.reading.length === 0 ? (
             <EmptyState
@@ -287,7 +322,7 @@ export default function LibraryPage() {
                         <div key={s.id}
                           onClick={() => router.push(`/book/${s.book_id}`)}
                           style={{
-                            background: "var(--sf)", borderRadius: 12,
+                            background: "var(--sf)", borderRadius: 14,
                             border: "0.5px solid var(--bd)", padding: "12px 14px",
                             cursor: "pointer", transition: "all 0.2s, background 0.4s",
                           }}
@@ -316,7 +351,7 @@ export default function LibraryPage() {
         </div>
       )}
 
-      {tab === "done" && (
+      {!loadError && tab === "done" && (
         <div style={{ animation: "pageIn 0.22s cubic-bezier(0.22,1,0.36,1)" }}>
           <div style={{ padding: "8px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontSize: 10, fontWeight: 700, color: "var(--tm)", letterSpacing: "1.2px", textTransform: "uppercase", transition: "color 0.4s" }}>완독 {counts.done}권</span>
@@ -348,7 +383,7 @@ export default function LibraryPage() {
         </div>
       )}
 
-      {tab === "wish" && (
+      {!loadError && tab === "wish" && (
         <div style={{ animation: "pageIn 0.22s cubic-bezier(0.22,1,0.36,1)", padding: "4px 0" }}>
           {grouped.want.length === 0 ? (
             <EmptyState
@@ -364,7 +399,7 @@ export default function LibraryPage() {
         </div>
       )}
 
-      {tab === "scrap" && (
+      {!loadError && tab === "scrap" && (
         <div style={{ animation: "pageIn 0.22s cubic-bezier(0.22,1,0.36,1)" }}>
           <div style={{ padding: "8px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontSize: 10, fontWeight: 700, color: "var(--tm)", letterSpacing: "1.2px", textTransform: "uppercase", transition: "color 0.4s" }}>

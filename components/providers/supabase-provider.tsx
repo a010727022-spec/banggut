@@ -22,14 +22,14 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
     const supabase = createClient();
     let resolved = false;
 
-    // 3초 안전장치 (5초 → 3초로 단축)
+    // 8초 안전장치 (느린 네트워크 대응)
     const safetyTimeout = setTimeout(() => {
       const { isLoading } = useAuthStore.getState();
       if (isLoading) {
         console.warn("[Auth] safety timeout — forcing loading=false");
         setLoading(false);
       }
-    }, 3000);
+    }, 8000);
 
     const resolveUser = async (userId: string, email: string | undefined) => {
       if (resolved) return;

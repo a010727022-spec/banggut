@@ -20,6 +20,7 @@ import type { Book, Message as MessageType } from "@/lib/types";
 import { fetchWithAuth } from "@/lib/fetch-with-auth";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  AlertTriangle,
   ArrowLeft,
   Send,
   PenLine,
@@ -244,6 +245,8 @@ export default function DiscussPage() {
   const greetingSentRef = useRef(false);
   const greetingInProgressRef = useRef(false);
   const abortControllerRef = useRef<AbortController | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sendAIGreetingRef = useRef<((...args: any[]) => void) | null>(null);
 
   /* ───── 네트워크 상태 감지 ───── */
 
@@ -253,6 +256,7 @@ export default function DiscussPage() {
       // 스트리밍 중이면 에러 상태로 전환
       if (isStreaming) {
         updateStreamPhase("error");
+        setStreaming(false);
       }
     };
     const goOnline = () => {
@@ -266,7 +270,7 @@ export default function DiscussPage() {
       window.removeEventListener("offline", goOffline);
       window.removeEventListener("online", goOnline);
     };
-  }, [isStreaming]);
+  }, [isStreaming, setStreaming, updateStreamPhase]);
 
   /* ───── 부분 응답 저장 + 에러 처리 헬퍼 ───── */
 
@@ -332,7 +336,7 @@ export default function DiscussPage() {
         }
       }
     } catch (err) {
-      if (fullContent.trim()) {
+      if (fullContent.trim().length > 20) {
         await savePartialResponse(fullContent, bookData);
       }
       throw err;
@@ -441,6 +445,9 @@ export default function DiscussPage() {
     [addMsg, setStreaming, setStreamContent, readStream],
   );
 
+  // sendAIGreeting를 ref에 저장하여 useEffect에서 안정적으로 참조
+  sendAIGreetingRef.current = sendAIGreeting;
+
   const prevBookIdRef = useRef<string | null>(null);
   const loadedRef = useRef(false);
   const userId = user?.id;
@@ -453,7 +460,10 @@ export default function DiscussPage() {
       const { reset } = useDiscussionStore.getState();
       reset();
       setBook(null);
-      greetingSentRef.current = false;
+      // localStorage 키로 이미 greeting을 보낸 적 있는지 확인
+      const greetingKey = `greeting-sent-${bookId}`;
+      const alreadySent = localStorage.getItem(greetingKey) === "true";
+      greetingSentRef.current = alreadySent;
       greetingInProgressRef.current = false;
       updateStreamPhase("idle");
       prevBookIdRef.current = bookId;
@@ -492,6 +502,7 @@ export default function DiscussPage() {
 
         if (b && !greetingSentRef.current) {
           greetingSentRef.current = true;
+          localStorage.setItem(`greeting-sent-${bookId}`, "true");
           const isResume = searchParams.get("resume") === "1";
           const ulTexts = uls.map((u) => ({ text: u.text }));
           const needsGreeting = msgs.length === 0 || isResume;
@@ -501,9 +512,9 @@ export default function DiscussPage() {
 
           if (needsGreeting) {
             if (msgs.length === 0) {
-              sendAIGreeting(b, [], ulTexts, "start", ctxData, scrapTexts);
+              sendAIGreetingRef.current?.(b, [], ulTexts, "start", ctxData, scrapTexts);
             } else {
-              sendAIGreeting(
+              sendAIGreetingRef.current?.(
                 b,
                 msgs.map((m) => ({ role: m.role, content: m.content })),
                 ulTexts,
@@ -710,11 +721,35 @@ export default function DiscussPage() {
 
   if (loadError) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen text-center px-6">
-        <p className="text-warmgray text-sm mb-3">데이터를 불러오지 못했어요</p>
+      <div
+        className="flex flex-col items-center justify-center min-h-screen text-center px-6"
+        style={{ backgroundColor: "var(--bg)" }}
+      >
+        <AlertTriangle
+          className="w-12 h-12 mb-4"
+          style={{ color: "var(--ac)" }}
+        />
+        <p
+          className="text-lg font-bold mb-2"
+          style={{ color: "var(--tp)", fontFamily: "var(--sf)" }}
+        >
+          대화를 불러올 수 없어요
+        </p>
+        <p
+          className="text-sm mb-6"
+          style={{ color: "var(--ts)", fontFamily: "var(--sf)" }}
+        >
+          네트워크 연결을 확인하고 다시 시도해주세요
+        </p>
         <button
           onClick={() => window.location.reload()}
-          className="text-sm text-ink-green font-semibold hover:underline"
+          className="px-6 py-2.5 text-sm font-semibold rounded-lg transition-colors"
+          style={{
+            color: "var(--bg)",
+            backgroundColor: "var(--ac)",
+            border: "1px solid var(--bd)",
+            fontFamily: "var(--sf)",
+          }}
         >
           다시 시도
         </button>

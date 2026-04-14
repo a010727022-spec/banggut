@@ -19,8 +19,10 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Sparkles, Save, Eye, EyeOff, Check, Undo2, X, Lock } from "lucide-react";
+import { ArrowLeft, Sparkles, Save, Eye, EyeOff, Check, Undo2, X, Lock, Share2 } from "lucide-react";
 import { toast } from "sonner";
+import ShareCard from "@/components/shared/ShareCard";
+import { shareReviewCard } from "@/lib/share-utils";
 
 /* ───── localStorage 임시저장 유틸 ───── */
 
@@ -220,6 +222,11 @@ export default function ReviewPage() {
   const [diagnosing, setDiagnosing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loadError, setLoadError] = useState(false);
+
+  // 공유 관련
+  const [showShareCard, setShowShareCard] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const shareCardRef = useRef<HTMLDivElement>(null);
 
   // 자동저장 상태
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -593,6 +600,48 @@ export default function ReviewPage() {
     setDiagnosing(false);
   };
 
+  /* ───── 공유하기 ───── */
+
+  const handleShare = async () => {
+    setShowShareCard(true);
+    setSharing(true);
+
+    // Wait for the card to render
+    await new Promise((r) => setTimeout(r, 100));
+
+    if (!shareCardRef.current) {
+      toast.error("공유 카드를 생성할 수 없어요");
+      setSharing(false);
+      setShowShareCard(false);
+      return;
+    }
+
+    try {
+      const reviewOneliner = mode === "essay"
+        ? essayBody.slice(0, 100)
+        : oneliner || structuredBody.slice(0, 100);
+
+      const result = await shareReviewCard({
+        element: shareCardRef.current,
+        bookTitle: book?.title || "",
+        oneliner: reviewOneliner,
+      });
+
+      if (result === "shared") {
+        toast.success("서평 카드를 공유했어요");
+      } else if (result === "copied") {
+        toast.success("서평 텍스트가 클립보드에 복사되었어요");
+      } else {
+        toast.success("서평 카드 이미지가 저장되었어요");
+      }
+    } catch {
+      toast.error("공유에 실패했어요");
+    }
+
+    setSharing(false);
+    setShowShareCard(false);
+  };
+
   /* ───── 최종 저장 ───── */
 
   const handleSave = async () => {
@@ -891,15 +940,53 @@ export default function ReviewPage() {
           </button>
         </div>
 
-        <Button
-          onClick={handleSave}
-          disabled={saving}
-          className="w-full bg-ink-green text-paper hover:bg-ink-medium rounded-btn h-12 text-base font-semibold"
-        >
-          <Save className="w-4 h-4 mr-2" />
-          {saving ? "저장 중..." : "서평 저장"}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={handleSave}
+            disabled={saving}
+            className="flex-1 bg-ink-green text-paper hover:bg-ink-medium rounded-btn h-12 text-base font-semibold"
+          >
+            <Save className="w-4 h-4 mr-2" />
+            {saving ? "저장 중..." : "서평 저장"}
+          </Button>
+          <Button
+            onClick={handleShare}
+            disabled={sharing || (!essayBody && !oneliner && !structuredBody)}
+            variant="outline"
+            className="h-12 px-4 rounded-btn border-ink-green text-ink-green hover:bg-ink-green/5"
+            title="공유하기"
+          >
+            <Share2 className="w-5 h-5" />
+          </Button>
+        </div>
       </div>
+
+      {/* Hidden ShareCard for image capture */}
+      {showShareCard && (
+        <div
+          style={{
+            position: "fixed",
+            left: "-9999px",
+            top: 0,
+            zIndex: -1,
+            pointerEvents: "none",
+          }}
+        >
+          <ShareCard
+            ref={shareCardRef}
+            bookTitle={book?.title || ""}
+            bookAuthor={book?.author || null}
+            oneliner={
+              mode === "essay"
+                ? essayBody.slice(0, 100)
+                : oneliner || structuredBody.slice(0, 100)
+            }
+            rating={book?.rating || null}
+            nickname={user?.nickname || "독서가"}
+            mode={mode}
+          />
+        </div>
+      )}
 
       {/* AI 초안 선택 바텀시트 */}
       {showDraftSheet && pendingAIDraft && (

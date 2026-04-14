@@ -25,9 +25,14 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  } catch (e) {
+    console.error("[middleware] auth check failed:", e);
+    // Let request through — auth-guard will handle it
+  }
 
   const isOnboarding = request.nextUrl.pathname.startsWith("/onboarding");
   const isAuthCallback = request.nextUrl.pathname.startsWith("/auth");
