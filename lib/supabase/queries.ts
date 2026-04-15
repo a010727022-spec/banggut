@@ -25,13 +25,36 @@ export async function upsertProfile(supabase: SupabaseClient, user: Partial<User
 }
 
 // --- Books ---
-export async function getBooks(supabase: SupabaseClient, userId: string) {
+/**
+ * 유저 서재 책 목록.
+ * 기본 limit 200 — 99%의 유저는 이 선을 안 넘음.
+ * 더 많은 책이 있는 유저는 limit을 늘리거나 range로 페이징.
+ */
+export async function getBooks(
+  supabase: SupabaseClient,
+  userId: string,
+  options?: { limit?: number; offset?: number },
+) {
+  const { limit = 200, offset = 0 } = options || {};
   const { data } = await supabase
     .from("books")
     .select("*, group_books(id, group_id, weeks_data, start_date, end_date, round_number, status, reading_groups(id, name))")
     .eq("user_id", userId)
-    .order("updated_at", { ascending: false });
+    .order("updated_at", { ascending: false })
+    .range(offset, offset + limit - 1);
   return (data || []) as Book[];
+}
+
+/**
+ * 유저 책 수만 필요한 경우 (통계/대시보드).
+ * getBooks()로 전체를 불러와서 .length 재는 것보다 훨씬 가벼움.
+ */
+export async function getBookCount(supabase: SupabaseClient, userId: string) {
+  const { count } = await supabase
+    .from("books")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId);
+  return count || 0;
 }
 
 export async function getBook(supabase: SupabaseClient, bookId: string) {
@@ -148,12 +171,18 @@ export async function updateScrap(supabase: SupabaseClient, scrapId: string, upd
   return data as Scrap;
 }
 
-export async function getScrapsByBook(supabase: SupabaseClient, bookId: string) {
+export async function getScrapsByBook(
+  supabase: SupabaseClient,
+  bookId: string,
+  options?: { limit?: number; offset?: number },
+) {
+  const { limit = 500, offset = 0 } = options || {};
   const { data } = await supabase
     .from("scraps")
     .select("*")
     .eq("book_id", bookId)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(offset, offset + limit - 1);
   return (data || []) as Scrap[];
 }
 
@@ -210,13 +239,28 @@ export async function getReview(supabase: SupabaseClient, bookId: string) {
   return data as Review | null;
 }
 
-export async function getReviewsByUser(supabase: SupabaseClient, userId: string) {
+export async function getReviewsByUser(
+  supabase: SupabaseClient,
+  userId: string,
+  options?: { limit?: number; offset?: number },
+) {
+  const { limit = 100, offset = 0 } = options || {};
   const { data } = await supabase
     .from("reviews")
     .select("*")
     .eq("user_id", userId)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(offset, offset + limit - 1);
   return (data || []) as Review[];
+}
+
+/** 유저가 작성한 서평 수 (통계용) */
+export async function getReviewCount(supabase: SupabaseClient, userId: string) {
+  const { count } = await supabase
+    .from("reviews")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId);
+  return count || 0;
 }
 
 export async function upsertReview(supabase: SupabaseClient, review: Omit<Review, "id" | "created_at">) {
@@ -428,16 +472,17 @@ export async function getBookWithCounts(supabase: SupabaseClient, bookId: string
 }
 
 export async function getBookStats(supabase: SupabaseClient, userId: string) {
-  const [books, totalMessageCount, reviews] = await Promise.all([
-    getBooks(supabase, userId),
+  // 각 테이블을 count(head)로 조회 — 실제 row를 내려받지 않으므로 가벼움
+  const [totalBooks, totalMessageCount, reviewCount] = await Promise.all([
+    getBookCount(supabase, userId),
     getTotalMessageCount(supabase, userId),
-    getReviewsByUser(supabase, userId),
+    getReviewCount(supabase, userId),
   ]);
 
   return {
-    totalBooks: books.length,
+    totalBooks,
     totalMessageCount,
-    reviewCount: reviews.length,
+    reviewCount,
   };
 }
 
@@ -647,7 +692,10 @@ export async function getMemberCount(supabase: SupabaseClient, groupId: string) 
   return count || 0;
 }
 
-/** 사용자가 아직 참가하지 않은 공개 모임 목록 */
+/**
+ * 사용자가 아직 참가하지 않은 공개 모임 목록.
+ * nested select로 멤버 수 + 현재 읽는 책을 단일 쿼리로 가져와 N+1 제거.
+ */
 export async function getPublicGroups(supabase: SupabaseClient, userId: string) {
   // 이미 참가 중인 group_id 목록
   const { data: myMemberships } = await supabase
@@ -656,49 +704,44 @@ export async function getPublicGroups(supabase: SupabaseClient, userId: string) 
     .eq("user_id", userId);
   const myGroupIds = (myMemberships || []).map((m) => m.group_id as string);
 
-  // 모든 그룹 가져오기
+  // 단일 쿼리: 그룹 + 멤버 수(count) + 현재 읽는 책
   let query = supabase
     .from("reading_groups")
-    .select("*")
-    .order("created_at", { ascending: false });
+    .select(
+      "id, name, description, group_members(count), group_books(book_title, book_author, status)"
+    )
+    .order("created_at", { ascending: false })
+    .limit(50);
 
   // 이미 참가한 그룹 제외
   if (myGroupIds.length > 0) {
-    for (const id of myGroupIds) {
-      query = query.neq("id", id);
-    }
+    query = query.not("id", "in", `(${myGroupIds.join(",")})`);
   }
 
   const { data: groups } = await query;
   if (!groups || groups.length === 0) return [];
 
-  // 각 그룹의 멤버 수 + 현재 읽는 책 정보
-  const enriched = await Promise.all(
-    (groups as ReadingGroup[]).map(async (g) => {
-      const [countResult, booksResult] = await Promise.all([
-        supabase
-          .from("group_members")
-          .select("user_id", { count: "exact", head: true })
-          .eq("group_id", g.id),
-        supabase
-          .from("group_books")
-          .select("book_title, book_author")
-          .eq("group_id", g.id)
-          .eq("status", "reading")
-          .limit(1),
-      ]);
-      const currentBook = booksResult.data?.[0] as { book_title: string; book_author: string | null } | undefined;
-      return {
-        id: g.id,
-        name: g.name,
-        description: g.description,
-        memberCount: countResult.count || 0,
-        currentBookTitle: currentBook?.book_title || null,
-        currentBookAuthor: currentBook?.book_author || null,
-      };
-    })
-  );
-  return enriched;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (groups as any[]).map((g) => {
+    // group_members(count): [{ count: N }] 형태
+    const memberCount = Array.isArray(g.group_members) && g.group_members[0]
+      ? (g.group_members[0].count as number) || 0
+      : 0;
+
+    // group_books: 전체 책 중 status='reading'만 필터
+    const readingBook = Array.isArray(g.group_books)
+      ? g.group_books.find((b: { status: string }) => b.status === "reading")
+      : null;
+
+    return {
+      id: g.id as string,
+      name: g.name as string,
+      description: g.description as string | null,
+      memberCount,
+      currentBookTitle: (readingBook?.book_title as string) || null,
+      currentBookAuthor: (readingBook?.book_author as string) || null,
+    };
+  });
 }
 
 /* ═══ 라이브 독서 ═══ */
@@ -816,12 +859,18 @@ export interface GroupDiscussionReply {
   author_emoji?: string;
 }
 
-export async function getGroupDiscussions(supabase: SupabaseClient, groupId: string) {
+export async function getGroupDiscussions(
+  supabase: SupabaseClient,
+  groupId: string,
+  options?: { limit?: number; offset?: number },
+) {
+  const { limit = 50, offset = 0 } = options || {};
   const { data } = await supabase
     .from("group_discussions")
     .select("*, profiles!group_discussions_author_id_fkey(nickname, emoji), group_discussion_replies(id)")
     .eq("group_id", groupId)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(offset, offset + limit - 1);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (data || []).map((d: any) => {
     const prof = Array.isArray(d.profiles) ? d.profiles[0] : d.profiles;
