@@ -125,7 +125,7 @@ function AIDraftSheet({
       >
         <div className="flex items-center justify-between mb-1">
           <h3 className="text-base font-bold text-ink">AI 초안 적용 방식</h3>
-          <button onClick={onCancel} className="text-warmgray p-1">
+          <button onClick={onCancel} aria-label="닫기" className="text-warmgray -m-2 p-3">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -177,7 +177,7 @@ function AIDraftPreview({
     <div className="bg-ink-green/5 border border-ink-green/20 rounded-card p-4 mb-4">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-semibold text-ink-green">🤖 AI 초안 미리보기</h3>
-        <button onClick={onClose} className="text-warmgray p-1 hover:text-ink">
+        <button onClick={onClose} aria-label="닫기" className="text-warmgray -m-2 p-3 hover:text-ink">
           <X className="w-4 h-4" />
         </button>
       </div>

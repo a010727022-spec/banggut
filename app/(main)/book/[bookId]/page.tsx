@@ -240,7 +240,7 @@ function ImageHighlighter({
         className="flex items-center justify-between px-4 py-3 bg-black/90 shrink-0"
         style={{ paddingTop: "max(12px, env(safe-area-inset-top))" }}
       >
-        <button onClick={onCancel} className="text-white p-2">
+        <button onClick={onCancel} aria-label="닫기" className="text-white p-3 -m-1">
           <X className="w-6 h-6" />
         </button>
         <div className="text-center">
@@ -250,7 +250,8 @@ function ImageHighlighter({
         <button
           onClick={handleUndo}
           disabled={highlights.length === 0}
-          className="text-white p-2 disabled:opacity-20"
+          aria-label="되돌리기"
+          className="text-white p-3 -m-1 disabled:opacity-20"
         >
           <RotateCcw className="w-5 h-5" />
         </button>
@@ -974,8 +975,8 @@ export default function BookDetailPage() {
               <Bookmark size={10} strokeWidth={2.5} />
               위시리스트
             </div>
-            <div style={{ fontSize: 20, fontWeight: 800, color: "#fff", letterSpacing: "-0.5px", lineHeight: 1.3, textShadow: "0 2px 12px rgba(0,0,0,0.6)", marginBottom: 6 }}>{book.title}</div>
-            {book.author && <div style={{ fontSize: 12, color: "rgba(255,255,255,0.6)" }}>{book.author}{book.genre ? ` · ${book.genre.split(">")[0]?.trim()}` : ""}</div>}
+            <div style={{ fontSize: 20, fontWeight: 800, color: "#fff", letterSpacing: "-0.5px", lineHeight: 1.3, textShadow: "0 2px 12px rgba(0,0,0,0.6)", marginBottom: 6, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{book.title}</div>
+            {book.author && <div style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{book.author}{book.genre ? ` · ${book.genre.split(">")[0]?.trim()}` : ""}</div>}
           </div>
         </div>
 
@@ -1116,8 +1117,8 @@ export default function BookDetailPage() {
             <BookOpen size={10} strokeWidth={2.5} />
             {statusBadge.label}
           </div>
-          <div style={{ fontSize: 19, fontWeight: 800, color: "#fff", letterSpacing: "-0.5px", lineHeight: 1.2, textShadow: "0 2px 12px rgba(0,0,0,0.6)", marginBottom: 4 }}>{book.title}</div>
-          {book.author && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.6)" }}>{book.author}</div>}
+          <div style={{ fontSize: 19, fontWeight: 800, color: "#fff", letterSpacing: "-0.5px", lineHeight: 1.2, textShadow: "0 2px 12px rgba(0,0,0,0.6)", marginBottom: 4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{book.title}</div>
+          {book.author && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.6)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{book.author}</div>}
         </div>
       </div>
 

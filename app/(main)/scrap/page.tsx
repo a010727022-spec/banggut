@@ -270,9 +270,9 @@ export default function ReviewFeedPage() {
                   </div>
 
                   {/* 정보 */}
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tp)", transition: "color 0.4s" }}>{book?.title || "책 제목"}</div>
-                    {book?.author && <div style={{ fontSize: 10, color: "var(--tm)", marginTop: 2, transition: "color 0.4s" }}>{book.author}</div>}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tp)", transition: "color 0.4s", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{book?.title || "책 제목"}</div>
+                    {book?.author && <div style={{ fontSize: 10, color: "var(--tm)", marginTop: 2, transition: "color 0.4s", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{book.author}</div>}
                     {oneLiner && <div style={{ fontSize: 11, color: "var(--ts)", marginTop: 4, fontStyle: "italic", lineHeight: 1.4, transition: "color 0.4s" }}>&ldquo;{oneLiner}&rdquo;</div>}
                     <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 5 }}>
                       {/* 별점 */}

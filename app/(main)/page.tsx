@@ -67,8 +67,8 @@ function FeaturedCard({ book }: { book: Book }) {
           {groupName && (
             <div style={{ fontSize: 9, fontWeight: 800, color: "var(--ac)", letterSpacing: "1px", textTransform: "uppercase", marginBottom: 5, transition: "color 0.4s" }}>{groupName}</div>
           )}
-          <div style={{ fontSize: 15, fontWeight: 800, color: "var(--tp)", letterSpacing: "-0.4px", lineHeight: 1.25, transition: "color 0.4s" }}>{book.title}</div>
-          {book.author && <div style={{ fontSize: 11, color: "var(--ts)", marginTop: 3, transition: "color 0.4s" }}>{book.author}</div>}
+          <div style={{ fontSize: 15, fontWeight: 800, color: "var(--tp)", letterSpacing: "-0.4px", lineHeight: 1.25, transition: "color 0.4s", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{book.title}</div>
+          {book.author && <div style={{ fontSize: 11, color: "var(--ts)", marginTop: 3, transition: "color 0.4s", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{book.author}</div>}
           {/* 인용문 (HTML .fc-qt) */}
           {book.one_liner && (
             <div style={{
@@ -130,8 +130,8 @@ function BookTile({ book }: { book: Book }) {
       }}>
         <span style={{ alignSelf: "flex-start", fontSize: 8, fontWeight: 800, padding: "3px 7px", borderRadius: 100, background: "color-mix(in srgb, var(--ac) 90%, transparent)", color: "var(--acc)", letterSpacing: "0.6px" }}>완독</span>
         <div>
-          <div style={{ fontSize: 11, fontWeight: 800, color: "#ede8e0", lineHeight: 1.3, textShadow: "0 1px 6px rgba(0,0,0,0.9)" }}>{book.title}</div>
-          {book.author && <div style={{ fontSize: 9, color: "rgba(220,210,200,0.48)", marginTop: 1 }}>{book.author}</div>}
+          <div style={{ fontSize: 11, fontWeight: 800, color: "#ede8e0", lineHeight: 1.3, textShadow: "0 1px 6px rgba(0,0,0,0.9)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{book.title}</div>
+          {book.author && <div style={{ fontSize: 9, color: "rgba(220,210,200,0.48)", marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{book.author}</div>}
         </div>
       </div>
     </div>
@@ -160,9 +160,9 @@ function WishItem({ book }: { book: Book }) {
           <div style={{ position: "absolute", inset: 0, background: `linear-gradient(150deg, ${bg}, ${fg})` }} />
         )}
       </div>
-      <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: "var(--tp)", lineHeight: 1.3, transition: "color 0.4s" }}>{book.title}</div>
-        {book.author && <div style={{ fontSize: 11, color: "var(--tm)", marginTop: 2, transition: "color 0.4s" }}>{book.author}</div>}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "var(--tp)", lineHeight: 1.3, transition: "color 0.4s", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{book.title}</div>
+        {book.author && <div style={{ fontSize: 11, color: "var(--tm)", marginTop: 2, transition: "color 0.4s", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{book.author}</div>}
         {book.genre && (
           <span style={{ display: "inline-block", marginTop: 6, fontSize: 9, fontWeight: 800, color: "var(--ac)", background: "color-mix(in srgb, var(--ac) 12%, transparent)", padding: "3px 9px", borderRadius: 100, transition: "all 0.4s" }}>{book.genre}</span>
         )}

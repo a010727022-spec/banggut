@@ -169,18 +169,18 @@ function GroupCard({ group, onClick }: { group: GroupWithMeta; onClick: () => vo
         }}>
           <BookOpen size={22} color="var(--ac)" strokeWidth={1.5} />
         </div>
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 3 }}>
-            <span style={{ fontSize: 14, fontWeight: 800, color: "var(--tp)", transition: "color 0.4s" }}>{group.name}</span>
+            <span style={{ fontSize: 14, fontWeight: 800, color: "var(--tp)", transition: "color 0.4s", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 }}>{group.name}</span>
             <span style={{
               fontSize: 8, fontWeight: 800, padding: "2px 8px", borderRadius: 100,
               color: hasBook ? "var(--ac)" : "var(--tm)",
               background: hasBook ? "color-mix(in srgb, var(--ac) 12%, transparent)" : "var(--sf2)",
-              transition: "all 0.4s",
+              transition: "all 0.4s", flexShrink: 0, whiteSpace: "nowrap",
             }}>{hasBook ? "진행 중" : "책 선정 중"}</span>
           </div>
           {hasBook && (
-            <div style={{ fontSize: 11, color: "var(--ts)", marginTop: 2, transition: "color 0.4s" }}>
+            <div style={{ fontSize: 11, color: "var(--ts)", marginTop: 2, transition: "color 0.4s", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {group.currentBook!.book_title} · {weekNum}주차
             </div>
           )}
@@ -793,10 +793,10 @@ export default function GroupsPage() {
                     <div style={{ width: 46, height: 64, borderRadius: 8, overflow: "hidden", flexShrink: 0, background: "var(--sf2)", boxShadow: "0 4px 14px rgba(0,0,0,0.4)" }}>
                       {readingBook.cover_url ? <img src={readingBook.cover_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : null}
                     </div>
-                    <div style={{ flex: 1 }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 9, fontWeight: 800, color: "var(--ac)", letterSpacing: "1px", textTransform: "uppercase", marginBottom: 4, transition: "color 0.4s" }}>지금 읽는 중</div>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: "var(--tp)", letterSpacing: "-0.3px", lineHeight: 1.25, marginBottom: 2, transition: "color 0.4s" }}>{readingBook.title}</div>
-                      <div style={{ fontSize: 10, color: "var(--tm)", transition: "color 0.4s" }}>{readingBook.author}</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: "var(--tp)", letterSpacing: "-0.3px", lineHeight: 1.25, marginBottom: 2, transition: "color 0.4s", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{readingBook.title}</div>
+                      <div style={{ fontSize: 10, color: "var(--tm)", transition: "color 0.4s", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{readingBook.author}</div>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 3, flexShrink: 0 }}>
                       <div style={{ fontSize: 20, fontWeight: 800, color: "var(--ac)", letterSpacing: "-0.8px", lineHeight: 1, transition: "color 0.4s" }}>{pct}%</div>
@@ -898,8 +898,8 @@ export default function GroupsPage() {
 
       {/* FAB */}
       {groups.length > 0 && (
-        <button onClick={() => setShowFab(!showFab)} style={{
-          position: "fixed", bottom: 80, right: 20, zIndex: 80,
+        <button onClick={() => setShowFab(!showFab)} aria-label={showFab ? "메뉴 닫기" : "새 모임 메뉴 열기"} style={{
+          position: "fixed", bottom: "calc(80px + env(safe-area-inset-bottom))", right: 20, zIndex: 80,
           width: 52, height: 52, borderRadius: 16,
           background: "var(--ac)", color: "var(--acc)",
           display: "flex", alignItems: "center", justifyContent: "center",
@@ -914,7 +914,7 @@ export default function GroupsPage() {
       {showFab && (
         <>
           <div onClick={() => setShowFab(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.2)", zIndex: 90 }} />
-          <div style={{ position: "fixed", bottom: 140, right: 20, zIndex: 91, display: "flex", flexDirection: "column", gap: 8, alignItems: "flex-end" }}>
+          <div style={{ position: "fixed", bottom: "calc(140px + env(safe-area-inset-bottom))", right: 20, zIndex: 91, display: "flex", flexDirection: "column", gap: 8, alignItems: "flex-end" }}>
             {[
               { id: "create", icon: <BookOpen size={14} color="var(--ac)" strokeWidth={1.5} />, label: "모임 만들기" },
               { id: "join", icon: <Hash size={14} color="var(--ac)" strokeWidth={1.5} />, label: "코드로 참여" },

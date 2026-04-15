@@ -319,7 +319,8 @@ export default function SetupPage() {
                 setShowManualAuthor(false);
                 setManualAuthor("");
               }}
-              className="text-warmgray hover:text-ink p-1"
+              aria-label="선택 해제"
+              className="text-warmgray hover:text-ink -m-2 p-3"
             >
               <X className="w-4 h-4" />
             </button>
