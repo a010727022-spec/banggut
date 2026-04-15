@@ -568,7 +568,7 @@ function JoinGroupSheet({ onClose, onJoined }: { onClose: () => void; onJoined: 
           setSearching(true);
           try { const s = createClient(); const g = await getGroupByInviteCode(s, code.trim()); setFound(g); if (!g) toast.error("모임을 찾을 수 없어요"); } catch { toast.error("검색에 실패했어요"); } finally { setSearching(false); }
         }} disabled={!code.trim() || searching} className="btn-main" style={{ maxWidth: 240, margin: "16px auto 0", display: "block", opacity: !code.trim() || searching ? 0.5 : 1 }}>
-          {searching ? "검색 중..." : "검색"}
+          {searching ? "검색 중" : "검색"}
         </button>
         {found && (
           <div style={{ marginTop: 24, padding: 20, borderRadius: 14, background: "var(--sf)", border: "0.5px solid var(--bd)", textAlign: "left" }}>

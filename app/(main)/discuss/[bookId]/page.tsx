@@ -18,6 +18,7 @@ import {
 import { BRANCHES, parseBranchTag } from "@/lib/types";
 import type { Book, Message as MessageType } from "@/lib/types";
 import { fetchWithAuth } from "@/lib/fetch-with-auth";
+import { track, EVENTS } from "@/lib/analytics";
 import { Textarea } from "@/components/ui/textarea";
 import {
   AlertTriangle,
@@ -585,6 +586,17 @@ export default function DiscussPage() {
     });
     addMsg(userMsg);
 
+    // 토론 메시지 트래킹
+    const msgCount = messages.length + 1;
+    track(EVENTS.DISCUSSION_MESSAGE_SENT, {
+      book_id: book.id,
+      message_number: msgCount,
+      content_length: content.length,
+    });
+    if (msgCount === 1) {
+      track(EVENTS.DISCUSSION_STARTED, { book_id: book.id, title: book.title });
+    }
+
     // 스트릭 기록
     const uid = useAuthStore.getState().user?.id;
     if (uid) upsertStreak(supabase, uid, { discuss: true }).catch(() => {});
@@ -760,7 +772,7 @@ export default function DiscussPage() {
   if (!book) {
     return (
       <div className="flex items-center justify-center min-h-screen text-warmgray text-sm">
-        불러오는 중...
+        불러오는 중
       </div>
     );
   }

@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Suspense } from "react";
 import { BookOpen, Search, MessageCircle, HelpCircle } from "lucide-react";
+import { track, identifyUser, EVENTS } from "@/lib/analytics";
 
 type Step = "login" | "taste" | "profile";
 type AuthMode = "login" | "signup";
@@ -65,6 +66,7 @@ function OnboardingContent() {
 
   const handleKakaoLogin = async () => {
     setLoading(true);
+    track(EVENTS.SIGNUP_STARTED, { method: "kakao" });
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "kakao",
       options: { redirectTo: `${window.location.origin}/auth/callback` },
@@ -80,6 +82,7 @@ function OnboardingContent() {
     setLoading(true);
 
     if (authMode === "signup") {
+      track(EVENTS.SIGNUP_STARTED, { method: "email" });
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -87,6 +90,7 @@ function OnboardingContent() {
       if (error) {
         toast.error(error.message === "User already registered" ? "이미 가입된 이메일이에요" : `회원가입 실패: ${error.message}`);
       } else {
+        track(EVENTS.SIGNUP_COMPLETED, { method: "email" });
         toast.success("가입 완료! 취향을 알려주세요");
         setStep("taste");
       }
@@ -123,6 +127,17 @@ function OnboardingContent() {
         discussion_style: discussionStyle || undefined,
         onboarding_completed: true,
       });
+      identifyUser(user.id, {
+        nickname: nickname.trim(),
+        emoji,
+        preferred_genres: selectedGenres,
+        reading_frequency: readingFrequency || undefined,
+        discussion_style: discussionStyle || undefined,
+      });
+      track(EVENTS.ONBOARDING_PROFILE_DONE, {
+        avatar_type: emoji.length > 2 ? "author" : "emoji",
+        genre_count: selectedGenres.length,
+      });
       router.push("/setup?onboarding=true");
       router.refresh();
     } catch {
@@ -138,6 +153,14 @@ function OnboardingContent() {
   };
 
   const handleTasteNext = () => {
+    if (tasteStep === 1) {
+      track(EVENTS.ONBOARDING_TASTE_Q1, { genres: selectedGenres, count: selectedGenres.length });
+    } else if (tasteStep === 2) {
+      track(EVENTS.ONBOARDING_TASTE_Q2, { frequency: readingFrequency });
+    } else if (tasteStep === 3) {
+      track(EVENTS.ONBOARDING_TASTE_Q3, { style: discussionStyle });
+    }
+
     if (tasteStep < 3) {
       setTasteStep((prev) => (prev + 1) as TasteStep);
     } else {
@@ -522,7 +545,7 @@ function OnboardingContent() {
           disabled={loading || !nickname.trim()}
           className="w-full max-w-xs bg-ink-green text-paper hover:bg-ink-medium rounded-btn h-12 text-base font-semibold"
         >
-          {loading ? "저장 중..." : "첫 번째 책 추가하기 →"}
+          {loading ? "저장 중" : "첫 번째 책 추가하기 →"}
         </Button>
       </div>
     );
@@ -589,7 +612,7 @@ function OnboardingContent() {
 
 export default function OnboardingPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-screen text-warmgray">로딩 중...</div>}>
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen text-warmgray">로딩 중</div>}>
       <OnboardingContent />
     </Suspense>
   );

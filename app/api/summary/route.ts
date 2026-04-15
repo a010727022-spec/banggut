@@ -24,7 +24,7 @@ export async function POST(req: Request) {
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
     const result = await model.generateContent(
-      `아래 독서토론 내용을 여정 요약으로 정리해주세요.
+      `아래 토론 내용을 여정 요약으로 정리해주세요.
 
 토론 내용:
 ${conversationSummary}

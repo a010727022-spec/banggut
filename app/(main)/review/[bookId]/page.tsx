@@ -14,6 +14,7 @@ import {
   upsertStreak,
 } from "@/lib/supabase/queries";
 import type { Book, Message, Diagnosis } from "@/lib/types";
+import { track, EVENTS } from "@/lib/analytics";
 import { countMeaningfulTurns, REQUIRED_MEANINGFUL_TURNS } from "@/lib/meaningful-turns";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -85,7 +86,7 @@ function SaveStatus({ status, savedAt }: { status: "idle" | "saving" | "saved" |
 
   return (
     <span className="text-[11px] text-warmgray flex items-center gap-1">
-      {status === "saving" && "저장 중..."}
+      {status === "saving" && "저장 중"}
       {status === "saved" && savedAt && (
         <>
           <Check className="w-3 h-3 text-ink-green" />
@@ -630,7 +631,7 @@ export default function ReviewPage() {
       if (result === "shared") {
         toast.success("서평 카드를 공유했어요");
       } else if (result === "copied") {
-        toast.success("서평 텍스트가 클립보드에 복사되었어요");
+        toast.success("서평 텍스트를 복사했어요");
       } else {
         toast.success("서평 카드 이미지가 저장되었어요");
       }
@@ -667,6 +668,12 @@ export default function ReviewPage() {
         is_public: isPublic,
       });
       await updateBook(supabase, bookId, { has_review: true });
+      track(EVENTS.REVIEW_SAVED, {
+        book_id: bookId,
+        mode,
+        is_public: isPublic,
+        has_diagnosis: !!diagnosis,
+      });
       // 스트릭 기록
       if (user) upsertStreak(supabase, user.id, { review: true }).catch(() => {});
       clearDraftFromLocal(bookId);
@@ -702,7 +709,7 @@ export default function ReviewPage() {
   if (!book) {
     return (
       <div className="flex items-center justify-center min-h-screen text-warmgray text-sm">
-        불러오는 중...
+        불러오는 중
       </div>
     );
   }
@@ -781,7 +788,7 @@ export default function ReviewPage() {
             size="sm"
             className="text-xs border-ink-green text-ink-green hover:bg-ink-green/5 rounded-btn"
           >
-            {diagnosing ? "분석 중..." : "진단하기"}
+            {diagnosing ? "분석 중" : "진단하기"}
           </Button>
         </div>
         {!diagnosis && !diagnosing && (
@@ -896,7 +903,7 @@ export default function ReviewPage() {
               <Lock className="w-4 h-4 mr-2" />
             )}
             {generating
-              ? "생성 중..."
+              ? "생성 중"
               : canUseAI
                 ? "AI 초안 생성"
                 : "AI로 쓰기 🔒"}
@@ -947,7 +954,7 @@ export default function ReviewPage() {
             className="flex-1 bg-ink-green text-paper hover:bg-ink-medium rounded-btn h-12 text-base font-semibold"
           >
             <Save className="w-4 h-4 mr-2" />
-            {saving ? "저장 중..." : "서평 저장"}
+            {saving ? "저장 중" : "서평 저장"}
           </Button>
           <Button
             onClick={handleShare}

@@ -2,13 +2,14 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import "./globals.css";
 import { SupabaseProvider } from "@/components/providers/supabase-provider";
+import { PostHogProvider } from "@/components/providers/posthog-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "방긋 — 읽고, 긋고, 방긋.",
   description:
-    "방금 그은 문장에서 대화가 시작돼요. AI와 1:1 독서토론을 하고 나만의 서평을 완성하세요.",
+    "방금 그은 문장에서 대화가 시작돼요. AI와 1:1 토론을 하고 나만의 서평을 완성하세요.",
   manifest: "/manifest.json",
 };
 
@@ -59,6 +60,7 @@ export default function RootLayout({
         <Script id="kakao-init" strategy="afterInteractive">
           {`if(window.Kakao&&!window.Kakao.isInitialized()){window.Kakao.init("${process.env.NEXT_PUBLIC_KAKAO_KEY||""}")}`}
         </Script>
+        <PostHogProvider>
         <SupabaseProvider>
           <ThemeProvider />
           <div className="mx-auto max-w-lg min-h-screen" style={{ background: "var(--bg)", transition: "background 0.4s" }}>
@@ -81,6 +83,7 @@ export default function RootLayout({
             }}
           />
         </SupabaseProvider>
+        </PostHogProvider>
       </body>
     </html>
   );

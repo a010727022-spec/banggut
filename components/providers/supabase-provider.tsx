@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { getProfile } from "@/lib/supabase/queries";
 import { useEffect } from "react";
+import { identifyUser, resetAnalytics, track, EVENTS } from "@/lib/analytics";
 
 function makeFallbackUser(userId: string, email?: string | null) {
   return {
@@ -45,6 +46,14 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
         const user = profile || makeFallbackUser(userId, email);
         setUser(user);
 
+        // PostHog 유저 식별
+        identifyUser(userId, {
+          nickname: user.nickname,
+          emoji: user.emoji,
+          email: email || undefined,
+        });
+        track(EVENTS.APP_OPENED);
+
         // 미들웨어용 프로필 쿠키 세팅
         if (profile) {
           document.cookie = "banggut-has-profile=1;path=/;max-age=31536000;SameSite=Lax";
@@ -75,6 +84,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
             resolved = false;
             setUser(null);
             setLoading(false);
+            resetAnalytics();
             // 프로필 쿠키 제거
             document.cookie = "banggut-has-profile=;path=/;max-age=0";
           }

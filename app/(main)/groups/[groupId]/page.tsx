@@ -228,7 +228,7 @@ export default function GroupDetailPage() {
             } else {
               try {
                 await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
-                toast("초대 링크가 복사되었어요");
+                toast("초대 링크를 복사했어요");
               } catch { toast.error("복사에 실패했어요"); }
             }
           }} style={{ position: "absolute", top: 14, right: 16, zIndex: 10, width: 34, height: 34, borderRadius: "50%", background: "rgba(0,0,0,0.38)", backdropFilter: "blur(12px)", border: "0.5px solid rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
@@ -280,7 +280,7 @@ export default function GroupDetailPage() {
             } else {
               try {
                 await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
-                toast("초대 링크가 복사되었어요");
+                toast("초대 링크를 복사했어요");
               } catch { toast.error("복사에 실패했어요"); }
             }
           }} style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--sf2)", border: "0.5px solid var(--bd2)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>

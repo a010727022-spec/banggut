@@ -172,7 +172,7 @@ function ImageHighlighter({
 
   const handleConfirm = () => {
     if (highlights.length === 0) {
-      toast.error("형광펜으로 문장을 칠해주세요");
+      toast.error("밑줄로 문장을 표시해주세요");
       return;
     }
     if (!imgRef.current || imgSize.natW === 0) return;
@@ -244,7 +244,7 @@ function ImageHighlighter({
           <X className="w-6 h-6" />
         </button>
         <div className="text-center">
-          <p className="text-white text-sm font-medium">형광펜으로 칠하세요</p>
+          <p className="text-white text-sm font-medium">밑줄을 그어주세요</p>
           <p className="text-white/50 text-[11px]">문장 위를 쭉 그으면 돼요</p>
         </div>
         <button
@@ -773,7 +773,7 @@ export default function BookDetailPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-paper">
-        <p className="text-warmgray text-sm">불러오는 중...</p>
+        <p className="text-warmgray text-sm">불러오는 중</p>
       </div>
     );
   }
@@ -1031,7 +1031,7 @@ export default function BookDetailPage() {
               <p style={{ fontSize: 12, color: "var(--tm)", textAlign: "center", marginBottom: 20 }}>이 책이 서재에서 사라져요</p>
               <div style={{ display: "flex", gap: 8 }}>
                 <button onClick={() => setShowDeleteConfirm(false)} style={{ flex: 1, padding: 12, borderRadius: 12, background: "var(--sf2)", color: "var(--tm)", fontSize: 13, fontWeight: 600, border: "none", cursor: "pointer" }}>취소</button>
-                <button onClick={handleDeleteBook} disabled={deleting} style={{ flex: 1, padding: 12, borderRadius: 12, background: "#e05028", color: "#fff", fontSize: 13, fontWeight: 700, border: "none", cursor: "pointer", opacity: deleting ? 0.6 : 1 }}>{deleting ? "삭제 중..." : "삭제"}</button>
+                <button onClick={handleDeleteBook} disabled={deleting} style={{ flex: 1, padding: 12, borderRadius: 12, background: "#e05028", color: "#fff", fontSize: 13, fontWeight: 700, border: "none", cursor: "pointer", opacity: deleting ? 0.6 : 1 }}>{deleting ? "삭제 중" : "삭제"}</button>
               </div>
             </div>
           </>
@@ -1761,7 +1761,7 @@ export default function BookDetailPage() {
                 disabled={deleting}
                 className="flex-1 rounded-btn bg-red-500 text-paper text-sm font-semibold py-2.5 hover:bg-red-500/90 disabled:opacity-50"
               >
-                {deleting ? "삭제 중..." : "삭제"}
+                {deleting ? "삭제 중" : "삭제"}
               </button>
             </div>
           </div>
@@ -1959,7 +1959,7 @@ function ScrapTab({
         setPageNumber("");
         setMemo("");
         setShowForm(false);
-        toast.success(`${savedScraps.length}개 글귀를 저장했어요`, { duration: 1500 });
+        toast.success(`${savedScraps.length}개 스크랩을 저장했어요`, { duration: 1500 });
         upsertStreak(supabaseRef.current, userId, { scrap: true }).catch(() => {});
       } catch {
         toast.error("저장에 실패했어요");
@@ -1988,7 +1988,7 @@ function ScrapTab({
       setPageNumber("");
       setMemo("");
       setShowForm(false);
-      toast.success("글귀를 저장했어요", { duration: 1500 });
+      toast.success("스크랩을 저장했어요", { duration: 1500 });
       upsertStreak(supabaseRef.current, userId, { scrap: true }).catch(() => {});
     } catch {
       toast.error("저장에 실패했어요");
@@ -2039,15 +2039,15 @@ function ScrapTab({
           setExtractedSentences(sentences);
           setText("");
           setShowForm(true);
-          toast.success(`${sentences.length}개의 하이라이트를 찾았어요`);
+          toast.success(`${sentences.length}개의 밑줄을 찾았어요`);
         } else {
           setText(sentences[0] || data.text);
           setExtractedSentences([]);
           setShowForm(true);
-          toast.success("하이라이트 문장을 추출했어요!");
+          toast.success("밑줄 문장을 추출했어요");
         }
       } else {
-        toast.error("하이라이트를 인식하지 못했어요");
+        toast.error("밑줄을 인식하지 못했어요");
         setShowForm(true);
       }
     } catch {
@@ -2105,7 +2105,7 @@ function ScrapTab({
             onClick={() => setShowForm((v) => !v)}
             className="flex-1 text-sm font-semibold text-ink-green bg-ink-green/5 border border-dashed border-ink-green/20 rounded-card py-3 hover:bg-ink-green/10 transition-colors"
           >
-            + 글귀 추가
+            + 스크랩 추가
           </button>
           <button
             onClick={() => fileRef.current?.click()}
@@ -2119,7 +2119,7 @@ function ScrapTab({
             onClick={() => galleryRef.current?.click()}
             disabled={ocrLoading}
             className="w-12 flex items-center justify-center text-[#C4A35A] bg-[#C4A35A]/5 border border-dashed border-[#C4A35A]/20 rounded-card hover:bg-[#C4A35A]/10 transition-colors disabled:opacity-50"
-            title="캡처에서 하이라이트 추출"
+            title="캡처에서 밑줄 추출"
           >
             <ImagePlus className="w-5 h-5" />
           </button>
@@ -2143,7 +2143,7 @@ function ScrapTab({
         {/* OCR Loading */}
         {ocrLoading && (
           <div className="bg-warm rounded-card border border-[var(--bd)] shadow-card p-4 text-center text-sm text-warmgray">
-            형광펜 친 부분을 텍스트로 변환 중...
+            밑줄 친 부분을 텍스트로 변환 중
           </div>
         )}
 
@@ -2152,7 +2152,7 @@ function ScrapTab({
           <div className="bg-warm rounded-card border border-[var(--bd)] shadow-card p-4 space-y-3">
             <div className="flex items-center gap-1.5 text-sm font-semibold text-ink">
               <Sparkles className="w-4 h-4 text-[#C4A35A]" />
-              <span>{extractedSentences.length}개의 하이라이트</span>
+              <span>{extractedSentences.length}개의 밑줄</span>
             </div>
             <div className="space-y-2">
               {extractedSentences.map((sentence, idx) => (
@@ -2199,7 +2199,7 @@ function ScrapTab({
               disabled={extractedSentences.length === 0 || saving}
               className="w-full bg-ink-green text-paper text-sm font-semibold py-2.5 rounded-btn hover:bg-ink-green/90 transition-colors disabled:opacity-50"
             >
-              {saving ? "저장 중..." : `전체 저장 (${extractedSentences.length}개)`}
+              {saving ? "저장 중" : `전체 저장 (${extractedSentences.length}개)`}
             </button>
           </div>
         )}
@@ -2235,7 +2235,7 @@ function ScrapTab({
               disabled={!text.trim() || saving}
               className="w-full bg-ink-green text-paper text-sm font-semibold py-2.5 rounded-btn hover:bg-ink-green/90 transition-colors disabled:opacity-50"
             >
-              {saving ? "저장 중..." : "저장"}
+              {saving ? "저장 중" : "저장"}
             </button>
           </div>
         )}
@@ -2244,7 +2244,7 @@ function ScrapTab({
         {scraps.length === 0 && !showForm && (
           <EmptyState
             icon={Highlighter}
-            title="아직 글귀가 없어요"
+            title="아직 스크랩이 없어요"
             description="마음에 드는 문장을 기록해보세요"
           />
         )}
@@ -2339,9 +2339,9 @@ function DiscussionTab({
     const scrapMessage = scrapsCount === 0
       ? null
       : scrapsCount <= 2
-      ? "글귀가 더 있으면 더 깊은 토론이 가능해요"
+      ? "스크랩이 더 있으면 더 깊은 토론이 가능해요"
       : scrapsCount <= 4
-      ? `글귀가 ${scrapsCount}개! 토론을 시작해볼까요?`
+      ? `스크랩이 ${scrapsCount}개! 토론을 시작해볼까요?`
       : "문장 수준까지 파고들 수 있어요";
 
     return (
@@ -2389,7 +2389,7 @@ function DiscussionTab({
             <p className="text-xs text-warmgray/70">웹에서 책 정보를 모으고 있어요</p>
             <div className="mt-4">
               <span className="inline-flex items-center gap-2 bg-warmgray/10 text-warmgray text-sm font-semibold px-5 py-2.5 rounded-btn cursor-not-allowed">
-                토론 준비 중...
+                토론 준비 중
               </span>
             </div>
           </>
@@ -2401,7 +2401,7 @@ function DiscussionTab({
               <span>❌ 등장인물</span>
               <span>❌ 독자 반응</span>
             </div>
-            <p className="text-xs text-warmgray/70 mb-4">글귀를 추가하면 토론이 더 풍부해져요</p>
+            <p className="text-xs text-warmgray/70 mb-4">스크랩을 추가하면 토론이 더 풍부해져요</p>
             <Link
               href={`/discuss/${bookId}`}
               className="inline-flex items-center gap-2 bg-warmgray/20 text-warmgray text-sm font-semibold px-5 py-2.5 rounded-btn hover:bg-warmgray/30 transition-colors"
@@ -2681,7 +2681,7 @@ function ReviewTab({
                     disabled={deleting}
                     className="flex-1 rounded-btn bg-[#B86B4A] text-paper text-sm font-semibold py-2.5 hover:bg-[#B86B4A]/90 disabled:opacity-50"
                   >
-                    {deleting ? "삭제 중..." : "삭제하기"}
+                    {deleting ? "삭제 중" : "삭제하기"}
                   </button>
                 </div>
               </div>

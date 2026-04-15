@@ -41,14 +41,14 @@ export async function POST(req: Request) {
 
   const prompt =
     style === "essay"
-      ? `아래 독서토론 내용을 바탕으로 에세이형 서평 초안을 작성해주세요.
+      ? `아래 토론 내용을 바탕으로 에세이형 서평 초안을 작성해주세요.
 책 정보: ${bookInfo}
 토론 내용:
 ${conversationSummary}
 
 자연스러운 에세이 형식으로, 개인적 감상과 분석을 섞어 작성해주세요. 800-1200자 정도.
 순수 텍스트로만 응답하세요. JSON이나 마크다운 포맷 없이.`
-      : `아래 독서토론 내용을 바탕으로 구조형 서평 초안을 작성해주세요.
+      : `아래 토론 내용을 바탕으로 구조형 서평 초안을 작성해주세요.
 책 정보: ${bookInfo}
 토론 내용:
 ${conversationSummary}

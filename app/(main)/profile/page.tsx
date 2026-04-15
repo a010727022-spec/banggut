@@ -395,7 +395,7 @@ export default function ProfilePage() {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 20px", height: 52, borderBottom: "0.5px solid var(--bd)" }}>
             <button onClick={() => setEditMode(false)} style={{ fontSize: 14, fontWeight: 600, color: "var(--ts)" }}>닫기</button>
             <span style={{ fontSize: 14, fontWeight: 700, color: "var(--tp)" }}>프로필 편집</span>
-            <button onClick={saveProfile} disabled={saving || !editNickname.trim()} style={{ fontSize: 14, fontWeight: 700, color: "var(--ac)", opacity: saving ? 0.5 : 1 }}>{saving ? "저장 중..." : "저장"}</button>
+            <button onClick={saveProfile} disabled={saving || !editNickname.trim()} style={{ fontSize: 14, fontWeight: 700, color: "var(--ac)", opacity: saving ? 0.5 : 1 }}>{saving ? "저장 중" : "저장"}</button>
           </div>
           <div style={{ padding: "24px 20px" }}>
             <div style={{ fontSize: 10, fontWeight: 600, color: "var(--ts)", marginBottom: 8 }}>작가 아바타</div>

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, ArrowLeft, BookOpen, X } from "lucide-react";
 import { toast } from "sonner";
+import { track, EVENTS } from "@/lib/analytics";
 
 interface BookResult {
   title: string;
@@ -126,6 +127,12 @@ export default function SetupPage() {
         ...(selected.cover ? { cover_url: selected.cover } : {}),
         ...(selected.pageCount ? { total_pages: selected.pageCount } : {}),
       });
+      track(EVENTS.BOOK_ADDED, {
+        title: selected.title,
+        author: selected.author,
+        genre: selected.category,
+        is_onboarding: isOnboarding,
+      });
 
       // 백그라운드: 주제 지도 (실패해도 OK)
       fetchWithAuth("/api/topic-map", {
@@ -230,7 +237,7 @@ export default function SetupPage() {
       </div>
 
       {searching && (
-        <div className="text-center text-warmgray text-sm py-12">검색 중...</div>
+        <div className="text-center text-warmgray text-sm py-12">검색 중</div>
       )}
 
       {/* Search Empty State */}

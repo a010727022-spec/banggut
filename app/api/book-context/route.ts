@@ -4,6 +4,7 @@ import { getApiUser, unauthorized, tooManyRequests } from "@/lib/supabase/api-au
 import { rateLimit } from "@/lib/rate-limit";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { normalizeKey } from "@/lib/normalize-key";
 
 function getSupabase() {
   const cookieStore = cookies();
@@ -51,11 +52,16 @@ async function geminiSearch(query: string, label: string): Promise<{
   sourceCount: number;
 }> {
   const apiKey = process.env.GEMINI_API_KEY!;
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${apiKey}`;
+  // ⚠️ 보안: API 키는 URL query가 아닌 x-goog-api-key 헤더로 전송
+  // (URL은 서버 로그/Referer/CDN 캐시에 평문 기록되어 유출 위험)
+  const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent";
 
   const res = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "x-goog-api-key": apiKey,
+    },
     body: JSON.stringify({
       contents: [{ parts: [{ text: query }] }],
       tools: [{ google_search: {} }],
@@ -262,18 +268,6 @@ JSON 응답:
   return JSON.parse(text);
 }
 
-// ── 제목/저자 정규화 (캐시 키 생성용) ──
-function normalizeBookKey(text: string): string {
-  return text
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, " ")           // 다중 공백 → 단일
-    .replace(/[()（）[\]「」『』《》〈〉""'']/g, "") // 괄호/따옴표 제거
-    .replace(/\s*:\s*/g, " ")       // 콜론 → 공백
-    .replace(/[.,·\-–—_]/g, "")     // 구두점 제거
-    .trim();
-}
-
 // ── 품질 평가 ──
 function assessQuality(data: Record<string, unknown>): {
   quality: "sufficient" | "partial" | "insufficient";
@@ -310,8 +304,8 @@ export async function POST(req: Request) {
   }
 
   const supabase = getSupabase();
-  const titleNorm = normalizeBookKey(title);
-  const authorNorm = normalizeBookKey(author || "");
+  const titleNorm = normalizeKey(title);
+  const authorNorm = normalizeKey(author || "");
 
   // 1) 이 book row 자체 확인
   const { data: bookRow } = await supabase
@@ -336,7 +330,13 @@ export async function POST(req: Request) {
     .eq("author_normalized", authorNorm)
     .single();
 
-  if (cached?.context_data && cached.fetch_status === "done") {
+  // topic-map 전용 row (context_data는 비어있고 topic_map만 있는 경우) 배제
+  const hasRealContext =
+    cached?.context_data &&
+    typeof cached.context_data === "object" &&
+    (cached.context_data as { known?: unknown }).known !== undefined;
+
+  if (hasRealContext && cached?.fetch_status === "done") {
     console.log("[book-context] 글로벌 캐시 히트! title:", title, "(₩0, 즉시)");
     // books 테이블에 복사 + 히트 카운트 증가
     await Promise.all([

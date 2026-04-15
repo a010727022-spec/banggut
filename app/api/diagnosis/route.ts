@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     });
 
     const result = await model.generateContent(
-      `아래 독서토론 내용을 분석하여 독서 역량을 진단해주세요.
+      `아래 토론 내용을 분석하여 독서 역량을 진단해주세요.
 
 토론 내용:
 ${conversationSummary}

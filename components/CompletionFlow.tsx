@@ -226,7 +226,7 @@ export default function CompletionFlow({ book, scraps, onClose, onSave, onNaviga
                   opacity: saving ? 0.6 : 1,
                 }}
               >
-                {saving ? "저장 중..." : "다음"}
+                {saving ? "저장 중" : "다음"}
               </button>
               <button
                 onClick={() => setStep("next")}
