@@ -64,38 +64,23 @@ export default function GreetingBar() {
         }
       `}</style>
 
-      {/* 원형 마스코트 */}
-      <div
+      {/* 마스코트 — 동그라미 없이 그대로 */}
+      <img
+        src={`/${greeting.mascot}.png`}
+        alt="방긋이"
+        className="banggut-mascot-bob"
         style={{
           width: 56,
           height: 56,
           minWidth: 56,
-          borderRadius: "50%",
-          background: "color-mix(in srgb, var(--ac) 14%, var(--sf))",
-          border: "1px solid color-mix(in srgb, var(--ac) 18%, transparent)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          objectFit: "contain",
+          display: "block",
           flexShrink: 0,
-          overflow: "hidden",
-          transition: "background var(--duration-slow) var(--easing-default)",
         }}
-      >
-        <img
-          src={`/${greeting.mascot}.png`}
-          alt="방긋이"
-          className="banggut-mascot-bob"
-          style={{
-            width: 50,
-            height: 50,
-            objectFit: "contain",
-            display: "block",
-          }}
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = "/mascot-happy.png";
-          }}
-        />
-      </div>
+        onError={(e) => {
+          (e.currentTarget as HTMLImageElement).src = "/mascot-happy.png";
+        }}
+      />
 
       {/* 인사말 + 날짜 */}
       <div

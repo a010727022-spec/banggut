@@ -34,7 +34,8 @@ export default function ContinueHeroCard({
 
   // 컨텍스트: one_liner(한 줄 감상) 우선, 없으면 최신 스크랩
   const contextText = book.one_liner || lastScrap?.text || null;
-  const contextLabel = book.one_liner ? "한 줄 감상" : "마지막 문장";
+  // 목업과 동일한 라벨 — 책을 덮고 나서 마지막으로 멈춘 자리의 문장이라는 의미
+  const contextLabel = "어제 마지막 문장";
 
   const handleContinue = () => router.push(`/book/${book.id}`);
 
@@ -48,7 +49,7 @@ export default function ContinueHeroCard({
         position: "relative",
         overflow: "hidden",
         background:
-          "linear-gradient(155deg, var(--ac) 0%, color-mix(in srgb, var(--ac) 70%, #000) 100%)",
+          "linear-gradient(155deg, var(--ac) 0%, var(--ac2) 100%)",
         boxShadow: "0 8px 24px color-mix(in srgb, var(--ac) 22%, transparent)",
         transition:
           "background var(--duration-slow) var(--easing-default), box-shadow var(--duration-slow) var(--easing-default)",
@@ -98,7 +99,7 @@ export default function ContinueHeroCard({
         }}
       >
         <Clock size={11} strokeWidth={2.5} />
-        이어 읽기
+        어제 멈춘 곳
       </div>
 
       {/* 본문 */}
@@ -300,7 +301,7 @@ export default function ContinueHeroCard({
         aria-label={`${book.title} 이어 읽기`}
         style={{
           background: "var(--sf)",
-          color: "var(--ac)",
+          color: "var(--ac2)",
           border: "none",
           width: "100%",
           padding: 13,
