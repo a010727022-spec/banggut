@@ -14,6 +14,19 @@ function getProgress(b: Book): number {
   return 0;
 }
 
+/** started_at 또는 updated_at 기반 "n일째 읽고 있어요" 문구 — 없으면 null */
+function getStartedLabel(b: Book): string | null {
+  const anchor = b.started_at ?? b.updated_at;
+  if (!anchor) return null;
+  const t = new Date(anchor).getTime();
+  if (Number.isNaN(t)) return null;
+  const days = Math.floor((Date.now() - t) / (1000 * 60 * 60 * 24));
+  if (days < 0) return null;
+  if (days === 0) return "오늘 시작했어요";
+  if (days === 1) return "어제 시작했어요";
+  return `${days}일째 읽고 있어요`;
+}
+
 /**
  * ContinueHeroCard (Theme A) — 대형 민트 그라데이션 이어 읽기 카드.
  * 표지 + 제목/저자 + 진행률 + "어제 마지막 문장" 컨텍스트(one_liner 또는 최신 스크랩) + CTA.
@@ -31,6 +44,7 @@ export default function ContinueHeroCard({
   const coverUrl = useMemo(() => upgradeCoverUrl(book.cover_url), [book.cover_url]);
   const [coverBg, coverFg] = useMemo(() => coverPalette(book.title), [book.title]);
   const progress = useMemo(() => getProgress(book), [book]);
+  const startedLabel = useMemo(() => getStartedLabel(book), [book]);
 
   // 컨텍스트: one_liner(한 줄 감상) 우선, 없으면 최신 스크랩
   const contextText = book.one_liner || lastScrap?.text || null;
@@ -83,14 +97,13 @@ export default function ContinueHeroCard({
         }}
       />
 
-      {/* 상단 뱃지 */}
+      {/* 상단 뱃지 — 시작일 있으면 "n일째", 없으면 "어제 멈춘 곳" */}
       <div
         style={{
-          fontSize: 10,
+          fontSize: 11,
           fontWeight: 700,
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-          opacity: 0.85,
+          letterSpacing: "-0.01em",
+          opacity: 0.92,
           marginBottom: 12,
           position: "relative",
           display: "inline-flex",
@@ -99,7 +112,7 @@ export default function ContinueHeroCard({
         }}
       >
         <Clock size={11} strokeWidth={2.5} />
-        어제 멈춘 곳
+        {startedLabel ?? "어제 멈춘 곳"}
       </div>
 
       {/* 본문 */}

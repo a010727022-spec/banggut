@@ -13,6 +13,9 @@ import { LibraryViewA } from "@/components/library/view-a";
 import { LibraryViewB } from "@/components/library/view-b";
 import { LibraryViewC } from "@/components/library/view-c";
 
+/* 뷰 B의 '이달의 한 문장' 섹션을 위해 최신 스크랩 1개만 가져와요.
+   이어 읽기 맥락은 홈의 <ContinueHeroCard> 로 이관됐어요. */
+
 /**
  * /library — 가상 서재
  *
@@ -25,7 +28,6 @@ export default function LibraryPage() {
   const user = useAuthStore((s) => s.user);
   const { books, setBooks } = useLibraryStore();
   const view = useLibraryViewStore((s) => s.view);
-  const setView = useLibraryViewStore((s) => s.setView);
   const exhibit = useLibraryViewStore((s) => s.exhibit);
   const setExhibit = useLibraryViewStore((s) => s.setExhibit);
   const [scraps, setScraps] = useState<Scrap[]>([]);
@@ -33,6 +35,7 @@ export default function LibraryPage() {
   useEffect(() => {
     if (!user) return;
     const supabase = createClient();
+    // 뷰 B의 '이달의 한 문장' 용도로 최신 1개만 가져와요.
     Promise.all([getBooks(supabase, user.id), getScraps(supabase, user.id, 1)])
       .then(([bookData, scrapData]) => {
         setBooks(bookData);
@@ -43,8 +46,14 @@ export default function LibraryPage() {
       });
   }, [user, setBooks]);
 
-  const { reading, finishedThisYear, allFinishedCount, wishBooks, borrowedBooks } =
-    useMemo(() => buildBuckets(books), [books]);
+  const {
+    reading,
+    finishedThisYear,
+    allFinishedCount,
+    allFinishedBooks,
+    wishBooks,
+    borrowedBooks,
+  } = useMemo(() => buildBuckets(books), [books]);
 
   const curatedShelves = useMemo(
     () => buildCuratedShelves(finishedThisYear, books),
@@ -70,7 +79,6 @@ export default function LibraryPage() {
         exhibit={exhibit}
         onExhibitToggle={() => setExhibit(!exhibit)}
         view={view}
-        onViewChange={setView}
       />
 
       {view === "A" && (
@@ -78,6 +86,7 @@ export default function LibraryPage() {
           reading={reading}
           finishedThisYear={finishedThisYear}
           allFinishedCount={allFinishedCount}
+          allFinishedBooks={allFinishedBooks}
           wishBooks={wishBooks}
           borrowedBooks={borrowedBooks}
           curatedShelves={curatedShelves}
@@ -153,6 +162,7 @@ function buildBuckets(books: Book[]) {
     reading,
     finishedThisYear,
     allFinishedCount: finishedAll.length,
+    allFinishedBooks: finishedAll,
     wishBooks,
     borrowedBooks,
   };
