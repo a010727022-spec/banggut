@@ -5,8 +5,14 @@ export interface User {
   created_at: string;
   preferred_genres?: string[];
   reading_frequency?: string;
-  discussion_style?: string;
+  discussion_style?: string; // @deprecated — use discussion_styles
+  discussion_styles?: string[];
   onboarding_completed?: boolean;
+  favorite_library_code?: string | null;
+  favorite_library_name?: string | null;
+  yearly_goal?: number | null;
+  daily_page_goal?: number | null;
+  stats_widget?: "today_goal" | "yearly_ring";
 }
 
 export interface TopicMap {
@@ -37,6 +43,8 @@ export interface Book {
   reading_status: ReadingStatus;
   started_at: string | null;
   finished_at: string | null;
+  plan_to_start_at: string | null;
+  is_favorite?: boolean | null;
   format: "paper" | "ebook";
   current_page: number | null;
   total_pages: number | null;

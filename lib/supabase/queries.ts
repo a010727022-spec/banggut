@@ -24,6 +24,33 @@ export async function upsertProfile(supabase: SupabaseClient, user: Partial<User
   return data as User;
 }
 
+/**
+ * 닉네임 중복 확인.
+ * 자기 자신(excludeUserId)은 제외하고 같은 닉네임이 있는지 체크.
+ */
+export async function isNicknameAvailable(
+  supabase: SupabaseClient,
+  nickname: string,
+  excludeUserId?: string
+): Promise<boolean> {
+  const trimmed = nickname.trim();
+  if (!trimmed) return false;
+
+  let query = supabase
+    .from("profiles")
+    .select("id")
+    .ilike("nickname", trimmed)
+    .limit(1);
+
+  if (excludeUserId) {
+    query = query.neq("id", excludeUserId);
+  }
+
+  const { data, error } = await query;
+  if (error) return false;
+  return !data || data.length === 0;
+}
+
 // --- Books ---
 /**
  * 유저 서재 책 목록.

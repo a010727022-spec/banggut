@@ -17,7 +17,8 @@ export function BottomNav() {
   if (
     pathname.startsWith("/discuss/") ||
     pathname.startsWith("/review/") ||
-    pathname.startsWith("/book/")
+    pathname.startsWith("/book/") ||
+    pathname.startsWith("/settings/")
   ) return null;
 
   return (
@@ -26,36 +27,42 @@ export function BottomNav() {
       background: "color-mix(in srgb, var(--bg) 92%, transparent)",
       backdropFilter: "blur(20px)",
       WebkitBackdropFilter: "blur(20px)",
-      transition: "all 0.4s",
+      transition: "background var(--duration-slow) var(--easing-default), border-color var(--duration-slow)",
     }}>
       <div className="mx-auto max-w-lg flex items-center justify-around"
-        style={{ paddingTop: 10, paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 10px)" }}>
+        style={{
+          height: "var(--nav-height)",
+          paddingBottom: "env(safe-area-inset-bottom, 0px)",
+        }}>
         {NAV_ITEMS.map((item) => {
           const isActive = item.route === "/" ? pathname === "/" : pathname.startsWith(item.route);
           const Icon = item.icon;
           return (
             <Link key={item.id} href={item.route}
               aria-label={item.ariaLabel}
-              className="flex flex-col items-center gap-1"
-              style={{ cursor: "pointer", padding: "4px 0", minWidth: 56 }}>
+              className="flex flex-col items-center justify-center"
+              style={{
+                cursor: "pointer",
+                minWidth: 56,
+                height: "100%",
+                gap: 3,
+                position: "relative",
+              }}>
               <Icon style={{
-                width: 22, height: 22,
+                width: 20, height: 20,
                 stroke: isActive ? "var(--ac)" : "var(--tm)",
-                strokeWidth: isActive ? 2 : 1.8,
-                transition: "stroke 0.4s",
+                strokeWidth: isActive ? 2 : 1.75,
+                transition: "stroke var(--duration-fast) var(--easing-default)",
               }} />
               <span style={{
-                fontSize: 9, fontWeight: 700,
+                fontSize: 10,
+                fontFamily: isActive ? "var(--font-playful)" : "var(--font-body)",
+                fontWeight: isActive ? 700 : 500,
                 color: isActive ? "var(--ac)" : "var(--tm)",
-                letterSpacing: "0.8px", textTransform: "uppercase",
-                transition: "color 0.4s",
+                letterSpacing: isActive ? "var(--ls-gaegu)" : "0.2px",
+                transition: "color var(--duration-fast) var(--easing-default)",
+                lineHeight: 1,
               }}>{item.label}</span>
-              <div style={{
-                width: 4, height: 4, borderRadius: "50%",
-                background: "var(--ac)",
-                opacity: isActive ? 1 : 0,
-                transition: "opacity 0.2s, background 0.4s",
-              }} />
             </Link>
           );
         })}

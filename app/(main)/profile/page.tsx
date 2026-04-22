@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 // types moved — reviews/groups no longer fetched here
 import { Settings, Users, ChevronRight, Flame, LogOut, Check, MapPin, Clock, AlertTriangle, User, RefreshCw } from "lucide-react";
 import { useThemeStore } from "@/stores/useThemeStore";
+import { useHomeLayoutStore, type HomeLayout } from "@/stores/useHomeLayoutStore";
 import { AVATAR_IMAGES, EMOJI_AVATARS, getAvatarSrc } from "@/lib/types";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -30,9 +31,22 @@ const defaultNotif: NotifSettings = { subway: false, cafe: false, bedtime: false
 export default function ProfilePage() {
   const user = useAuthStore((s) => s.user);
   const setUser = useAuthStore((s) => s.setUser);
-  const { setBooks } = useLibraryStore();
+  const { books: libraryBooks, setBooks } = useLibraryStore();
   // reviews, messages, groups — 현재 MY 페이지에서 미사용, fetch 제거
   const [streakDates, setStreakDates] = useState<string[]>([]);
+  const [favoriteLibrary, setFavoriteLibrary] = useState<{ code: string | null; name: string | null }>({ code: null, name: null });
+  const [showLibrarySheet, setShowLibrarySheet] = useState(false);
+  const [statsWidget, setStatsWidget] = useState<"today_goal" | "yearly_ring">("today_goal");
+  const homeLayout = useHomeLayoutStore((s) => s.layout);
+  const setHomeLayoutStore = useHomeLayoutStore((s) => s.setLayout);
+  const [yearlyGoal, setYearlyGoal] = useState<number | null>(null);
+  const [dailyPageGoal, setDailyPageGoal] = useState<number | null>(null);
+  const [goalsEditing, setGoalsEditing] = useState(false);
+  const [yearlyInput, setYearlyInput] = useState("");
+  const [pageInput, setPageInput] = useState("");
+  const [librarySearchQuery, setLibrarySearchQuery] = useState("");
+  const [librarySearchResults, setLibrarySearchResults] = useState<Array<{ libCode: string; libName: string; address: string }>>([]);
+  const [librarySearching, setLibrarySearching] = useState(false);
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
   const [editNickname, setEditNickname] = useState("");
@@ -85,10 +99,101 @@ export default function ProfilePage() {
     Promise.all([
       getBooks(supabase, user.id).then(setBooks),
       getAllStreakDates(supabase, user.id).then(setStreakDates),
+      supabase.from("profiles").select("favorite_library_code, favorite_library_name, stats_widget, yearly_goal, daily_page_goal, home_layout").eq("id", user.id).maybeSingle().then(({ data }) => {
+        if (data) {
+          setFavoriteLibrary({ code: data.favorite_library_code, name: data.favorite_library_name });
+          setStatsWidget((data.stats_widget as "today_goal" | "yearly_ring") || "today_goal");
+          setYearlyGoal(data.yearly_goal ?? null);
+          setDailyPageGoal(data.daily_page_goal ?? null);
+          setYearlyInput(data.yearly_goal ? String(data.yearly_goal) : "");
+          setPageInput(data.daily_page_goal ? String(data.daily_page_goal) : "");
+          // DB 값이 "hero" | "calendar"이면 store에 동기화
+          const dbLayout = data.home_layout as string | null;
+          if (dbLayout === "hero" || dbLayout === "calendar") {
+            setHomeLayoutStore(dbLayout as HomeLayout);
+          }
+        }
+      }),
     ]).catch(() => {
       setLoadError(true);
     }).finally(() => setLoading(false));
   }, [user, setBooks, retryCount]);
+
+  // 도서관 검색 (지역 + 키워드)
+  const [selectedRegion, setSelectedRegion] = useState<string>("");
+  const [apiError, setApiError] = useState<string>("");
+
+  const searchLibraries = async (q: string, region: string) => {
+    if (!q.trim() && !region) {
+      setLibrarySearchResults([]);
+      return;
+    }
+    setLibrarySearching(true);
+    setApiError("");
+    try {
+      const params = new URLSearchParams();
+      if (q.trim()) params.set("q", q.trim());
+      if (region) params.set("region", region);
+      const res = await fetch(`/api/library-search?${params.toString()}`);
+      const data = await res.json();
+      if (data.error === "api_key_missing") {
+        setApiError(data.message || "API 키가 없어 검색할 수 없어요");
+      } else if (data.error === "api_not_approved") {
+        setApiError(data.message || "API 승인 대기 중입니다");
+      } else if (data.error === "api_error") {
+        setApiError(data.message || "도서관 조회에 실패했어요");
+      } else {
+        setApiError("");
+      }
+      setLibrarySearchResults(data.libraries || []);
+    } catch {
+      setLibrarySearchResults([]);
+    }
+    setLibrarySearching(false);
+  };
+
+  const setStatsWidgetHandler = async (variant: "today_goal" | "yearly_ring") => {
+    if (!user) return;
+    const sb = createClient();
+    await sb.from("profiles").update({ stats_widget: variant }).eq("id", user.id);
+    setStatsWidget(variant);
+    toast.success(variant === "today_goal" ? "오늘 목표 바로 바꿨어요" : "연간 챌린지 링으로 바꿨어요");
+  };
+
+  const saveGoals = async () => {
+    if (!user) return;
+    const yearly = yearlyInput.trim() ? parseInt(yearlyInput.trim(), 10) : null;
+    const page = pageInput.trim() ? parseInt(pageInput.trim(), 10) : null;
+    if (yearly !== null && (isNaN(yearly) || yearly < 1 || yearly > 999)) {
+      toast.error("연간 목표는 1~999권 사이여야 해요");
+      return;
+    }
+    if (page !== null && (isNaN(page) || page < 1 || page > 999)) {
+      toast.error("하루 목표는 1~999쪽 사이여야 해요");
+      return;
+    }
+    const sb = createClient();
+    await sb.from("profiles").update({ yearly_goal: yearly, daily_page_goal: page }).eq("id", user.id);
+    setYearlyGoal(yearly);
+    setDailyPageGoal(page);
+    setGoalsEditing(false);
+    toast.success("목표를 저장했어요");
+  };
+
+  const setFavoriteLibraryHandler = async (code: string, name: string) => {
+    if (!user) return;
+    try {
+      const supabase = createClient();
+      await supabase.from("profiles").update({ favorite_library_code: code, favorite_library_name: name }).eq("id", user.id);
+      setFavoriteLibrary({ code, name });
+      setShowLibrarySheet(false);
+      setLibrarySearchQuery("");
+      setLibrarySearchResults([]);
+      toast.success(`${name} 설정했어요`);
+    } catch {
+      toast.error("설정에 실패했어요");
+    }
+  };
 
   const handleLogout = async () => {
     const supabase = createClient();
@@ -250,6 +355,339 @@ export default function ProfilePage() {
           ))}
         </div>
       </div>
+
+      {/* ═══ 홈 화면 테마 (선택 스크린으로 연결) ═══ */}
+      <div style={{ fontSize: 10, fontWeight: 700, color: "var(--tm)", letterSpacing: "0.8px", textTransform: "uppercase", padding: "0 20px 8px", transition: "color 0.4s" }}>🏠 홈 화면</div>
+      <div style={{ margin: "0 20px 14px" }}>
+        <button
+          onClick={() => router.push("/settings/home-theme")}
+          aria-label="홈 화면 테마 설정으로 이동"
+          style={{
+            width: "100%",
+            background: "var(--sf)",
+            borderRadius: 14,
+            border: "0.5px solid var(--bd)",
+            padding: "14px 16px",
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            cursor: "pointer",
+            textAlign: "left",
+            transition: "all 0.4s",
+          }}
+        >
+          <div style={{
+            width: 40, height: 40, borderRadius: 12,
+            background: "color-mix(in srgb, var(--ac) 15%, var(--bg))",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: "var(--ac)", fontSize: 20, flexShrink: 0,
+          }}>
+            🏠
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "var(--tp)", lineHeight: 1.3 }}>
+              홈 화면 테마
+            </div>
+            <div style={{ fontSize: 11, color: "var(--tm)", marginTop: 2 }}>
+              현재: {homeLayout === "hero" ? "이어 읽기 HERO" : "캘린더 First"}
+            </div>
+          </div>
+          <ChevronRight size={16} color="var(--tm)" />
+        </button>
+      </div>
+
+      {/* ═══ 독서 목표 ═══ */}
+      <div style={{ fontSize: 10, fontWeight: 700, color: "var(--tm)", letterSpacing: "0.8px", textTransform: "uppercase", padding: "0 20px 8px", transition: "color 0.4s" }}>🎯 독서 목표</div>
+      <div style={{ margin: "0 20px 14px", background: "var(--sf)", borderRadius: 14, border: "0.5px solid var(--bd)", padding: 16, transition: "all 0.4s" }}>
+        {/* 위젯 선택 */}
+        <div style={{ fontSize: 11, fontWeight: 700, color: "var(--tp)", marginBottom: 10 }}>홈 화면 위젯</div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 16 }}>
+          {([
+            { id: "today_goal", label: "오늘 목표 바", emoji: "🎯", desc: "매일 페이지 목표" },
+            { id: "yearly_ring", label: "연간 챌린지 링", emoji: "🏆", desc: "연간 권수 진행률" },
+          ] as const).map((opt) => {
+            const active = statsWidget === opt.id;
+            return (
+              <button
+                key={opt.id}
+                onClick={() => setStatsWidgetHandler(opt.id)}
+                style={{
+                  padding: "12px 10px",
+                  borderRadius: 12,
+                  border: `1.5px solid ${active ? "var(--ac)" : "var(--bd2)"}`,
+                  background: active ? "color-mix(in srgb, var(--ac) 9%, var(--bg))" : "var(--bg)",
+                  cursor: "pointer",
+                  textAlign: "center",
+                  transition: "all 0.2s",
+                }}
+              >
+                <div style={{ fontSize: 18, marginBottom: 4 }}>{opt.emoji}</div>
+                <div style={{ fontFamily: "'Gaegu', cursive", fontSize: 13, fontWeight: 700, color: active ? "var(--ac)" : "var(--tp)", letterSpacing: "0.02em", marginBottom: 2 }}>{opt.label}</div>
+                <div style={{ fontSize: 10, color: "var(--tm)", lineHeight: 1.3 }}>{opt.desc}</div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* 목표 수치 */}
+        <div style={{ fontSize: 11, fontWeight: 700, color: "var(--tp)", marginBottom: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          목표 수치
+          {!goalsEditing ? (
+            <button
+              onClick={() => setGoalsEditing(true)}
+              style={{ fontSize: 11, color: "var(--ac)", fontWeight: 700, background: "transparent", border: "none", cursor: "pointer" }}
+            >
+              편집
+            </button>
+          ) : (
+            <div style={{ display: "flex", gap: 6 }}>
+              <button
+                onClick={() => { setGoalsEditing(false); setYearlyInput(yearlyGoal ? String(yearlyGoal) : ""); setPageInput(dailyPageGoal ? String(dailyPageGoal) : ""); }}
+                style={{ fontSize: 11, color: "var(--tm)", fontWeight: 600, background: "transparent", border: "none", cursor: "pointer" }}
+              >취소</button>
+              <button
+                onClick={saveGoals}
+                style={{ fontSize: 11, color: "var(--ac)", fontWeight: 800, background: "transparent", border: "none", cursor: "pointer" }}
+              >저장</button>
+            </div>
+          )}
+        </div>
+
+        <div style={{ display: "flex", gap: 8 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 10, color: "var(--tm)", marginBottom: 4, fontWeight: 600 }}>연간 목표</div>
+            {goalsEditing ? (
+              <div style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--bg)", border: "0.5px solid var(--bd2)", borderRadius: 10, padding: "8px 12px" }}>
+                <input
+                  type="number"
+                  value={yearlyInput}
+                  onChange={(e) => setYearlyInput(e.target.value)}
+                  placeholder="24"
+                  min={1}
+                  max={999}
+                  style={{ flex: 1, border: "none", background: "transparent", fontSize: 15, fontWeight: 800, color: "var(--tp)", outline: "none", width: 40 }}
+                />
+                <span style={{ fontSize: 11, color: "var(--tm)", fontWeight: 600 }}>권</span>
+              </div>
+            ) : (
+              <div style={{ fontSize: 15, fontWeight: 800, color: "var(--tp)", padding: "8px 0" }}>
+                {yearlyGoal ? `${yearlyGoal}권` : <span style={{ color: "var(--tm)", fontWeight: 500 }}>설정 안 함</span>}
+              </div>
+            )}
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 10, color: "var(--tm)", marginBottom: 4, fontWeight: 600 }}>하루 목표</div>
+            {goalsEditing ? (
+              <div style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--bg)", border: "0.5px solid var(--bd2)", borderRadius: 10, padding: "8px 12px" }}>
+                <input
+                  type="number"
+                  value={pageInput}
+                  onChange={(e) => setPageInput(e.target.value)}
+                  placeholder="30"
+                  min={1}
+                  max={999}
+                  style={{ flex: 1, border: "none", background: "transparent", fontSize: 15, fontWeight: 800, color: "var(--tp)", outline: "none", width: 40 }}
+                />
+                <span style={{ fontSize: 11, color: "var(--tm)", fontWeight: 600 }}>쪽</span>
+              </div>
+            ) : (
+              <div style={{ fontSize: 15, fontWeight: 800, color: "var(--tp)", padding: "8px 0" }}>
+                {dailyPageGoal ? `${dailyPageGoal}쪽` : <span style={{ color: "var(--tm)", fontWeight: 500 }}>30쪽 (기본)</span>}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ═══ 인생책 (하트 담은 책) ═══ */}
+      <div style={{ fontSize: 10, fontWeight: 700, color: "var(--tm)", letterSpacing: "0.8px", textTransform: "uppercase", padding: "0 20px 8px", transition: "color 0.4s" }}>❤ 인생책</div>
+      <div style={{ margin: "0 20px 14px", background: "var(--sf)", borderRadius: 14, border: "0.5px solid var(--bd)", padding: 14, transition: "all 0.4s" }}>
+        {(() => {
+          const faves = libraryBooks.filter((b) => b.is_favorite);
+          if (faves.length === 0) {
+            return (
+              <div style={{ textAlign: "center", padding: "12px 0 4px" }}>
+                <div style={{ fontSize: 12, color: "var(--tm)", lineHeight: 1.6 }}>
+                  아직 인생책이 없어요<br />
+                  책 상세에서 <span style={{ color: "var(--ac)", fontWeight: 700 }}>♥</span> 눌러 담아보세요
+                </div>
+              </div>
+            );
+          }
+          return (
+            <div style={{ display: "flex", gap: 10, overflowX: "auto", margin: "0 -14px", padding: "0 14px 2px", scrollbarWidth: "none" }}>
+              {faves.slice(0, 12).map((b) => (
+                <button
+                  key={b.id}
+                  onClick={() => router.push(`/book/${b.id}`)}
+                  style={{ flexShrink: 0, width: 72, textAlign: "left", background: "transparent", border: "none", cursor: "pointer", padding: 0 }}
+                >
+                  <div style={{ width: 72, height: 104, borderRadius: 6, overflow: "hidden", border: "0.5px solid var(--bd)", marginBottom: 6, background: "var(--sf2)" }}>
+                    {b.cover_url ? (
+                      <img src={b.cover_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    ) : (
+                      <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--tm)", fontSize: 20 }}>♥</div>
+                    )}
+                  </div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: "var(--tp)", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{b.title}</div>
+                </button>
+              ))}
+            </div>
+          );
+        })()}
+      </div>
+
+      {/* ═══ 자주 가는 도서관 ═══ */}
+      <div style={{ fontSize: 10, fontWeight: 700, color: "var(--tm)", letterSpacing: "0.8px", textTransform: "uppercase", padding: "0 20px 8px", transition: "color 0.4s" }}>🏛 자주 가는 도서관</div>
+      <div style={{ margin: "0 20px 14px" }}>
+        {favoriteLibrary.code ? (
+          <div
+            onClick={() => setShowLibrarySheet(true)}
+            style={{ background: "var(--sf)", borderRadius: 14, border: "0.5px solid var(--bd)", padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, cursor: "pointer", transition: "all 0.2s" }}
+          >
+            <div style={{ width: 40, height: 40, borderRadius: 12, background: "color-mix(in srgb, var(--ac) 15%, var(--bg))", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--ac)", fontSize: 20, flexShrink: 0 }}>🏛</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "var(--tp)", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{favoriteLibrary.name}</div>
+              <div style={{ fontSize: 11, color: "var(--tm)", marginTop: 2 }}>책 상세에서 바로 소장 조회할 수 있어요</div>
+            </div>
+            <ChevronRight size={16} color="var(--tm)" />
+          </div>
+        ) : (
+          <button
+            onClick={() => setShowLibrarySheet(true)}
+            style={{ width: "100%", padding: "16px", borderRadius: 14, border: "1.5px dashed color-mix(in srgb, var(--ac) 35%, transparent)", background: "color-mix(in srgb, var(--ac) 4%, var(--bg))", color: "var(--tp)", cursor: "pointer", textAlign: "center", fontSize: 13, fontWeight: 600, transition: "all 0.2s" }}
+          >
+            🏛 자주 가는 도서관 설정하기
+            <div style={{ fontSize: 11, color: "var(--tm)", fontWeight: 400, marginTop: 4 }}>설정하면 책 상세에서 바로 소장 여부를 볼 수 있어요</div>
+          </button>
+        )}
+      </div>
+
+      {/* 도서관 검색 바텀시트 */}
+      {showLibrarySheet && (
+        <>
+          <div
+            onClick={() => setShowLibrarySheet(false)}
+            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 100 }}
+          />
+          <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 110, background: "var(--bg)", borderRadius: "24px 24px 0 0", maxHeight: "80vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 -8px 24px rgba(0,0,0,0.15)" }}>
+            <div style={{ width: 36, height: 4, background: "var(--bd2)", borderRadius: 100, margin: "10px auto 6px" }} />
+            <div style={{ padding: "12px 20px 14px", borderBottom: "0.5px solid var(--bd)" }}>
+              <div style={{ fontFamily: "'Gaegu', cursive", fontSize: 18, fontWeight: 700, color: "var(--tp)", letterSpacing: "0.02em", marginBottom: 4, textAlign: "center" }}>
+                자주 가는 도서관 찾기
+              </div>
+              <div style={{ fontSize: 11, color: "var(--tm)", textAlign: "center", marginBottom: 12 }}>지역을 고르고 이름을 검색해 주세요</div>
+
+              {/* 지역 칩 */}
+              <div style={{ display: "flex", gap: 6, overflowX: "auto", margin: "0 -20px 10px", padding: "0 20px 4px", scrollbarWidth: "none" }}>
+                {[
+                  { code: "", label: "전체" },
+                  { code: "11", label: "서울" },
+                  { code: "41", label: "경기" },
+                  { code: "28", label: "인천" },
+                  { code: "26", label: "부산" },
+                  { code: "27", label: "대구" },
+                  { code: "29", label: "광주" },
+                  { code: "30", label: "대전" },
+                  { code: "31", label: "울산" },
+                  { code: "36", label: "세종" },
+                  { code: "42", label: "강원" },
+                  { code: "43", label: "충북" },
+                  { code: "44", label: "충남" },
+                  { code: "45", label: "전북" },
+                  { code: "46", label: "전남" },
+                  { code: "47", label: "경북" },
+                  { code: "48", label: "경남" },
+                  { code: "50", label: "제주" },
+                ].map((r) => {
+                  const on = selectedRegion === r.code;
+                  return (
+                    <button
+                      key={r.code || "all"}
+                      onClick={() => {
+                        setSelectedRegion(r.code);
+                        searchLibraries(librarySearchQuery, r.code);
+                      }}
+                      style={{
+                        flexShrink: 0,
+                        padding: "6px 14px",
+                        borderRadius: 100,
+                        fontSize: 12,
+                        fontWeight: 700,
+                        border: `1px solid ${on ? "var(--ac)" : "var(--bd2)"}`,
+                        background: on ? "color-mix(in srgb, var(--ac) 12%, var(--bg))" : "var(--sf)",
+                        color: on ? "var(--ac)" : "var(--ts)",
+                        cursor: "pointer",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {r.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <input
+                type="text"
+                placeholder="도서관 이름 (예: 양천도서관)"
+                value={librarySearchQuery}
+                onChange={(e) => {
+                  setLibrarySearchQuery(e.target.value);
+                  searchLibraries(e.target.value, selectedRegion);
+                }}
+                style={{
+                  width: "100%",
+                  height: 46,
+                  padding: "0 18px",
+                  borderRadius: 100,
+                  border: "1px solid var(--bd2)",
+                  background: "var(--sf)",
+                  color: "var(--tp)",
+                  fontSize: 14,
+                  outline: "none",
+                  fontFamily: "inherit",
+                }}
+              />
+              {apiError && (
+                <div style={{ marginTop: 10, padding: "10px 14px", borderRadius: 10, background: "color-mix(in srgb, #e88b7a 10%, var(--bg))", border: "0.5px solid color-mix(in srgb, #e88b7a 35%, transparent)", fontSize: 11, color: "#c05a48", lineHeight: 1.5 }}>
+                  ⚠️ {apiError}
+                </div>
+              )}
+            </div>
+            <div style={{ flex: 1, overflowY: "auto", padding: "8px 0" }}>
+              {librarySearching ? (
+                <div style={{ padding: "40px 20px", textAlign: "center", color: "var(--tm)", fontSize: 13 }}>검색 중...</div>
+              ) : librarySearchResults.length === 0 ? (
+                <div style={{ padding: "40px 20px", textAlign: "center", color: "var(--tm)", fontSize: 13 }}>
+                  {librarySearchQuery ? "검색 결과가 없어요" : "도서관 이름을 입력해 주세요"}
+                </div>
+              ) : (
+                librarySearchResults.map((lib) => (
+                  <button
+                    key={lib.libCode}
+                    onClick={() => setFavoriteLibraryHandler(lib.libCode, lib.libName)}
+                    style={{ width: "100%", padding: "14px 20px", borderBottom: "0.5px solid var(--bd)", background: "transparent", border: "none", textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", gap: 12 }}
+                  >
+                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "color-mix(in srgb, var(--ac) 12%, transparent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>🏛</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tp)", marginBottom: 2 }}>{lib.libName}</div>
+                      <div style={{ fontSize: 11, color: "var(--tm)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{lib.address}</div>
+                    </div>
+                  </button>
+                ))
+              )}
+            </div>
+            <div style={{ padding: 16, borderTop: "0.5px solid var(--bd)" }}>
+              <button
+                onClick={() => setShowLibrarySheet(false)}
+                style={{ width: "100%", height: 44, borderRadius: 100, background: "var(--sf)", border: "0.5px solid var(--bd)", color: "var(--tm)", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* ═══ 테마 피커 (HTML .th-grid) ═══ */}
       <div style={{ fontSize: 10, fontWeight: 700, color: "var(--tm)", letterSpacing: "0.8px", textTransform: "uppercase", padding: "0 20px 12px", transition: "color 0.4s" }}>테마</div>

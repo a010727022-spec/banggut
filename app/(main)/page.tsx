@@ -1,16 +1,24 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
-import { Plus, BookOpen, Bookmark, PenLine, Clock, AlertTriangle, RefreshCw, ArrowUpDown } from "lucide-react";
-import AppHeader from "@/components/shared/AppHeader";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Plus, BookOpen, Bookmark, PenLine, Clock, AlertTriangle, RefreshCw, Tag, Calendar as CalendarIcon, Users } from "lucide-react";
+import { type CalEvent } from "@/components/shared/ReadingCalendar";
+import CalendarSheet from "@/components/shared/CalendarSheet";
 import { EmptyState } from "@/components/shared/EmptyState";
+import GreetingBar from "@/components/home/GreetingBar";
+import ContinueHeroCard from "@/components/home/ContinueHeroCard";
+import ContinueCompactCard from "@/components/home/ContinueCompactCard";
+import HomeCalendarWidget from "@/components/home/HomeCalendarWidget";
+import FriendsFeed, { type GroupScrapShape } from "@/components/home/FriendsFeed";
 // date-fns format moved to AppHeader
 import { createClient } from "@/lib/supabase/client";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useLibraryStore } from "@/stores/useLibraryStore";
 import { useThemeStore } from "@/stores/useThemeStore";
-import { getBooks, getAllStreakDates, getScraps } from "@/lib/supabase/queries";
+import { useHomeLayoutStore, type HomeLayout } from "@/stores/useHomeLayoutStore";
+import { getBooks, getAllStreakDates, getScraps, getGroupScraps } from "@/lib/supabase/queries";
+import { coverPalette } from "@/lib/reading-utils";
 import type { Scrap } from "@/lib/types";
 // getAvatarSrc moved to AppHeader
 import type { Book } from "@/lib/types";
@@ -28,10 +36,8 @@ function upgradeCoverUrl(url: string | null | undefined): string | null {
   if (!url) return null;
   return url.replace("/cover/", "/cover500/").replace("/cover200/", "/cover500/").replace("/coversum/", "/cover500/").replace("http://", "https://");
 }
-const COVER_PALETTES = [["#90C4E4","#2B6CB0"],["#7FAF8A","#2B4C3F"],["#C4A35A","#8B6F3C"],["#F0A8C4","#B0557A"],["#94B8B0","#3D6B5A"],["#B8A9D4","#5B4A8A"]];
-const coverPalette = (t: string) => COVER_PALETTES[t.charCodeAt(0) % COVER_PALETTES.length];
-
 /* 체온/위젯/Hero 유틸은 components/shared/AppHeader.tsx로 이동 */
+/* coverPalette는 lib/reading-utils.ts — 테마 토큰 기반 6 variants (Gail) */
 
 /* ═══ 피처 카드 (읽는 중 — HTML .fc) ═══ */
 function FeaturedCard({ book }: { book: Book }) {
@@ -115,6 +121,8 @@ function BookTile({ book }: { book: Book }) {
   const router = useRouter();
   const coverUrl = upgradeCoverUrl(book.cover_url);
   const [bg, fg] = coverPalette(book.title);
+  const rating = book.rating ? book.rating.toFixed(1) : null;
+  const isFav = book.is_favorite;
   return (
     <div onClick={() => router.push(`/book/${book.id}`)}
       style={{ aspectRatio: "2/3", position: "relative", overflow: "hidden", cursor: "pointer", background: "var(--sf2)", transition: "background 0.4s" }}>
@@ -123,50 +131,109 @@ function BookTile({ book }: { book: Book }) {
       ) : (
         <div style={{ position: "absolute", inset: 0, background: `linear-gradient(150deg, ${bg}, ${fg})` }} />
       )}
+      {/* 별점 or 인생책 뱃지 (우상단) */}
+      {(rating || isFav) && (
+        <span style={{
+          position: "absolute", top: 6, right: 6,
+          fontSize: 8, fontWeight: 800,
+          padding: "2px 6px", borderRadius: 100,
+          background: isFav ? "rgba(224,155,142,0.95)" : "rgba(255,255,255,0.94)",
+          color: isFav ? "#fff" : "var(--ac)",
+          letterSpacing: "0.2px",
+          zIndex: 2,
+        }}>
+          {isFav ? `♥ ${rating ? "★" + rating : ""}` : `★ ${rating}`}
+        </span>
+      )}
       <div style={{
         position: "absolute", inset: 0, padding: "9px 8px",
-        display: "flex", flexDirection: "column", justifyContent: "space-between",
-        background: "linear-gradient(to top, rgba(0,0,0,0.88) 30%, rgba(0,0,0,0.06) 65%, transparent)",
+        display: "flex", flexDirection: "column", justifyContent: "flex-end",
+        background: "linear-gradient(to top, rgba(0,0,0,0.75) 20%, transparent 55%)",
       }}>
-        <span style={{ alignSelf: "flex-start", fontSize: 8, fontWeight: 800, padding: "3px 7px", borderRadius: 100, background: "color-mix(in srgb, var(--ac) 90%, transparent)", color: "var(--acc)", letterSpacing: "0.6px" }}>완독</span>
         <div>
           <div style={{ fontSize: 11, fontWeight: 800, color: "#ede8e0", lineHeight: 1.3, textShadow: "0 1px 6px rgba(0,0,0,0.9)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{book.title}</div>
-          {book.author && <div style={{ fontSize: 9, color: "rgba(220,210,200,0.48)", marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{book.author}</div>}
+          {book.author && <div style={{ fontSize: 9, color: "rgba(220,210,200,0.55)", marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{book.author}</div>}
         </div>
       </div>
     </div>
   );
 }
 
-/* ═══ 위시 아이템 (HTML .wi) ═══ */
-function WishItem({ book }: { book: Book }) {
-  const router = useRouter();
-  const coverUrl = upgradeCoverUrl(book.cover_url);
-  const [bg, fg] = coverPalette(book.title);
+
+/* ═══ 이어 읽을 책이 없을 때 홈 상단 엠프티 스테이트 ═══ */
+function ContinueHeroEmpty({ onAdd, compact = false }: { onAdd: () => void; compact?: boolean }) {
   return (
-    <div onClick={() => router.push(`/book/${book.id}`)}
+    <div
       style={{
-        display: "flex", gap: 13, padding: "12px 20px",
-        borderBottom: "0.5px solid var(--bd)", alignItems: "center",
-        cursor: "pointer", transition: "background 0.15s, border-color 0.4s",
+        background:
+          "linear-gradient(155deg, color-mix(in srgb, var(--ac) 15%, var(--sf)) 0%, var(--sf) 100%)",
+        borderRadius: compact ? 18 : 22,
+        padding: compact ? 16 : 18,
+        marginBottom: compact ? 8 : 14,
+        border: "0.5px solid var(--bd)",
+        display: "flex",
+        gap: 14,
+        alignItems: "center",
+        transition:
+          "background var(--duration-slow) var(--easing-default), border-color var(--duration-slow) var(--easing-default)",
       }}
-      onMouseEnter={(e) => (e.currentTarget.style.background = "var(--sf)")}
-      onMouseLeave={(e) => (e.currentTarget.style.background = "")}
     >
-      <div style={{ width: 44, height: 64, borderRadius: 7, overflow: "hidden", flexShrink: 0, position: "relative" }}>
-        {coverUrl ? (
-          <img src={coverUrl} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
-        ) : (
-          <div style={{ position: "absolute", inset: 0, background: `linear-gradient(150deg, ${bg}, ${fg})` }} />
-        )}
+      <div
+        style={{
+          width: 56,
+          height: 56,
+          minWidth: 56,
+          borderRadius: "50%",
+          background: "color-mix(in srgb, var(--ac) 18%, var(--sf))",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+        }}
+      >
+        <BookOpen size={24} color="var(--ac)" strokeWidth={2} />
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: "var(--tp)", lineHeight: 1.3, transition: "color 0.4s", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{book.title}</div>
-        {book.author && <div style={{ fontSize: 11, color: "var(--tm)", marginTop: 2, transition: "color 0.4s", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{book.author}</div>}
-        {book.genre && (
-          <span style={{ display: "inline-block", marginTop: 6, fontSize: 9, fontWeight: 800, color: "var(--ac)", background: "color-mix(in srgb, var(--ac) 12%, transparent)", padding: "3px 9px", borderRadius: 100, transition: "all 0.4s" }}>{book.genre}</span>
-        )}
+        <div
+          style={{
+            fontSize: 14,
+            fontWeight: 700,
+            color: "var(--tp)",
+            letterSpacing: "-0.015em",
+            lineHeight: 1.35,
+            marginBottom: 2,
+          }}
+        >
+          읽고 있는 책이 없어요
+        </div>
+        <div style={{ fontSize: 11.5, color: "var(--ts)", lineHeight: 1.45 }}>
+          첫 책을 담으면 여기에 이어 읽기 카드가 나타나요
+        </div>
       </div>
+      <button
+        type="button"
+        onClick={onAdd}
+        aria-label="책 추가하기"
+        style={{
+          background: "var(--ac)",
+          color: "var(--acc)",
+          border: "none",
+          padding: "10px 14px",
+          borderRadius: 100,
+          fontSize: 12,
+          fontWeight: 700,
+          cursor: "pointer",
+          fontFamily: "inherit",
+          minHeight: 36,
+          display: "flex",
+          alignItems: "center",
+          gap: 4,
+          flexShrink: 0,
+        }}
+      >
+        <Plus size={13} strokeWidth={2.5} />
+        담기
+      </button>
     </div>
   );
 }
@@ -177,14 +244,26 @@ function WishItem({ book }: { book: Book }) {
 export default function LibraryPage() {
   const user = useAuthStore((s) => s.user);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { books, setBooks, setLoading } = useLibraryStore();
   useThemeStore();
-  const [tab, setTab] = useState<LibraryTab>("reading");
+  const homeLayout = useHomeLayoutStore((s) => s.layout);
+  const setHomeLayout = useHomeLayoutStore((s) => s.setLayout);
+  const initialTab = ((): LibraryTab => {
+    const t = searchParams.get("tab");
+    if (t === "wish" || t === "reading" || t === "done" || t === "scrap") return t;
+    return "reading";
+  })();
+  const [tab, setTab] = useState<LibraryTab>(initialTab);
+  // Theme A (hero) 내부 세그먼트: calendar | community
+  const [heroSeg, setHeroSeg] = useState<"calendar" | "community">("calendar");
   const [finishedSort, setFinishedSort] = useState<"recent" | "rating" | "title">("recent");
   const [streakDatesArr, setStreakDatesArr] = useState<string[]>([]);
   const [recentScraps, setRecentScraps] = useState<Scrap[]>([]);
+  const [groupScraps, setGroupScraps] = useState<GroupScrapShape[]>([]);
   const [loadError, setLoadError] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
+  const [calendarOpen, setCalendarOpen] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -194,15 +273,27 @@ export default function LibraryPage() {
       getBooks(supabase, user.id),
       getAllStreakDates(supabase, user.id),
       getScraps(supabase, user.id, 4),
-    ]).then(([booksData, streakData, scrapsData]) => {
+      // 프로필에서 home_layout 동기화 (DB → 스토어)
+      supabase
+        .from("profiles")
+        .select("home_layout")
+        .eq("id", user.id)
+        .maybeSingle()
+        .then(({ data }) => data?.home_layout as HomeLayout | "reading" | "community" | null | undefined),
+    ]).then(([booksData, streakData, scrapsData, dbLayout]) => {
       setBooks(booksData);
       setStreakDatesArr(streakData);
       setRecentScraps(scrapsData);
+      // DB 값이 구버전(reading/community)이면 새 값으로 마이그레이션된 뒤를 가정
+      // 안전하게 현재 값만 받아오고, 유효한 2-옵션이면 스토어에 반영
+      if (dbLayout === "hero" || dbLayout === "calendar") {
+        setHomeLayout(dbLayout);
+      }
     }).catch(() => {
       setLoadError(true);
       setLoading(false);
     });
-  }, [user, setBooks, setLoading, retryCount]);
+  }, [user, setBooks, setLoading, retryCount, setHomeLayout]);
 
   const grouped = useMemo(() => {
     const g = { reading: [] as Book[], done: [] as Book[], want: [] as Book[] };
@@ -214,6 +305,23 @@ export default function LibraryPage() {
     g.reading.sort((a, b) => (b.group_books ? 1 : 0) - (a.group_books ? 1 : 0));
     return g;
   }, [books]);
+
+  // ═══ 모임 스크랩 피드 (현재 읽는 중 책 중 group_books가 있는 첫 책) ═══
+  const groupBookIdForFeed = useMemo(() => {
+    const withGroup = grouped.reading.find((b) => b.group_books?.id);
+    return withGroup?.group_books?.id || null;
+  }, [grouped.reading]);
+
+  useEffect(() => {
+    if (!user || !groupBookIdForFeed) {
+      setGroupScraps([]);
+      return;
+    }
+    const supabase = createClient();
+    getGroupScraps(supabase, groupBookIdForFeed)
+      .then((rows) => setGroupScraps(rows.slice(0, 6)))
+      .catch(() => setGroupScraps([]));
+  }, [user, groupBookIdForFeed]);
 
   const sortedDone = useMemo(() => {
     const list = [...grouped.done];
@@ -240,11 +348,66 @@ export default function LibraryPage() {
     { id: "scrap", label: "스크랩", icon: <PenLine size={11} strokeWidth={2.5} /> },
   ];
 
+  // ═══ MascotHero 컨텍스트 ═══
+  const currentBook = useMemo(() =>
+    [...grouped.reading].sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())[0] || null,
+    [grouped.reading]
+  );
+
+  const streak = useMemo(() => {
+    const set = new Set(streakDatesArr);
+    let s = 0;
+    const d = new Date();
+    while (set.has(d.toISOString().slice(0, 10))) {
+      s++;
+      d.setDate(d.getDate() - 1);
+    }
+    return s;
+  }, [streakDatesArr]);
+
+  const readingEvents = useMemo<CalEvent[]>(() => {
+    const todayIso = new Date().toISOString().slice(0, 10);
+    const out: CalEvent[] = [];
+    for (const b of books) {
+      // 위시 책 시작일
+      if (b.plan_to_start_at && b.plan_to_start_at >= todayIso) {
+        out.push({
+          date: b.plan_to_start_at,
+          type: "wish",
+          title: `《${b.title}》 읽기 시작일`,
+          meta: b.ownership_type === "borrowed" ? "도서관 대여 예정" : undefined,
+          targetId: b.id,
+        });
+      }
+      // 도서관 반납일 (완독 전 책)
+      if (b.due_date && b.due_date >= todayIso && b.reading_status !== "finished") {
+        out.push({
+          date: b.due_date,
+          type: "return",
+          title: `도서관 반납 · 《${b.title}》`,
+          meta: b.borrowed_from || undefined,
+          targetId: b.id,
+        });
+      }
+      // 모임 마감일 (모임 진행 중)
+      if (b.group_books?.end_date && b.group_books.end_date >= todayIso) {
+        const gname = b.group_books.reading_groups?.name || "북토크";
+        out.push({
+          date: b.group_books.end_date,
+          type: "meeting",
+          title: `${gname} · 《${b.title}》`,
+          meta: `${b.group_books.round_number}차 모임 마감`,
+          targetId: b.id,
+        });
+      }
+    }
+    return out;
+  }, [books]);
+
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", paddingBottom: 100, transition: "background 0.4s" }}>
 
-      {/* ═══ 공통 헤더 (Hero + 프로필 + 체온) ═══ */}
-      <AppHeader streakDates={streakDatesArr} counts={counts} />
+      {/* 헤더 제거 — 방긋이 히어로가 상단을 담당 */}
 
       {/* ═══ ERROR STATE ═══ */}
       {loadError && (
@@ -275,41 +438,215 @@ export default function LibraryPage() {
         </div>
       )}
 
-      {/* ═══ TABS ═══ */}
-      {!loadError && (<div style={{ display: "flex", gap: 6, padding: "12px 20px 8px", overflowX: "auto" }} className="scrollbar-hide">
-        {TABS.map((t) => {
-          const on = tab === t.id;
-          return (
-            <button key={t.id} onClick={() => setTab(t.id)}
-              style={{
-                display: "flex", alignItems: "center", gap: 5,
-                padding: "6px 14px", borderRadius: 100,
-                fontSize: 12, fontWeight: 700, letterSpacing: "0.2px",
-                whiteSpace: "nowrap", cursor: "pointer",
-                border: "0.5px solid transparent",
-                background: on ? "var(--ac)" : "transparent",
-                color: on ? "var(--acc)" : "var(--tm)",
-                borderColor: on ? "var(--ac)" : "var(--bd2)",
-                transition: "all 0.2s cubic-bezier(0.22,1,0.36,1)",
-                fontFamily: "'Pretendard', sans-serif",
-                userSelect: "none",
-              }}>
-              {t.icon}
-              {t.label}
-              {t.count != null && (
-                <span style={{
-                  fontSize: 10, fontWeight: 800, borderRadius: 100, padding: "1px 6px", minWidth: 18, textAlign: "center",
-                  background: on ? "rgba(0,0,0,0.15)" : "var(--sf2)",
-                  color: on ? "var(--acc)" : "var(--tm)",
-                  transition: "all 0.2s",
-                }}>{t.count}</span>
-              )}
-            </button>
-          );
-        })}
-      </div>)}
+      {/* ═══ 홈 상단 — 레이아웃 테마별 조건부 렌더 ═══ */}
+      {!loadError && (
+        <div style={{ padding: "0 20px" }}>
+          <GreetingBar />
 
-      {/* ═══ PANELS ═══ */}
+          {homeLayout === "hero" ? (
+            <>
+              {/* 테마 A: 이어 읽기 HERO */}
+              {currentBook ? (
+                <ContinueHeroCard book={currentBook} lastScrap={recentScraps[0] || null} />
+              ) : (
+                <ContinueHeroEmpty onAdd={() => router.push("/setup")} />
+              )}
+
+              {/* 세그먼트 탭: 캘린더 ↔ 커뮤니티 */}
+              <div
+                role="tablist"
+                aria-label="캘린더와 커뮤니티 전환"
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: 4,
+                  background: "var(--sf2)",
+                  padding: 4,
+                  borderRadius: 14,
+                  marginBottom: 14,
+                  transition: "background var(--duration-slow) var(--easing-default)",
+                }}
+              >
+                {(["calendar", "community"] as const).map((seg) => {
+                  const on = heroSeg === seg;
+                  const Icon = seg === "calendar" ? CalendarIcon : Users;
+                  const label = seg === "calendar" ? "캘린더" : "커뮤니티";
+                  return (
+                    <button
+                      key={seg}
+                      type="button"
+                      role="tab"
+                      aria-selected={on}
+                      onClick={() => setHeroSeg(seg)}
+                      style={{
+                        padding: "10px 8px",
+                        borderRadius: 10,
+                        fontSize: 12,
+                        fontWeight: on ? 700 : 600,
+                        color: on ? "var(--tp)" : "var(--tm)",
+                        textAlign: "center",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 5,
+                        transition: "all var(--duration-fast) var(--easing-default)",
+                        border: "none",
+                        background: on ? "var(--sf)" : "transparent",
+                        fontFamily: "inherit",
+                        minHeight: 40,
+                        letterSpacing: "-0.01em",
+                        boxShadow: on
+                          ? "0 1px 3px color-mix(in srgb, var(--tp) 8%, transparent)"
+                          : "none",
+                      }}
+                    >
+                      <Icon
+                        size={14}
+                        strokeWidth={2}
+                        color={on ? "var(--ac)" : "var(--tm)"}
+                      />
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {heroSeg === "calendar" ? (
+                <HomeCalendarWidget
+                  readDates={streakDatesArr}
+                  events={readingEvents}
+                  streak={streak}
+                  onCardTap={() => setCalendarOpen(true)}
+                  onEventTap={(e) => {
+                    if (e.targetId) router.push(`/book/${e.targetId}`);
+                  }}
+                />
+              ) : (
+                <FriendsFeed
+                  myScraps={recentScraps}
+                  groupScraps={groupScraps}
+                  books={books}
+                  currentUserNickname={user?.nickname}
+                  currentUserEmoji={user?.emoji}
+                  currentUserId={user?.id}
+                  limit={4}
+                  onMoreTap={() => router.push("/scrap")}
+                />
+              )}
+            </>
+          ) : (
+            <>
+              {/* 테마 B: 캘린더 First */}
+              <HomeCalendarWidget
+                readDates={streakDatesArr}
+                events={readingEvents}
+                streak={streak}
+                onCardTap={() => setCalendarOpen(true)}
+                onEventTap={(e) => {
+                  if (e.targetId) router.push(`/book/${e.targetId}`);
+                }}
+              />
+              {currentBook ? (
+                <ContinueCompactCard book={currentBook} />
+              ) : (
+                <ContinueHeroEmpty onAdd={() => router.push("/setup")} compact />
+              )}
+              <FriendsFeed
+                myScraps={recentScraps}
+                groupScraps={groupScraps}
+                books={books}
+                currentUserNickname={user?.nickname}
+                currentUserEmoji={user?.emoji}
+                currentUserId={user?.id}
+                limit={3}
+                onMoreTap={() => router.push("/scrap")}
+              />
+            </>
+          )}
+        </div>
+      )}
+
+      {/* ═══ 캘린더 바텀시트 ═══ */}
+      <CalendarSheet
+        open={calendarOpen}
+        onClose={() => setCalendarOpen(false)}
+        readDates={streakDatesArr}
+        events={readingEvents}
+        streak={streak}
+        onEventTap={(e) => {
+          if (e.targetId) router.push(`/book/${e.targetId}`);
+        }}
+      />
+
+      {/* ═══ TABS · 애니메이션 언더라인 ═══ */}
+      {!loadError && (
+        <div style={{
+          display: "flex",
+          padding: "0 20px",
+          overflowX: "auto",
+          borderBottom: "0.5px solid var(--bd)",
+          gap: 18,
+        }} className="scrollbar-hide">
+          {TABS.map((t) => {
+            const on = tab === t.id;
+            return (
+              <button key={t.id} onClick={() => setTab(t.id)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 5,
+                  padding: "12px 4px",
+                  fontSize: 14,
+                  fontWeight: on ? 700 : 500,
+                  letterSpacing: "-0.01em",
+                  whiteSpace: "nowrap",
+                  cursor: "pointer",
+                  border: "none",
+                  background: "transparent",
+                  color: on ? "var(--tp)" : "var(--tm)",
+                  transition: "color 0.25s",
+                  fontFamily: "'Pretendard', sans-serif",
+                  userSelect: "none",
+                  position: "relative",
+                  flexShrink: 0,
+                }}>
+                {t.icon}
+                {t.label}
+                {t.count != null && (
+                  <span style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    borderRadius: 100,
+                    padding: "2px 7px",
+                    minWidth: 18,
+                    textAlign: "center",
+                    background: on ? "color-mix(in srgb, var(--ac) 15%, transparent)" : "var(--sf2)",
+                    color: on ? "var(--ac)" : "var(--tm)",
+                    transition: "all 0.2s",
+                  }}>{t.count}</span>
+                )}
+                {/* 언더라인 인디케이터 */}
+                <span
+                  style={{
+                    position: "absolute",
+                    bottom: -0.5,
+                    left: 0,
+                    right: 0,
+                    height: 2.5,
+                    background: on ? "linear-gradient(90deg, var(--ac), var(--ac2))" : "transparent",
+                    borderRadius: 2,
+                    boxShadow: on ? "0 2px 8px color-mix(in srgb, var(--ac) 40%, transparent)" : "none",
+                    transition: "all 0.3s cubic-bezier(0.4,0,0.2,1)",
+                  }}
+                />
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+
       {!loadError && tab === "reading" && (
         <div style={{ animation: "pageIn 0.22s cubic-bezier(0.22,1,0.36,1)" }}>
           {grouped.reading.length === 0 ? (
@@ -370,15 +707,69 @@ export default function LibraryPage() {
 
       {!loadError && tab === "done" && (
         <div style={{ animation: "pageIn 0.22s cubic-bezier(0.22,1,0.36,1)" }}>
-          <div style={{ padding: "8px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontSize: 10, fontWeight: 700, color: "var(--tm)", letterSpacing: "1.2px", textTransform: "uppercase", transition: "color 0.4s" }}>완독 {counts.done}권</span>
-            <span
-              onClick={() => setFinishedSort((s) => s === "recent" ? "rating" : s === "rating" ? "title" : "recent")}
-              style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 700, color: "var(--ac)", cursor: "pointer", transition: "color 0.4s", userSelect: "none" }}
-            >
-              {finishedSort === "recent" ? "최신순" : finishedSort === "rating" ? "평점순" : "제목순"}
-              <ArrowUpDown size={12} strokeWidth={2.5} />
-            </span>
+          {/* 인스타 프로필 헤더 */}
+          {counts.done > 0 && (() => {
+            const favCount = grouped.done.filter((b) => b.is_favorite).length;
+            const rated = grouped.done.filter((b) => b.rating);
+            const avgRating = rated.length > 0 ? (rated.reduce((s, b) => s + (b.rating || 0), 0) / rated.length).toFixed(1) : null;
+            return (
+              <div style={{ padding: "4px 20px 12px", display: "flex", gap: 14, alignItems: "center", borderBottom: "0.5px solid var(--bd)" }}>
+                <div style={{ width: 54, height: 54, borderRadius: "50%", overflow: "hidden", background: "linear-gradient(135deg, var(--ac3, #A4D4C0), var(--ac))", padding: 2, flexShrink: 0, boxShadow: "0 0 0 2px var(--ac2, #7ABBA4)" }}>
+                  <img src="/mascot-happy.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain", background: "var(--bg)", borderRadius: "50%" }} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", gap: 18, marginBottom: 4 }}>
+                    <div style={{ textAlign: "center" }}>
+                      <div style={{ fontSize: 16, fontWeight: 800, color: "var(--tp)", letterSpacing: "-0.3px", lineHeight: 1 }}>{counts.done}</div>
+                      <div style={{ fontSize: 9.5, color: "var(--tm)", fontWeight: 600, marginTop: 3 }}>완독</div>
+                    </div>
+                    {avgRating && (
+                      <div style={{ textAlign: "center" }}>
+                        <div style={{ fontSize: 16, fontWeight: 800, color: "var(--tp)", letterSpacing: "-0.3px", lineHeight: 1 }}>★ {avgRating}</div>
+                        <div style={{ fontSize: 9.5, color: "var(--tm)", fontWeight: 600, marginTop: 3 }}>평균</div>
+                      </div>
+                    )}
+                    <div style={{ textAlign: "center" }}>
+                      <div style={{ fontSize: 16, fontWeight: 800, color: "var(--tp)", letterSpacing: "-0.3px", lineHeight: 1 }}>{favCount}</div>
+                      <div style={{ fontSize: 9.5, color: "var(--tm)", fontWeight: 600, marginTop: 3 }}>인생책</div>
+                    </div>
+                  </div>
+                  <div style={{ fontFamily: "'Gaegu', cursive", fontSize: 13, color: "var(--ts)", lineHeight: 1.4, letterSpacing: "0.02em" }}>
+                    {new Date().getFullYear()}년 <span style={{ color: "var(--ac)", fontWeight: 700, fontStyle: "normal" }}>{counts.done}권째</span>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+          {/* 정렬 */}
+          <div style={{ padding: "10px 20px", display: "flex", gap: 6, overflowX: "auto" as const }}>
+            {([
+              { id: "recent", label: "최근순" },
+              { id: "rating", label: "별점순" },
+              { id: "title", label: "제목순" },
+            ] as const).map((s) => {
+              const on = finishedSort === s.id;
+              return (
+                <button
+                  key={s.id}
+                  onClick={() => setFinishedSort(s.id)}
+                  style={{
+                    padding: "5px 12px",
+                    borderRadius: 100,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    whiteSpace: "nowrap",
+                    border: on ? "0.5px solid var(--ac)" : "0.5px solid var(--bd2)",
+                    background: on ? "var(--ac)" : "transparent",
+                    color: on ? "var(--acc)" : "var(--tm)",
+                    cursor: "pointer",
+                    flexShrink: 0,
+                  }}
+                >
+                  {s.label}
+                </button>
+              );
+            })}
           </div>
           {counts.done === 0 ? (
             <EmptyState
@@ -407,7 +798,7 @@ export default function LibraryPage() {
       )}
 
       {!loadError && tab === "wish" && (
-        <div style={{ animation: "pageIn 0.22s cubic-bezier(0.22,1,0.36,1)", padding: "4px 0" }}>
+        <div style={{ animation: "pageIn 0.22s cubic-bezier(0.22,1,0.36,1)" }}>
           {grouped.want.length === 0 ? (
             <EmptyState
               icon={Bookmark}
@@ -417,7 +808,227 @@ export default function LibraryPage() {
               onCta={() => router.push("/setup")}
             />
           ) : (
-            grouped.want.map((b) => <WishItem key={b.id} book={b} />)
+            <>
+              {/* 통계 스트립 (클레이 민트 칩) */}
+              {(() => {
+                const today = new Date().toISOString().slice(0, 10);
+                const weekFromNow = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
+                const soon = grouped.want.filter((b) => b.plan_to_start_at && b.plan_to_start_at >= today && b.plan_to_start_at <= weekFromNow).length;
+                const genres = new Set(grouped.want.map((b) => b.genre).filter(Boolean)).size;
+                const MINT_TOP = "#62C9A6";
+                const MINT_BOT = "#2F9E74";
+                const MINT_DEEP = "#1F7B5A";
+                type Stat = { icon: typeof Bookmark; value: number; label: string; accent: boolean };
+                const stats: Stat[] = [
+                  { icon: Bookmark, value: counts.want, label: "위시", accent: counts.want > 0 },
+                  { icon: Clock, value: soon, label: "곧 시작", accent: soon > 0 },
+                  { icon: Tag, value: genres, label: "장르", accent: false },
+                ];
+                return (
+                  <div
+                    style={{
+                      padding: "6px 20px 10px",
+                      display: "flex",
+                      gap: 6,
+                      alignItems: "stretch",
+                    }}
+                  >
+                    {stats.map((s) => {
+                      const Icon = s.icon;
+                      return (
+                        <div
+                          key={s.label}
+                          style={{
+                            flex: 1,
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 7,
+                            padding: "7px 10px 7px 8px",
+                            borderRadius: 12,
+                            background: s.accent
+                              ? "linear-gradient(180deg, color-mix(in srgb, var(--sf) 86%, " + MINT_TOP + " 14%) 0%, color-mix(in srgb, var(--sf) 94%, " + MINT_BOT + " 6%) 100%)"
+                              : "linear-gradient(180deg, color-mix(in srgb, var(--sf) 94%, #ffffff 6%) 0%, var(--sf) 100%)",
+                            border: s.accent
+                              ? "0.5px solid color-mix(in srgb, var(--bd) 40%, " + MINT_TOP + " 60%)"
+                              : "0.5px solid var(--bd)",
+                            boxShadow: s.accent
+                              ? "inset 0 0.5px 0 rgba(255,255,255,0.65), 0 1px 3px color-mix(in srgb, " + MINT_TOP + " 18%, rgba(50,40,25,0.04))"
+                              : "inset 0 0.5px 0 rgba(255,255,255,0.5), 0 1px 2px rgba(50,40,25,0.04)",
+                            minWidth: 0,
+                          }}
+                        >
+                          {/* 클레이 스퀘어클 아이콘 타일 */}
+                          <span
+                            aria-hidden
+                            style={{
+                              width: 26,
+                              height: 26,
+                              borderRadius: 8,
+                              background: s.accent
+                                ? `linear-gradient(135deg, ${MINT_TOP} 0%, ${MINT_BOT} 100%)`
+                                : "linear-gradient(135deg, color-mix(in srgb, var(--tm) 16%, var(--bg)) 0%, color-mix(in srgb, var(--tm) 26%, var(--bg)) 100%)",
+                              boxShadow: s.accent
+                                ? "inset 0 0.8px 0 rgba(255,255,255,0.5), " +
+                                  `inset 0 -0.8px 0 color-mix(in srgb, ${MINT_DEEP} 45%, transparent), ` +
+                                  `0 2px 4px color-mix(in srgb, ${MINT_TOP} 28%, transparent)`
+                                : "inset 0 0.5px 0 rgba(255,255,255,0.35), inset 0 -0.5px 0 rgba(0,0,0,0.06)",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              flexShrink: 0,
+                            }}
+                          >
+                            <Icon
+                              size={13}
+                              strokeWidth={2.3}
+                              color="#ffffff"
+                              fill={s.accent ? "rgba(255,255,255,0.22)" : "transparent"}
+                              style={{
+                                filter: s.accent
+                                  ? `drop-shadow(0 0.5px 0.5px color-mix(in srgb, ${MINT_DEEP} 60%, transparent))`
+                                  : "drop-shadow(0 0.5px 0.5px rgba(0,0,0,0.1))",
+                              }}
+                            />
+                          </span>
+                          {/* 숫자 + 라벨 */}
+                          <span
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "flex-start",
+                              gap: 0,
+                              minWidth: 0,
+                              lineHeight: 1,
+                            }}
+                          >
+                            <span
+                              style={{
+                                fontFamily: "var(--font-playful)",
+                                fontSize: 17,
+                                fontWeight: 700,
+                                color: s.accent ? MINT_DEEP : "var(--tp)",
+                                letterSpacing: "-0.02em",
+                                fontVariantNumeric: "tabular-nums",
+                                lineHeight: 1,
+                              }}
+                            >
+                              {s.value}
+                            </span>
+                            <span
+                              style={{
+                                fontSize: 9.5,
+                                color: "var(--tm)",
+                                fontWeight: 600,
+                                marginTop: 2,
+                                letterSpacing: "0.02em",
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                              }}
+                            >
+                              {s.label}
+                            </span>
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+
+              {/* 그리드 */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 2, marginTop: 2 }}>
+                {[...grouped.want]
+                  .sort((a, b) => {
+                    // 시작 예정 있는 것 먼저, 날짜 가까운 순
+                    if (a.plan_to_start_at && b.plan_to_start_at) return a.plan_to_start_at.localeCompare(b.plan_to_start_at);
+                    if (a.plan_to_start_at) return -1;
+                    if (b.plan_to_start_at) return 1;
+                    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+                  })
+                  .map((b) => {
+                    const coverUrl = upgradeCoverUrl(b.cover_url);
+                    const [bg, fg] = coverPalette(b.title);
+                    const todayIso = new Date().toISOString().slice(0, 10);
+                    let planBadge: string | null = null;
+                    if (b.plan_to_start_at) {
+                      const daysUntil = Math.ceil((new Date(b.plan_to_start_at).getTime() - new Date(todayIso).getTime()) / (1000 * 60 * 60 * 24));
+                      if (daysUntil <= 0) planBadge = "📖 지금";
+                      else if (daysUntil === 1) planBadge = "📅 D-1";
+                      else if (daysUntil <= 7) planBadge = `📅 D-${daysUntil}`;
+                      else {
+                        const d = new Date(b.plan_to_start_at);
+                        planBadge = `📅 ${d.getMonth() + 1}/${d.getDate()}`;
+                      }
+                    }
+                    return (
+                      <div
+                        key={b.id}
+                        onClick={() => router.push(`/book/${b.id}`)}
+                        style={{ aspectRatio: "2/3", position: "relative", overflow: "hidden", cursor: "pointer", background: "var(--sf2)" }}
+                      >
+                        {coverUrl ? (
+                          <img src={coverUrl} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+                        ) : (
+                          <div style={{ position: "absolute", inset: 0, background: `linear-gradient(150deg, ${bg}, ${fg})` }} />
+                        )}
+                        {planBadge && (
+                          <span
+                            style={{
+                              position: "absolute",
+                              top: 6,
+                              right: 6,
+                              fontSize: 8,
+                              fontWeight: 800,
+                              padding: "2px 6px",
+                              borderRadius: 100,
+                              background: "rgba(183,149,86,0.95)",
+                              color: "#fff",
+                              letterSpacing: "0.2px",
+                              zIndex: 2,
+                            }}
+                          >
+                            {planBadge}
+                          </span>
+                        )}
+                        <div
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+                            padding: "9px 8px",
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "flex-end",
+                            background: "linear-gradient(to top, rgba(0,0,0,0.75) 20%, transparent 55%)",
+                          }}
+                        >
+                          <div style={{ fontSize: 11, fontWeight: 800, color: "#ede8e0", lineHeight: 1.3, textShadow: "0 1px 6px rgba(0,0,0,0.9)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{b.title}</div>
+                          {b.author && <div style={{ fontSize: 9, color: "rgba(220,210,200,0.55)", marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{b.author}</div>}
+                        </div>
+                      </div>
+                    );
+                  })}
+                <div
+                  onClick={() => router.push("/setup")}
+                  style={{
+                    aspectRatio: "2/3",
+                    background: "transparent",
+                    border: "1px dashed color-mix(in srgb, var(--ac) 25%, transparent)",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    gap: 7,
+                  }}
+                >
+                  <div style={{ width: 32, height: 32, borderRadius: "50%", border: "1.5px solid color-mix(in srgb, var(--ac) 35%, transparent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Plus size={14} stroke="var(--ac)" strokeWidth={2.5} style={{ opacity: 0.5 }} />
+                  </div>
+                  <span style={{ fontSize: 9, fontWeight: 800, color: "var(--tm)", letterSpacing: "0.8px", textTransform: "uppercase" }}>추가</span>
+                </div>
+              </div>
+            </>
           )}
         </div>
       )}
