@@ -83,13 +83,8 @@ export function LibraryViewA({
                 fontWeight: 700,
               }}
             >
-              {featured.current_page ? `p.${featured.current_page}` : "시작 전"} ·{" "}
-              {featured.updated_at
-                ? new Date(featured.updated_at).toLocaleDateString("ko", {
-                    month: "short",
-                    day: "numeric",
-                  })
-                : ""}
+              {featured.current_page ? `p.${featured.current_page}` : "시작 전"}
+              {featured.updated_at && ` · ${relativeKo(featured.updated_at)}`}
             </div>
             <div
               style={{
@@ -286,6 +281,23 @@ function formatDate(iso: string | null): string {
   if (!iso) return "-";
   return new Date(iso).toLocaleDateString("ko", {
     month: "long",
+    day: "numeric",
+  });
+}
+
+/** "오늘" · "어제" · "3일 전" · 7일 이상은 짧은 날짜로 */
+function relativeKo(iso: string): string {
+  const t = new Date(iso).getTime();
+  if (Number.isNaN(t)) return "";
+  const now = Date.now();
+  const ms = now - t;
+  const day = 1000 * 60 * 60 * 24;
+  const diffDays = Math.floor(ms / day);
+  if (diffDays <= 0) return "오늘";
+  if (diffDays === 1) return "어제";
+  if (diffDays < 7) return `${diffDays}일 전`;
+  return new Date(iso).toLocaleDateString("ko", {
+    month: "short",
     day: "numeric",
   });
 }

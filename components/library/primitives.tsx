@@ -5,26 +5,71 @@ import type { Book } from "@/lib/types";
 
 /* ═══════════════════════════════════════════════════════════════
    Library 원자 프리미티브 — mockup-library-v1.html 기반
-   책등 · 표지 · 쉘프 나무 바. 모든 색은 테마 토큰 기반.
+   책등 · 표지 · 쉘프 나무 바.
+   책 컬러는 목업 고정 팔레트(sage/cream/oak/ink/berry/peach/rose/
+   forest/dusk/clay) — 모든 테마에서 동일한 "책꽂이"의 느낌.
    ═══════════════════════════════════════════════════════════════ */
 
-/** 책등/표지 8단계 팔레트. 제목 해시로 결정적 선택. */
+/** 책등 10단계 팔레트 (mockup-library-v1.html 의 .spine.v-* 와 동일). */
 export const SPINE_VARIANTS: { bg: string; fg: string }[] = [
-  { bg: "var(--ac)", fg: "var(--acc)" },
-  { bg: "var(--ac2)", fg: "var(--acc)" },
-  { bg: "var(--theme-deep)", fg: "var(--sf)" },
-  { bg: "color-mix(in srgb, var(--tp) 82%, var(--ac) 18%)", fg: "var(--sf)" },
-  { bg: "var(--milestone)", fg: "var(--tp)" },
-  { bg: "color-mix(in srgb, var(--warm) 70%, var(--tp) 30%)", fg: "var(--sf)" },
-  { bg: "var(--sf3)", fg: "var(--tp)" },
-  { bg: "var(--ac3)", fg: "var(--ac2)" },
+  { bg: "#84A98C", fg: "rgba(255,255,255,0.92)" },  // sage
+  { bg: "#EFE3C8", fg: "#3A3320" },                 // cream
+  { bg: "#A07B55", fg: "rgba(255,255,255,0.92)" },  // oak
+  { bg: "#1E2A33", fg: "#EDE5D4" },                 // ink
+  { bg: "#8B3A4E", fg: "#F7EAE9" },                 // berry
+  { bg: "#D98D62", fg: "#2B1A10" },                 // peach
+  { bg: "#C97C84", fg: "#4A2A2E" },                 // rose
+  { bg: "#2E4D3F", fg: "#E8EDE8" },                 // forest
+  { bg: "#6B5B93", fg: "#F0ECF7" },                 // dusk
+  { bg: "#B7664F", fg: "#FFF2E8" },                 // clay
 ];
+
+/** 표지 6단계 그라데이션 팔레트 (mockup-library-v1.html 의 .cover.v-* 와 동일). */
+export const COVER_GRADIENTS: { from: string; to: string; fg: string }[] = [
+  { from: "#A4C3A8", to: "#5B8968", fg: "#F5F8F0" }, // sage
+  { from: "#3C4A54", to: "#1E2A33", fg: "#EDE5D4" }, // ink
+  { from: "#B25A70", to: "#7A2D42", fg: "#F7EAE9" }, // berry
+  { from: "#E6A8A8", to: "#C97C84", fg: "#4A2A2E" }, // rose
+  { from: "#C79868", to: "#8B6640", fg: "#FBF2E0" }, // oak
+  { from: "#8679B2", to: "#4C4074", fg: "#F0ECF7" }, // dusk
+];
+
+/** 큐레이터 셀 전용 6단계 그라데이션 (mockup-library-v1.html 의 .curator-cell .cv.v-*).
+ *  표지보다 살짝 진한 끝 색으로 "쉘프 카드" 느낌을 냅니다. */
+export const CURATOR_GRADIENTS: { from: string; to: string; fg: string }[] = [
+  { from: "#A4C3A8", to: "#4F7A62", fg: "#F5F8F0" }, // sage
+  { from: "#4C5D68", to: "#1E2A33", fg: "#EDE5D4" }, // ink
+  { from: "#B25A70", to: "#6B2437", fg: "#F7EAE9" }, // berry
+  { from: "#C79868", to: "#7C5A36", fg: "#FBF2E0" }, // oak
+  { from: "#E6A8A8", to: "#A45F69", fg: "#4A2A2E" }, // rose
+  { from: "#8679B2", to: "#3F356A", fg: "#F0ECF7" }, // dusk
+];
+
+function hashSeed(seed: string): number {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+  return h;
+}
 
 export function pickVariant(seed: string, offset = 0): { bg: string; fg: string } {
   if (!seed) return SPINE_VARIANTS[0];
-  let h = 0;
-  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
-  return SPINE_VARIANTS[(h + offset) % SPINE_VARIANTS.length];
+  return SPINE_VARIANTS[(hashSeed(seed) + offset) % SPINE_VARIANTS.length];
+}
+
+export function pickCoverGradient(
+  seed: string,
+  offset = 0
+): { from: string; to: string; fg: string } {
+  if (!seed) return COVER_GRADIENTS[0];
+  return COVER_GRADIENTS[(hashSeed(seed) + offset) % COVER_GRADIENTS.length];
+}
+
+export function pickCuratorGradient(
+  seed: string,
+  offset = 0
+): { from: string; to: string; fg: string } {
+  if (!seed) return CURATOR_GRADIENTS[0];
+  return CURATOR_GRADIENTS[(hashSeed(seed) + offset) % CURATOR_GRADIENTS.length];
 }
 
 /** 책등 높이 3단계 — 서재 리듬 연출 */
@@ -126,7 +171,7 @@ export function BookCover({
   height?: number;
   variantOffset?: number;
 }) {
-  const variant = pickVariant(title, variantOffset);
+  const gradient = pickCoverGradient(title, variantOffset);
   const w = width ?? (featured ? 90 : 82);
   const h = height ?? (featured ? 128 : 118);
 
@@ -139,9 +184,9 @@ export function BookCover({
     borderRadius: "2px 5px 5px 2px",
     position: "relative",
     cursor: onClick ? "pointer" : "default",
-    color: variant.fg,
+    color: gradient.fg,
     boxShadow:
-      "0 2px 6px rgba(0,0,0,0.22), inset 2px 0 0 rgba(0,0,0,0.22), inset -1px 0 0 rgba(255,255,255,0.15)",
+      "0 2px 6px rgba(30,20,10,0.22), inset 2px 0 0 rgba(0,0,0,0.22), inset -1px 0 0 rgba(255,255,255,0.15)",
     padding: hasImage ? 0 : "10px 9px",
     display: "flex",
     flexDirection: "column",
@@ -204,8 +249,8 @@ export function BookCover({
       style={{
         ...baseStyle,
         background: hasImage
-          ? variant.bg
-          : `linear-gradient(135deg, ${variant.bg}, color-mix(in srgb, ${variant.bg} 70%, var(--tp)))`,
+          ? gradient.from
+          : `linear-gradient(135deg, ${gradient.from} 0%, ${gradient.to} 100%)`,
       }}
       onMouseEnter={
         onClick

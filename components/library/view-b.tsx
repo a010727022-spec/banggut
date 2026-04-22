@@ -6,8 +6,8 @@ import { upgradeCoverUrl } from "@/lib/reading-utils";
 import {
   BookSpine,
   SectionHead,
+  pickCuratorGradient,
   pickHeight,
-  pickVariant,
 } from "./primitives";
 
 /* ═══════════════════════════════════════════════
@@ -189,10 +189,10 @@ function CuratorCell({
   index: number;
   onClick?: () => void;
 }) {
-  // 대표 책 표지: 첫 책에 cover_url이 있으면 그것으로, 없으면 variant gradient
+  // 대표 책 표지: 첫 책에 cover_url이 있으면 그것으로, 없으면 큐레이터 그라데이션
   const cover = shelf.books[0];
   const coverUrl = cover?.cover_url ? upgradeCoverUrl(cover.cover_url) : null;
-  const variant = pickVariant(shelf.name, index);
+  const gradient = pickCuratorGradient(shelf.name, index);
   const hasImage = !!coverUrl;
 
   const shelfNo = `Shelf ${String(index + 1).padStart(2, "0")}`;
@@ -230,12 +230,12 @@ function CuratorCell({
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          color: variant.fg,
+          color: gradient.fg,
           boxShadow:
             "0 2px 4px rgba(30,20,10,0.18), inset 3px 0 0 rgba(0,0,0,0.2), inset -1px 0 0 rgba(255,255,255,0.12)",
           background: hasImage
-            ? variant.bg
-            : `linear-gradient(135deg, ${variant.bg}, color-mix(in srgb, ${variant.bg} 55%, var(--tp)))`,
+            ? gradient.from
+            : `linear-gradient(135deg, ${gradient.from} 0%, ${gradient.to} 100%)`,
           overflow: "hidden",
         }}
       >
