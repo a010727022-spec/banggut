@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>방긋 · 책 상세 진행률 UI 정리 v1</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" />
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#F7F3ED; --sf:#FFFDF9; --sf2:#F1EBE0; --sf3:#E8E1D4;
+    --tp:#2B2420; --ts:#6B5E52; --tm:#8C7D6F;
+    --ac:#5FA48E; --ac2:#4E8A77; --acc:#FFFDF9;
+    --bd:rgba(43,36,32,0.08); --bd2:rgba(43,36,32,0.16);
+    --honey:#D4A056; --honey2:#B5803E;
+    --shadow-card:0 1px 2px rgba(40,25,10,0.08);
+    --danger:#C26B4B;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--tp);font-family:"Pretendard Variable",Pretendard,system-ui,sans-serif;letter-spacing:-0.01em;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1320px;margin:0 auto;padding:36px 24px 80px}
+  .hdr{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:28px;gap:16px;flex-wrap:wrap}
+  .hdr h1{margin:0;font-size:22px;font-weight:800;letter-spacing:-0.02em}
+  .hdr p{margin:0;font-size:13px;color:var(--tm);line-height:1.5}
+  .phones{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+  @media (max-width:1100px){.phones{grid-template-columns:repeat(1,1fr);max-width:420px;margin:0 auto}}
+  .phone{background:var(--bg);border:1px solid var(--bd);border-radius:34px;padding:14px 12px;box-shadow:0 20px 40px -20px rgba(40,25,10,0.18),0 4px 8px -4px rgba(40,25,10,0.1);position:relative;overflow:hidden}
+  .phone-label{position:absolute;top:14px;left:0;right:0;text-align:center;font-size:10px;font-weight:800;color:var(--tm);letter-spacing:2px;text-transform:uppercase;pointer-events:none;z-index:0}
+  .phone-tag{position:absolute;top:46px;left:14px;padding:4px 10px;border-radius:999px;font-size:9px;font-weight:800;letter-spacing:0.5px;z-index:2;text-transform:uppercase}
+  .tag-a{background:var(--ac);color:var(--acc)}
+  .tag-b{background:var(--honey);color:#fff}
+  .tag-c{background:#C26B4B;color:#fff}
+  .screen{margin-top:60px;border-radius:24px;background:var(--bg);padding:0;overflow:hidden;position:relative;z-index:1}
+
+  /* Book detail micro-layout shared */
+  .hero{height:140px;background:linear-gradient(135deg,#2a3d3a,#42605a);position:relative;overflow:hidden;margin-bottom:12px;border-radius:0 0 16px 16px}
+  .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.55))}
+  .hero-cover{position:absolute;left:14px;bottom:-20px;width:72px;height:100px;border-radius:6px;background:#1a1a1a url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="72" height="100"><rect width="72" height="100" fill="%23222"/><circle cx="36" cy="30" r="14" fill="%23444"/><rect x="10" y="58" width="52" height="4" fill="%23555"/><rect x="10" y="66" width="42" height="4" fill="%23555"/></svg>') center/cover;box-shadow:0 6px 14px -4px rgba(0,0,0,0.5);z-index:3}
+  .hero-meta{position:absolute;left:96px;right:16px;bottom:14px;z-index:3;color:#fff}
+  .badge-reading{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:100px;background:rgba(95,164,142,0.85);font-size:8px;font-weight:800;margin-bottom:5px;backdrop-filter:blur(8px)}
+  .badge-reading::before{content:"●";font-size:8px}
+  .hero-title{font-size:14px;font-weight:800;letter-spacing:-0.3px;line-height:1.25;text-shadow:0 2px 10px rgba(0,0,0,0.5);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .hero-author{font-size:9px;color:rgba(255,255,255,0.65);margin-top:3px}
+
+  .qa-row{display:flex;gap:6px;padding:14px 14px 8px}
+  .qa-btn{flex:1;padding:9px 0;border-radius:11px;font-size:10.5px;font-weight:700;border:0.5px solid var(--bd2);background:var(--sf);color:var(--ac2);display:flex;align-items:center;justify-content:center;gap:5px}
+  .qa-btn.primary{background:var(--ac);color:var(--acc);border-color:var(--ac)}
+  .qa-btn.muted{opacity:0.6;color:var(--tm)}
+  .qa-btn svg{width:12px;height:12px}
+
+  .prog-card{margin:4px 14px 12px;background:var(--sf);border-radius:14px;border:0.5px solid var(--bd);overflow:hidden}
+  .prog-head{display:flex;align-items:center;justify-content:space-between;padding:11px 12px 8px}
+  .prog-head-left{display:flex;align-items:center;gap:8px}
+  .prog-label{font-size:9px;font-weight:800;color:var(--tm);letter-spacing:1px;text-transform:uppercase}
+  .prog-pct{font-size:20px;font-weight:800;color:var(--ac);letter-spacing:-1px}
+  .fmt-toggle{display:inline-flex;background:var(--sf2);border-radius:100px;padding:2px;font-size:9px;gap:2px}
+  .fmt-toggle button{padding:3px 8px;border:none;border-radius:100px;background:transparent;font-weight:700;color:var(--tm);cursor:pointer;font-family:inherit}
+  .fmt-toggle button.on{background:var(--ac);color:var(--acc)}
+  .prog-bar{height:5px;background:var(--sf3);border-radius:3px;overflow:hidden;margin:0 12px}
+  .prog-bar > div{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));width:23%}
+  .prog-stats{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:0.5px solid var(--bd);margin-top:9px}
+  .prog-stats > div{padding:9px 0;text-align:center;border-right:0.5px solid var(--bd)}
+  .prog-stats > div:last-child{border-right:none}
+  .prog-stats b{font-size:13px;font-weight:800;color:var(--tp);letter-spacing:-0.5px}
+  .prog-stats b span{font-size:8px;font-weight:500;color:var(--tm);margin-left:1px}
+  .prog-stats p{margin:1px 0 0;font-size:8px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:0.5px}
+  .slider-row{padding:9px 12px;border-top:0.5px solid var(--bd)}
+  .slider-row h5{margin:0 0 7px;font-size:9px;font-weight:700;color:var(--tm)}
+  .slider-inline{display:flex;align-items:center;gap:9px}
+  .slider-inline input[type=range]{flex:1;-webkit-appearance:none;height:4px;background:var(--sf3);border-radius:2px;accent-color:var(--ac)}
+  .slider-inline .num{width:46px;background:var(--sf2);border:0.5px solid var(--bd2);border-radius:7px;padding:4px 6px;font-size:11px;font-weight:700;color:var(--tp);text-align:center}
+  .slider-inline .save{padding:5px 11px;background:var(--ac);color:var(--acc);border-radius:100px;font-size:10px;font-weight:800;border:none;cursor:pointer}
+
+  .focus-card{margin:0 14px 12px;padding:11px 12px;background:var(--sf);border-radius:14px;border:0.5px solid var(--bd);display:flex;align-items:center;gap:10px}
+  .focus-card .ico{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--honey),var(--honey2));display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;flex-shrink:0}
+  .focus-card .tt{font-size:11px;font-weight:800;color:var(--tp)}
+  .focus-card .sb{font-size:9px;color:var(--tm);margin-top:1px}
+  .focus-card .go{margin-left:auto;padding:5px 11px;background:var(--ac);color:var(--acc);border-radius:100px;font-size:9px;font-weight:800;border:none;display:flex;align-items:center;gap:3px}
+
+  .cta-stack{padding:0 14px 10px;display:flex;flex-direction:column;gap:8px}
+  .cta-main{padding:12px;border-radius:14px;background:#2B4C3F;color:#fff;font-size:13px;font-weight:800;text-align:center;border:none;letter-spacing:-0.3px}
+  .cta-hold{padding:12px;border-radius:14px;border:1.5px solid #2B4C3F;color:#2B4C3F;background:transparent;font-size:13px;font-weight:800;text-align:center;letter-spacing:-0.3px}
+
+  .detail-accordion{margin:0 14px 14px;background:var(--sf);border-radius:12px;border:0.5px solid var(--bd);overflow:hidden}
+  .detail-head{padding:10px 12px;display:flex;align-items:center;justify-content:space-between;font-size:10px;font-weight:700;color:var(--tm);cursor:pointer}
+  .detail-head .chev{transition:transform 0.2s}
+  .detail-body{padding:0 12px 10px;font-size:10px;color:var(--ts);line-height:1.5;display:none}
+  .detail-accordion.open .detail-body{display:block}
+  .detail-accordion.open .detail-head .chev{transform:rotate(90deg)}
+  .input-row{display:flex;gap:6px;margin-top:6px;align-items:center}
+  .input-row input{flex:1;padding:6px 8px;border:0.5px solid var(--bd2);border-radius:7px;background:var(--bg);font-size:11px;color:var(--tp);text-align:center;font-family:inherit}
+  .input-row .sep{color:var(--tm);font-size:11px}
+
+  .dup{outline:2px dashed var(--danger);outline-offset:-2px;position:relative}
+  .dup::before{content:attr(data-n);position:absolute;top:-8px;right:-8px;width:20px;height:20px;border-radius:50%;background:var(--danger);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:10;box-shadow:0 2px 4px rgba(40,25,10,0.25)}
+
+  .notes{margin-top:34px;background:var(--sf);border:1px solid var(--bd);border-radius:18px;padding:22px 24px}
+  .notes h2{margin:0 0 10px;font-size:14px;font-weight:800;color:var(--tp);letter-spacing:-0.2px}
+  .notes h3{margin:16px 0 6px;font-size:11px;font-weight:800;color:var(--ac2);letter-spacing:0.5px;text-transform:uppercase}
+  .notes p,.notes li{font-size:12.5px;color:var(--ts);line-height:1.6;margin:0 0 6px}
+  .notes ul{padding-left:18px;margin:4px 0 8px}
+  .notes code{background:var(--sf2);padding:1px 6px;border-radius:4px;font-size:11.5px;color:var(--ac2);font-family:ui-monospace,"SF Mono",Menlo,monospace}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px}
+  .legend span{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--ts)}
+  .legend span::before{content:"";width:12px;height:12px;border-radius:3px}
+  .legend .l-keep::before{background:var(--ac)}
+  .legend .l-drop::before{background:var(--danger)}
+  .legend .l-move::before{background:var(--honey)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hdr">
+    <div>
+      <h1>책 상세 · 진행률 UI 정리 v1</h1>
+      <p>같은 "오늘 읽은 페이지 기록"이 ①②③④ 네 군데 — 드림팀 합의에 따른 정리안 3종 비교.</p>
+    </div>
+    <div class="legend">
+      <span class="l-keep">유지</span>
+      <span class="l-drop">제거</span>
+      <span class="l-move">이동/축소</span>
+    </div>
+  </header>
+
+  <div class="phones">
+
+    <!-- ══════════════════════ PHONE A · 합의안 ══════════════════════ -->
+    <div class="phone">
+      <div class="phone-label">PHONE A</div>
+      <div class="phone-tag tag-a">권장 · 합의안</div>
+      <div class="screen">
+        <div class="hero">
+          <div class="hero-cover"></div>
+          <div class="hero-meta">
+            <div class="badge-reading">읽는 중</div>
+            <div class="hero-title">시 심리학자가 종이책을 읽는다</div>
+            <div class="hero-author">린다 N. 애셔스타인</div>
+          </div>
+        </div>
+
+        <!-- ① 진행률 업데이트 버튼 제거 → 2열로 축소 -->
+        <div class="qa-row">
+          <button class="qa-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 17l6-6 4 4 8-8"/></svg>문장 긋기</button>
+          <button class="qa-btn muted"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 11l3 3 5-6"/></svg>서평 쓰기</button>
+        </div>
+
+        <!-- ② 진행률 카드 — 상단에 📘/📱 토글 (④ 포맷 전환 이주) -->
+        <div class="prog-card">
+          <div class="prog-head">
+            <div class="prog-head-left">
+              <span class="prog-label">나의 진행률</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="fmt-toggle">
+                <button class="on">📘 종이책</button>
+                <button>📱 전자책</button>
+              </div>
+              <span class="prog-pct">23%</span>
+            </div>
+          </div>
+          <div class="prog-bar"><div></div></div>
+          <div class="prog-stats">
+            <div><b>124<span>p</span></b><p>현재 페이지</p></div>
+            <div><b>520<span>p</span></b><p>전체 페이지</p></div>
+            <div><b>8<span>일</span></b><p>읽은 기간</p></div>
+          </div>
+          <div class="slider-row">
+            <h5>오늘 어디까지 읽었나요? <span style="color:var(--ts);font-weight:500">(슬라이더로 빠르게 조절)</span></h5>
+            <div class="slider-inline">
+              <input type="range" min="0" max="520" value="124" />
+              <input type="text" class="num" value="124" />
+              <button class="save">저장</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="focus-card">
+          <div class="ico">⏱</div>
+          <div>
+            <div class="tt">25분 집중 · 읽는 만큼</div>
+            <div class="sb">방해 없이 책과 둘만의 시간</div>
+          </div>
+          <button class="go">▶ 시작</button>
+        </div>
+
+        <!-- ③ 큰 CTA — 이름 살짝 개선 + 동작을 "슬라이더 값으로 저장 + 축하 토스트"로 -->
+        <div class="cta-stack">
+          <button class="cta-main">오늘 읽은 만큼 기록 🌿</button>
+          <button class="cta-hold">꾹 눌러서 완독하기</button>
+        </div>
+
+        <!-- ④ showProgress 카드 — 접기형 '책 정보 수정'으로 축소 -->
+        <div class="detail-accordion">
+          <div class="detail-head">
+            <span>· 책 정보 수정 (전체 페이지, 시작/완독일)</span>
+            <span class="chev">›</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════ PHONE B · 미니멀 대안 ══════════════════════ -->
+    <div class="phone">
+      <div class="phone-label">PHONE B</div>
+      <div class="phone-tag tag-b">미니멀 대안</div>
+      <div class="screen">
+        <div class="hero">
+          <div class="hero-cover"></div>
+          <div class="hero-meta">
+            <div class="badge-reading">읽는 중</div>
+            <div class="hero-title">시 심리학자가 종이책을 읽는다</div>
+            <div class="hero-author">린다 N. 애셔스타인</div>
+          </div>
+        </div>
+
+        <!-- 퀵 액션 없음 — 메타 최소 -->
+
+        <!-- 슬라이더가 유일한 기록 수단. "오늘 읽었어요" CTA 없음 -->
+        <div class="prog-card">
+          <div class="prog-head">
+            <div class="prog-head-left">
+              <div class="fmt-toggle"><button class="on">📘</button><button>📱</button></div>
+              <span class="prog-label">진행률</span>
+            </div>
+            <span class="prog-pct">23%</span>
+          </div>
+          <div class="prog-bar"><div></div></div>
+          <div class="slider-row" style="border-top:none">
+            <h5>오늘 어디까지? · 조절하면 자동으로 기록돼요</h5>
+            <div class="slider-inline">
+              <input type="range" min="0" max="520" value="124" />
+              <span style="font-size:11px;color:var(--ac);font-weight:800">124p</span>
+            </div>
+          </div>
+          <div class="prog-stats" style="border-top:0.5px solid var(--bd)">
+            <div><b>124<span>p</span></b><p>현재</p></div>
+            <div><b>520<span>p</span></b><p>전체</p></div>
+            <div><b>8<span>일</span></b><p>기간</p></div>
+          </div>
+        </div>
+
+        <div class="focus-card">
+          <div class="ico">⏱</div>
+          <div>
+            <div class="tt">25분 집중 · 읽는 만큼</div>
+            <div class="sb">방해 없이 책과 둘만의 시간</div>
+          </div>
+          <button class="go">▶ 시작</button>
+        </div>
+
+        <!-- "문장 긋기"는 FAB나 스크랩 탭으로, 서평은 완독 후 -->
+        <div class="cta-stack">
+          <button class="cta-main" style="background:transparent;color:var(--ac);border:1.5px solid var(--ac)">📝 문장 긋기</button>
+          <button class="cta-hold">꾹 눌러서 완독하기</button>
+        </div>
+
+        <div class="detail-accordion">
+          <div class="detail-head">
+            <span>· 책 정보 수정</span>
+            <span class="chev">›</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════ PHONE C · 현재 (문제 지도) ══════════════════════ -->
+    <div class="phone">
+      <div class="phone-label">PHONE C</div>
+      <div class="phone-tag tag-c">현재 · 중복 4개</div>
+      <div class="screen">
+        <div class="hero">
+          <div class="hero-cover"></div>
+          <div class="hero-meta">
+            <div class="badge-reading">읽는 중</div>
+            <div class="hero-title">시 심리학자가 종이책을 읽는다</div>
+            <div class="hero-author">린다 N. 애셔스타인</div>
+          </div>
+        </div>
+
+        <div class="qa-row">
+          <button class="qa-btn primary dup" data-n="①"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>진행률 업데이트</button>
+          <button class="qa-btn">✍ 문장 긋기</button>
+          <button class="qa-btn muted">🔒 서평</button>
+        </div>
+
+        <div class="prog-card dup" data-n="②">
+          <div class="prog-head">
+            <span class="prog-label">나의 진행률</span>
+            <span class="prog-pct">0%</span>
+          </div>
+          <div class="prog-bar"><div style="width:0%"></div></div>
+          <div class="prog-stats">
+            <div><b>0<span>p</span></b><p>현재</p></div>
+            <div><b>0<span>p</span></b><p>전체</p></div>
+            <div><b>8<span>일</span></b><p>기간</p></div>
+          </div>
+          <div class="slider-row">
+            <h5>오늘 어디까지 읽었나요?</h5>
+            <div class="slider-inline">
+              <input type="range" min="0" max="100" value="0" />
+              <input type="text" class="num" value="" />
+              <button class="save">저장</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="focus-card">
+          <div class="ico">⏱</div>
+          <div><div class="tt">25분 집중 읽기</div><div class="sb">방해 없이 책과 둘만의 시간</div></div>
+          <button class="go">▶ 시작</button>
+        </div>
+
+        <div class="cta-stack">
+          <button class="cta-main dup" data-n="③">오늘 읽었어요</button>
+          <button class="cta-hold">다 읽었어요!</button>
+        </div>
+
+        <!-- showProgress 상세 카드 -->
+        <div class="prog-card dup" data-n="④" style="margin-top:0">
+          <div style="padding:11px 12px 0">
+            <div class="fmt-toggle" style="margin-bottom:8px"><button class="on">종이책</button><button>전자책</button></div>
+            <div class="prog-bar" style="margin:0 0 8px"><div style="width:0%"></div></div>
+            <p style="margin:0;font-size:10px;color:var(--tm)">p.0 / ?</p>
+            <div class="input-row" style="padding-bottom:12px">
+              <input placeholder="현재" />
+              <span class="sep">/</span>
+              <input placeholder="전체" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <section class="notes">
+    <h2>🤝 드림팀 합의 요약</h2>
+
+    <h3>① 퀵액션의 '진행률 업데이트' 버튼</h3>
+    <p><b>제거.</b> ③ 큰 CTA와 동일한 모달을 열 뿐이라 중복. 퀵액션은 2열(<code>문장 긋기</code> · <code>서평 쓰기</code>)로 축소.</p>
+
+    <h3>② 진행률 카드 슬라이더</h3>
+    <p><b>유지.</b> 'fidget' 레이어 — 하루에 여러 번 조금씩 조절하는 용. 슬라이더 + 숫자 input + 저장 버튼 그대로.</p>
+
+    <h3>③ '오늘 읽었어요' 큰 CTA</h3>
+    <p><b>유지 + 개선.</b> 'ritual' 레이어 — 하루의 독서 마무리 의식. 이름을 <code>오늘 읽은 만큼 기록 🌿</code>로 따뜻하게. 동작은 <b>현재 슬라이더 값으로 즉시 저장 + 축하 토스트</b>로 바꾸고 <code>showTodayModal</code> 바텀시트는 생략 (슬라이더가 이미 값을 받았으니 모달 중복).</p>
+
+    <h3>④ showProgress 카드 (종이책/전자책 · 현재/전체)</h3>
+    <p><b>이동.</b> 포맷 토글은 진행률 카드 상단 오른쪽에 작게 옮기고, 전체 페이지·시작일·완독일 편집은 <code>· 책 정보 수정</code> 접기 섹션으로 한 단계 숨김.</p>
+
+    <h3>🧪 변경 대상 파일</h3>
+    <ul>
+      <li><code>app/(main)/book/[bookId]/page.tsx</code>
+        <ul>
+          <li>L1478-1500 퀵액션: 3열 → 2열 (진행률 업데이트 버튼 삭제)</li>
+          <li>L1505-1508 진행률 카드 헤더: 포맷 토글 영입</li>
+          <li>L1559-1568 큰 CTA: 라벨 변경, onClick을 "슬라이더 값 저장 + 토스트"로</li>
+          <li>L1838-1911 showProgress 카드: 접기형 '책 정보 수정'으로 축소</li>
+          <li>L2188- <code>showTodayModal</code> 바텀시트: 필요 시 제거 검토</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h3>📐 Phone A vs B — 무엇을 고를까요</h3>
+    <ul>
+      <li><b>Phone A</b>는 기존 구조를 살리며 중복만 제거해요. ritual CTA(오늘 읽은 만큼 기록)가 있어 스트릭과 감정적 마무리를 유지할 수 있어요.</li>
+      <li><b>Phone B</b>는 더 미니멀해요. 슬라이더를 조절하면 자동 저장되고, 별도 CTA는 없음. 대신 '오늘의 의식' 느낌이 약해져요.</li>
+    </ul>
+    <p><b>권장은 Phone A예요.</b> 사용자의 기존 멘탈 모델을 덜 흔들고, '오늘 읽은 만큼 기록'이라는 감정적 순간을 지켜요.</p>
+  </section>
+</div>
+</body>
+</html>

@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>방긋 · Maison & Atelier (Rose × Mint Luxury)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Italiana&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Crimson+Pro:ital,wght@0,400;1,400&display=swap" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css" />
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  font-family: 'Pretendard Variable', -apple-system, sans-serif;
+  background: #1F1A14;
+  color: #EFE8D9;
+  padding: 48px 24px;
+  min-height: 100vh;
+}
+
+.lab-hero { max-width: 1200px; margin: 0 auto 40px; text-align: center; }
+.lab-hero h1 {
+  font-family: 'Italiana', serif;
+  font-size: 56px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.lab-hero .wave {
+  display: inline-block;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 15px;
+  color: #C9A770;
+  letter-spacing: 0.16em;
+  text-transform: lowercase;
+  padding: 10px 0;
+  position: relative;
+}
+.lab-hero .wave::before,
+.lab-hero .wave::after {
+  content: "";
+  display: inline-block;
+  width: 60px; height: 1px;
+  background: #A78148;
+  vertical-align: middle;
+  margin: 0 18px;
+}
+.lab-hero .sub {
+  font-family: 'Crimson Pro', serif; font-style: italic;
+  font-size: 14px; color: #A08659; margin-top: 14px;
+  letter-spacing: 0.02em;
+}
+
+.phones-row { max-width: 1200px; margin: 0 auto; display: flex; gap: 60px; justify-content: center; flex-wrap: wrap; }
+.phone-col { display: flex; flex-direction: column; gap: 18px; align-items: center; }
+
+.phone-label {
+  font-family: 'Italiana', serif;
+  font-size: 22px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-align: center;
+  color: #EFE8D9;
+}
+.phone-label em {
+  display: block;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: #A08659;
+  text-transform: none;
+  margin-top: 4px;
+}
+
+.palette-strip {
+  display: flex; gap: 8px; padding: 6px; background: rgba(255,255,255,0.04);
+  border: 1px solid #3E3424; border-radius: 2px;
+}
+.palette-strip .sw { width: 32px; height: 32px; border-radius: 2px; border: 1px solid rgba(255,255,255,0.08); }
+
+/* ═══════════════════════════ PHONE BASE ═══════════════════════════ */
+.phone {
+  width: 360px; height: 812px;
+  background: var(--bg);
+  border-radius: 48px;
+  overflow: hidden;
+  position: relative;
+  display: flex; flex-direction: column;
+  box-shadow:
+    0 40px 80px rgba(0,0,0,0.5),
+    0 0 0 1px var(--gold),
+    0 0 0 10px #0A0804,
+    0 0 0 11px var(--gold);
+  color: var(--tp);
+}
+.status { height: 44px; padding: 14px 28px 0; display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; flex-shrink: 0; color: var(--mono); }
+.scroll { flex: 1; overflow-y: auto; padding: 0 0 24px; }
+.scroll::-webkit-scrollbar { display: none; }
+
+/* ═══════════════════════════ MAISON · LV-inspired ═══════════════════════════ */
+.phone.maison {
+  --bg: #EFE8D9;
+  --sf2: #F7F0DE;
+  --sf3: #E6DDC6;
+  --tp: #1F1A14;
+  --mono: #46382A;
+  --gold: #A78148;
+  --gold2: #C9A770;
+  --gold-deep: #5F4420;
+  --rose: #C15670;
+  --rose-deep: #7A2E41;
+  --mint: #8EB5A2;
+  --mint-deep: #4F6F5F;
+}
+
+/* Monogram bar — repeating B cipher + diamond + floret */
+.maison .mono-bar {
+  height: 64px;
+  background: var(--sf3);
+  border-top: 1px solid var(--gold);
+  border-bottom: 1px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+.maison .mono-tile {
+  display: flex;
+  gap: 22px;
+  align-items: center;
+  color: var(--gold-deep);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  letter-spacing: 0.08em;
+}
+.maison .mono-tile .cipher {
+  font-style: italic;
+  font-weight: 600;
+  font-size: 22px;
+}
+.maison .mono-tile .diamond { color: var(--rose); font-size: 10px; }
+.maison .mono-tile .floret { color: var(--mint-deep); font-size: 14px; }
+.maison .mono-tile .dot { color: var(--gold); font-size: 8px; }
+
+/* Wordmark */
+.maison .wordmark {
+  text-align: center;
+  padding: 20px 24px 10px;
+}
+.maison .wordmark h1 {
+  font-family: 'Italiana', serif;
+  font-size: 26px;
+  letter-spacing: 0.22em;
+  color: var(--tp);
+  margin-bottom: 6px;
+}
+.maison .wordmark .est {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--gold-deep);
+  display: inline-flex; align-items: center; gap: 10px;
+}
+.maison .wordmark .est::before,
+.maison .wordmark .est::after {
+  content: ""; width: 30px; height: 1px; background: var(--gold);
+}
+
+/* Greeting */
+.maison .greet {
+  padding: 14px 24px 8px;
+  display: flex; justify-content: space-between; align-items: flex-end;
+  border-bottom: 1px solid var(--gold);
+  margin: 0 24px;
+}
+.maison .greet .bonjour {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--tp);
+}
+.maison .greet .bonjour em {
+  color: var(--rose-deep);
+  font-weight: 600;
+}
+.maison .greet .today {
+  display: block;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-style: normal;
+  font-size: 11px;
+  color: var(--mono);
+  letter-spacing: 0;
+  margin-top: 4px;
+  font-weight: 400;
+}
+.maison .chip-streak {
+  display: inline-flex; flex-direction: column; align-items: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  color: var(--gold-deep);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+}
+.maison .chip-streak .num {
+  font-family: 'Italiana', serif;
+  font-style: normal;
+  font-size: 26px;
+  color: var(--rose-deep);
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+/* Hero — book as couture object */
+.maison .hero {
+  margin: 20px 24px;
+  padding: 22px;
+  background: var(--sf2);
+  position: relative;
+}
+.maison .hero::before,
+.maison .hero::after {
+  content: ""; position: absolute;
+  width: 22px; height: 22px;
+  border: 1px solid var(--gold);
+}
+.maison .hero::before { top: 6px; left: 6px; border-right: none; border-bottom: none; }
+.maison .hero::after { bottom: 6px; right: 6px; border-left: none; border-top: none; }
+.maison .hero .corner-tr,
+.maison .hero .corner-bl {
+  position: absolute;
+  width: 22px; height: 22px;
+  border: 1px solid var(--gold);
+}
+.maison .hero .corner-tr { top: 6px; right: 6px; border-left: none; border-bottom: none; }
+.maison .hero .corner-bl { bottom: 6px; left: 6px; border-right: none; border-top: none; }
+
+.maison .hero .meta-top {
+  text-align: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  margin-bottom: 14px;
+}
+.maison .hero .book-row {
+  display: flex; gap: 16px; margin-bottom: 14px;
+}
+.maison .hero .cover {
+  width: 90px; height: 130px;
+  background: linear-gradient(180deg, #3A1820, #1F0D12);
+  border: 1px solid var(--gold);
+  box-shadow:
+    inset 0 0 0 3px #1F0D12,
+    inset 0 0 0 4px var(--gold),
+    inset 0 0 0 6px #1F0D12;
+  position: relative;
+  flex-shrink: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  color: var(--gold2);
+}
+.maison .hero .cover .cipher {
+  font-family: 'Italiana', serif;
+  font-size: 42px;
+  letter-spacing: 0;
+  color: var(--gold2);
+  text-shadow: 0 0 1px var(--gold);
+}
+.maison .hero .cover .wax {
+  position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--rose);
+  border: 1px solid var(--rose-deep);
+  box-shadow: inset 0 0 4px rgba(255,255,255,0.2);
+  font-family: 'Italiana', serif;
+  color: var(--rose-deep);
+  font-size: 11px;
+  display: flex; align-items: center; justify-content: center;
+}
+.maison .hero .info { flex: 1; display: flex; flex-direction: column; gap: 3px; padding-top: 6px; }
+.maison .hero .info .title {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 1.1;
+  color: var(--tp);
+}
+.maison .hero .info .author {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mono);
+  margin-top: 4px;
+}
+.maison .hero .info .chapter {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--gold-deep);
+  margin-top: auto;
+}
+.maison .hero .info .chapter .num {
+  font-family: 'Italiana', serif;
+  font-style: normal;
+  color: var(--rose-deep);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+/* Gold progress band */
+.maison .progress {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--gold);
+  border-bottom: 1px solid var(--gold);
+  margin-bottom: 14px;
+}
+.maison .progress .pct {
+  font-family: 'Italiana', serif;
+  font-size: 28px;
+  color: var(--rose-deep);
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+.maison .progress .pct sup { font-size: 11px; color: var(--gold-deep); vertical-align: top; margin-left: 2px; letter-spacing: 0.1em; }
+.maison .progress .rule {
+  flex: 1; height: 6px; position: relative;
+  border-top: 1px solid var(--gold);
+  border-bottom: 1px solid var(--gold);
+}
+.maison .progress .rule .fill {
+  position: absolute; top: 1px; bottom: 1px; left: 0;
+  background: var(--rose);
+  border-right: 1px solid var(--gold);
+}
+.maison .progress .pages {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 11px;
+  color: var(--mono);
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+/* CTA — couture button */
+.maison .cta {
+  display: block; width: 100%;
+  padding: 14px 16px;
+  background: var(--tp);
+  color: var(--gold2);
+  border: 1px solid var(--gold);
+  font-family: 'Italiana', serif;
+  font-size: 12px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  text-align: center;
+  box-shadow: inset 0 0 0 3px var(--tp), inset 0 0 0 4px var(--gold2);
+  cursor: pointer;
+}
+.maison .cta-sub {
+  text-align: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 11px;
+  color: var(--mono);
+  margin-top: 8px;
+  letter-spacing: 0.06em;
+}
+
+/* La Semaine */
+.maison .section {
+  margin: 24px 24px 16px;
+  padding-top: 20px;
+  border-top: 1px solid var(--gold);
+}
+.maison .section .section-head {
+  text-align: center;
+  margin-bottom: 14px;
+}
+.maison .section .section-head h3 {
+  font-family: 'Italiana', serif;
+  font-size: 16px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--tp);
+}
+.maison .section .section-head em {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 11px;
+  color: var(--gold-deep);
+  letter-spacing: 0.12em;
+}
+
+.maison .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.maison .day { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.maison .day .lbl {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 9px;
+  color: var(--gold-deep);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.maison .day .sq {
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  color: var(--mono);
+  border: 1px solid var(--gold);
+}
+.maison .day.read .sq {
+  background: var(--rose);
+  color: var(--sf2);
+  border-color: var(--rose-deep);
+  position: relative;
+}
+.maison .day.read .sq::after {
+  content: "·"; position: absolute; bottom: -2px; color: var(--gold2); font-size: 16px;
+}
+.maison .day.today .sq {
+  background: var(--mint);
+  border-color: var(--mint-deep);
+  color: var(--tp);
+}
+.maison .day.event .sq::before {
+  content: ""; position: absolute; top: -4px; right: -2px;
+  width: 6px; height: 6px; background: var(--gold2); border: 1px solid var(--gold-deep);
+  transform: rotate(45deg);
+}
+.maison .day.event .sq { position: relative; }
+
+.maison .events {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--gold);
+  display: flex; flex-direction: column;
+}
+.maison .event-row {
+  display: grid;
+  grid-template-columns: 42px 10px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px dashed rgba(167,129,72,0.35);
+  font-size: 12px;
+}
+.maison .event-row:last-child { border-bottom: none; }
+.maison .event-row .date {
+  font-family: 'Italiana', serif;
+  font-size: 14px;
+  color: var(--rose-deep);
+  letter-spacing: 0.05em;
+}
+.maison .event-row .pin {
+  width: 8px; height: 8px; border: 1px solid var(--gold-deep); border-radius: 50%;
+}
+.maison .event-row.a .pin { background: var(--mint); }
+.maison .event-row.b .pin { background: var(--rose); }
+.maison .event-row.c .pin { background: var(--gold2); }
+.maison .event-row .title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  color: var(--tp);
+  font-weight: 500;
+}
+.maison .event-row .note {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 11px;
+  color: var(--mono);
+}
+
+/* Le Cercle */
+.maison .cercle {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0;
+}
+.maison .cercle .av {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1px solid var(--gold);
+  background: var(--sf3);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--gold-deep);
+  margin-left: -8px;
+  position: relative;
+}
+.maison .cercle .av:first-child { margin-left: 0; }
+.maison .cercle .av:nth-child(2) { background: var(--rose); color: var(--sf2); border-color: var(--rose-deep); }
+.maison .cercle .av:nth-child(3) { background: var(--mint); color: var(--tp); border-color: var(--mint-deep); }
+.maison .cercle .note {
+  flex: 1;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--mono);
+  line-height: 1.5;
+  margin-left: 6px;
+}
+.maison .cercle .note strong {
+  font-family: 'Italiana', serif;
+  font-style: normal;
+  font-size: 12px;
+  color: var(--rose-deep);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Footer seal */
+.maison .seal {
+  text-align: center; padding: 20px 24px 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 10px;
+  color: var(--gold-deep);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+.maison .seal::before, .maison .seal::after { content: "◆"; margin: 0 10px; font-size: 6px; vertical-align: middle; color: var(--rose); }
+
+/* ═══════════════════════════ ATELIER · Dior-inspired ═══════════════════════════ */
+.phone.atelier {
+  --bg: #F0ECE1;
+  --sf2: #FAF6EB;
+  --sf3: #E9E3D4;
+  --tp: #2A2520;
+  --mono: #5A5048;
+  --stripe: #B5AEA0;
+  --stripe2: #D4CCBD;
+  --gold: #A08245;
+  --rose: #D08E96;
+  --rose-soft: #EDCFD3;
+  --rose-deep: #884E58;
+  --mint: #A3C3B2;
+  --mint-soft: #D6E4DA;
+  --mint-deep: #5E8172;
+}
+
+/* Toile illustration header band */
+.atelier .toile-band {
+  height: 54px;
+  background:
+    repeating-linear-gradient(90deg,
+      var(--sf3) 0, var(--sf3) 20px,
+      transparent 20px, transparent 22px),
+    linear-gradient(180deg, var(--sf2), var(--bg));
+  border-bottom: 1px solid var(--stripe);
+  position: relative;
+  overflow: hidden;
+}
+.atelier .toile-band svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.85; }
+
+/* Dior-style stripe divider */
+.atelier .stripe-bar {
+  height: 10px;
+  background: repeating-linear-gradient(90deg,
+    var(--stripe) 0, var(--stripe) 8px,
+    var(--sf2) 8px, var(--sf2) 10px,
+    var(--rose) 10px, var(--rose) 14px,
+    var(--sf2) 14px, var(--sf2) 16px,
+    var(--mint) 16px, var(--mint) 20px,
+    var(--sf2) 20px, var(--sf2) 22px);
+}
+
+/* Wordmark */
+.atelier .wordmark {
+  text-align: center;
+  padding: 18px 24px 6px;
+}
+.atelier .wordmark h1 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 28px;
+  letter-spacing: 0.06em;
+  color: var(--tp);
+  line-height: 1;
+}
+.atelier .wordmark .sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--rose-deep);
+  letter-spacing: 0.06em;
+  margin-top: 4px;
+}
+
+/* Miss Banggut tag */
+.atelier .miss-tag {
+  margin: 14px 24px 0;
+  padding: 10px 14px;
+  border: 1px solid var(--tp);
+  border-radius: 0;
+  background: var(--sf2);
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 4px 4px 0 var(--stripe);
+  position: relative;
+}
+.atelier .miss-tag::before {
+  content: "";
+  position: absolute;
+  left: -1px; top: 50%; transform: translateY(-50%);
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--sf2); border: 1px solid var(--tp);
+  box-shadow: -14px 0 0 -1px var(--bg);
+}
+.atelier .miss-tag .name {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--tp);
+}
+.atelier .miss-tag .name em {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--rose-deep);
+}
+.atelier .miss-tag .no {
+  font-family: 'Playfair Display', serif;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  color: var(--mono);
+}
+
+/* Hero card — scalloped */
+.atelier .hero {
+  margin: 14px 24px 18px;
+  background: var(--sf2);
+  border: 1px solid var(--tp);
+  padding: 16px 16px 18px;
+  position: relative;
+}
+.atelier .hero::before {
+  content: "";
+  position: absolute;
+  top: -7px; left: 0; right: 0; height: 7px;
+  background: radial-gradient(circle at 7px 0, var(--sf2) 6.5px, transparent 7px) repeat-x;
+  background-size: 14px 7px;
+}
+.atelier .hero::after {
+  content: "";
+  position: absolute;
+  top: -7px; left: 0; right: 0; height: 7px;
+  background: radial-gradient(circle at 7px 0, transparent 5.5px, var(--tp) 6px, var(--tp) 6.5px, transparent 7px) repeat-x;
+  background-size: 14px 7px;
+}
+
+.atelier .hero .meta-top {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding-bottom: 10px; margin-bottom: 14px;
+  border-bottom: 1px solid var(--stripe);
+}
+.atelier .hero .meta-top .cat {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--rose-deep);
+  letter-spacing: 0.1em;
+}
+.atelier .hero .meta-top .num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: var(--mono);
+  text-transform: uppercase;
+}
+
+.atelier .hero .book-row { display: flex; gap: 14px; margin-bottom: 14px; }
+.atelier .hero .cover {
+  width: 84px; height: 120px;
+  background:
+    repeating-linear-gradient(90deg,
+      var(--stripe) 0, var(--stripe) 4px,
+      var(--stripe2) 4px, var(--stripe2) 8px);
+  border: 1px solid var(--tp);
+  position: relative;
+  flex-shrink: 0;
+  display: flex; align-items: flex-end; padding: 10px 8px;
+}
+.atelier .hero .cover::before {
+  content: "";
+  position: absolute; top: 14px; left: 0; right: 0; height: 24px;
+  background: var(--sf2);
+  border-top: 1px solid var(--tp); border-bottom: 1px solid var(--tp);
+}
+.atelier .hero .cover .lbl {
+  position: absolute; top: 18px; left: 0; right: 0;
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--tp);
+  letter-spacing: 0.04em;
+}
+.atelier .hero .cover .ribbon {
+  position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%);
+  width: 30px; height: 10px;
+  background: var(--rose);
+  border: 1px solid var(--rose-deep);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 8px;
+  color: var(--sf2);
+  letter-spacing: 0.1em;
+}
+
+.atelier .hero .info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.atelier .hero .info .title {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 21px;
+  line-height: 1.1;
+  color: var(--tp);
+}
+.atelier .hero .info .author {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mono);
+  margin-top: 2px;
+}
+.atelier .hero .info .quote {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--tp);
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--stripe);
+}
+
+/* Satin ribbon progress */
+.atelier .ribbon-progress {
+  margin-bottom: 14px;
+}
+.atelier .ribbon-progress .meta {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 6px;
+}
+.atelier .ribbon-progress .meta .chapter {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--rose-deep);
+}
+.atelier .ribbon-progress .meta .pct {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--mono);
+  letter-spacing: 0.08em;
+}
+.atelier .ribbon-progress .satin {
+  height: 12px;
+  background: var(--sf3);
+  border: 1px solid var(--tp);
+  position: relative;
+  overflow: hidden;
+}
+.atelier .ribbon-progress .satin .fill {
+  position: absolute; inset: 0 auto 0 0; width: 47%;
+  background:
+    repeating-linear-gradient(45deg,
+      var(--rose) 0, var(--rose) 4px,
+      var(--rose-soft) 4px, var(--rose-soft) 6px);
+  border-right: 1px solid var(--tp);
+}
+.atelier .ribbon-progress .satin .knot {
+  position: absolute; top: 50%; left: 47%; transform: translate(-50%, -50%);
+  width: 14px; height: 14px; border: 1px solid var(--tp);
+  background: var(--mint);
+  border-radius: 2px;
+}
+
+.atelier .cta-wrap { display: flex; gap: 8px; }
+.atelier .cta {
+  flex: 1;
+  padding: 12px;
+  background: var(--tp);
+  color: var(--sf2);
+  border: none;
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  position: relative;
+}
+.atelier .cta::before {
+  content: "";
+  position: absolute; inset: 3px;
+  border: 1px solid var(--rose-soft);
+  pointer-events: none;
+}
+.atelier .cta .fr {
+  display: block;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 10px;
+  color: var(--rose-soft);
+  letter-spacing: 0.14em;
+  margin-top: 2px;
+}
+.atelier .cta-mini {
+  width: 44px; background: var(--sf2); border: 1px solid var(--tp);
+  color: var(--tp); font-family: 'Playfair Display', serif; font-size: 14px;
+  cursor: pointer;
+}
+
+/* Sections */
+.atelier .section {
+  margin: 0 24px 14px;
+  background: var(--sf2);
+  border: 1px solid var(--tp);
+  padding: 16px;
+  position: relative;
+}
+.atelier .section .scallop-accent {
+  position: absolute;
+  top: 12px; right: 16px;
+  width: 36px; height: 6px;
+  background:
+    radial-gradient(circle at 3px 0, var(--rose) 2.5px, transparent 3px) repeat-x;
+  background-size: 6px 6px;
+}
+.atelier .section .head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--stripe);
+}
+.atelier .section .head h3 {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--tp);
+}
+.atelier .section .head h3 em {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mono);
+  margin-left: 6px;
+}
+.atelier .section .head .more {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 11px;
+  color: var(--rose-deep);
+  letter-spacing: 0.06em;
+}
+
+/* Semaine — dot grid */
+.atelier .days {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+  margin-bottom: 12px;
+}
+.atelier .day { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.atelier .day .lbl {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 10px;
+  color: var(--mono);
+  letter-spacing: 0.1em;
+}
+.atelier .day .dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 1px solid var(--tp);
+  background: var(--bg);
+  position: relative;
+}
+.atelier .day.read .dot { background: var(--rose); border-color: var(--rose-deep); }
+.atelier .day.today .dot {
+  background: var(--mint);
+  border-color: var(--mint-deep);
+  transform: scale(1.35);
+  box-shadow: 0 0 0 2px var(--sf2), 0 0 0 3px var(--tp);
+}
+.atelier .day.event .dot::after {
+  content: ""; position: absolute; top: -5px; right: -5px;
+  width: 4px; height: 4px; background: var(--gold); border-radius: 50%;
+  border: 0.5px solid var(--tp);
+}
+.atelier .day .dnum {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 10px;
+  color: var(--mono);
+}
+
+.atelier .events { display: flex; flex-direction: column; padding-top: 10px; border-top: 1px dashed var(--stripe); gap: 6px; }
+.atelier .event-row {
+  display: flex; align-items: center; gap: 10px;
+}
+.atelier .event-row .date {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--rose-deep);
+  min-width: 38px;
+}
+.atelier .event-row .ttl {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--tp);
+  flex: 1;
+}
+.atelier .event-row .pin {
+  width: 8px; height: 8px; border-radius: 50%; border: 1px solid var(--tp);
+}
+.atelier .event-row.a .pin { background: var(--rose); }
+.atelier .event-row.b .pin { background: var(--mint); }
+.atelier .event-row.c .pin { background: var(--gold); }
+
+/* Lectrices */
+.atelier .lectrices { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+.atelier .lectrices .av {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 1px solid var(--tp);
+  background: var(--rose-soft);
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--rose-deep);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.atelier .lectrices .av::after {
+  content: ""; position: absolute; inset: -3px;
+  border: 0.5px solid var(--rose);
+  border-radius: 50%;
+}
+.atelier .lectrices .av:nth-child(2) { background: var(--mint-soft); color: var(--mint-deep); }
+.atelier .lectrices .av:nth-child(2)::after { border-color: var(--mint); }
+.atelier .lectrices .av:nth-child(3) { background: var(--sf3); color: var(--mono); }
+.atelier .lectrices .av:nth-child(3)::after { border-color: var(--gold); }
+
+.atelier .lec-note {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--tp);
+  padding-top: 8px;
+  border-top: 1px dashed var(--stripe);
+}
+.atelier .lec-note strong {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-weight: 700;
+  color: var(--rose-deep);
+  margin-right: 3px;
+}
+
+/* ═══════════════════════════ NOTES ═══════════════════════════ */
+.notes {
+  max-width: 1200px; margin: 52px auto 0;
+  background: #2B2218; border: 1px solid #A78148; padding: 28px;
+}
+.notes h2 {
+  font-family: 'Italiana', serif;
+  font-size: 22px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #EFE8D9;
+  margin-bottom: 6px;
+  text-align: center;
+}
+.notes > .caption {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  text-align: center;
+  color: #C9A770;
+  margin-bottom: 22px;
+  letter-spacing: 0.08em;
+}
+.notes .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; }
+.notes .col { color: #D4C8AE; }
+.notes .col h4 {
+  font-family: 'Italiana', serif;
+  font-size: 15px;
+  letter-spacing: 0.22em;
+  color: #EFE8D9;
+  margin-bottom: 4px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #A78148;
+}
+.notes .col .tagline {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: #C9A770;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+.notes .col p {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 13px; line-height: 1.7; margin-bottom: 6px;
+  color: #C4B9A2;
+}
+.notes .col p strong {
+  color: #EFE8D9;
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-weight: 700;
+}
+.notes .col .pal { display: flex; gap: 6px; margin-top: 14px; }
+.notes .col .pal .s { width: 28px; height: 28px; border: 1px solid #A78148; }
+</style>
+</head>
+<body>
+
+<div class="lab-hero">
+  <h1>Banggut</h1>
+  <div class="wave">rose &amp; mint · couture edition</div>
+  <div class="sub">"만약 LV와 Dior가 방긋을 만든다면 — 로즈와 민트를 어떻게 쓸까?"</div>
+</div>
+
+<div class="phones-row">
+
+  <!-- ════════════ MAISON (LV-inspired) ════════════ -->
+  <div class="phone-col">
+    <div class="phone maison">
+      <div class="status">
+        <span>9:41</span>
+        <span>◉ 4G · 82%</span>
+      </div>
+
+      <div class="mono-bar">
+        <div class="mono-tile">
+          <span class="cipher">B</span>
+          <span class="dot">·</span>
+          <span class="diamond">◆</span>
+          <span class="floret">✿</span>
+          <span class="diamond">◆</span>
+          <span class="dot">·</span>
+          <span class="cipher">B</span>
+          <span class="dot">·</span>
+          <span class="diamond">◆</span>
+          <span class="floret">✿</span>
+          <span class="diamond">◆</span>
+          <span class="dot">·</span>
+          <span class="cipher">B</span>
+        </div>
+      </div>
+
+      <div class="scroll">
+        <div class="wordmark">
+          <h1>MAISON BANGGUT</h1>
+          <div class="est">EST. MMXXV · PARIS · SEOUL</div>
+        </div>
+
+        <div class="greet">
+          <div class="bonjour">
+            <em>Bonjour,</em><br>lecteur.
+            <span class="today">오늘의 독서를 시작합니다.</span>
+          </div>
+          <div class="chip-streak">
+            <span class="num">VII</span>
+            jours consécutifs
+          </div>
+        </div>
+
+        <div class="hero">
+          <span class="corner-tr"></span>
+          <span class="corner-bl"></span>
+          <div class="meta-top">— Livre · No. 003 —</div>
+
+          <div class="book-row">
+            <div class="cover">
+              <div class="cipher">B</div>
+              <div class="wax">❀</div>
+            </div>
+            <div class="info">
+              <div class="title">Aller<br>jusqu'à la lune</div>
+              <div class="author">Jang Ryu-jin</div>
+              <div class="chapter">Chapitre <span class="num">III</span> de III</div>
+            </div>
+          </div>
+
+          <div class="progress">
+            <div class="pct">XLVII<sup>%</sup></div>
+            <div class="rule"><div class="fill" style="width:47%;"></div></div>
+            <div class="pages">148/312</div>
+          </div>
+
+          <button class="cta">Reprendre</button>
+          <div class="cta-sub">어제 멈춘 148 페이지에서 —</div>
+        </div>
+
+        <div class="section">
+          <div class="section-head">
+            <h3>LA SEMAINE</h3>
+            <em>— semaine dix-sept —</em>
+          </div>
+
+          <div class="days">
+            <div class="day read"><span class="lbl">L</span><span class="sq">15</span></div>
+            <div class="day read"><span class="lbl">M</span><span class="sq">16</span></div>
+            <div class="day read"><span class="lbl">M</span><span class="sq">17</span></div>
+            <div class="day read"><span class="lbl">J</span><span class="sq">18</span></div>
+            <div class="day read"><span class="lbl">V</span><span class="sq">19</span></div>
+            <div class="day read event"><span class="lbl">S</span><span class="sq">20</span></div>
+            <div class="day today"><span class="lbl">D</span><span class="sq">21</span></div>
+          </div>
+
+          <div class="events">
+            <div class="event-row a">
+              <span class="date">IV·23</span><span class="pin"></span>
+              <span class="title">Le Cercle de Jeudi</span>
+              <span class="note">소설 독서모임</span>
+            </div>
+            <div class="event-row b">
+              <span class="date">IV·25</span><span class="pin"></span>
+              <span class="title">위시 리스트 개시</span>
+              <span class="note">— Mes Listes</span>
+            </div>
+            <div class="event-row c">
+              <span class="date">IV·28</span><span class="pin"></span>
+              <span class="title">Bibliothèque 반납</span>
+              <span class="note">Cosmos</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-head">
+            <h3>LE CERCLE</h3>
+            <em>— trois amies sont de retour —</em>
+          </div>
+
+          <div class="cercle">
+            <div class="av">S</div>
+            <div class="av">J</div>
+            <div class="av">M</div>
+            <div class="av">+</div>
+            <div class="note"><strong>Sujin</strong> 님이 <em>시선으로부터</em>를 완독하셨습니다.</div>
+          </div>
+        </div>
+
+        <div class="seal">Fait à la main · Seoul</div>
+      </div>
+    </div>
+
+    <div class="phone-label">
+      MAISON
+      <em>— LV-inspired · gold &amp; monogram —</em>
+    </div>
+    <div class="palette-strip">
+      <div class="sw" style="background:#EFE8D9"></div>
+      <div class="sw" style="background:#A78148"></div>
+      <div class="sw" style="background:#C15670"></div>
+      <div class="sw" style="background:#8EB5A2"></div>
+      <div class="sw" style="background:#1F1A14"></div>
+    </div>
+  </div>
+
+  <!-- ════════════ ATELIER (Dior-inspired) ════════════ -->
+  <div class="phone-col">
+    <div class="phone atelier">
+      <div class="status">
+        <span>9:41</span>
+        <span>◉ 4G · 82%</span>
+      </div>
+
+      <div class="toile-band">
+        <svg viewBox="0 0 360 54" xmlns="http://www.w3.org/2000/svg">
+          <!-- tiny toile: person reading, plant, book, dot -->
+          <g stroke="#884E58" stroke-width="0.7" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.7">
+            <!-- reader 1 -->
+            <circle cx="20" cy="20" r="3"/><path d="M20 23 L20 33 L14 38 M20 33 L26 38 M15 26 L25 26"/>
+            <rect x="22" y="24" width="5" height="4" fill="#D08E96" stroke-width="0.5"/>
+            <!-- plant -->
+            <path d="M60 42 L60 30 M60 34 C57 32, 55 28, 57 26 M60 32 C63 30, 65 26, 63 24"/>
+            <circle cx="57" cy="26" r="1.5" fill="#A3C3B2" stroke-width="0.3"/>
+            <circle cx="63" cy="24" r="1.5" fill="#A3C3B2" stroke-width="0.3"/>
+            <!-- book open -->
+            <path d="M100 32 L100 40 L108 40 L116 40 L116 32 L108 34 Z M108 34 L108 40"/>
+            <!-- reader 2 -->
+            <circle cx="150" cy="18" r="2.5"/><path d="M150 20 L150 30 L145 34 M150 30 L155 34"/>
+            <rect x="146" y="22" width="8" height="3" fill="#D08E96" stroke-width="0.5"/>
+            <!-- flower -->
+            <circle cx="190" cy="28" r="1.5" fill="#D08E96" stroke-width="0.3"/>
+            <circle cx="187" cy="25" r="1.2" fill="#EDCFD3" stroke-width="0.3"/>
+            <circle cx="193" cy="25" r="1.2" fill="#EDCFD3" stroke-width="0.3"/>
+            <circle cx="187" cy="31" r="1.2" fill="#EDCFD3" stroke-width="0.3"/>
+            <circle cx="193" cy="31" r="1.2" fill="#EDCFD3" stroke-width="0.3"/>
+            <path d="M190 33 L190 42"/>
+            <!-- book stack -->
+            <rect x="220" y="34" width="14" height="2.5" fill="#D08E96" stroke-width="0.4"/>
+            <rect x="222" y="30" width="14" height="2.5" fill="#A3C3B2" stroke-width="0.4"/>
+            <rect x="221" y="26" width="14" height="2.5" fill="#A08245" stroke-width="0.4"/>
+            <!-- reader 3 -->
+            <circle cx="270" cy="20" r="3"/><path d="M270 23 L270 33 L264 38 M270 33 L276 38 M265 26 L275 26"/>
+            <rect x="272" y="24" width="5" height="4" fill="#A3C3B2" stroke-width="0.5"/>
+            <!-- bird -->
+            <path d="M310 20 Q315 16, 320 20 Q325 16, 330 20" />
+            <path d="M315 22 L315 28"/>
+            <!-- butterfly -->
+            <path d="M345 28 L345 32 M343 28 Q340 26, 342 30 Q340 34, 343 32 M347 28 Q350 26, 348 30 Q350 34, 347 32"/>
+          </g>
+        </svg>
+      </div>
+
+      <div class="stripe-bar"></div>
+
+      <div class="scroll">
+        <div class="wordmark">
+          <h1><em>Atelier</em> BANGGUT</h1>
+          <div class="sub">carnet de lecture · depuis 2025</div>
+        </div>
+
+        <div class="miss-tag">
+          <div class="name">Miss Banggut <em>— lectrice</em></div>
+          <div class="no">N° 007</div>
+        </div>
+
+        <div class="hero">
+          <div class="meta-top">
+            <span class="cat">en lecture</span>
+            <span class="num">chapitre III / III</span>
+          </div>
+
+          <div class="book-row">
+            <div class="cover">
+              <div class="lbl">달까지<br>가자</div>
+              <div class="ribbon">MISS B</div>
+            </div>
+            <div class="info">
+              <div class="title">달까지<br>가자</div>
+              <div class="author">Jang Ryu-jin</div>
+              <div class="quote">"그건 정말 꿈 같은 얘기였지만, 나는 그 꿈을 믿어보기로 했다."</div>
+            </div>
+          </div>
+
+          <div class="ribbon-progress">
+            <div class="meta">
+              <span class="chapter">어제 148페이지에서 멈춤</span>
+              <span class="pct">47 %</span>
+            </div>
+            <div class="satin">
+              <div class="fill"></div>
+              <div class="knot"></div>
+            </div>
+          </div>
+
+          <div class="cta-wrap">
+            <button class="cta">Ouvrir le livre<span class="fr">이어 읽기</span></button>
+            <button class="cta-mini">♡</button>
+          </div>
+        </div>
+
+        <div class="section">
+          <span class="scallop-accent"></span>
+          <div class="head">
+            <h3><em>La</em> Semaine <em>· week xvii</em></h3>
+            <span class="more">voir tout →</span>
+          </div>
+
+          <div class="days">
+            <div class="day read"><span class="lbl">lun</span><span class="dot"></span><span class="dnum">15</span></div>
+            <div class="day read"><span class="lbl">mar</span><span class="dot"></span><span class="dnum">16</span></div>
+            <div class="day read"><span class="lbl">mer</span><span class="dot"></span><span class="dnum">17</span></div>
+            <div class="day read"><span class="lbl">jeu</span><span class="dot"></span><span class="dnum">18</span></div>
+            <div class="day read"><span class="lbl">ven</span><span class="dot"></span><span class="dnum">19</span></div>
+            <div class="day read event"><span class="lbl">sam</span><span class="dot"></span><span class="dnum">20</span></div>
+            <div class="day today"><span class="lbl">dim</span><span class="dot"></span><span class="dnum">21</span></div>
+          </div>
+
+          <div class="events">
+            <div class="event-row a">
+              <span class="pin"></span><span class="date">23.IV</span>
+              <span class="ttl">목요 독서모임 · Le Cercle</span>
+            </div>
+            <div class="event-row b">
+              <span class="pin"></span><span class="date">25.IV</span>
+              <span class="ttl">위시 · 새 소설 시작</span>
+            </div>
+            <div class="event-row c">
+              <span class="pin"></span><span class="date">28.IV</span>
+              <span class="ttl">도서관 반납 · Cosmos</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <span class="scallop-accent"></span>
+          <div class="head">
+            <h3><em>Nos</em> Lectrices</h3>
+            <span class="more">voir le cercle →</span>
+          </div>
+
+          <div class="lectrices">
+            <div class="av">S</div>
+            <div class="av">J</div>
+            <div class="av">M</div>
+          </div>
+          <div class="lec-note">
+            <strong>Sujin</strong>님이 <em>시선으로부터</em>를 완독했어요.<br>
+            <strong>Jimin</strong>님이 이번 주 모임 후기를 남겼어요.
+          </div>
+        </div>
+      </div>
+
+      <div class="stripe-bar"></div>
+    </div>
+
+    <div class="phone-label">
+      ATELIER
+      <em>— Dior-inspired · toile &amp; scallop —</em>
+    </div>
+    <div class="palette-strip">
+      <div class="sw" style="background:#F0ECE1"></div>
+      <div class="sw" style="background:#B5AEA0"></div>
+      <div class="sw" style="background:#D08E96"></div>
+      <div class="sw" style="background:#A3C3B2"></div>
+      <div class="sw" style="background:#2A2520"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="notes">
+  <h2>Maison × Atelier</h2>
+  <div class="caption">— 같은 로즈 &amp; 민트, 두 메종의 전혀 다른 해석 —</div>
+
+  <div class="grid">
+    <div class="col">
+      <h4>MAISON BANGGUT</h4>
+      <div class="tagline">Louis Vuitton inspired · monogram &amp; gold</div>
+      <p><strong>모노그램 바 (상단):</strong> B 이니셜 × 다이아몬드 × 꽃 문양 반복 타일. 상단에 브랜드 의례처럼 깔림.</p>
+      <p><strong>금 헤어라인:</strong> 모든 카드/구획선이 1px 금선 (#A78148). 로즈와 민트는 <em>포인트</em>로만 등장 — 금이 주인공.</p>
+      <p><strong>로즈 = 밀랍 인장:</strong> 책 표지 중앙에 원형 wax seal. 달력에서 읽은 날 표시. 독서 = 서명 행위.</p>
+      <p><strong>민트 = 오늘:</strong> 캘린더 today 한 칸에만. 성당 창문처럼 희귀.</p>
+      <p><strong>타이포:</strong> Italiana (헤어라인 세리프) 헤더 + Cormorant Garamond 이탤릭 본문 + Roman numerals (XLVII, MMXXV, VII).</p>
+      <p><strong>언어:</strong> 불어 1행 + 한국어 서브. "Bonjour, lecteur. / 오늘의 독서를 시작합니다."</p>
+      <p><strong>버튼:</strong> 잉크빛 검정 + 금선 3중 프레임 + 대문자 자간 0.32em "REPRENDRE" — 향수병 라벨 느낌.</p>
+      <div class="pal">
+        <div class="s" style="background:#EFE8D9" title="parchment"></div>
+        <div class="s" style="background:#A78148" title="gold"></div>
+        <div class="s" style="background:#C9A770" title="gold light"></div>
+        <div class="s" style="background:#C15670" title="wax rose"></div>
+        <div class="s" style="background:#8EB5A2" title="porcelain mint"></div>
+        <div class="s" style="background:#1F1A14" title="umber ink"></div>
+      </div>
+    </div>
+
+    <div class="col">
+      <h4>ATELIER BANGGUT</h4>
+      <div class="tagline">Dior inspired · toile &amp; scallop</div>
+      <p><strong>Toile 일러 배너 (상단):</strong> 독서하는 사람, 꽃, 책, 새, 나비 — 미니 손그림 반복. 로즈&amp;민트로 채색된 18세기 프린트 감성.</p>
+      <p><strong>디올 그레이 스트라이프:</strong> 상하단 10px 띠 — 그레이+로즈+민트 세로줄. 쇼핑백 그래픽 오마주.</p>
+      <p><strong>Miss Banggut 태그:</strong> 티켓 펀치 자국이 있는 쿠튀르 라벨. 유저 = Miss Banggut N° 007 (향수처럼 넘버링).</p>
+      <p><strong>스캘럽 카드:</strong> 카드 상단 가장자리가 동글동글 물결. Dior 쿠튀르 드레스의 밑단.</p>
+      <p><strong>새틴 리본 진행바:</strong> 로즈 사선 패턴 + 민트 매듭(knot). 책 읽기 = 리본 풀기.</p>
+      <p><strong>타이포:</strong> Playfair Display 이탤릭(볼드) 헤더 + Cormorant Garamond 본문 + 한국어 Pretendard.</p>
+      <p><strong>언어:</strong> 섹션 헤더 불어 + 본문 한국어. "La Semaine · 목요 독서모임" 식.</p>
+      <p><strong>CTA:</strong> 검정 + 로즈 내부 프레임 "Ouvrir le livre / 이어 읽기" — 향수 광고 캡션 톤.</p>
+      <div class="pal">
+        <div class="s" style="background:#F0ECE1" title="porcelain"></div>
+        <div class="s" style="background:#B5AEA0" title="dior gray"></div>
+        <div class="s" style="background:#D08E96" title="poudré rose"></div>
+        <div class="s" style="background:#A3C3B2" title="celadon mint"></div>
+        <div class="s" style="background:#A08245" title="gold touch"></div>
+        <div class="s" style="background:#2A2520" title="charcoal"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>방긋 홈 v4 — 배경·씬 실험</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F3ED;
+    --sf: #EDE7DF;
+    --sf2: #E0D9D0;
+    --sf3: #D0C8BC;
+    --bd: rgba(95,164,142,0.14);
+    --bd2: rgba(95,164,142,0.28);
+    --tp: #1c201d;
+    --ts: #4a5550;
+    --tm: #7a8b7e;
+    --ac: #5FA48E;
+    --ac2: #7ABBA4;
+    --ac3: #A4D4C0;
+    --ac-deep: #3A6B56;
+    --acc: #f7f3ed;
+    --milestone: #B79556;
+    --warm: #E07856;
+    --font-body: "Pretendard Variable", sans-serif;
+    --font-playful: "Gaegu", cursive;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+  body {
+    font-family: var(--font-body);
+    background: #E4DCCC;
+    min-height: 100vh;
+    padding: 56px 24px 48px;
+    color: var(--tp);
+  }
+  .stage { max-width: 1280px; margin: 0 auto; }
+  .header { text-align: center; margin-bottom: 48px; }
+  .header h1 {
+    font-family: var(--font-playful);
+    font-size: 32px;
+    color: var(--ac-deep);
+    letter-spacing: 0.02em;
+    margin-bottom: 6px;
+  }
+  .header p { font-size: 13px; color: #7a6f5c; }
+  .phones {
+    display: grid;
+    grid-template-columns: repeat(3, 360px);
+    gap: 56px;
+    justify-content: center;
+  }
+  .phone {
+    width: 360px;
+    height: 812px;
+    border-radius: 48px;
+    overflow: hidden;
+    position: relative;
+    border: 8px solid #1C1C1E;
+    box-shadow: 0 30px 80px -20px rgba(58,107,86,0.25);
+    background: var(--bg);
+  }
+  .phone-label {
+    position: absolute;
+    top: -36px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-playful);
+    font-size: 17px;
+    color: var(--ac-deep);
+    white-space: nowrap;
+  }
+  .screen {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    padding-bottom: 72px;
+    position: relative;
+  }
+  .screen::-webkit-scrollbar { display: none; }
+
+  .status-bar {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--tp);
+    position: relative;
+    z-index: 5;
+  }
+  .app-header {
+    padding: 8px 20px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    z-index: 5;
+  }
+  .avatar {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--ac3), var(--ac));
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 700; font-size: 16px;
+    flex-shrink: 0; position: relative;
+  }
+  .avatar-streak {
+    position: absolute; bottom: -2px; right: -4px;
+    background: linear-gradient(135deg, var(--milestone), #d4b06a);
+    border-radius: 100px; padding: 1px 6px;
+    font-size: 9px; font-weight: 800; color: #1a1000;
+    border: 1.5px solid var(--bg);
+  }
+  .greeting { flex: 1; min-width: 0; }
+  .greeting-name {
+    font-family: var(--font-playful);
+    font-size: 16px; font-weight: 700;
+    color: var(--tp); letter-spacing: 0.02em;
+  }
+  .greeting-name span { color: var(--ac); }
+  .greeting-sub { font-size: 11.5px; color: var(--tm); margin-top: 2px; }
+  .bell {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--sf); border: 0.5px solid var(--bd);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* ═══ Option A: 박스 없음 + 책장 SVG 배경 ═══ */
+  .scene-a {
+    position: relative;
+    padding: 20px 20px 24px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .scene-a-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at center top, color-mix(in srgb, var(--ac) 10%, transparent), transparent 70%),
+      linear-gradient(180deg, color-mix(in srgb, var(--ac) 4%, var(--bg)) 0%, var(--bg) 100%);
+  }
+  .scene-a-shelf {
+    position: absolute;
+    bottom: 24px;
+    left: 0;
+    right: 0;
+    height: 80px;
+    opacity: 0.5;
+  }
+  .scene-a-mascot-wrap {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+  }
+  .scene-speech {
+    background: #FFFFFF;
+    border: 0.5px solid var(--bd2);
+    border-radius: 20px 20px 20px 4px;
+    padding: 9px 16px;
+    font-family: var(--font-playful);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ac-deep);
+    letter-spacing: 0.02em;
+    box-shadow: 0 4px 14px rgba(58,107,86,0.08);
+    margin-bottom: -4px;
+    margin-right: 60px;
+    align-self: flex-start;
+    margin-left: 20px;
+    position: relative;
+    z-index: 3;
+  }
+  .scene-speech::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 12px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid #FFFFFF;
+  }
+  .scene-mascot {
+    width: 130px;
+    height: 130px;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 20px color-mix(in srgb, var(--ac) 20%, transparent));
+  }
+  .scene-caption {
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--ts);
+    text-align: center;
+    position: relative;
+    z-index: 3;
+  }
+  .scene-caption strong { color: var(--ac); font-weight: 700; }
+
+  /* ═══ Option B: 창문씬 — 방긋이가 창 안에서 인사 ═══ */
+  .scene-b {
+    position: relative;
+    margin: 4px 20px 14px;
+    height: 260px;
+    border-radius: 22px;
+    overflow: hidden;
+    background: linear-gradient(180deg, #E8DFC8 0%, #F0E8D4 100%);
+  }
+  .scene-b-sky {
+    position: absolute;
+    inset: 0 0 40% 0;
+    background: linear-gradient(180deg, #D8E4D8 0%, #E8EFDF 100%);
+  }
+  .scene-b-ground {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(180deg, #D4C8A8, #C4B894);
+  }
+  .scene-b-mascot {
+    position: absolute;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 130px;
+    height: 130px;
+    object-fit: contain;
+    z-index: 3;
+    filter: drop-shadow(0 8px 16px rgba(0,0,0,0.1));
+  }
+  .scene-b-speech {
+    position: absolute;
+    top: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #FFFFFF;
+    border: 0.5px solid var(--bd2);
+    border-radius: 100px;
+    padding: 9px 18px;
+    font-family: var(--font-playful);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ac-deep);
+    letter-spacing: 0.02em;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    z-index: 4;
+    white-space: nowrap;
+  }
+
+  /* ═══ Option C: 종이 질감 + 도트 패턴 + 자유 방긋이 ═══ */
+  .scene-c {
+    position: relative;
+    padding: 24px 20px 28px;
+    margin-bottom: 10px;
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(circle at 20% 30%, color-mix(in srgb, var(--ac) 14%, transparent) 1.5px, transparent 2px),
+      radial-gradient(circle at 70% 20%, color-mix(in srgb, var(--milestone) 20%, transparent) 1.5px, transparent 2px),
+      radial-gradient(circle at 85% 70%, color-mix(in srgb, var(--ac) 12%, transparent) 1.5px, transparent 2px),
+      radial-gradient(circle at 30% 80%, color-mix(in srgb, var(--warm) 18%, transparent) 1px, transparent 1.5px),
+      radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--ac) 10%, transparent) 1px, transparent 1.5px);
+    background-size: 140px 140px, 180px 180px, 120px 120px, 80px 80px, 60px 60px;
+  }
+  .scene-c-mascot-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+    min-height: 140px;
+  }
+  .scene-c-decor {
+    position: absolute;
+    font-size: 24px;
+    opacity: 0.5;
+  }
+  .scene-c-decor-1 { top: 10px; left: 30px; transform: rotate(-15deg); }
+  .scene-c-decor-2 { top: 20px; right: 40px; transform: rotate(10deg); }
+  .scene-c-decor-3 { bottom: 0; right: 60px; transform: rotate(-8deg); }
+  .scene-c-mascot {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 20px color-mix(in srgb, var(--ac) 18%, transparent));
+  }
+  .scene-c-speech {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-85%);
+    background: #FFFFFF;
+    border: 0.5px solid var(--bd2);
+    border-radius: 16px 16px 4px 16px;
+    padding: 8px 14px;
+    font-family: var(--font-playful);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ac-deep);
+    letter-spacing: 0.02em;
+    box-shadow: 0 4px 14px rgba(58,107,86,0.08);
+    white-space: nowrap;
+    z-index: 3;
+  }
+
+  /* ═══ 공통: 이어읽기 카드 ═══ */
+  .continue {
+    margin: 0 20px 14px;
+    background: var(--sf);
+    border: 0.5px solid var(--bd);
+    border-radius: 16px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    z-index: 2;
+  }
+  .continue-cover {
+    width: 52px; height: 76px; border-radius: 5px;
+    background: linear-gradient(135deg, #C8A878, #8B6B3C);
+    color: #f4efe8; font-size: 9px; font-weight: 700; padding: 5px;
+    display: flex; align-items: flex-end; line-height: 1.2;
+    flex-shrink: 0;
+  }
+  .continue-body { flex: 1; min-width: 0; }
+  .continue-title {
+    font-size: 15px; font-weight: 800; color: var(--tp);
+    line-height: 1.3; letter-spacing: -0.2px;
+  }
+  .continue-author { font-size: 11px; color: var(--tm); margin-bottom: 8px; }
+  .continue-progress {
+    height: 3px; background: var(--sf3); border-radius: 100px; overflow: hidden;
+    margin-bottom: 4px;
+  }
+  .continue-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--ac), var(--ac2));
+  }
+  .continue-meta {
+    display: flex; justify-content: space-between;
+    font-size: 10.5px; color: var(--tm);
+  }
+  .continue-meta strong { color: var(--ac); font-weight: 700; }
+  .continue-cta {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--ac), var(--ac2));
+    color: var(--acc);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--ac) 30%, transparent);
+  }
+
+  /* ═══ 액션 타일 ═══ */
+  .actions {
+    margin: 0 20px 12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .action-tile {
+    padding: 12px 14px;
+    background: var(--sf);
+    border: 0.5px solid var(--bd);
+    border-radius: 14px;
+  }
+  .action-icon {
+    width: 30px; height: 30px; border-radius: 10px;
+    background: color-mix(in srgb, var(--ac) 14%, var(--bg));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; margin-bottom: 8px;
+  }
+  .action-label {
+    font-family: var(--font-playful);
+    font-size: 13px; font-weight: 700; color: var(--tp);
+    letter-spacing: 0.02em; line-height: 1.2;
+  }
+  .action-sub {
+    font-size: 10px; color: var(--tm); margin-top: 2px; line-height: 1.3;
+  }
+
+  /* ═══ 서브탭 ═══ */
+  .tabs {
+    display: flex; gap: 20px; padding: 0 20px;
+    margin-bottom: 10px;
+    border-bottom: 0.5px solid var(--bd);
+  }
+  .tab {
+    padding: 10px 0; font-size: 13px; font-weight: 500;
+    color: var(--tm); position: relative;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .tab.on { color: var(--tp); font-weight: 700; }
+  .tab.on::after {
+    content: ''; position: absolute; bottom: -0.5px; left: 0; right: 0;
+    height: 2.5px;
+    background: linear-gradient(90deg, var(--ac), var(--ac2));
+    border-radius: 2px;
+  }
+  .tab-count {
+    font-size: 9.5px; font-weight: 700; padding: 1px 6px;
+    border-radius: 100px; background: var(--sf2); color: var(--tm);
+  }
+  .tab.on .tab-count {
+    background: color-mix(in srgb, var(--ac) 15%, transparent);
+    color: var(--ac);
+  }
+
+  /* ═══ 하단 네비 ═══ */
+  .bottom-nav {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 60px;
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter: blur(20px);
+    border-top: 0.5px solid var(--bd);
+    display: flex; justify-content: space-around; align-items: center;
+  }
+  .nav-btn {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 3px; color: var(--tm); min-width: 56px;
+  }
+  .nav-btn svg { width: 20px; height: 20px; }
+  .nav-btn .nav-label {
+    font-size: 10px; font-weight: 500; letter-spacing: 0.2px; line-height: 1;
+  }
+  .nav-btn.on { color: var(--ac); }
+  .nav-btn.on .nav-label {
+    font-family: var(--font-playful); font-weight: 700; letter-spacing: 0.02em;
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="header">
+    <h1>방긋 홈 v4 — 배경 실험</h1>
+    <p>박스 없애고 씬 구성 · 3가지 배경 접근</p>
+  </div>
+
+  <div class="phones">
+
+    <!-- ══ A: 박스 없음 + 은은한 그라디언트 + 책장 실루엣 ══ -->
+    <div class="phone">
+      <div class="phone-label">① 박스 X · 책장 실루엣</div>
+      <div class="screen">
+        <div class="status-bar"><span>9:41</span><span>●●● 100%</span></div>
+        <div class="app-header">
+          <div class="avatar">지<div class="avatar-streak">🔥 4</div></div>
+          <div class="greeting">
+            <div class="greeting-name">안녕, <span>지선</span>님</div>
+            <div class="greeting-sub">좋은 아침이에요</div>
+          </div>
+          <div class="bell">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--ts)" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          </div>
+        </div>
+
+        <div class="scene-a">
+          <div class="scene-a-bg"></div>
+          <!-- 책장 실루엣 SVG -->
+          <svg class="scene-a-shelf" viewBox="0 0 360 80" preserveAspectRatio="none">
+            <g fill="var(--ac-deep)" opacity="0.18">
+              <!-- 책들 -->
+              <rect x="20" y="20" width="18" height="55" rx="1"/>
+              <rect x="40" y="30" width="14" height="45" rx="1"/>
+              <rect x="56" y="15" width="20" height="60" rx="1"/>
+              <rect x="78" y="25" width="16" height="50" rx="1"/>
+              <rect x="96" y="35" width="22" height="40" rx="1"/>
+              <rect x="120" y="20" width="14" height="55" rx="1"/>
+              <rect x="136" y="28" width="20" height="47" rx="1"/>
+              <rect x="158" y="18" width="16" height="57" rx="1"/>
+              <rect x="176" y="32" width="18" height="43" rx="1"/>
+              <rect x="196" y="22" width="22" height="53" rx="1"/>
+              <rect x="220" y="30" width="14" height="45" rx="1"/>
+              <rect x="236" y="18" width="18" height="57" rx="1"/>
+              <rect x="256" y="28" width="16" height="47" rx="1"/>
+              <rect x="274" y="20" width="20" height="55" rx="1"/>
+              <rect x="296" y="32" width="18" height="43" rx="1"/>
+              <rect x="316" y="22" width="14" height="53" rx="1"/>
+              <rect x="332" y="28" width="20" height="47" rx="1"/>
+              <!-- 선반 -->
+              <rect x="0" y="75" width="360" height="3" fill="var(--ac-deep)" opacity="0.5"/>
+            </g>
+          </svg>
+          <div class="scene-a-mascot-wrap">
+            <div class="scene-speech">어제 157쪽에서 멈췄어요!</div>
+            <img src="/mascot-happy.png" alt="방긋이" class="scene-mascot" />
+          </div>
+          <div class="scene-caption">오늘도 한 장 <strong>같이 넘겨봐요</strong></div>
+        </div>
+
+        <div class="continue">
+          <div class="continue-cover">아몬드<br>손원평</div>
+          <div class="continue-body">
+            <div class="continue-title">아몬드</div>
+            <div class="continue-author">손원평 · 창비</div>
+            <div class="continue-progress"><div class="continue-progress-fill" style="width:52%"></div></div>
+            <div class="continue-meta"><span><strong>157</strong> / 302쪽</span><span>52%</span></div>
+          </div>
+          <div class="continue-cta">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,4 20,12 6,20"/></svg>
+          </div>
+        </div>
+
+        <div class="actions">
+          <div class="action-tile">
+            <div class="action-icon">💬</div>
+            <div class="action-label">방긋이와 이야기</div>
+            <div class="action-sub">5분 대화 → 서평</div>
+          </div>
+          <div class="action-tile">
+            <div class="action-icon">✍️</div>
+            <div class="action-label">글귀 스크랩</div>
+            <div class="action-sub">마음 남는 문장</div>
+          </div>
+        </div>
+
+        <div class="tabs">
+          <div class="tab on">읽는 중 <span class="tab-count">3</span></div>
+          <div class="tab">완독 <span class="tab-count">42</span></div>
+          <div class="tab">위시 <span class="tab-count">12</span></div>
+          <div class="tab">스크랩</div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-btn on">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>
+          <span class="nav-label">서재</span>
+        </div>
+        <div class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span class="nav-label">모임</span></div>
+        <div class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg><span class="nav-label">서평</span></div>
+        <div class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="8" r="4"/><path d="M20 21v-2a7 7 0 0 0-14 0v2"/></svg><span class="nav-label">MY</span></div>
+      </div>
+    </div>
+
+    <!-- ══ B: 창문씬 — 방긋이가 마당/언덕에 있음 ══ -->
+    <div class="phone">
+      <div class="phone-label">② 풍경씬 — 방긋이의 마당</div>
+      <div class="screen">
+        <div class="status-bar"><span>9:41</span><span>●●● 100%</span></div>
+        <div class="app-header">
+          <div class="avatar">지<div class="avatar-streak">🔥 4</div></div>
+          <div class="greeting">
+            <div class="greeting-name">안녕, <span>지선</span>님</div>
+            <div class="greeting-sub">좋은 아침이에요</div>
+          </div>
+          <div class="bell">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--ts)" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          </div>
+        </div>
+
+        <!-- Scene B: 풍경 -->
+        <div class="scene-b">
+          <div class="scene-b-sky"></div>
+          <!-- 해 -->
+          <svg style="position:absolute; top:18px; right:24px; z-index:1;" width="44" height="44" viewBox="0 0 44 44">
+            <circle cx="22" cy="22" r="14" fill="#F5D078" opacity="0.85"/>
+            <circle cx="22" cy="22" r="20" fill="#F5D078" opacity="0.2"/>
+          </svg>
+          <!-- 구름들 -->
+          <svg style="position:absolute; top:42px; left:30px; z-index:1;" width="70" height="30" viewBox="0 0 70 30">
+            <ellipse cx="20" cy="16" rx="18" ry="10" fill="#FFFFFF" opacity="0.75"/>
+            <ellipse cx="40" cy="12" rx="14" ry="9" fill="#FFFFFF" opacity="0.75"/>
+            <ellipse cx="54" cy="18" rx="12" ry="8" fill="#FFFFFF" opacity="0.75"/>
+          </svg>
+          <svg style="position:absolute; top:68px; right:70px; z-index:1;" width="50" height="22" viewBox="0 0 50 22">
+            <ellipse cx="15" cy="12" rx="14" ry="8" fill="#FFFFFF" opacity="0.6"/>
+            <ellipse cx="32" cy="10" rx="12" ry="7" fill="#FFFFFF" opacity="0.6"/>
+          </svg>
+          <!-- 언덕 -->
+          <svg style="position:absolute; bottom:0; left:0; right:0; z-index:1;" viewBox="0 0 320 130" preserveAspectRatio="none" width="100%" height="130">
+            <!-- 먼 언덕 -->
+            <path d="M0,70 Q80,40 160,55 T320,50 L320,130 L0,130 Z" fill="#C8D4B8" opacity="0.6"/>
+            <!-- 가까운 언덕 -->
+            <path d="M0,90 Q100,60 200,80 T320,75 L320,130 L0,130 Z" fill="#D4C8A8"/>
+          </svg>
+          <!-- 나무 왼쪽 -->
+          <svg style="position:absolute; bottom:32px; left:16px; z-index:2;" width="36" height="54" viewBox="0 0 36 54">
+            <rect x="16" y="36" width="4" height="16" fill="#6B4A2A"/>
+            <circle cx="18" cy="30" r="16" fill="#7AA08A"/>
+            <circle cx="10" cy="26" r="10" fill="#8EB49E"/>
+            <circle cx="26" cy="26" r="10" fill="#8EB49E"/>
+          </svg>
+          <!-- 풀 -->
+          <svg style="position:absolute; bottom:20px; right:28px; z-index:2;" width="44" height="22" viewBox="0 0 44 22">
+            <path d="M4 22 Q6 10 8 22 Q10 14 12 22 Q14 8 16 22" stroke="#7AA08A" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M24 22 Q26 12 28 22 Q30 10 32 22 Q34 14 36 22" stroke="#7AA08A" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </svg>
+
+          <!-- 말풍선 -->
+          <div class="scene-b-speech">오늘도 한 장 같이 넘겨봐요!</div>
+          <!-- 방긋이 -->
+          <img src="/mascot-happy.png" alt="방긋이" class="scene-b-mascot" />
+        </div>
+
+        <div class="continue">
+          <div class="continue-cover">아몬드<br>손원평</div>
+          <div class="continue-body">
+            <div class="continue-title">아몬드</div>
+            <div class="continue-author">손원평 · 창비 · 3/6장</div>
+            <div class="continue-progress"><div class="continue-progress-fill" style="width:52%"></div></div>
+            <div class="continue-meta"><span><strong>157</strong> / 302쪽</span><span>52%</span></div>
+          </div>
+          <div class="continue-cta">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,4 20,12 6,20"/></svg>
+          </div>
+        </div>
+
+        <div class="actions">
+          <div class="action-tile">
+            <div class="action-icon">💬</div>
+            <div class="action-label">방긋이와 이야기</div>
+            <div class="action-sub">5분 대화 → 서평</div>
+          </div>
+          <div class="action-tile">
+            <div class="action-icon">✍️</div>
+            <div class="action-label">글귀 스크랩</div>
+            <div class="action-sub">마음 남는 문장</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-btn on">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>
+          <span class="nav-label">서재</span>
+        </div>
+        <div class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span class="nav-label">모임</span></div>
+        <div class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg><span class="nav-label">서평</span></div>
+        <div class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="8" r="4"/><path d="M20 21v-2a7 7 0 0 0-14 0v2"/></svg><span class="nav-label">MY</span></div>
+      </div>
+    </div>
+
+    <!-- ══ C: 종이+도트 패턴 + 떠다니는 소품 ══ -->
+    <div class="phone">
+      <div class="phone-label">③ 종이 패턴 + 떠다니는 소품</div>
+      <div class="screen">
+        <div class="status-bar"><span>9:41</span><span>●●● 100%</span></div>
+        <div class="app-header">
+          <div class="avatar">지<div class="avatar-streak">🔥 4</div></div>
+          <div class="greeting">
+            <div class="greeting-name">안녕, <span>지선</span>님</div>
+            <div class="greeting-sub">좋은 아침이에요</div>
+          </div>
+          <div class="bell">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--ts)" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          </div>
+        </div>
+
+        <div class="scene-c">
+          <!-- 떠다니는 소품 -->
+          <svg class="scene-c-decor scene-c-decor-1" width="32" height="32" viewBox="0 0 32 32">
+            <!-- 책 기울어짐 -->
+            <rect x="4" y="6" width="24" height="20" rx="2" fill="#C8A878"/>
+            <rect x="4" y="6" width="24" height="4" fill="#8B6B3C"/>
+            <line x1="8" y1="14" x2="24" y2="14" stroke="#6B4A2A" stroke-width="1" opacity="0.4"/>
+            <line x1="8" y1="18" x2="24" y2="18" stroke="#6B4A2A" stroke-width="1" opacity="0.4"/>
+          </svg>
+          <svg class="scene-c-decor scene-c-decor-2" width="28" height="32" viewBox="0 0 28 32">
+            <!-- 펜 -->
+            <rect x="10" y="4" width="8" height="24" rx="1" fill="#3A6B56"/>
+            <polygon points="14,0 10,4 18,4" fill="#C0A060"/>
+          </svg>
+          <svg class="scene-c-decor scene-c-decor-3" width="30" height="24" viewBox="0 0 30 24">
+            <!-- 잎 -->
+            <path d="M4 12 Q15 4 26 12 Q15 20 4 12 Z" fill="#7AA08A"/>
+            <path d="M6 12 Q15 10 24 12" stroke="#3A6B56" stroke-width="1" fill="none" opacity="0.5"/>
+          </svg>
+
+          <div class="scene-c-mascot-wrap">
+            <div class="scene-c-speech">어제 157쪽에서 멈췄어요!</div>
+            <img src="/mascot-happy.png" alt="방긋이" class="scene-c-mascot" />
+          </div>
+        </div>
+
+        <div style="text-align:center; font-family: var(--font-playful); font-size:15px; color: var(--ac-deep); letter-spacing: 0.02em; margin: -6px 0 14px;">
+          오늘도 한 장 같이 넘겨봐요
+        </div>
+
+        <div class="continue">
+          <div class="continue-cover">아몬드<br>손원평</div>
+          <div class="continue-body">
+            <div class="continue-title">아몬드</div>
+            <div class="continue-author">손원평 · 창비</div>
+            <div class="continue-progress"><div class="continue-progress-fill" style="width:52%"></div></div>
+            <div class="continue-meta"><span><strong>157</strong> / 302쪽</span><span>52%</span></div>
+          </div>
+          <div class="continue-cta">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,4 20,12 6,20"/></svg>
+          </div>
+        </div>
+
+        <div class="actions">
+          <div class="action-tile">
+            <div class="action-icon">💬</div>
+            <div class="action-label">방긋이와 이야기</div>
+            <div class="action-sub">5분 대화 → 서평</div>
+          </div>
+          <div class="action-tile">
+            <div class="action-icon">✍️</div>
+            <div class="action-label">글귀 스크랩</div>
+            <div class="action-sub">마음 남는 문장</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-btn on">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>
+          <span class="nav-label">서재</span>
+        </div>
+        <div class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span class="nav-label">모임</span></div>
+        <div class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg><span class="nav-label">서평</span></div>
+        <div class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="8" r="4"/><path d="M20 21v-2a7 7 0 0 0-14 0v2"/></svg><span class="nav-label">MY</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

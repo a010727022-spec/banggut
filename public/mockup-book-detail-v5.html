@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>책 상세 · 읽는 중 v5 — Solo base + Group overlay</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;word-break:keep-all}
+
+:root{
+  --bg:#F7F3ED;
+  --bg2:#F0EADF;
+  --paper:#FBF7EF;
+  --sf:#FFFFFF;
+  --sf2:#EDE7DF;
+  --sf3:#E0D9D0;
+  --ink:#1c201d;
+  --ink2:#4a5550;
+  --ink3:#7a8b7e;
+  --mint:#5FA48E;
+  --mint2:#7ABBA4;
+  --mint3:#A4D4C0;
+  --mintbg:rgba(95,164,142,0.08);
+  --mintbg2:rgba(95,164,142,0.16);
+  --bd:rgba(95,164,142,0.14);
+  --bd2:rgba(95,164,142,0.3);
+  --acc:#f7f3ed;
+  --danger:#C55E4A;
+  --honey:#D4A056;
+  --honey2:#E8B86A;
+  --peach:#F4A882;
+  --lavender:#B39BC4;
+  --font-playful:'Gaegu',cursive;
+  --ls:0.02em;
+}
+
+body{
+  font-family:'Pretendard',system-ui,-apple-system,sans-serif;
+  background:#D8D1C5;
+  padding:32px 20px 48px;
+  min-height:100vh;
+  color:var(--ink);
+}
+
+.wrap{max-width:960px;margin:0 auto}
+
+.title{
+  font-family:var(--font-playful);
+  font-size:32px;
+  font-weight:700;
+  letter-spacing:var(--ls);
+  text-align:center;
+  margin-bottom:6px;
+}
+
+.sub{
+  color:var(--ink2);
+  font-size:13px;
+  text-align:center;
+  margin-bottom:32px;
+  font-weight:500;
+  line-height:1.65;
+}
+
+.sub em{font-style:normal;color:var(--mint);font-weight:700}
+
+.phones{display:flex;gap:32px;justify-content:center;flex-wrap:wrap}
+
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;max-width:400px}
+
+.phone-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:7px 16px;
+  border-radius:100px;
+  background:#FFFFFF;
+  border:1px solid var(--bd2);
+  font-size:11.5px;
+  font-weight:700;
+  color:var(--mint);
+  letter-spacing:0.4px;
+}
+
+.phone-badge b{font-family:var(--font-playful);font-size:13px;letter-spacing:var(--ls)}
+.phone-badge.group{color:var(--honey);border-color:color-mix(in srgb,var(--honey) 40%,transparent)}
+
+.phone{
+  width:380px;
+  height:820px;
+  border-radius:44px;
+  box-shadow:0 0 0 3px #1a1a1a,0 0 28px rgba(0,0,0,0.12);
+  overflow:hidden;
+  position:relative;
+}
+
+.phone-desc{
+  font-size:11.5px;
+  color:var(--ink2);
+  text-align:center;
+  line-height:1.65;
+  max-width:380px;
+  font-weight:500;
+}
+
+.phone-desc strong{color:var(--mint);font-weight:700}
+
+.status{
+  height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 24px;
+  font-size:14px;
+  font-weight:700;
+  color:var(--ink);
+}
+
+/* ========================================================
+   SOLO BASE + cover ambient tint
+   Book cover palette: #9A6B3A / #E2C8A8 (warm brown/cream)
+   ======================================================== */
+.p-solo{
+  --book-tint-1:#9A6B3A;
+  --book-tint-2:#E2C8A8;
+  height:100%;
+  background:
+    radial-gradient(ellipse 640px 360px at 50% -40px,color-mix(in srgb,var(--book-tint-1) 14%,var(--bg)),var(--bg) 62%),
+    var(--bg);
+  position:relative;
+  overflow:auto;
+}
+
+.p-solo::-webkit-scrollbar{width:0}
+
+.p-group{
+  --book-tint-1:#3A5E4A;
+  --book-tint-2:#A4C9B5;
+  height:100%;
+  background:
+    radial-gradient(ellipse 640px 360px at 50% -40px,color-mix(in srgb,var(--book-tint-1) 16%,var(--bg)),var(--bg) 62%),
+    var(--bg);
+  position:relative;
+  overflow:auto;
+}
+
+.p-group::-webkit-scrollbar{width:0}
+
+/* ================ Shared top nav ================ */
+.nav{
+  display:flex;
+  justify-content:space-between;
+  padding:8px 20px 2px;
+  position:relative;
+  z-index:3;
+}
+
+.nav-btn{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.78);
+  backdrop-filter:blur(8px);
+  border:0.5px solid var(--bd);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--ink2);
+  cursor:pointer;
+}
+
+.nav-btn svg{width:15px;height:15px}
+
+/* ================ Header · Cover presented ================ */
+.head{
+  padding:14px 24px 18px;
+  display:flex;
+  gap:18px;
+  align-items:flex-start;
+  position:relative;
+}
+
+.head-cover{
+  width:84px;
+  height:120px;
+  border-radius:7px;
+  box-shadow:0 12px 28px rgba(0,0,0,0.22),0 3px 8px rgba(0,0,0,0.08);
+  flex-shrink:0;
+  display:flex;
+  align-items:flex-end;
+  padding:8px;
+  font-size:10px;
+  font-weight:800;
+  line-height:1.15;
+  position:relative;
+}
+
+.head-cover::after{
+  content:"";
+  position:absolute;
+  top:3px;
+  left:3px;
+  right:3px;
+  height:35%;
+  background:linear-gradient(135deg,rgba(255,255,255,0.18),transparent 60%);
+  border-radius:5px;
+  pointer-events:none;
+}
+
+.head-cover.warm{background:linear-gradient(135deg,#9A6B3A,#C48D58);color:#f4efe8}
+.head-cover.forest{background:linear-gradient(135deg,#3A5E4A,#6A8A7A);color:#e8ede8}
+
+.head-body{flex:1;min-width:0;padding-top:2px}
+
+.head-subtitle{
+  font-size:10.5px;
+  font-weight:700;
+  color:var(--mint);
+  letter-spacing:1.4px;
+  text-transform:uppercase;
+  margin-bottom:6px;
+}
+
+.head-subtitle.group{color:var(--honey)}
+
+.head-title{
+  font-size:20px;
+  font-weight:800;
+  color:var(--ink);
+  letter-spacing:-0.015em;
+  line-height:1.22;
+  margin-bottom:3px;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+
+.head-author{
+  font-size:11.5px;
+  color:var(--ink3);
+  font-weight:500;
+  margin-bottom:10px;
+}
+
+.head-meta{
+  display:flex;
+  align-items:baseline;
+  gap:6px;
+  font-size:11.5px;
+  color:var(--ink2);
+}
+
+.head-meta b{
+  font-family:var(--font-playful);
+  font-size:17px;
+  color:var(--mint);
+  letter-spacing:var(--ls);
+  line-height:1;
+  font-weight:700;
+}
+
+.head-meta .dot{width:3px;height:3px;border-radius:50%;background:var(--bd2);margin:0 4px}
+
+/* ================ Group ribbon (only in group state, replaces/appends to head-subtitle area) ================ */
+.group-ribbon{
+  margin:6px 20px 0;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--honey) 20%,var(--sf)),var(--sf));
+  border:1px solid color-mix(in srgb,var(--honey) 40%,transparent);
+  border-radius:14px;
+  padding:12px 14px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  position:relative;
+  box-shadow:0 4px 14px color-mix(in srgb,var(--honey) 10%,transparent);
+}
+
+.group-ribbon::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:14px;
+  right:14px;
+  height:3px;
+  background:var(--honey);
+  border-radius:0 0 3px 3px;
+}
+
+.group-mem{display:flex;align-items:center}
+.group-ava{
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  border:2px solid var(--sf);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-size:10px;
+  font-weight:800;
+  margin-left:-8px;
+  position:relative;
+  flex-shrink:0;
+}
+
+.group-ava:first-child{margin-left:0}
+.group-ava.a1{background:linear-gradient(135deg,var(--peach),#e89562)}
+.group-ava.a2{background:linear-gradient(135deg,var(--lavender),#9a7eb3)}
+.group-ava.a3{background:linear-gradient(135deg,var(--mint2),var(--mint))}
+
+.group-ava.live::after{
+  content:"";
+  position:absolute;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--mint);
+  border:2px solid var(--sf);
+  bottom:-2px;
+  right:-3px;
+  animation:pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+
+.group-text{
+  flex:1;
+  min-width:0;
+  font-size:12px;
+  color:var(--ink2);
+  line-height:1.4;
+}
+
+.group-text b{font-family:var(--font-playful);font-size:14px;color:var(--ink);letter-spacing:var(--ls);font-weight:700}
+.group-text em{font-style:normal;color:var(--honey);font-weight:700}
+
+.group-dday{
+  font-family:var(--font-playful);
+  font-size:13px;
+  font-weight:700;
+  color:var(--honey);
+  background:color-mix(in srgb,var(--honey) 18%,transparent);
+  padding:3px 10px;
+  border-radius:100px;
+  letter-spacing:var(--ls);
+  flex-shrink:0;
+}
+
+/* ================ Streak thin ribbon (solo only) ================ */
+.streak{
+  margin:14px 20px 0;
+  padding:10px 14px;
+  background:rgba(255,255,255,0.7);
+  backdrop-filter:blur(6px);
+  border:0.5px solid var(--bd);
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:11.5px;
+  color:var(--ink2);
+  line-height:1.4;
+}
+
+.streak svg{width:14px;height:14px;color:var(--mint);flex-shrink:0}
+.streak b{font-family:var(--font-playful);font-size:14px;color:var(--mint);letter-spacing:var(--ls);font-weight:700}
+
+.streak-dots{display:flex;gap:4px;margin-left:auto;flex-shrink:0}
+.streak-dot{width:8px;height:8px;border-radius:50%;background:var(--sf3)}
+.streak-dot.on{background:var(--mint)}
+.streak-dot.on.today{box-shadow:0 0 0 3px color-mix(in srgb,var(--mint) 18%,transparent)}
+
+/* ================ Focus card (oldsen's journal entry) ================ */
+.focus{
+  margin:14px 20px 0;
+  padding:20px 20px 18px;
+  background:var(--sf);
+  border:1px solid var(--bd);
+  border-radius:20px;
+  position:relative;
+  box-shadow:0 6px 20px color-mix(in srgb,var(--mint) 10%,transparent);
+}
+
+/* A subtle Gaegu date label in the top right — diary feel */
+.focus-date{
+  position:absolute;
+  top:16px;
+  right:18px;
+  font-family:var(--font-playful);
+  font-size:12px;
+  color:var(--ink3);
+  letter-spacing:var(--ls);
+  font-weight:700;
+  text-align:right;
+  line-height:1.2;
+}
+
+.focus-date b{display:block;font-size:17px;color:var(--mint);line-height:1}
+
+.focus-label{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:10px;
+  font-weight:700;
+  color:var(--mint);
+  letter-spacing:1.4px;
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+
+.focus-label svg{width:11px;height:11px}
+
+.focus-q{
+  font-family:var(--font-playful);
+  font-size:21px;
+  font-weight:700;
+  color:var(--ink);
+  letter-spacing:var(--ls);
+  line-height:1.3;
+  margin-bottom:5px;
+  max-width:230px;
+}
+
+.focus-hint{
+  font-size:11.5px;
+  color:var(--ink3);
+  margin-bottom:16px;
+  font-weight:500;
+}
+
+.focus-hint b{
+  font-family:var(--font-playful);
+  font-size:13.5px;
+  color:var(--mint);
+  letter-spacing:var(--ls);
+  font-weight:700;
+}
+
+.chips{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:7px;margin-bottom:12px}
+
+.chip{
+  padding:10px 0;
+  border-radius:11px;
+  background:var(--bg2);
+  border:1px solid var(--bd);
+  font-family:var(--font-playful);
+  font-size:14px;
+  font-weight:700;
+  color:var(--ink);
+  letter-spacing:var(--ls);
+  text-align:center;
+  cursor:pointer;
+  transition:all 140ms cubic-bezier(0.16,1,0.3,1);
+}
+
+.chip:hover{border-color:var(--bd2)}
+.chip.on{
+  background:color-mix(in srgb,var(--mint) 14%,var(--sf));
+  border-color:var(--mint);
+  color:var(--mint);
+  box-shadow:0 2px 8px color-mix(in srgb,var(--mint) 20%,transparent);
+}
+
+.chip.ed{
+  font-family:'Pretendard',system-ui,sans-serif;
+  font-size:11.5px;
+  font-weight:600;
+  color:var(--ink2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+}
+
+.chip.ed svg{width:11px;height:11px;opacity:0.7}
+
+.cta{
+  width:100%;
+  padding:13px;
+  border-radius:12px;
+  background:linear-gradient(135deg,var(--mint),var(--mint2));
+  color:var(--acc);
+  font-size:13.5px;
+  font-weight:700;
+  border:none;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  box-shadow:0 4px 14px color-mix(in srgb,var(--mint) 26%,transparent);
+  transition:transform 140ms cubic-bezier(0.16,1,0.3,1);
+}
+
+.cta:hover{transform:translateY(-1px)}
+.cta svg{width:13px;height:13px}
+.cta.dim{background:var(--sf2);color:var(--ink3);box-shadow:none;cursor:not-allowed}
+
+/* ================ Progress block ================ */
+.prog{
+  margin:14px 20px 0;
+  padding:16px 18px;
+  background:rgba(255,255,255,0.6);
+  backdrop-filter:blur(6px);
+  border:1px solid var(--bd);
+  border-radius:18px;
+}
+
+.prog-top{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+
+.prog-label{
+  font-size:10px;
+  font-weight:700;
+  color:var(--ink3);
+  letter-spacing:1.2px;
+  text-transform:uppercase;
+}
+
+.prog-pct{
+  font-family:var(--font-playful);
+  font-size:28px;
+  font-weight:700;
+  color:var(--mint);
+  letter-spacing:var(--ls);
+  line-height:1;
+}
+
+.prog-bar{
+  height:8px;
+  background:var(--bg2);
+  border-radius:100px;
+  overflow:hidden;
+  margin-bottom:12px;
+  position:relative;
+}
+
+.prog-bar-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--mint),var(--mint2));
+  border-radius:100px;
+  box-shadow:0 1px 4px color-mix(in srgb,var(--mint) 30%,transparent);
+}
+
+/* Group compare: my pos + avg pos markers on the bar */
+.prog-marker{
+  position:absolute;
+  top:-4px;
+  width:2px;
+  height:16px;
+  background:var(--honey);
+  border-radius:2px;
+}
+
+.prog-marker::before{
+  content:attr(data-label);
+  position:absolute;
+  top:-16px;
+  left:50%;
+  transform:translateX(-50%);
+  font-family:var(--font-playful);
+  font-size:10px;
+  font-weight:700;
+  color:var(--honey);
+  letter-spacing:var(--ls);
+  white-space:nowrap;
+}
+
+.prog-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:1px;
+  background:var(--bd);
+  border-radius:12px;
+  overflow:hidden;
+}
+
+.prog-grid > div{
+  background:var(--paper);
+  padding:10px 0;
+  text-align:center;
+}
+
+.prog-grid b{
+  font-family:var(--font-playful);
+  font-size:16px;
+  font-weight:700;
+  color:var(--ink);
+  letter-spacing:var(--ls);
+  display:block;
+  line-height:1;
+  margin-bottom:3px;
+}
+
+.prog-grid span{
+  font-size:9.5px;
+  color:var(--ink3);
+  font-weight:600;
+  letter-spacing:0.3px;
+}
+
+.prog-grid .mine{color:var(--mint)}
+.prog-grid .avg{color:var(--honey)}
+
+/* ================ AI / Group discussion entry ================ */
+.entry{
+  margin:12px 20px 0;
+  padding:14px 16px;
+  background:var(--sf);
+  border:1px solid var(--bd);
+  border-radius:16px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  cursor:pointer;
+  transition:border-color 140ms ease;
+  position:relative;
+  overflow:hidden;
+}
+
+.entry:hover{border-color:var(--bd2)}
+
+.entry-avatar{
+  width:42px;
+  height:42px;
+  border-radius:12px;
+  background:color-mix(in srgb,var(--mint) 14%,var(--sf));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:var(--font-playful);
+  font-size:12px;
+  font-weight:700;
+  color:var(--mint);
+  letter-spacing:var(--ls);
+  flex-shrink:0;
+}
+
+.entry-avatar.group{
+  background:color-mix(in srgb,var(--honey) 16%,var(--sf));
+  color:var(--honey);
+}
+
+.entry-avatar svg{width:16px;height:16px}
+
+.entry-body{flex:1;min-width:0}
+.entry-t{
+  font-size:13.5px;
+  font-weight:700;
+  color:var(--ink);
+  letter-spacing:-0.01em;
+  line-height:1.25;
+  margin-bottom:2px;
+}
+
+.entry-s{font-size:11px;color:var(--ink3);line-height:1.4}
+.entry-s em{font-style:normal;color:var(--mint);font-weight:700}
+.entry-s em.honey{color:var(--honey)}
+
+.entry-arr{color:var(--ink3);flex-shrink:0}
+.entry-arr svg{width:14px;height:14px}
+
+/* ================ Sub actions ================ */
+.subs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin:12px 20px 0;
+}
+
+.sub{
+  background:var(--sf);
+  border:1px solid var(--bd);
+  border-radius:16px;
+  padding:14px 14px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  cursor:pointer;
+  transition:border-color 140ms ease,transform 140ms ease;
+}
+
+.sub:hover{border-color:var(--bd2);transform:translateY(-1px)}
+
+.sub-icon{
+  width:34px;
+  height:34px;
+  border-radius:10px;
+  background:color-mix(in srgb,var(--mint) 14%,var(--sf));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--mint);
+  flex-shrink:0;
+}
+
+.sub-icon svg{width:15px;height:15px}
+
+.sub-body{flex:1;min-width:0}
+.sub-t{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.2;margin-bottom:2px}
+.sub-s{font-size:10.5px;color:var(--ink3);line-height:1.3}
+.sub-count{font-family:var(--font-playful);font-size:13px;font-weight:700;color:var(--mint);letter-spacing:var(--ls);line-height:1}
+
+/* ================ Past journal entries (solo-only flavor) ================ */
+.past-label{
+  margin:18px 20px 8px;
+  font-family:var(--font-playful);
+  font-size:12px;
+  font-weight:700;
+  color:var(--ink3);
+  letter-spacing:var(--ls);
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.past-label::after{content:"";flex:1;height:1px;background:var(--bd)}
+
+.past{
+  margin:0 20px 8px;
+  padding:12px 14px;
+  background:rgba(255,255,255,0.6);
+  border:1px solid var(--bd);
+  border-radius:14px;
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+
+.past-date{
+  font-family:var(--font-playful);
+  font-size:11.5px;
+  color:var(--ink3);
+  letter-spacing:var(--ls);
+  min-width:34px;
+  text-align:center;
+  line-height:1.1;
+  font-weight:700;
+}
+
+.past-date b{display:block;font-size:17px;color:var(--mint);line-height:1}
+.past-body{flex:1;min-width:0}
+.past-body b{font-family:var(--font-playful);font-size:13px;color:var(--ink);letter-spacing:var(--ls);font-weight:700}
+.past-body span{display:block;font-size:11px;color:var(--ink3);margin-top:2px;line-height:1.35}
+.past-body em{font-style:normal;color:var(--mint);font-weight:700;font-family:var(--font-playful);font-size:12.5px;letter-spacing:var(--ls)}
+
+/* Bottom tabs */
+.btmtabs{
+  position:absolute;
+  bottom:0;
+  left:0;
+  right:0;
+  height:60px;
+  background:rgba(247,243,237,0.92);
+  backdrop-filter:blur(10px);
+  border-top:0.5px solid var(--bd);
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  padding:4px 12px 8px;
+  z-index:4;
+}
+
+.btmtab{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  color:var(--ink3);
+  font-size:9.5px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.btmtab.on{color:var(--mint)}
+.btmtab svg{width:16px;height:16px}
+
+/* Padding bottom for scroll */
+.bottom-pad{height:76px}
+
+/* ================ Note ================ */
+.note{
+  margin:40px auto 0;
+  padding:26px 30px;
+  background:#FFFFFF;
+  border:1px solid var(--bd2);
+  border-radius:20px;
+  color:var(--ink);
+  font-size:12.5px;
+  line-height:1.8;
+  max-width:900px;
+}
+
+.note-title{
+  font-family:var(--font-playful);
+  font-size:20px;
+  font-weight:700;
+  color:var(--mint);
+  margin-bottom:10px;
+  letter-spacing:var(--ls);
+}
+
+.note h4{
+  font-family:var(--font-playful);
+  font-size:15px;
+  color:var(--ink);
+  letter-spacing:var(--ls);
+  margin:14px 0 6px;
+  font-weight:700;
+}
+
+.note ul{margin-left:20px}
+.note li{margin-bottom:3px;color:var(--ink2)}
+.note strong{color:var(--mint);font-weight:700}
+.note code{
+  background:var(--bg2);
+  padding:1px 6px;
+  border-radius:4px;
+  font-size:11px;
+  font-family:ui-monospace,monospace;
+  color:var(--ink);
+}
+
+.note-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  margin-top:14px;
+}
+
+.note-card{
+  background:var(--bg);
+  border:1px solid var(--bd);
+  border-radius:12px;
+  padding:14px 16px;
+}
+
+.note-card h5{
+  font-family:var(--font-playful);
+  font-size:14px;
+  color:var(--ink);
+  letter-spacing:var(--ls);
+  margin-bottom:4px;
+  font-weight:700;
+}
+
+.note-card.group h5{color:var(--honey)}
+.note-card ul{margin-left:16px;font-size:11.5px;color:var(--ink2);line-height:1.6}
+.note-card li{margin-bottom:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title">책 상세 · 읽는 중 v5</div>
+  <div class="sub"><em>Solo</em>가 기본, <em>Group</em>은 <code>book.group_books</code> 있을 때만 오버레이 교체<br>표지 팔레트 기반 <strong>ambient tint</strong>로 책마다 은은하게 다른 무드</div>
+
+  <div class="phones">
+
+    <!-- ============ SOLO BASE ============ -->
+    <div class="phone-wrap">
+      <div class="phone-badge"><b>Solo</b> · 기본 상태</div>
+      <div class="phone">
+        <div class="p-solo">
+          <div class="status">
+            <span>9:41</span>
+            <svg width="14" height="11" viewBox="0 0 14 11" fill="currentColor"><path d="M1 4h1v5H1zM4 2.5h1V9H4zM7 1h1v8H7zM10 2.5h1V9h-1zM13 4h1v5h-1z"/></svg>
+          </div>
+
+          <div class="nav">
+            <div class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+            <div class="nav-btn"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></div>
+          </div>
+
+          <!-- Head: cover presented + title -->
+          <div class="head">
+            <div class="head-cover warm">캐릭터<br>심리<br>사전</div>
+            <div class="head-body">
+              <div class="head-subtitle">READING · 12일차</div>
+              <div class="head-title">캐릭터 심리 사전</div>
+              <div class="head-author">린다 N. 에델스타인</div>
+              <div class="head-meta">
+                <b>245</b><span>/ 340쪽</span>
+                <span class="dot"></span>
+                <b>72%</b>
+              </div>
+            </div>
+          </div>
+
+          <!-- Streak ribbon -->
+          <div class="streak">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+            <div>이 책 <b>5일 연속</b> 읽고 있어요</div>
+            <div class="streak-dots">
+              <div class="streak-dot on"></div>
+              <div class="streak-dot on"></div>
+              <div class="streak-dot on"></div>
+              <div class="streak-dot on"></div>
+              <div class="streak-dot on today"></div>
+            </div>
+          </div>
+
+          <!-- Focus card -->
+          <div class="focus">
+            <div class="focus-date">4월<b>23</b>목</div>
+            <div class="focus-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+              오늘의 기록
+            </div>
+            <div class="focus-q">오늘 몇 쪽까지 읽었어요?</div>
+            <div class="focus-hint">어제 <b>245쪽</b>에서 멈췄어요</div>
+
+            <div class="chips">
+              <div class="chip">+10</div>
+              <div class="chip on">+20</div>
+              <div class="chip">+30</div>
+              <div class="chip ed">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                직접
+              </div>
+            </div>
+
+            <button class="cta">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              265쪽까지 읽었어요
+            </button>
+          </div>
+
+          <!-- Progress -->
+          <div class="prog">
+            <div class="prog-top">
+              <div class="prog-label">나의 진행률</div>
+              <div class="prog-pct">72%</div>
+            </div>
+            <div class="prog-bar">
+              <div class="prog-bar-fill" style="width:72%"></div>
+            </div>
+            <div class="prog-grid">
+              <div><b>245</b><span>현재 쪽</span></div>
+              <div><b>340</b><span>전체 쪽</span></div>
+              <div><b>12</b><span>읽은 날</span></div>
+            </div>
+          </div>
+
+          <!-- AI entry -->
+          <div class="entry">
+            <div class="entry-avatar">방긋</div>
+            <div class="entry-body">
+              <div class="entry-t">방긋이랑 얘기해요</div>
+              <div class="entry-s">오늘 읽은 <em>주인공</em>에 대해 어땠나요?</div>
+            </div>
+            <div class="entry-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+
+          <!-- Sub actions -->
+          <div class="subs">
+            <div class="sub">
+              <div class="sub-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+              </div>
+              <div class="sub-body">
+                <div class="sub-t">문장 긋기</div>
+                <div class="sub-s"><span class="sub-count">4</span>개 모았어요</div>
+              </div>
+            </div>
+            <div class="sub">
+              <div class="sub-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              </div>
+              <div class="sub-body">
+                <div class="sub-t">서평 쓰기</div>
+                <div class="sub-s">다 읽기 전에 남겨도</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Past entries -->
+          <div class="past-label">지난 기록</div>
+          <div class="past">
+            <div class="past-date">4.<b>22</b></div>
+            <div class="past-body">
+              <b>어제 · 15쪽 읽었어요</b>
+              <span>문장 <em>1개</em> 긋고 '<em>주인공이 왜 이렇게 행동하는지…</em>'</span>
+            </div>
+          </div>
+          <div class="past">
+            <div class="past-date">4.<b>21</b></div>
+            <div class="past-body">
+              <b>22쪽 읽었어요</b>
+              <span>문장 <em>2개</em> · 서평 메모 <em>1건</em></span>
+            </div>
+          </div>
+
+          <div class="bottom-pad"></div>
+
+          <div class="btmtabs">
+            <div class="btmtab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>홈</div>
+            <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>서재</div>
+            <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>캘린더</div>
+            <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>나</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>Solo base</strong> · 표지 팔레트(웜 브라운)로 상단 ambient tint · 컴팩트 헤더 + streak 리본 + Focus Card + 진행률 + 방긋 AI + 문장/서평 + 과거 기록 타임라인</div>
+    </div>
+
+    <!-- ============ GROUP OVERLAY ============ -->
+    <div class="phone-wrap">
+      <div class="phone-badge group"><b>Group</b> · 모임 책 오버레이</div>
+      <div class="phone">
+        <div class="p-group">
+          <div class="status">
+            <span>9:41</span>
+            <svg width="14" height="11" viewBox="0 0 14 11" fill="currentColor"><path d="M1 4h1v5H1zM4 2.5h1V9H4zM7 1h1v8H7zM10 2.5h1V9h-1zM13 4h1v5h-1z"/></svg>
+          </div>
+
+          <div class="nav">
+            <div class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+            <div class="nav-btn"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></div>
+          </div>
+
+          <!-- Head: cover presented + title (forest palette) -->
+          <div class="head">
+            <div class="head-cover forest">침묵의<br>독자<br>클럽</div>
+            <div class="head-body">
+              <div class="head-subtitle group">GROUP READING · 4회차</div>
+              <div class="head-title">침묵의 독자 클럽</div>
+              <div class="head-author">프랭크 블라이빙거</div>
+              <div class="head-meta">
+                <b>245</b><span>/ 340쪽</span>
+                <span class="dot"></span>
+                <b>72%</b>
+              </div>
+            </div>
+          </div>
+
+          <!-- Group ribbon replaces streak -->
+          <div class="group-ribbon">
+            <div class="group-mem">
+              <div class="group-ava a1 live">지</div>
+              <div class="group-ava a2">민</div>
+              <div class="group-ava a3">현</div>
+            </div>
+            <div class="group-text">
+              <b>목요 책잡이</b><br>
+              <em>민수</em> 지금 읽는 중 · 평균 <em>247쪽</em>
+            </div>
+            <div class="group-dday">D-3</div>
+          </div>
+
+          <!-- Focus card (same) -->
+          <div class="focus">
+            <div class="focus-date">4월<b>23</b>목</div>
+            <div class="focus-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+              오늘의 기록
+            </div>
+            <div class="focus-q">오늘 몇 쪽까지 읽었어요?</div>
+            <div class="focus-hint">어제 <b>245쪽</b>에서 멈췄어요</div>
+
+            <div class="chips">
+              <div class="chip">+10</div>
+              <div class="chip on">+20</div>
+              <div class="chip">+30</div>
+              <div class="chip ed">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                직접
+              </div>
+            </div>
+
+            <button class="cta">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              265쪽까지 읽었어요
+            </button>
+          </div>
+
+          <!-- Progress: nâng cấp with group avg marker -->
+          <div class="prog">
+            <div class="prog-top">
+              <div class="prog-label">나의 vs 모임 평균</div>
+              <div class="prog-pct">72%</div>
+            </div>
+            <div class="prog-bar">
+              <div class="prog-bar-fill" style="width:72%"></div>
+              <div class="prog-marker" data-label="평균 73%" style="left:73%"></div>
+            </div>
+            <div class="prog-grid">
+              <div><b class="mine">245</b><span>내 쪽수</span></div>
+              <div><b class="avg">247</b><span>모임 평균</span></div>
+              <div><b>3</b><span>함께 읽는 중</span></div>
+            </div>
+          </div>
+
+          <!-- Group discussion entry replaces AI -->
+          <div class="entry">
+            <div class="entry-avatar group">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="entry-body">
+              <div class="entry-t">모임 토론방 · <span style="color:var(--honey);font-family:var(--font-playful);font-size:14px;letter-spacing:var(--ls)">7</span>개 새 메시지</div>
+              <div class="entry-s"><em class="honey">민수</em>: "5장 나만 이렇게 느낀 건가요…"</div>
+            </div>
+            <div class="entry-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+
+          <!-- Sub actions: same but with hint -->
+          <div class="subs">
+            <div class="sub">
+              <div class="sub-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+              </div>
+              <div class="sub-body">
+                <div class="sub-t">문장 긋기</div>
+                <div class="sub-s">멤버도 볼 수 있어요</div>
+              </div>
+            </div>
+            <div class="sub">
+              <div class="sub-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              </div>
+              <div class="sub-body">
+                <div class="sub-t">서평 쓰기</div>
+                <div class="sub-s">모임 준비용으로</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Past entries: group members' recent -->
+          <div class="past-label">모임 멤버 어제</div>
+          <div class="past">
+            <div class="past-date">4.<b>22</b></div>
+            <div class="past-body">
+              <b><em>민수</em> 28쪽 읽음</b>
+              <span>"<em style="color:var(--honey)">5장 · 가장 고요한 사람이 가장 깊은 물이다</em>"</span>
+            </div>
+          </div>
+          <div class="past">
+            <div class="past-date">4.<b>22</b></div>
+            <div class="past-body">
+              <b><em>현아</em> 문장 <em>2개</em>를 모음</b>
+              <span>모임 토론방에서 <em>3개 댓글</em> 달림</span>
+            </div>
+          </div>
+
+          <div class="bottom-pad"></div>
+
+          <div class="btmtabs">
+            <div class="btmtab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>홈</div>
+            <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>서재</div>
+            <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>캘린더</div>
+            <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>나</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>Group overlay</strong> · 표지 팔레트(포레스트)로 tint 전환 · streak 리본 → <strong>멤버 리본(D-day, 라이브 점)</strong> · 진행률 섹션에 <strong>모임 평균 마커</strong> · 방긋 AI → <strong>토론방</strong> · 과거 기록 → 멤버 활동</div>
+    </div>
+
+  </div>
+
+  <div class="note">
+    <div class="note-title">v5 · Solo base + Group overlay 설계</div>
+
+    <h4>레이아웃 원칙</h4>
+    <ul>
+      <li><strong>Solo가 기본</strong> — 모든 책은 이 레이아웃으로 먼저 렌더</li>
+      <li><strong>Group은 오버레이</strong> — <code>book.group_books</code> 있을 때만 특정 모듈 <em>교체</em> (새 섹션 추가 아님)</li>
+      <li><strong>Ambient tint</strong> — <code>coverPalette(book.title)</code>의 첫 색을 상단 radial gradient에 14-16% opacity로 얹음. 책마다 무드가 다르게 느껴짐</li>
+      <li><strong>Glassmorphism 살짝</strong> — streak/진행률 카드는 <code>rgba(255,255,255,0.6-0.7) + backdrop-filter:blur</code>로 배경 tint를 받음</li>
+      <li><strong>Gaegu 포인트 타이포</strong> — 숫자(쪽/%/날짜), Focus Card 질문, 멤버 이름 등 감성 필요 지점만. 본문은 Pretendard</li>
+    </ul>
+
+    <div class="note-grid">
+      <div class="note-card">
+        <h5>Solo 전용 모듈</h5>
+        <ul>
+          <li>Streak 리본 (5일 연속 + 도트 5개)</li>
+          <li>방긋 AI 엔트리 (오픈 질문)</li>
+          <li>과거 기록 = 내 개인 타임라인</li>
+          <li>진행률 grid: 현재/전체/읽은 날</li>
+        </ul>
+      </div>
+      <div class="note-card group">
+        <h5>Group 오버레이로 교체되는 모듈</h5>
+        <ul>
+          <li>Streak 리본 → 멤버 리본 (D-day + 라이브 점)</li>
+          <li>방긋 AI 엔트리 → 모임 토론방 엔트리</li>
+          <li>과거 기록 = 멤버 어제 활동</li>
+          <li>진행률 grid: 내 쪽수/모임 평균/함께 읽는 중</li>
+          <li>진행률 bar에 <strong>모임 평균 마커</strong> 추가</li>
+        </ul>
+      </div>
+    </div>
+
+    <h4>Variant resolver (구현 참고)</h4>
+    <ul>
+      <li><code>resolveBookDetailVariant(book)</code> — <code>book.group_books != null</code>이면 <code>'group'</code>, 아니면 <code>'solo'</code></li>
+      <li>홈 HERO의 <code>resolveHeroVariant</code>와 같은 패턴 (V1A/B/C vs V3)</li>
+      <li>모임 상태에서 필요 쿼리: <code>getGroupMembers</code>, <code>getGroupBookProgressSummary</code>, <code>getGroupChatUnread</code></li>
+      <li>Endge case: 멤버가 나만 = Solo처럼 · <code>end_date &lt; today</code> = D+N 표시 + honey dim</li>
+    </ul>
+
+    <h4>제거/유지 정리</h4>
+    <ul>
+      <li>❌ 280px HERO → ✅ 컴팩트 head (120px)</li>
+      <li>❌ 진행률 업데이트 3곳 중복 → ✅ Focus Card 하나로 일원화</li>
+      <li>❌ 꾹 누르기 완독 → ✅ 100% 자동 프롬프트 + Kebab '완독 처리'</li>
+      <li>❌ 중단/삭제 하단 링크 → ✅ Kebab 메뉴 (⋯) 안</li>
+      <li>❌ 평면적 카드 나열 → ✅ <strong>표지 팔레트 ambient tint</strong>로 책마다 고유 무드</li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>방긋 · 세션 + 목표 + 기록</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;word-break:keep-all}
+:root{
+  --bg:#F7F3ED; --sf:#EDE7DF; --sf2:#E0D9D0; --sf3:#D0C8BC;
+  --bd:rgba(95,164,142,0.14); --bd2:rgba(95,164,142,0.28);
+  --tp:#1c201d; --ts:#4a5550; --tm:#7a8b7e;
+  --ac:#5FA48E; --ac2:#7ABBA4; --ac3:#A4D4C0; --acc:#f7f3ed;
+  --milestone:#B79556;
+}
+body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:#DCD5CA;padding:32px 20px;min-height:100vh;color:var(--tp)}
+.wrap{max-width:1400px;margin:0 auto}
+.title{font-family:'Gaegu',cursive;font-size:30px;font-weight:700;letter-spacing:0.02em;text-align:center;margin-bottom:6px}
+.sub{color:var(--ts);font-size:13px;text-align:center;margin-bottom:36px;font-weight:500}
+.sub em{font-style:normal;color:var(--ac);font-weight:700}
+
+.phones{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;max-width:380px}
+.phone-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:100px;background:#FFFFFF;border:1px solid var(--bd2);font-size:11px;font-weight:700;color:var(--ac);letter-spacing:0.5px}
+.phone{width:360px;height:820px;background:var(--bg);border-radius:40px;box-shadow:0 0 0 3px #1a1a1a,0 0 24px rgba(0,0,0,0.1);overflow:auto;position:relative}
+.phone::-webkit-scrollbar{width:0}
+.phone-desc{font-size:11px;color:var(--ts);text-align:center;line-height:1.6;max-width:360px;font-weight:500}
+.phone-desc strong{color:var(--ac)}
+
+/* ═══ 1. 목표 선택 시트 ═══ */
+.goal-wrap{min-height:100%;padding:48px 20px 30px;display:flex;flex-direction:column}
+.goal-nav{display:flex;justify-content:flex-end;margin-bottom:20px}
+.goal-close{width:36px;height:36px;border-radius:50%;background:var(--sf);border:0.5px solid var(--bd);display:flex;align-items:center;justify-content:center;color:var(--ts);font-size:14px;cursor:pointer}
+
+.goal-hero{text-align:center;margin-bottom:32px}
+.goal-hero-mascot{width:72px;height:72px;margin:0 auto 14px;animation:bob 3s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.goal-hero-title{font-family:'Gaegu',cursive;font-size:22px;font-weight:700;color:var(--tp);letter-spacing:0.02em;margin-bottom:4px}
+.goal-hero-sub{font-size:12px;color:var(--tm);line-height:1.6}
+.goal-hero-sub em{color:var(--ac);font-style:normal;font-weight:700}
+
+.goal-book{margin-bottom:24px;padding:14px;background:var(--sf);border:0.5px solid var(--bd);border-radius:16px;display:flex;gap:12px;align-items:center}
+.goal-book-cover{width:48px;height:70px;border-radius:6px;background:linear-gradient(135deg,#c89060,#806040);color:#f4efe8;display:flex;align-items:flex-end;padding:5px;font-size:9px;font-weight:700;line-height:1.2;flex-shrink:0}
+.goal-book-info{flex:1;min-width:0}
+.goal-book-t{font-size:13px;font-weight:700;color:var(--tp);line-height:1.3}
+.goal-book-s{font-size:10.5px;color:var(--tm);margin-top:2px}
+
+.goal-label{font-family:'Gaegu',cursive;font-size:14px;font-weight:700;color:var(--tp);letter-spacing:0.02em;margin-bottom:12px}
+
+.goal-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.goal-opt{padding:18px 14px;border-radius:18px;background:var(--sf);border:1.5px solid var(--bd);cursor:pointer;transition:all 0.2s;text-align:center}
+.goal-opt.on{background:color-mix(in srgb,var(--ac) 10%,var(--bg));border-color:var(--ac);box-shadow:0 4px 14px color-mix(in srgb,var(--ac) 15%,transparent)}
+.goal-opt-emoji{font-size:22px;margin-bottom:6px}
+.goal-opt-time{font-family:'Gaegu',cursive;font-size:22px;font-weight:700;color:var(--tp);letter-spacing:0.02em;line-height:1;margin-bottom:4px}
+.goal-opt.on .goal-opt-time{color:var(--ac)}
+.goal-opt-label{font-size:11px;color:var(--tm);font-weight:600}
+
+.goal-opt-free{grid-column:span 2;padding:14px;display:flex;align-items:center;gap:10px;text-align:left}
+.goal-opt-free .goal-opt-emoji{font-size:18px;margin:0}
+.goal-opt-free-body{flex:1}
+.goal-opt-free-t{font-family:'Gaegu',cursive;font-size:14px;font-weight:700;color:var(--tp);letter-spacing:0.02em;margin-bottom:1px}
+.goal-opt-free-s{font-size:10.5px;color:var(--tm)}
+
+.goal-start{margin-top:auto;padding:16px;border-radius:100px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:var(--acc);font-family:'Gaegu',cursive;font-size:18px;font-weight:700;letter-spacing:0.04em;border:none;cursor:pointer;box-shadow:0 6px 18px color-mix(in srgb,var(--ac) 30%,transparent);display:flex;align-items:center;justify-content:center;gap:6px}
+
+/* ═══ 2. 세션 진행 중 (목표 정보 포함) ═══ */
+.timer-bg{min-height:100%;background:linear-gradient(180deg,var(--bg) 0%,color-mix(in srgb,var(--ac) 8%,var(--bg)) 100%);padding:48px 20px 32px;display:flex;flex-direction:column}
+.timer-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.timer-title{font-family:'Gaegu',cursive;font-size:15px;font-weight:700;color:var(--tp);letter-spacing:0.02em}
+.timer-ind{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:100px;background:color-mix(in srgb,var(--ac) 12%,var(--bg));font-size:10.5px;font-weight:800;color:var(--ac)}
+.timer-ind::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ac);animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+.timer-book{text-align:center;margin-bottom:22px}
+.timer-book-cover{width:76px;height:108px;margin:0 auto 10px;border-radius:7px;background:linear-gradient(135deg,#c89060,#806040);color:#f4efe8;display:flex;align-items:flex-end;padding:5px;font-size:10px;font-weight:800;line-height:1.2;box-shadow:0 10px 22px rgba(0,0,0,0.15)}
+.timer-book-title{font-size:13px;font-weight:700;color:var(--tp)}
+.timer-book-page{font-size:11px;color:var(--tm);margin-top:2px}
+
+.timer-ring-wrap{display:flex;justify-content:center;margin-bottom:16px}
+.timer-ring{position:relative;width:220px;height:220px}
+.timer-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.timer-ring circle{fill:none;stroke-width:10}
+.timer-ring .track{stroke:var(--sf2)}
+.timer-ring .prog{stroke:url(#ring-grad);stroke-linecap:round;stroke-dasharray:352 628;transition:stroke-dasharray 0.5s}
+.timer-ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.timer-ring-v{font-family:'Gaegu',cursive;font-size:48px;font-weight:700;color:var(--tp);letter-spacing:-0.04em;line-height:1}
+.timer-ring-v span{color:var(--ac)}
+.timer-ring-l{font-size:11px;color:var(--tm);font-weight:600}
+.timer-ring-remaining{font-size:10px;color:var(--ac);font-weight:700;margin-top:2px;letter-spacing:0.3px}
+
+.timer-mascot{text-align:center;margin-bottom:20px;font-family:'Gaegu',cursive;font-size:13px;color:var(--tp);letter-spacing:0.02em}
+.timer-mascot img{width:44px;height:44px;display:block;margin:0 auto 4px;object-fit:contain;animation:bob 2.5s ease-in-out infinite}
+.timer-mascot em{color:var(--ac);font-style:normal;font-weight:700}
+
+.timer-actions{display:flex;gap:10px}
+.timer-act{flex:1;padding:13px;border-radius:100px;font-size:14px;font-weight:700;border:none;cursor:pointer}
+.timer-act-pause{background:var(--sf);color:var(--tp);border:0.5px solid var(--bd2)}
+.timer-act-end{background:linear-gradient(135deg,var(--ac),var(--ac2));color:var(--acc);box-shadow:0 6px 18px color-mix(in srgb,var(--ac) 25%,transparent)}
+
+/* ═══ 3. 목표 완료 알림 (자동 뜸) ═══ */
+.completion-wrap{min-height:100%;background:linear-gradient(180deg,var(--bg) 0%,color-mix(in srgb,var(--milestone) 10%,var(--bg)) 60%,var(--bg) 100%);padding:48px 24px 32px;display:flex;flex-direction:column;align-items:center;position:relative;overflow:hidden}
+.completion-wrap::before{content:"";position:absolute;top:20%;left:-50px;width:200px;height:200px;background:radial-gradient(circle,color-mix(in srgb,var(--milestone) 20%,transparent),transparent 70%);filter:blur(20px);pointer-events:none}
+
+.completion-badge{position:relative;z-index:2;padding:4px 14px;border-radius:100px;background:linear-gradient(135deg,color-mix(in srgb,var(--milestone) 18%,var(--bg)),var(--bg));border:0.5px solid color-mix(in srgb,var(--milestone) 35%,transparent);color:var(--milestone);font-family:'Gaegu',cursive;font-size:12px;font-weight:700;margin-bottom:18px;letter-spacing:0.02em}
+.completion-mascot{width:110px;height:110px;margin-bottom:16px;position:relative;z-index:2;animation:celebrate 2s ease-in-out infinite}
+@keyframes celebrate{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-6px) rotate(2deg)}}
+.completion-title{font-family:'Gaegu',cursive;font-size:24px;font-weight:700;color:var(--tp);letter-spacing:0.02em;text-align:center;margin-bottom:6px;position:relative;z-index:2;line-height:1.3}
+.completion-title em{color:var(--ac);font-style:normal}
+.completion-sub{font-size:13px;color:var(--tm);text-align:center;line-height:1.6;margin-bottom:24px;position:relative;z-index:2}
+.completion-sub em{color:var(--tp);font-style:normal;font-weight:700}
+
+.completion-stats{width:100%;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:24px;position:relative;z-index:2}
+.completion-stat{padding:14px 8px;background:var(--sf);border:0.5px solid var(--bd);border-radius:14px;text-align:center}
+.completion-stat-v{font-family:'Gaegu',cursive;font-size:22px;font-weight:700;color:var(--tp);letter-spacing:-0.02em;line-height:1}
+.completion-stat-v em{color:var(--milestone);font-style:normal}
+.completion-stat-l{font-size:9.5px;color:var(--tm);font-weight:700;margin-top:4px;letter-spacing:0.3px}
+
+.completion-btn-row{width:100%;display:flex;gap:8px;position:relative;z-index:2}
+.completion-continue{flex:1;padding:14px;border-radius:100px;background:var(--sf);border:0.5px solid var(--bd2);color:var(--tp);font-size:13px;font-weight:700;cursor:pointer}
+.completion-end{flex:2;padding:14px;border-radius:100px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:var(--acc);font-family:'Gaegu',cursive;font-size:16px;font-weight:700;letter-spacing:0.04em;border:none;cursor:pointer;box-shadow:0 6px 18px color-mix(in srgb,var(--ac) 25%,transparent)}
+
+/* ═══ 4. 세션 완료 시트 (확장) ═══ */
+.done-hdr{padding:40px 20px 12px;text-align:center}
+.done-close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:var(--sf);border:0.5px solid var(--bd);display:flex;align-items:center;justify-content:center;color:var(--ts);font-size:14px;cursor:pointer;z-index:10}
+.done-mascot{width:64px;height:64px;margin:0 auto 10px;object-fit:contain}
+.done-title{font-family:'Gaegu',cursive;font-size:20px;font-weight:700;color:var(--tp);letter-spacing:0.02em;margin-bottom:4px}
+.done-sub{font-size:12px;color:var(--tm)}
+.done-sub em{font-style:normal;color:var(--tp);font-weight:700}
+.done-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:100px;background:color-mix(in srgb,var(--ac) 12%,var(--bg));color:var(--ac);font-family:'Gaegu',cursive;font-size:13px;font-weight:700;letter-spacing:0.02em;margin-top:10px}
+
+.done-stats{margin:18px 18px 18px;padding:16px;background:var(--sf);border:0.5px solid var(--bd);border-radius:16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center}
+.done-stat-v{font-family:'Gaegu',cursive;font-size:22px;font-weight:700;color:var(--tp);letter-spacing:-0.02em;line-height:1}
+.done-stat-v em{color:var(--ac);font-style:normal}
+.done-stat-l{font-size:9.5px;color:var(--tm);font-weight:600;margin-top:4px}
+
+.done-section{margin:0 18px 12px}
+.done-label{font-family:'Gaegu',cursive;font-size:13px;font-weight:700;color:var(--tp);letter-spacing:0.02em;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.done-label em{font-size:10px;color:var(--tm);font-weight:400;font-family:'Pretendard',sans-serif;letter-spacing:0;margin-left:auto;font-style:normal}
+.done-page-input{width:100%;padding:12px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:12px;font-size:14px;font-weight:700;color:var(--tp);outline:none;font-family:inherit}
+.done-page-input:focus{border-color:var(--ac)}
+
+.done-moods{display:flex;gap:6px}
+.mood{flex:1;padding:10px 4px;border-radius:12px;background:var(--sf);border:1px solid var(--bd);text-align:center;cursor:pointer;transition:all 0.2s}
+.mood.on{background:color-mix(in srgb,var(--ac) 10%,var(--bg));border-color:var(--ac)}
+.mood-e{font-size:20px;margin-bottom:3px}
+.mood-l{font-size:10px;color:var(--tp);font-weight:700}
+.mood.on .mood-l{color:var(--ac)}
+
+/* 기억에 남는 문장 입력 (NEW) */
+.scrap-input{width:100%;padding:14px;background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 6%,var(--sf)),var(--sf));border:1px solid var(--bd);border-radius:14px;border-left:3px solid var(--ac);font-family:'Gaegu',cursive;font-size:14px;color:var(--tp);letter-spacing:0.01em;line-height:1.55;outline:none;resize:none;min-height:70px;font-weight:400}
+.scrap-input::placeholder{color:var(--tm);opacity:0.7}
+.scrap-meta{display:flex;gap:8px;margin-top:6px}
+.scrap-page{flex:0 0 auto;width:90px;padding:8px 12px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;font-size:12px;color:var(--tp);outline:none;font-family:inherit}
+
+/* 느낌 한 줄 (NEW) */
+.feel-input{width:100%;padding:12px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:12px;font-size:13px;color:var(--tp);outline:none;font-family:inherit;line-height:1.5;resize:none;min-height:50px}
+.feel-input::placeholder{color:var(--tm);opacity:0.7}
+
+.done-ai{margin:12px 18px 0;padding:14px;background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 12%,var(--sf)),var(--sf));border:0.5px solid var(--bd2);border-radius:14px;display:flex;align-items:center;gap:12px;cursor:pointer;position:relative;overflow:hidden}
+.done-ai::before{content:"";position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:radial-gradient(circle,color-mix(in srgb,var(--ac) 20%,transparent),transparent 70%);pointer-events:none}
+.done-ai img{width:40px;height:40px;flex-shrink:0;position:relative;z-index:2;object-fit:contain}
+.done-ai-body{flex:1;position:relative;z-index:2}
+.done-ai-t{font-family:'Gaegu',cursive;font-size:13px;font-weight:700;color:var(--tp);letter-spacing:0.02em;margin-bottom:2px}
+.done-ai-s{font-size:10.5px;color:var(--tm)}
+.done-ai-s em{color:var(--ac);font-style:normal;font-weight:700}
+
+.done-btns{display:flex;gap:8px;padding:18px 18px 22px;background:linear-gradient(to top,var(--bg) 70%,transparent);position:sticky;bottom:0}
+.done-skip{flex:1;padding:14px;border-radius:100px;background:var(--sf);border:0.5px solid var(--bd2);color:var(--tm);font-size:13px;font-weight:700;cursor:pointer}
+.done-save{flex:2;padding:14px;border-radius:100px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:var(--acc);font-family:'Gaegu',cursive;font-size:16px;font-weight:700;letter-spacing:0.04em;border:none;cursor:pointer;box-shadow:0 6px 18px color-mix(in srgb,var(--ac) 25%,transparent)}
+
+.note{margin:40px auto 0;padding:24px 28px;background:#FFFFFF;border:1px solid var(--bd2);border-radius:18px;color:var(--tp);font-size:12px;line-height:1.85;max-width:900px}
+.note-title{font-family:'Gaegu',cursive;font-size:17px;font-weight:700;color:var(--ac);margin-bottom:12px}
+.note h4{font-family:'Gaegu',cursive;font-size:14px;font-weight:700;color:var(--tp);letter-spacing:0.02em;margin:12px 0 4px}
+.note strong{color:var(--ac);font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title">세션 플로우 · 목표 + 라이브 기록</div>
+  <div class="sub"><em>목표 시간 선택</em> → 진행 → 완료 알림 → 기록 (글귀 + 느낌)</div>
+
+  <div class="phones">
+
+    <!-- 1. 목표 선택 -->
+    <div class="phone-wrap">
+      <div class="phone-badge">① 목표 선택</div>
+      <div class="phone">
+        <div class="goal-wrap">
+          <div class="goal-nav">
+            <div class="goal-close">✕</div>
+          </div>
+
+          <div class="goal-hero">
+            <img src="/mascot-read.png" class="goal-hero-mascot" alt="">
+            <div class="goal-hero-title">얼마나 함께할까요?</div>
+            <div class="goal-hero-sub">부담 없이, <em>지금 기분만큼</em></div>
+          </div>
+
+          <div class="goal-book">
+            <div class="goal-book-cover">캐릭터<br>심리<br>사전</div>
+            <div class="goal-book-info">
+              <div class="goal-book-t">캐릭터 심리 사전</div>
+              <div class="goal-book-s">245쪽부터 · 한강</div>
+            </div>
+          </div>
+
+          <div class="goal-label">⏱ 오늘의 목표</div>
+          <div class="goal-options">
+            <div class="goal-opt">
+              <div class="goal-opt-emoji">☕</div>
+              <div class="goal-opt-time">15<span style="font-size:14px">분</span></div>
+              <div class="goal-opt-label">가볍게</div>
+            </div>
+            <div class="goal-opt on">
+              <div class="goal-opt-emoji">📖</div>
+              <div class="goal-opt-time">25<span style="font-size:14px">분</span></div>
+              <div class="goal-opt-label">집중 한 세션</div>
+            </div>
+            <div class="goal-opt">
+              <div class="goal-opt-emoji">🌿</div>
+              <div class="goal-opt-time">45<span style="font-size:14px">분</span></div>
+              <div class="goal-opt-label">깊게</div>
+            </div>
+            <div class="goal-opt">
+              <div class="goal-opt-emoji">✨</div>
+              <div class="goal-opt-time">60<span style="font-size:14px">분</span></div>
+              <div class="goal-opt-label">완전 몰입</div>
+            </div>
+            <div class="goal-opt goal-opt-free">
+              <div class="goal-opt-emoji">⏳</div>
+              <div class="goal-opt-free-body">
+                <div class="goal-opt-free-t">자유 시간</div>
+                <div class="goal-opt-free-s">목표 없이 읽은 시간만 기록해요</div>
+              </div>
+            </div>
+          </div>
+
+          <button class="goal-start">📖 지금 시작하기</button>
+        </div>
+      </div>
+      <div class="phone-desc">4가지 프리셋 + <strong>자유 시간</strong>. 뽀모도로 강제가 아니라 <strong>오늘 기분에 맞게</strong> 선택</div>
+    </div>
+
+    <!-- 2. 세션 진행 중 (60% 경과) -->
+    <div class="phone-wrap">
+      <div class="phone-badge">② 세션 진행 중</div>
+      <div class="phone">
+        <div class="timer-bg">
+          <div class="timer-nav">
+            <div class="timer-title">독서 세션</div>
+            <div class="timer-ind">LIVE</div>
+          </div>
+
+          <div class="timer-book">
+            <div class="timer-book-cover">캐릭터<br>심리<br>사전</div>
+            <div class="timer-book-title">캐릭터 심리 사전</div>
+            <div class="timer-book-page">245쪽부터</div>
+          </div>
+
+          <div class="timer-ring-wrap">
+            <div class="timer-ring">
+              <svg viewBox="0 0 200 200">
+                <defs>
+                  <linearGradient id="ring-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#5FA48E"/>
+                    <stop offset="100%" stop-color="#7ABBA4"/>
+                  </linearGradient>
+                </defs>
+                <circle cx="100" cy="100" r="86" class="track"/>
+                <circle cx="100" cy="100" r="86" class="prog"/>
+              </svg>
+              <div class="timer-ring-center">
+                <div class="timer-ring-v">15:<span>23</span></div>
+                <div class="timer-ring-l">25분 중 진행</div>
+                <div class="timer-ring-remaining">🎯 9분 37초 남음</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="timer-mascot">
+            <img src="/mascot-read.png" alt="">
+            <em>방긋이가</em> 조용히 기다리는 중이에요
+          </div>
+
+          <div class="timer-actions">
+            <button class="timer-act timer-act-pause">⏸ 일시정지</button>
+            <button class="timer-act timer-act-end">독서 마치기</button>
+          </div>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>목표 대비 진행도</strong> 링 + 남은 시간 표시. 목표 없으면 경과 시간만.</div>
+    </div>
+
+    <!-- 3. 목표 도달 알림 -->
+    <div class="phone-wrap">
+      <div class="phone-badge">③ 목표 도달!</div>
+      <div class="phone">
+        <div class="completion-wrap">
+          <div class="completion-badge">🎯 25분 목표 달성</div>
+          <img src="/mascot-happy.png" class="completion-mascot" alt="">
+          <div class="completion-title">오늘 목표<br>이뤘어요!</div>
+          <div class="completion-sub"><em>25분</em> 동안 조용히 함께 읽었어요</div>
+
+          <div class="completion-stats">
+            <div class="completion-stat"><div class="completion-stat-v"><em>25</em></div><div class="completion-stat-l">분</div></div>
+            <div class="completion-stat"><div class="completion-stat-v"><em>22</em></div><div class="completion-stat-l">쪽 예상</div></div>
+            <div class="completion-stat"><div class="completion-stat-v"><em>7</em></div><div class="completion-stat-l">일 연속</div></div>
+          </div>
+
+          <div class="completion-btn-row">
+            <button class="completion-continue">5분 더</button>
+            <button class="completion-end">독서 마치기</button>
+          </div>
+        </div>
+      </div>
+      <div class="phone-desc">목표 시간 도달 시 자동 알림. <strong>5분 더</strong> 또는 <strong>마치기</strong> 선택.</div>
+    </div>
+
+    <!-- 4. 완료 시트 (글귀 + 느낌) -->
+    <div class="phone-wrap">
+      <div class="phone-badge">④ 기록하기 (확장)</div>
+      <div class="phone">
+        <div class="done-close">✕</div>
+
+        <div class="done-hdr">
+          <img src="/mascot-happy.png" class="done-mascot" alt="">
+          <div class="done-title">오늘 수고했어요</div>
+          <div class="done-sub"><em>28분</em> · 22쪽 읽음</div>
+          <div class="done-badge">🔥 7일 연속</div>
+        </div>
+
+        <div class="done-stats">
+          <div><div class="done-stat-v"><em>28</em></div><div class="done-stat-l">분</div></div>
+          <div><div class="done-stat-v"><em>22</em></div><div class="done-stat-l">쪽</div></div>
+          <div><div class="done-stat-v"><em>267</em></div><div class="done-stat-l">마지막</div></div>
+        </div>
+
+        <div class="done-section">
+          <div class="done-label">어디까지 읽었나요? <em>오늘 읽은 쪽수 확정</em></div>
+          <input type="text" class="done-page-input" value="267" placeholder="267">
+        </div>
+
+        <div class="done-section">
+          <div class="done-label">오늘의 기분</div>
+          <div class="done-moods">
+            <div class="mood"><div class="mood-e">📚</div><div class="mood-l">몰입</div></div>
+            <div class="mood on"><div class="mood-e">🌿</div><div class="mood-l">잔잔</div></div>
+            <div class="mood"><div class="mood-e">💭</div><div class="mood-l">복잡</div></div>
+            <div class="mood"><div class="mood-e">😴</div><div class="mood-l">졸림</div></div>
+          </div>
+        </div>
+
+        <!-- ✨ 기억에 남는 문장 (NEW) -->
+        <div class="done-section">
+          <div class="done-label">✏️ 기억에 남는 문장 <em>선택</em></div>
+          <textarea class="scrap-input" placeholder="기억하고 싶은 한 문장을 남겨보세요">우리는 서로의 눈을 보며 알고 있었다, 이것이 마지막이 아니라는 것을.</textarea>
+          <div class="scrap-meta">
+            <input type="text" class="scrap-page" placeholder="몇 쪽?" value="p.262">
+          </div>
+        </div>
+
+        <!-- ✨ 느낌 한 줄 (NEW) -->
+        <div class="done-section">
+          <div class="done-label">💭 느낌 한 줄 <em>선택</em></div>
+          <textarea class="feel-input" placeholder="오늘 읽은 느낌이나 생각..."></textarea>
+        </div>
+
+        <!-- AI 토론 유도 -->
+        <div class="done-ai">
+          <img src="/mascot-read.png" alt="">
+          <div class="done-ai-body">
+            <div class="done-ai-t">방금 구절로 방긋이와 대화</div>
+            <div class="done-ai-s">5분만 이야기 나눠요 <em>소크라테스식 →</em></div>
+          </div>
+        </div>
+
+        <div class="done-btns">
+          <button class="done-skip">나중에</button>
+          <button class="done-save">✓ 기록 저장</button>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>글귀 + 느낌</strong> 빠르게 기록. 글귀는 스크랩으로 자동 저장. 모두 <strong>선택</strong>이라 부담 없음</div>
+    </div>
+
+  </div>
+
+  <div class="note">
+    <div class="note-title">🎯 추가된 핵심 기능</div>
+
+    <h4>① 목표 선택 (5가지)</h4>
+    ☕ <strong>15분 (가볍게)</strong> · 📖 <strong>25분 (집중 한 세션)</strong> · 🌿 <strong>45분 (깊게)</strong> · ✨ <strong>60분 (완전 몰입)</strong> · ⏳ <strong>자유 (목표 없음)</strong>
+    <br>기본값: 25분. 사용자 설정 저장(다음에 같은 값으로 시작).
+
+    <h4>② 진행 중 링</h4>
+    목표 시간 대비 진행도 시각화. 남은 시간 표시. <strong>자유 시간</strong> 선택 시 경과 시간만 카운트업.
+
+    <h4>③ 목표 도달 알림</h4>
+    목표 시간 도달 시 자동으로 <strong>축하 화면</strong>. "5분 더" 또는 "마치기" 선택. 진동/소리(설정 가능).
+
+    <h4>④ 완료 시트 확장</h4>
+    - <strong>페이지 확정</strong>: 시작 쪽 + 읽은 쪽 자동 계산<br>
+    - <strong>기분 4개</strong>: 몰입/잔잔/복잡/졸림<br>
+    - <strong>✏️ 기억에 남는 문장</strong>: 선택 입력. 저장 시 <strong>자동으로 스크랩에 추가</strong>. 페이지 번호 함께<br>
+    - <strong>💭 느낌 한 줄</strong>: 선택 입력. 세션 노트로 저장<br>
+    - <strong>AI 토론 자연스런 연결</strong>: 방금 쓴 구절을 바로 대화 재료로
+
+    <br><br>
+    <strong>DB 필드</strong>: <code style="font-family:monospace;font-size:11px;background:var(--sf);padding:2px 6px;border-radius:4px">reading_sessions</code>에 추가
+    <br>• <code style="font-family:monospace;font-size:11px;background:var(--sf);padding:1px 5px;border-radius:3px">goal_seconds, duration_seconds, mood, quick_scrap, quick_memo</code>
+
+    <br><br>
+    <strong>OK면 구현 시작할게요!</strong>
+  </div>
+</div>
+</body>
+</html>

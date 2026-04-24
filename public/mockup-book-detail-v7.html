@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>책 상세 · 읽는 중 v7 — Solo 재작업</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;word-break:keep-all}
+
+:root{
+  --bg:#F7F3ED;
+  --bg2:#F0EADF;
+  --paper:#FBF7EF;
+  --sf:#FFFFFF;
+  --sf2:#EDE7DF;
+  --sf3:#E0D9D0;
+  --ink:#1c201d;
+  --ink2:#4a5550;
+  --ink3:#7a8b7e;
+  --mint:#5FA48E;
+  --mint2:#7ABBA4;
+  --mint3:#A4D4C0;
+  --mintbg:rgba(95,164,142,0.08);
+  --bd:rgba(95,164,142,0.14);
+  --bd2:rgba(95,164,142,0.3);
+  --acc:#f7f3ed;
+  --danger:#C55E4A;
+  --honey:#D4A056;
+  --honey2:#E8B86A;
+  --peach:#F4A882;
+  --lavender:#B39BC4;
+  --washi:#F4D9B4;
+  --font-playful:'Gaegu',cursive;
+  --ls:0.02em;
+}
+
+body{
+  font-family:'Pretendard',system-ui,-apple-system,sans-serif;
+  background:#D8D1C5;
+  padding:32px 20px 48px;
+  min-height:100vh;
+  color:var(--ink);
+}
+
+.wrap{max-width:960px;margin:0 auto}
+
+.title{
+  font-family:var(--font-playful);
+  font-size:32px;
+  font-weight:700;
+  letter-spacing:var(--ls);
+  text-align:center;
+  margin-bottom:6px;
+}
+
+.sub{color:var(--ink2);font-size:13px;text-align:center;margin-bottom:32px;font-weight:500;line-height:1.65}
+.sub em{font-style:normal;color:var(--mint);font-weight:700}
+.sub .c{display:inline-block;background:var(--sf);padding:2px 10px;border-radius:100px;border:0.5px solid var(--bd2);color:var(--mint);font-family:var(--font-playful);font-size:14px;letter-spacing:var(--ls);margin:0 2px}
+.sub .c.solo{background:color-mix(in srgb,var(--mint) 10%,var(--sf));border-color:var(--bd2);color:var(--mint)}
+
+.phones{display:flex;gap:32px;justify-content:center;flex-wrap:wrap}
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;max-width:400px}
+
+.phone-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:7px 16px;border-radius:100px;
+  background:#FFFFFF;border:1px solid var(--bd2);
+  font-size:11.5px;font-weight:700;color:var(--mint);letter-spacing:0.4px;
+}
+.phone-badge b{font-family:var(--font-playful);font-size:13px;letter-spacing:var(--ls)}
+.phone-badge.group{color:var(--honey);border-color:color-mix(in srgb,var(--honey) 40%,transparent)}
+
+.phone{width:380px;height:820px;border-radius:44px;box-shadow:0 0 0 3px #1a1a1a,0 0 28px rgba(0,0,0,0.12);overflow:hidden;position:relative}
+
+.phone-desc{font-size:11.5px;color:var(--ink2);text-align:center;line-height:1.65;max-width:380px;font-weight:500}
+.phone-desc strong{color:var(--mint);font-weight:700}
+
+.status{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;font-size:14px;font-weight:700;color:var(--ink)}
+
+/* ================ Ambient roots ================ */
+.p-solo{
+  --tint1:#9A6B3A;
+  height:100%;
+  background:
+    radial-gradient(ellipse 640px 360px at 50% -40px,color-mix(in srgb,var(--tint1) 14%,var(--bg)),var(--bg) 62%),
+    var(--bg);
+  position:relative;
+  overflow:auto;
+}
+.p-solo::-webkit-scrollbar{width:0}
+
+.p-group{
+  --tint1:#3A5E4A;
+  height:100%;
+  background:
+    radial-gradient(ellipse 640px 360px at 50% -40px,color-mix(in srgb,var(--tint1) 16%,var(--bg)),var(--bg) 62%),
+    var(--bg);
+  position:relative;
+  overflow:auto;
+}
+.p-group::-webkit-scrollbar{width:0}
+
+/* ================ Top nav ================ */
+.nav{display:flex;justify-content:space-between;padding:8px 20px 2px;position:relative;z-index:3}
+
+.nav-btn{
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(255,255,255,0.8);backdrop-filter:blur(8px);
+  border:0.5px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--ink2);cursor:pointer;
+}
+.nav-btn svg{width:15px;height:15px}
+
+/* ================ Head ================ */
+.head{padding:14px 24px 14px;display:flex;gap:18px;align-items:flex-start;position:relative}
+
+.head-cover{
+  width:84px;height:120px;border-radius:7px;
+  box-shadow:0 12px 28px rgba(0,0,0,0.22),0 3px 8px rgba(0,0,0,0.08);
+  flex-shrink:0;display:flex;align-items:flex-end;padding:8px;
+  font-size:10px;font-weight:800;line-height:1.15;position:relative;
+}
+.head-cover::after{
+  content:"";position:absolute;top:3px;left:3px;right:3px;height:35%;
+  background:linear-gradient(135deg,rgba(255,255,255,0.18),transparent 60%);
+  border-radius:5px;pointer-events:none;
+}
+.head-cover.warm{background:linear-gradient(135deg,#9A6B3A,#C48D58);color:#f4efe8}
+.head-cover.forest{background:linear-gradient(135deg,#3A5E4A,#6A8A7A);color:#e8ede8}
+
+.head-body{flex:1;min-width:0;padding-top:2px}
+
+.head-subtitle{font-size:10.5px;font-weight:700;color:var(--mint);letter-spacing:1.4px;text-transform:uppercase;margin-bottom:6px}
+.head-subtitle.group{color:var(--honey)}
+
+.position-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:var(--font-playful);font-size:11.5px;font-weight:700;
+  color:var(--ink);letter-spacing:var(--ls);
+  background:color-mix(in srgb,var(--mint) 14%,var(--sf));
+  padding:2px 9px;border-radius:100px;
+  margin-left:6px;vertical-align:middle;
+  border:0.5px solid var(--bd2);
+}
+.position-badge::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--mint)}
+
+.head-title{
+  font-size:20px;font-weight:800;color:var(--ink);
+  letter-spacing:-0.015em;line-height:1.22;margin-bottom:3px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+
+.head-author{font-size:11.5px;color:var(--ink3);font-weight:500;margin-bottom:10px}
+.head-meta{display:flex;align-items:baseline;gap:6px;font-size:11.5px;color:var(--ink2)}
+.head-meta b{font-family:var(--font-playful);font-size:17px;color:var(--mint);letter-spacing:var(--ls);line-height:1;font-weight:700}
+.head-meta .dot{width:3px;height:3px;border-radius:50%;background:var(--bd2);margin:0 4px}
+
+/* ================ 🌿 SOLO v7 · Narrative greeting ================ */
+.narrative{
+  margin:12px 20px 0;
+  padding:10px 14px 10px 12px;
+  background:
+    linear-gradient(135deg,
+      color-mix(in srgb,var(--mint) 10%,transparent),
+      color-mix(in srgb,var(--mint) 3%,transparent) 60%);
+  border-left:2.5px solid var(--mint);
+  border-radius:3px 14px 14px 3px;
+  display:flex;align-items:center;gap:10px;
+  animation:fade-in 0.5s 0.2s cubic-bezier(0.16,1,0.3,1) both;
+}
+.narrative-mascot{
+  width:28px;height:28px;border-radius:50%;
+  background:linear-gradient(135deg,var(--mint2),var(--mint));
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--acc);
+  font-family:var(--font-playful);font-size:13px;font-weight:700;letter-spacing:var(--ls);
+  position:relative;
+}
+.narrative-mascot::after{
+  content:"";position:absolute;left:-5px;top:50%;
+  width:7px;height:7px;background:inherit;
+  transform:translateY(-50%) rotate(45deg);
+  clip-path:polygon(100% 0,100% 100%,0 50%);
+}
+.narrative-text{
+  flex:1;min-width:0;
+  font-family:var(--font-playful);
+  font-size:14.5px;letter-spacing:var(--ls);
+  color:var(--ink);
+  line-height:1.35;
+}
+.narrative-text em{font-style:normal;color:var(--mint);font-weight:700}
+@keyframes fade-in{
+  0%{opacity:0;transform:translateY(3px)}
+  100%{opacity:1;transform:translateY(0)}
+}
+
+/* ================ Streak ================ */
+.streak{
+  margin:12px 20px 0;padding:11px 14px;
+  background:rgba(255,255,255,0.72);backdrop-filter:blur(6px);
+  border:0.5px solid var(--bd);border-radius:14px;
+  display:flex;align-items:center;gap:10px;
+  font-size:11.5px;color:var(--ink2);line-height:1.4;
+}
+.streak svg{width:14px;height:14px;color:var(--mint);flex-shrink:0}
+.streak b{font-family:var(--font-playful);font-size:14px;color:var(--mint);letter-spacing:var(--ls);font-weight:700}
+
+.streak-edge{
+  display:flex;align-items:flex-end;gap:2px;
+  margin-left:auto;flex-shrink:0;height:18px;
+  padding:0 4px;
+  border-bottom:1.5px solid var(--ink);
+  border-bottom-left-radius:1px;
+  border-bottom-right-radius:1px;
+}
+.streak-mark{width:2.5px;height:12px;background:var(--sf3);border-radius:1px}
+.streak-mark.on{background:var(--mint);height:14px}
+.streak-mark.on.today{
+  background:linear-gradient(180deg,var(--mint) 0%,var(--mint2) 100%);
+  height:16px;
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--mint) 22%,transparent);
+}
+
+/* ================ 🌿 SOLO v7 · Pace pill with sparkline ================ */
+.pace{
+  margin:8px 20px 0;
+  padding:10px 14px;
+  background:var(--paper);
+  border:0.5px solid var(--bd);
+  border-radius:14px;
+  display:flex;align-items:center;gap:10px;
+  position:relative;overflow:hidden;
+}
+.pace::before{
+  content:"";position:absolute;top:0;bottom:0;left:0;width:2.5px;
+  background:linear-gradient(180deg,var(--mint3),var(--mint));
+  border-radius:2.5px 0 0 2.5px;
+}
+.pace-icon{
+  width:22px;height:22px;border-radius:7px;
+  background:color-mix(in srgb,var(--mint) 14%,var(--sf));
+  display:flex;align-items:center;justify-content:center;
+  color:var(--mint);flex-shrink:0;
+}
+.pace-icon svg{width:12px;height:12px}
+.pace-text{
+  flex:1;min-width:0;
+  font-size:11px;color:var(--ink2);line-height:1.4;
+}
+.pace-text b{
+  font-family:var(--font-playful);font-size:14px;font-weight:700;
+  color:var(--mint);letter-spacing:var(--ls);
+}
+.pace-text em{
+  font-style:normal;color:var(--ink);font-weight:700;
+  font-family:var(--font-playful);font-size:13px;letter-spacing:var(--ls);
+}
+.pace-spark{flex-shrink:0;opacity:0.9}
+.pace-spark svg{display:block}
+
+/* ================ Focus Card (v6 그대로) ================ */
+.focus{
+  margin:14px 20px 0;
+  padding:20px 20px 18px;
+  background:var(--sf);
+  border:1px solid var(--bd);
+  border-radius:20px;
+  position:relative;
+  box-shadow:0 6px 20px color-mix(in srgb,var(--mint) 10%,transparent);
+  overflow:visible;
+}
+.focus::before{
+  content:"";position:absolute;top:0;right:0;
+  width:54px;height:54px;
+  background:linear-gradient(225deg,var(--bg2) 0%,var(--bg2) 50%,transparent 50%,transparent 100%);
+  border-top-right-radius:20px;
+  pointer-events:none;z-index:1;
+}
+.focus-fold{
+  position:absolute;top:0;right:0;
+  width:54px;height:54px;
+  background:linear-gradient(225deg,var(--paper) 0%,#F5EFE2 48%,transparent 50%,transparent 100%);
+  border-top-right-radius:20px;
+  filter:drop-shadow(-2px 3px 2px rgba(28,32,29,0.08));
+  z-index:2;pointer-events:none;
+}
+.focus-fold-date{
+  position:absolute;top:14px;right:8px;
+  font-family:var(--font-playful);font-size:12px;color:var(--ink2);letter-spacing:var(--ls);
+  font-weight:700;line-height:1;
+  transform:rotate(-45deg);transform-origin:center;
+  text-align:center;z-index:3;width:36px;
+}
+.focus-fold-date b{display:block;font-size:16px;color:var(--mint);line-height:1;margin-top:1px}
+
+.focus-label{
+  display:flex;align-items:center;gap:6px;
+  font-size:10px;font-weight:700;color:var(--mint);
+  letter-spacing:1.4px;text-transform:uppercase;margin-bottom:8px;
+  position:relative;z-index:4;
+}
+.focus-label svg{width:11px;height:11px}
+
+.focus-q{
+  font-family:var(--font-playful);
+  font-size:21px;font-weight:700;color:var(--ink);
+  letter-spacing:var(--ls);line-height:1.3;margin-bottom:5px;
+  max-width:230px;position:relative;z-index:4;
+}
+
+.focus-hint{font-size:11.5px;color:var(--ink3);margin-bottom:16px;font-weight:500;position:relative;z-index:4}
+.focus-hint b{font-family:var(--font-playful);font-size:13.5px;color:var(--mint);letter-spacing:var(--ls);font-weight:700}
+
+.chips{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:7px;margin-bottom:12px;position:relative;z-index:4}
+.chip{
+  padding:10px 0;border-radius:11px;
+  background:var(--bg2);border:1px solid var(--bd);
+  font-family:var(--font-playful);font-size:14px;font-weight:700;
+  color:var(--ink);letter-spacing:var(--ls);text-align:center;cursor:pointer;
+  transition:all 140ms cubic-bezier(0.16,1,0.3,1);
+}
+.chip:hover{border-color:var(--bd2)}
+.chip.on{
+  background:color-mix(in srgb,var(--mint) 14%,var(--sf));
+  border-color:var(--mint);color:var(--mint);
+  box-shadow:0 2px 8px color-mix(in srgb,var(--mint) 20%,transparent);
+}
+.chip.ed{font-family:'Pretendard',system-ui,sans-serif;font-size:11.5px;font-weight:600;color:var(--ink2);display:flex;align-items:center;justify-content:center;gap:3px}
+.chip.ed svg{width:11px;height:11px;opacity:0.7}
+
+.cta{
+  width:100%;padding:13px;border-radius:12px;
+  background:linear-gradient(135deg,var(--mint),var(--mint2));
+  color:var(--acc);font-size:13.5px;font-weight:700;
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  box-shadow:0 4px 14px color-mix(in srgb,var(--mint) 26%,transparent);
+  transition:transform 140ms cubic-bezier(0.16,1,0.3,1);
+  position:relative;z-index:4;
+}
+.cta:hover{transform:translateY(-1px)}
+.cta svg{width:13px;height:13px}
+.cta.dim{background:var(--sf2);color:var(--ink3);box-shadow:none;cursor:not-allowed}
+
+/* ================ Cameo (v6 그대로) ================ */
+.cameo{
+  margin:-4px 32px 0;
+  padding:14px 16px 13px;
+  background:var(--paper);
+  border:0.5px solid rgba(28,32,29,0.06);
+  border-radius:4px;
+  position:relative;
+  transform:rotate(-1.2deg);
+  box-shadow:0 6px 14px rgba(28,32,29,0.08);
+  font-family:var(--font-playful);
+  font-size:14px;line-height:1.45;letter-spacing:var(--ls);
+  color:var(--ink);
+}
+.cameo::before{
+  content:"";position:absolute;
+  top:-8px;left:50%;transform:translateX(-50%) rotate(-2deg);
+  width:72px;height:18px;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--washi) 80%,#ffffff) 0%,var(--washi) 50%,color-mix(in srgb,var(--washi) 80%,#ffffff) 100%);
+  opacity:0.85;
+  box-shadow:0 1px 2px rgba(28,32,29,0.06);
+  border-radius:1px;
+}
+.cameo-label{
+  display:block;font-family:'Pretendard',system-ui,sans-serif;
+  font-size:9.5px;font-weight:700;color:var(--ink3);
+  letter-spacing:1.2px;text-transform:uppercase;margin-bottom:3px;
+  padding-top:4px;
+}
+.cameo em{font-style:normal;color:var(--mint);font-weight:700}
+
+/* ================ Progress (v6 그대로) ================ */
+.prog{
+  margin:22px 20px 0;
+  padding:16px 18px 18px;
+  background:rgba(255,255,255,0.68);backdrop-filter:blur(6px);
+  border:1px solid var(--bd);border-radius:18px;
+}
+.prog-top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px}
+.prog-label{font-size:10px;font-weight:700;color:var(--ink3);letter-spacing:1.2px;text-transform:uppercase}
+.prog-pct{font-family:var(--font-playful);font-size:28px;font-weight:700;color:var(--mint);letter-spacing:var(--ls);line-height:1}
+
+.prog-bar-wrap{position:relative;padding-bottom:26px;margin-bottom:4px}
+.prog-bar{height:8px;background:var(--bg2);border-radius:100px;overflow:hidden;position:relative}
+.prog-bar-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--mint),var(--mint2));
+  border-radius:100px;
+  box-shadow:0 1px 4px color-mix(in srgb,var(--mint) 30%,transparent);
+}
+
+.bookmark{
+  position:absolute;top:-2px;width:22px;
+  transform:translateX(-50%);z-index:2;pointer-events:none;
+}
+.bookmark-string{width:2px;height:10px;background:var(--mint);margin:0 auto;border-radius:0 0 1px 1px}
+.bookmark-tag{
+  width:100%;padding:3px 0 6px;
+  background:linear-gradient(180deg,var(--mint) 0%,var(--mint2) 100%);
+  color:var(--acc);
+  font-family:var(--font-playful);
+  font-size:11px;font-weight:700;text-align:center;letter-spacing:var(--ls);
+  border-radius:3px 3px 0 0;line-height:1;
+  box-shadow:0 3px 6px color-mix(in srgb,var(--mint) 25%,transparent);
+  position:relative;
+}
+.bookmark-tag::after{
+  content:"";position:absolute;bottom:-5px;left:0;right:0;height:6px;
+  background:inherit;clip-path:polygon(0 0,100% 0,50% 100%);
+}
+
+.prog-flag{position:absolute;top:-14px;width:3px;height:20px;border-radius:1.5px 1.5px 0 0;z-index:1;transform:translateX(-50%)}
+.prog-flag::before{
+  content:"";position:absolute;top:0;left:3px;width:14px;height:10px;
+  background:inherit;clip-path:polygon(0 0,100% 50%,0 100%);
+}
+.prog-flag.f1{background:var(--peach)}
+.prog-flag.f2{background:var(--lavender)}
+.prog-flag.f3{background:var(--mint2)}
+
+.prog-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--bd);border-radius:12px;overflow:hidden}
+.prog-grid > div{background:var(--paper);padding:10px 0;text-align:center}
+.prog-grid b{font-family:var(--font-playful);font-size:16px;font-weight:700;color:var(--ink);letter-spacing:var(--ls);display:block;line-height:1;margin-bottom:3px}
+.prog-grid span{font-size:9.5px;color:var(--ink3);font-weight:600;letter-spacing:0.3px}
+.prog-grid .mine{color:var(--mint)}
+.prog-grid .avg{color:var(--honey)}
+
+/* ================ Entry ================ */
+.entry{
+  margin:12px 20px 0;padding:14px 16px;
+  background:var(--sf);border:1px solid var(--bd);border-radius:16px;
+  display:flex;align-items:center;gap:12px;cursor:pointer;
+  transition:border-color 140ms ease;position:relative;overflow:hidden;
+}
+.entry:hover{border-color:var(--bd2)}
+.entry-avatar{
+  width:42px;height:42px;border-radius:12px;
+  background:color-mix(in srgb,var(--mint) 14%,var(--sf));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-playful);font-size:12px;font-weight:700;
+  color:var(--mint);letter-spacing:var(--ls);flex-shrink:0;
+}
+.entry-avatar.group{background:color-mix(in srgb,var(--honey) 16%,var(--sf));color:var(--honey)}
+.entry-avatar svg{width:16px;height:16px}
+.entry-body{flex:1;min-width:0}
+.entry-t{font-size:13.5px;font-weight:700;color:var(--ink);letter-spacing:-0.01em;line-height:1.25;margin-bottom:2px}
+.entry-s{font-size:11px;color:var(--ink3);line-height:1.4}
+.entry-s em{font-style:normal;color:var(--mint);font-weight:700}
+.entry-s em.honey{color:var(--honey)}
+.entry-arr{color:var(--ink3);flex-shrink:0}
+.entry-arr svg{width:14px;height:14px}
+
+/* ================ Subs ================ */
+.subs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 20px 0}
+.sub{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:14px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:border-color 140ms ease,transform 140ms ease}
+.sub:hover{border-color:var(--bd2);transform:translateY(-1px)}
+.sub-icon{width:34px;height:34px;border-radius:10px;background:color-mix(in srgb,var(--mint) 14%,var(--sf));display:flex;align-items:center;justify-content:center;color:var(--mint);flex-shrink:0}
+.sub-icon svg{width:15px;height:15px}
+.sub-body{flex:1;min-width:0}
+.sub-t{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.2;margin-bottom:2px}
+.sub-s{font-size:10.5px;color:var(--ink3);line-height:1.3}
+.sub-count{font-family:var(--font-playful);font-size:13px;font-weight:700;color:var(--mint);letter-spacing:var(--ls);line-height:1}
+
+/* ================ 🌿 SOLO v7 · Reading Well (내 자취) ================ */
+.well{
+  margin:16px 20px 0;
+  padding:14px 16px 14px;
+  background:var(--sf);
+  border:1px solid var(--bd);
+  border-radius:18px;
+  position:relative;
+}
+.well-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:11px;gap:8px;
+}
+.well-label{
+  display:flex;align-items:center;gap:6px;
+  font-size:10px;font-weight:700;color:var(--mint);
+  letter-spacing:1.4px;text-transform:uppercase;
+}
+.well-label svg{width:11px;height:11px}
+.well-more{
+  font-family:var(--font-playful);font-size:12px;font-weight:700;
+  color:var(--ink3);letter-spacing:var(--ls);cursor:pointer;
+  display:flex;align-items:center;gap:2px;
+}
+.well-more svg{width:10px;height:10px}
+.well-grid{
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;
+  margin-bottom:11px;
+}
+.well-cell{
+  text-align:center;
+  padding:8px 4px 7px;
+  background:var(--bg2);border-radius:10px;
+}
+.well-cell b{
+  font-family:var(--font-playful);font-size:17px;
+  color:var(--mint);letter-spacing:var(--ls);
+  display:block;line-height:1;margin-bottom:3px;font-weight:700;
+}
+.well-cell span{
+  font-size:9.5px;color:var(--ink3);font-weight:600;
+  letter-spacing:0.3px;
+}
+
+.well-fav{
+  position:relative;
+  padding:10px 12px 10px 14px;
+  background:color-mix(in srgb,var(--washi) 22%,var(--paper));
+  border-radius:4px;
+  overflow:hidden;
+}
+.well-fav::before{
+  content:"";position:absolute;top:0;bottom:0;left:0;width:3px;
+  background:var(--honey);
+}
+.well-fav-label{
+  display:block;font-family:'Pretendard',system-ui,sans-serif;
+  font-size:9.5px;font-weight:700;color:var(--honey);
+  letter-spacing:1.2px;text-transform:uppercase;margin-bottom:4px;
+}
+.well-fav-text{
+  font-family:var(--font-playful);font-size:13.5px;
+  color:var(--ink);letter-spacing:var(--ls);
+  line-height:1.4;
+}
+.well-fav-text em{font-style:normal;color:var(--honey);font-weight:700}
+
+/* ================ Past ================ */
+.past-label{margin:18px 20px 8px;font-family:var(--font-playful);font-size:12px;font-weight:700;color:var(--ink3);letter-spacing:var(--ls);display:flex;align-items:center;gap:8px}
+.past-label::after{content:"";flex:1;height:1px;background:var(--bd)}
+
+.past{margin:0 20px 8px;padding:12px 14px;background:rgba(255,255,255,0.6);border:1px solid var(--bd);border-radius:14px;display:flex;gap:12px;align-items:center}
+.past-date{font-family:var(--font-playful);font-size:11.5px;color:var(--ink3);letter-spacing:var(--ls);min-width:34px;text-align:center;line-height:1.1;font-weight:700}
+.past-date b{display:block;font-size:17px;color:var(--mint);line-height:1}
+.past-body{flex:1;min-width:0}
+.past-body b{font-family:var(--font-playful);font-size:13px;color:var(--ink);letter-spacing:var(--ls);font-weight:700}
+.past-body span{display:block;font-size:11px;color:var(--ink3);margin-top:2px;line-height:1.35}
+.past-body em{font-style:normal;color:var(--mint);font-weight:700;font-family:var(--font-playful);font-size:12.5px;letter-spacing:var(--ls)}
+
+/* Bottom tabs */
+.btmtabs{position:absolute;bottom:0;left:0;right:0;height:60px;background:rgba(247,243,237,0.92);backdrop-filter:blur(10px);border-top:0.5px solid var(--bd);display:grid;grid-template-columns:repeat(4,1fr);padding:4px 12px 8px;z-index:4}
+.btmtab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--ink3);font-size:9.5px;font-weight:600;cursor:pointer}
+.btmtab.on{color:var(--mint)}
+.btmtab svg{width:16px;height:16px}
+
+.bottom-pad{height:76px}
+
+/* ================ 🌿 SOLO v7 · Cover settle animation ================ */
+@keyframes cover-settle{
+  0%{transform:rotate(-2deg) translateY(-4px);opacity:0}
+  60%{transform:rotate(-0.4deg) translateY(0);opacity:1}
+  100%{transform:rotate(0) translateY(0);opacity:1}
+}
+.p-solo .head-cover{animation:cover-settle 0.5s cubic-bezier(0.16,1,0.3,1) both}
+@media (prefers-reduced-motion:reduce){
+  .p-solo .head-cover{animation:none}
+  .narrative{animation:none}
+  .group-ava.live::after{animation:none}
+}
+
+/* ================ Group ribbon (v6 그대로) ================ */
+.group-ribbon{
+  margin:14px 20px 0;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--honey) 20%,var(--sf)),var(--sf));
+  border:1px solid color-mix(in srgb,var(--honey) 40%,transparent);
+  border-radius:14px;
+  padding:12px 14px;
+  display:flex;align-items:center;gap:12px;
+  position:relative;
+  box-shadow:0 4px 14px color-mix(in srgb,var(--honey) 10%,transparent);
+}
+.group-ribbon::before{
+  content:"";position:absolute;top:0;left:14px;right:14px;height:3px;
+  background:var(--honey);border-radius:0 0 3px 3px;
+}
+.group-mem{display:flex;align-items:center}
+.group-ava{
+  width:28px;height:28px;border-radius:50%;
+  border:2px solid var(--sf);display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:10px;font-weight:800;
+  margin-left:-8px;position:relative;flex-shrink:0;
+}
+.group-ava:first-child{margin-left:0}
+.group-ava.a1{background:linear-gradient(135deg,var(--peach),#e89562)}
+.group-ava.a2{background:linear-gradient(135deg,var(--lavender),#9a7eb3)}
+.group-ava.a3{background:linear-gradient(135deg,var(--mint2),var(--mint))}
+.group-ava.live::after{
+  content:"";position:absolute;width:8px;height:8px;border-radius:50%;
+  background:var(--mint);border:2px solid var(--sf);bottom:-2px;right:-3px;
+  animation:pulse 1.8s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+
+.group-text{flex:1;min-width:0;font-size:12px;color:var(--ink2);line-height:1.4}
+.group-text b{font-family:var(--font-playful);font-size:14px;color:var(--ink);letter-spacing:var(--ls);font-weight:700}
+.group-text em{font-style:normal;color:var(--honey);font-weight:700}
+
+.group-dday{
+  font-family:var(--font-playful);font-size:13px;font-weight:700;color:var(--honey);
+  background:color-mix(in srgb,var(--honey) 18%,transparent);padding:3px 10px;border-radius:100px;
+  letter-spacing:var(--ls);flex-shrink:0;
+}
+
+/* ================ Note ================ */
+.note{margin:40px auto 0;padding:26px 30px;background:#FFFFFF;border:1px solid var(--bd2);border-radius:20px;color:var(--ink);font-size:12.5px;line-height:1.8;max-width:900px}
+.note-title{font-family:var(--font-playful);font-size:20px;font-weight:700;color:var(--mint);margin-bottom:10px;letter-spacing:var(--ls)}
+.note h4{font-family:var(--font-playful);font-size:15px;color:var(--ink);letter-spacing:var(--ls);margin:14px 0 6px;font-weight:700}
+.note ol{margin-left:22px}
+.note li{margin-bottom:6px;color:var(--ink2)}
+.note strong{color:var(--mint);font-weight:700}
+.note code{background:var(--bg2);padding:1px 6px;border-radius:4px;font-size:11px;font-family:ui-monospace,monospace;color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title">책 상세 · 읽는 중 v7</div>
+  <div class="sub">Group은 그대로 · <em>Solo만 재작업</em> — 서재의 언어 3종 + 진입 모션<br>
+    <span class="c solo">서사 greeting</span>
+    <span class="c solo">페이스 pill</span>
+    <span class="c solo">Reading Well</span>
+    <span class="c solo">cover settle</span>
+  </div>
+
+  <div class="phones">
+
+    <!-- ============ 🌿 SOLO (재작업) ============ -->
+    <div class="phone-wrap">
+      <div class="phone-badge"><b>Solo</b> · 재작업 · 서재의 언어</div>
+      <div class="phone">
+        <div class="p-solo">
+          <div class="status">
+            <span>9:41</span>
+            <svg width="14" height="11" viewBox="0 0 14 11" fill="currentColor"><path d="M1 4h1v5H1zM4 2.5h1V9H4zM7 1h1v8H7zM10 2.5h1V9h-1zM13 4h1v5h-1z"/></svg>
+          </div>
+
+          <div class="nav">
+            <div class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+            <div class="nav-btn"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></div>
+          </div>
+
+          <div class="head">
+            <div class="head-cover warm">캐릭터<br>심리<br>사전</div>
+            <div class="head-body">
+              <div class="head-subtitle">READING</div>
+              <div class="head-title">캐릭터 심리 사전<span class="position-badge">후반부 진입</span></div>
+              <div class="head-author">린다 N. 에델스타인</div>
+              <div class="head-meta">
+                <b>245</b><span>/ 340쪽</span>
+                <span class="dot"></span>
+                <b>72%</b>
+              </div>
+            </div>
+          </div>
+
+          <!-- 🌿 NEW · Narrative greeting · 책이 나에게 건네는 한 마디 -->
+          <div class="narrative">
+            <div class="narrative-mascot">방긋</div>
+            <div class="narrative-text">어제 <em>p.245</em>에서 잠들었네요</div>
+          </div>
+
+          <!-- Streak (책등) -->
+          <div class="streak">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+            <div>이 책 <b>5일 연속</b> 읽고 있어요</div>
+            <div class="streak-edge" title="책등처럼 쌓이는 읽은 날">
+              <div class="streak-mark on"></div>
+              <div class="streak-mark on"></div>
+              <div class="streak-mark on"></div>
+              <div class="streak-mark on"></div>
+              <div class="streak-mark on today"></div>
+            </div>
+          </div>
+
+          <!-- 🌿 NEW · Pace pill + sparkline · 나의 속도계 -->
+          <div class="pace">
+            <div class="pace-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <div class="pace-text">
+              최근 7일 · <b>하루 12쪽</b> · <em>5.8</em> 완독 예정
+            </div>
+            <div class="pace-spark" aria-label="최근 7일 읽은 쪽수 추이">
+              <svg width="62" height="16" viewBox="0 0 62 16" fill="none">
+                <defs>
+                  <linearGradient id="spk" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#5FA48E" stop-opacity="0.28"/>
+                    <stop offset="100%" stop-color="#5FA48E" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path d="M1 12 L10 9 L19 11 L28 6 L37 8 L46 5 L55 3 L61 4" stroke="#5FA48E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                <path d="M1 12 L10 9 L19 11 L28 6 L37 8 L46 5 L55 3 L61 4 L61 16 L1 16 Z" fill="url(#spk)"/>
+                <circle cx="55" cy="3" r="2" fill="#5FA48E"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Focus Card (dog-eared) -->
+          <div class="focus">
+            <div class="focus-fold"></div>
+            <div class="focus-fold-date">4.<b>23</b></div>
+
+            <div class="focus-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+              오늘의 기록
+            </div>
+            <div class="focus-q">오늘 몇 쪽까지 읽었어요?</div>
+            <div class="focus-hint">어제 <b>245쪽</b>에서 멈췄어요</div>
+
+            <div class="chips">
+              <div class="chip">+10</div>
+              <div class="chip on">+20</div>
+              <div class="chip">+30</div>
+              <div class="chip ed">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                직접
+              </div>
+            </div>
+
+            <button class="cta">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              265쪽까지 읽었어요
+            </button>
+          </div>
+
+          <!-- 어제 문장 cameo -->
+          <div class="cameo">
+            <span class="cameo-label">어제 그은 한 줄</span>
+            "<em>가장 고요한 사람이</em> 가장 깊은 물이다"
+          </div>
+
+          <!-- Progress -->
+          <div class="prog">
+            <div class="prog-top">
+              <div class="prog-label">나의 진행률</div>
+              <div class="prog-pct">72%</div>
+            </div>
+            <div class="prog-bar-wrap">
+              <div class="prog-bar">
+                <div class="prog-bar-fill" style="width:72%"></div>
+              </div>
+              <div class="bookmark" style="left:72%">
+                <div class="bookmark-string"></div>
+                <div class="bookmark-tag">245p</div>
+              </div>
+            </div>
+            <div class="prog-grid">
+              <div><b>245</b><span>현재 쪽</span></div>
+              <div><b>340</b><span>전체 쪽</span></div>
+              <div><b>12</b><span>읽은 날</span></div>
+            </div>
+          </div>
+
+          <!-- Entry · 방긋이랑 -->
+          <div class="entry">
+            <div class="entry-avatar">방긋</div>
+            <div class="entry-body">
+              <div class="entry-t">방긋이랑 얘기해요</div>
+              <div class="entry-s">오늘 읽은 <em>주인공</em>에 대해 어땠나요?</div>
+            </div>
+            <div class="entry-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+
+          <!-- Subs -->
+          <div class="subs">
+            <div class="sub">
+              <div class="sub-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+              </div>
+              <div class="sub-body">
+                <div class="sub-t">문장 긋기</div>
+                <div class="sub-s"><span class="sub-count">4</span>개 모았어요</div>
+              </div>
+            </div>
+            <div class="sub">
+              <div class="sub-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              </div>
+              <div class="sub-body">
+                <div class="sub-t">서평 쓰기</div>
+                <div class="sub-s">다 읽기 전에 남겨도</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 🌿 NEW · Reading Well · 내가 이 책에 남긴 자취 -->
+          <div class="well">
+            <div class="well-head">
+              <div class="well-label">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v20"/><path d="M18 2v20"/><path d="M6 6h12"/><path d="M6 18h12"/></svg>
+                이 책에 남긴 자취
+              </div>
+              <div class="well-more">모두 보기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+            </div>
+            <div class="well-grid">
+              <div class="well-cell"><b>4</b><span>문장</span></div>
+              <div class="well-cell"><b>2</b><span>서평 메모</span></div>
+              <div class="well-cell"><b>p.183</b><span>가장 머문 곳</span></div>
+            </div>
+            <div class="well-fav">
+              <span class="well-fav-label">내가 가장 오래 머문 문장</span>
+              <div class="well-fav-text">"고요함은 <em>도망이 아니라</em> 기다림이다" <em style="color:var(--ink3);font-size:11px">· p.183 · 17분</em></div>
+            </div>
+          </div>
+
+          <!-- Past -->
+          <div class="past-label">지난 기록</div>
+          <div class="past">
+            <div class="past-date">4.<b>22</b></div>
+            <div class="past-body">
+              <b>어제 · 15쪽 읽었어요</b>
+              <span>문장 <em>1개</em> 긋고 '<em>주인공이 왜 이렇게 행동하는지…</em>'</span>
+            </div>
+          </div>
+          <div class="past">
+            <div class="past-date">4.<b>21</b></div>
+            <div class="past-body">
+              <b>22쪽 읽었어요</b>
+              <span>문장 <em>2개</em> · 서평 메모 <em>1건</em></span>
+            </div>
+          </div>
+
+          <div class="bottom-pad"></div>
+
+          <div class="btmtabs">
+            <div class="btmtab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>홈</div>
+            <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>서재</div>
+            <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>캘린더</div>
+            <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>나</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-desc">
+        책이 <strong>'어제 p.245에서 잠들었네요'</strong> 하고 말 걸고 · 스트릭 아래 <strong>나의 속도계</strong>(하루 12쪽 + sparkline) · Subs 아래 <strong>Reading Well</strong>(문장 4개·서평 2개·가장 머문 곳 p.183)
+      </div>
+    </div>
+
+    <!-- ============ 🍯 GROUP (v6 그대로) ============ -->
+    <div class="phone-wrap">
+      <div class="phone-badge group"><b>Group</b> · v6 유지 (마음에 들어하신 버전)</div>
+      <div class="phone">
+        <div class="p-group">
+          <div class="status">
+            <span>9:41</span>
+            <svg width="14" height="11" viewBox="0 0 14 11" fill="currentColor"><path d="M1 4h1v5H1zM4 2.5h1V9H4zM7 1h1v8H7zM10 2.5h1V9h-1zM13 4h1v5h-1z"/></svg>
+          </div>
+
+          <div class="nav">
+            <div class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+            <div class="nav-btn"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></div>
+          </div>
+
+          <div class="head">
+            <div class="head-cover forest">침묵의<br>독자<br>클럽</div>
+            <div class="head-body">
+              <div class="head-subtitle group">GROUP READING · 4회차</div>
+              <div class="head-title">침묵의 독자 클럽<span class="position-badge" style="background:color-mix(in srgb,var(--honey) 14%,var(--sf))"><span style="background:var(--honey)"></span>마지막 챕터</span></div>
+              <div class="head-author">프랭크 블라이빙거</div>
+              <div class="head-meta">
+                <b>245</b><span>/ 340쪽</span>
+                <span class="dot"></span>
+                <b>72%</b>
+              </div>
+            </div>
+          </div>
+
+          <div class="group-ribbon">
+            <div class="group-mem">
+              <div class="group-ava a1 live">지</div>
+              <div class="group-ava a2">민</div>
+              <div class="group-ava a3">현</div>
+            </div>
+            <div class="group-text">
+              <b>목요 책잡이</b><br>
+              <em>민수</em> 지금 읽는 중 · 평균 <em>247쪽</em>
+            </div>
+            <div class="group-dday">D-3</div>
+          </div>
+
+          <div class="focus">
+            <div class="focus-fold"></div>
+            <div class="focus-fold-date">4.<b>23</b></div>
+
+            <div class="focus-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+              오늘의 기록
+            </div>
+            <div class="focus-q">오늘 몇 쪽까지 읽었어요?</div>
+            <div class="focus-hint">어제 <b>245쪽</b>에서 멈췄어요</div>
+
+            <div class="chips">
+              <div class="chip">+10</div>
+              <div class="chip on">+20</div>
+              <div class="chip">+30</div>
+              <div class="chip ed">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                직접
+              </div>
+            </div>
+
+            <button class="cta">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              265쪽까지 읽었어요
+            </button>
+          </div>
+
+          <div class="cameo" style="transform:rotate(1.2deg)">
+            <span class="cameo-label" style="color:var(--honey)">어제 · 민수가 그은 한 줄</span>
+            "모임 <em>D-3</em>인데 <em style="color:var(--honey)">이 챕터만큼은</em> 꼭 나누고 싶어요"
+          </div>
+
+          <div class="prog">
+            <div class="prog-top">
+              <div class="prog-label">나의 vs 모임 평균</div>
+              <div class="prog-pct">72%</div>
+            </div>
+            <div class="prog-bar-wrap" style="padding-top:22px">
+              <div class="prog-flag f1" style="left:66%" title="지선 66%"></div>
+              <div class="prog-flag f2" style="left:76%" title="민수 76%"></div>
+              <div class="prog-flag f3" style="left:78%" title="현아 78%"></div>
+
+              <div class="prog-bar">
+                <div class="prog-bar-fill" style="width:72%"></div>
+              </div>
+              <div class="bookmark" style="left:72%">
+                <div class="bookmark-string"></div>
+                <div class="bookmark-tag">나 245p</div>
+              </div>
+            </div>
+            <div class="prog-grid">
+              <div><b class="mine">245</b><span>내 쪽수</span></div>
+              <div><b class="avg">247</b><span>모임 평균</span></div>
+              <div><b>3</b><span>함께 읽는 중</span></div>
+            </div>
+          </div>
+
+          <div class="entry">
+            <div class="entry-avatar group">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="entry-body">
+              <div class="entry-t">모임 토론방 · <span style="color:var(--honey);font-family:var(--font-playful);font-size:14px;letter-spacing:var(--ls)">7</span>개 새 메시지</div>
+              <div class="entry-s"><em class="honey">민수</em>: "5장 나만 이렇게 느낀 건가요…"</div>
+            </div>
+            <div class="entry-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+
+          <div class="subs">
+            <div class="sub">
+              <div class="sub-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+              </div>
+              <div class="sub-body">
+                <div class="sub-t">문장 긋기</div>
+                <div class="sub-s">멤버도 볼 수 있어요</div>
+              </div>
+            </div>
+            <div class="sub">
+              <div class="sub-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              </div>
+              <div class="sub-body">
+                <div class="sub-t">서평 쓰기</div>
+                <div class="sub-s">모임 준비용으로</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="past-label">모임 멤버 어제</div>
+          <div class="past">
+            <div class="past-date">4.<b>22</b></div>
+            <div class="past-body">
+              <b><em>민수</em> 28쪽 읽음</b>
+              <span>"<em style="color:var(--honey)">5장 · 가장 고요한 사람이 가장 깊은 물이다</em>"</span>
+            </div>
+          </div>
+          <div class="past">
+            <div class="past-date">4.<b>22</b></div>
+            <div class="past-body">
+              <b><em>현아</em> 문장 <em>2개</em>를 모음</b>
+              <span>모임 토론방에서 <em>3개 댓글</em> 달림</span>
+            </div>
+          </div>
+
+          <div class="bottom-pad"></div>
+
+          <div class="btmtabs">
+            <div class="btmtab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>홈</div>
+            <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>서재</div>
+            <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>캘린더</div>
+            <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>나</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-desc">v6 Group 그대로 · 멤버 깃발 · cameo · 꿀색 뱃지 전부 유지</div>
+    </div>
+
+  </div>
+
+  <div class="note">
+    <div class="note-title">v7 · Solo 재작업 · '서재의 언어'</div>
+
+    <h4>Solo만 추가된 것 (Group은 v6 그대로)</h4>
+    <ol>
+      <li><strong>서사 greeting</strong> — 방긋 말풍선 <code>"어제 p.245에서 잠들었네요"</code>. 책이 나한테 말을 건다. Fallback 순서:
+        <br>· 연속일 ≥ 7: <code>"23일째 같이 있어요"</code>
+        <br>· 어제 읽기 있음: <code>"어제 p.N에서 잠들었네요"</code>
+        <br>· 신규 책: <code>"어제 시작했어요"</code>
+        <br>· 기본: <code>"책갈피가 기다리고 있어요"</code>
+      </li>
+      <li><strong>페이스 pill + sparkline</strong> — streak 바로 아래 짝으로 배치. <code>최근 7일 · 하루 12쪽 · 5.8 완독 예정</code> + 62×16px inline SVG sparkline. 데이터 &lt;3일이면 <code>"아직 페이스 파악 중"</code>로 대체</li>
+      <li><strong>Reading Well</strong> (이 책에 남긴 자취) — subs와 past 사이. 문장 수 · 서평 수 · 가장 머문 쪽수 3-grid + '가장 오래 머문 문장' 하나 강조 (꿀색 accent). 스크랩 0개면 섹션 숨김</li>
+      <li><strong>Cover settle</strong> — 진입 시 표지가 <code>-2°→0°</code>로 straighten + 0.4s fade. narrative greeting은 0.2s delay로 따라 fade-in. <code>prefers-reduced-motion</code> 시 모두 skip</li>
+    </ol>
+
+    <h4>Solo의 리듬 재배치</h4>
+    <ul style="list-style:disc;margin-left:22px">
+      <li><strong>head</strong> (정보) → <strong>narrative</strong> (감정) → <strong>streak + pace</strong> (나의 리듬 듀오) → <strong>focus + cameo</strong> (오늘 행동) → <strong>prog</strong> (위치) → <strong>entry + subs</strong> (도구) → <strong>Reading Well</strong> (축적 요약) → <strong>past</strong> (과거 타임라인)</li>
+      <li>서브타이틀은 <code>"READING · 12일차"</code>에서 <code>"READING"</code>으로 축소 — 12일 같은 숫자는 greeting이나 streak이 담당</li>
+    </ul>
+
+    <h4>시각 언어 차이화 (Solo vs Group)</h4>
+    <ul style="list-style:disc;margin-left:22px">
+      <li>Solo는 민트 계열 3종 accent (narrative 좌측 바 · pace 좌측 그라디언트 · Reading Well 꿀색 favorite)</li>
+      <li>Group은 꿀색 계열 주도 (ribbon · D-day · flag · cameo 라벨)</li>
+      <li>Group 상태에선 narrative와 pace와 Reading Well 모두 <strong>숨김</strong> — ribbon/토론방/멤버 활동이 그 자리를 대체함</li>
+    </ul>
+
+    <h4>구현 메모</h4>
+    <ul style="list-style:disc;margin-left:22px">
+      <li>Sparkline은 inline SVG (7 data points, linear path + area gradient). 데이터는 <code>progress_log</code> 최근 7일 group by date</li>
+      <li>Reading Well의 '가장 오래 머문 문장'은 스크랩에 <code>dwell_seconds</code> 없으면 <code>created_at - prev_scrap_created_at</code>으로 근사</li>
+      <li>narrative의 말풍선 tail은 <code>::after</code> + <code>clip-path:polygon</code> 삼각형</li>
+      <li>Solo 전용 클래스는 모두 <code>.p-solo</code> 스코프 아래에만 렌더 — Group에선 JSX 조건부로 제외</li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>

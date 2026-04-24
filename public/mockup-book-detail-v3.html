@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>책 상세 · 읽는 중 v3 — 드림팀 재설계</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;word-break:keep-all}
+
+:root{
+  --bg:#F7F3ED;
+  --sf:#FFFFFF;
+  --sf2:#EDE7DF;
+  --sf3:#E0D9D0;
+  --bd:rgba(95,164,142,0.14);
+  --bd2:rgba(95,164,142,0.3);
+  --bd3:rgba(28,32,29,0.08);
+  --tp:#1c201d;
+  --ts:#4a5550;
+  --tm:#7a8b7e;
+  --ac:#5FA48E;
+  --ac2:#7ABBA4;
+  --ac3:#A4D4C0;
+  --acc:#f7f3ed;
+  --danger:#C55E4A;
+  --danger-bg:rgba(197,94,74,0.08);
+  --font-playful:'Gaegu',cursive;
+  --ls-gaegu:0.02em;
+}
+
+body{
+  font-family:'Pretendard',system-ui,-apple-system,sans-serif;
+  background:#DCD5CA;
+  padding:32px 20px;
+  min-height:100vh;
+  color:var(--tp);
+}
+
+.wrap{max-width:1380px;margin:0 auto}
+
+.title{
+  font-family:var(--font-playful);
+  font-size:30px;
+  font-weight:700;
+  letter-spacing:var(--ls-gaegu);
+  text-align:center;
+  margin-bottom:6px;
+  color:var(--tp);
+}
+
+.sub{
+  color:var(--ts);
+  font-size:13px;
+  text-align:center;
+  margin-bottom:32px;
+  font-weight:500;
+  line-height:1.6;
+}
+
+.sub em{
+  font-style:normal;
+  color:var(--ac);
+  font-weight:700;
+}
+
+.phones{
+  display:flex;
+  gap:24px;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+
+.phone-wrap{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:14px;
+  max-width:400px;
+}
+
+.phone-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 14px;
+  border-radius:100px;
+  background:#FFFFFF;
+  border:1px solid var(--bd2);
+  font-size:11px;
+  font-weight:700;
+  color:var(--ac);
+  letter-spacing:0.4px;
+}
+
+.phone-badge.accent{
+  background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 14%,#FFFFFF),#FFFFFF);
+  border-color:var(--ac);
+  color:var(--ac);
+}
+
+.phone{
+  width:380px;
+  height:820px;
+  background:var(--bg);
+  border-radius:44px;
+  box-shadow:0 0 0 3px #1a1a1a,0 0 24px rgba(0,0,0,0.1);
+  overflow:hidden;
+  position:relative;
+}
+
+.phone-desc{
+  font-size:11.5px;
+  color:var(--ts);
+  text-align:center;
+  line-height:1.65;
+  max-width:380px;
+  font-weight:500;
+}
+
+.phone-desc strong{color:var(--ac);font-weight:700}
+
+/* ========== Shared phone scaffolding ========== */
+.status{
+  height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 22px;
+  font-size:14px;
+  font-weight:700;
+  color:var(--tp);
+}
+
+.status-right{display:flex;gap:4px;align-items:center;font-size:11px}
+
+/* Sticky header: compact book identity + inline progress */
+.sticky{
+  background:var(--bg);
+  padding:8px 18px 12px;
+  border-bottom:0.5px solid var(--bd);
+  position:relative;
+  z-index:5;
+}
+
+.sticky-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.sticky-nav{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  background:var(--sf);
+  border:0.5px solid var(--bd);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--ts);
+  flex-shrink:0;
+  cursor:pointer;
+}
+
+.sticky-nav svg{width:15px;height:15px}
+
+.sticky-cover{
+  width:44px;
+  height:62px;
+  border-radius:6px;
+  background:linear-gradient(135deg,#c89060,#806040);
+  box-shadow:0 4px 10px rgba(0,0,0,0.12);
+  flex-shrink:0;
+  display:flex;
+  align-items:flex-end;
+  padding:4px;
+  font-size:8px;
+  font-weight:800;
+  color:#f4efe8;
+  line-height:1.1;
+}
+
+.sticky-mid{flex:1;min-width:0}
+.sticky-title{
+  font-size:14px;
+  font-weight:700;
+  color:var(--tp);
+  line-height:1.25;
+  letter-spacing:-0.01em;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  margin-bottom:3px;
+}
+
+.sticky-meta{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:11px;
+  color:var(--tm);
+  font-weight:500;
+}
+
+.sticky-meta b{
+  font-family:var(--font-playful);
+  font-size:14px;
+  font-weight:700;
+  color:var(--ac);
+  letter-spacing:var(--ls-gaegu);
+  line-height:1;
+}
+
+.sticky-meta .dot{
+  width:3px;
+  height:3px;
+  border-radius:50%;
+  background:var(--bd2);
+}
+
+.sticky-kebab{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  background:var(--sf);
+  border:0.5px solid var(--bd);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--ts);
+  flex-shrink:0;
+  cursor:pointer;
+}
+
+.sticky-kebab svg{width:15px;height:15px}
+
+.sticky-bar{
+  height:4px;
+  background:var(--sf3);
+  border-radius:2px;
+  overflow:hidden;
+  margin-top:10px;
+}
+
+.sticky-bar-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--ac),var(--ac2));
+  border-radius:2px;
+}
+
+/* ========== Scrollable body ========== */
+.scroll{
+  height:calc(820px - 44px - 88px);
+  overflow:auto;
+  padding:16px 18px 24px;
+}
+.scroll::-webkit-scrollbar{width:0}
+
+/* ========== Focus Card ========== */
+.focus{
+  background:var(--sf);
+  border:1px solid var(--bd2);
+  border-radius:20px;
+  padding:18px 18px 16px;
+  margin-bottom:16px;
+  box-shadow:0 6px 18px color-mix(in srgb,var(--ac) 10%,transparent);
+  position:relative;
+  overflow:hidden;
+}
+
+.focus::before{
+  content:"";
+  position:absolute;
+  top:-30px;
+  right:-30px;
+  width:110px;
+  height:110px;
+  background:radial-gradient(circle,color-mix(in srgb,var(--ac) 16%,transparent),transparent 70%);
+  pointer-events:none;
+}
+
+.focus-label{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:10.5px;
+  font-weight:700;
+  color:var(--tm);
+  letter-spacing:1px;
+  text-transform:uppercase;
+  margin-bottom:8px;
+  position:relative;
+  z-index:1;
+}
+
+.focus-label svg{width:12px;height:12px;color:var(--ac)}
+
+.focus-q{
+  font-family:var(--font-playful);
+  font-size:19px;
+  font-weight:700;
+  color:var(--tp);
+  letter-spacing:var(--ls-gaegu);
+  line-height:1.35;
+  margin-bottom:4px;
+  position:relative;
+  z-index:1;
+}
+
+.focus-since{
+  font-size:11.5px;
+  color:var(--tm);
+  font-weight:500;
+  margin-bottom:14px;
+  position:relative;
+  z-index:1;
+}
+
+.focus-since b{
+  font-family:var(--font-playful);
+  font-size:13.5px;
+  color:var(--ac);
+  font-weight:700;
+  letter-spacing:var(--ls-gaegu);
+}
+
+.focus-chips{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr 1fr;
+  gap:7px;
+  margin-bottom:12px;
+  position:relative;
+  z-index:1;
+}
+
+.chip{
+  padding:10px 0;
+  border-radius:12px;
+  background:var(--bg);
+  border:1px solid var(--bd);
+  font-family:var(--font-playful);
+  font-size:14px;
+  font-weight:700;
+  color:var(--tp);
+  letter-spacing:var(--ls-gaegu);
+  text-align:center;
+  cursor:pointer;
+  transition:transform 120ms ease,background 120ms ease,border-color 120ms ease;
+}
+
+.chip.active{
+  background:color-mix(in srgb,var(--ac) 14%,var(--sf));
+  border-color:var(--ac);
+  color:var(--ac);
+}
+
+.chip.manual{
+  font-family:'Pretendard',system-ui,sans-serif;
+  font-size:11.5px;
+  font-weight:600;
+  color:var(--ts);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  letter-spacing:-0.01em;
+}
+
+.chip.manual svg{width:11px;height:11px;opacity:0.7}
+
+.focus-cta{
+  width:100%;
+  padding:13px;
+  border-radius:12px;
+  background:linear-gradient(135deg,var(--ac),var(--ac2));
+  color:var(--acc);
+  font-size:14px;
+  font-weight:700;
+  letter-spacing:-0.01em;
+  border:none;
+  cursor:pointer;
+  box-shadow:0 4px 14px color-mix(in srgb,var(--ac) 24%,transparent);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  position:relative;
+  z-index:1;
+}
+
+.focus-cta svg{width:14px;height:14px}
+.focus-cta.disabled{
+  background:var(--sf2);
+  color:var(--tm);
+  box-shadow:none;
+  cursor:not-allowed;
+}
+
+/* ========== Progress block (view-only) ========== */
+.prog{
+  background:var(--sf);
+  border:1px solid var(--bd);
+  border-radius:18px;
+  padding:16px 16px 14px;
+  margin-bottom:16px;
+}
+
+.prog-top{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+
+.prog-label{
+  font-size:10.5px;
+  font-weight:700;
+  color:var(--tm);
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+
+.prog-pct{
+  font-family:var(--font-playful);
+  font-size:28px;
+  font-weight:700;
+  color:var(--ac);
+  letter-spacing:var(--ls-gaegu);
+  line-height:1;
+}
+
+.prog-bar{
+  height:8px;
+  background:var(--sf3);
+  border-radius:4px;
+  overflow:hidden;
+  margin-bottom:12px;
+}
+
+.prog-bar-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--ac),var(--ac2));
+  border-radius:4px;
+  box-shadow:0 1px 4px color-mix(in srgb,var(--ac) 25%,transparent);
+}
+
+.prog-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:1px;
+  background:var(--bd);
+  border-radius:12px;
+  overflow:hidden;
+}
+
+.prog-grid div{
+  background:var(--bg);
+  padding:10px 0;
+  text-align:center;
+}
+
+.prog-grid b{
+  font-family:var(--font-playful);
+  font-size:16px;
+  font-weight:700;
+  color:var(--tp);
+  letter-spacing:var(--ls-gaegu);
+  display:block;
+  line-height:1;
+  margin-bottom:3px;
+}
+
+.prog-grid span{
+  font-size:9.5px;
+  color:var(--tm);
+  font-weight:600;
+  letter-spacing:0.3px;
+}
+
+/* ========== Sub actions row ========== */
+.subs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:16px;
+}
+
+.sub-act{
+  background:var(--sf);
+  border:1px solid var(--bd);
+  border-radius:16px;
+  padding:14px 12px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  cursor:pointer;
+  transition:transform 120ms ease,border-color 120ms ease;
+}
+
+.sub-act:hover{transform:translateY(-1px);border-color:var(--bd2)}
+
+.sub-act-icon{
+  width:36px;
+  height:36px;
+  border-radius:10px;
+  background:color-mix(in srgb,var(--ac) 12%,var(--bg));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--ac);
+  flex-shrink:0;
+}
+
+.sub-act-icon svg{width:16px;height:16px}
+
+.sub-act-body{flex:1;min-width:0}
+.sub-act-t{font-size:13px;font-weight:700;color:var(--tp);line-height:1.2;margin-bottom:2px}
+.sub-act-s{font-size:10.5px;color:var(--tm);line-height:1.3}
+
+/* ========== AI 토론 (keep from v2, improved) ========== */
+.ai{
+  background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 12%,var(--sf)),var(--sf));
+  border:1px solid var(--bd2);
+  border-radius:18px;
+  padding:14px 16px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:16px;
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+}
+
+.ai::before{
+  content:"";
+  position:absolute;
+  top:-24px;
+  right:-20px;
+  width:100px;
+  height:100px;
+  background:radial-gradient(circle,color-mix(in srgb,var(--ac) 20%,transparent),transparent 70%);
+  pointer-events:none;
+}
+
+.ai-avatar{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  background:var(--sf);
+  border:1px solid var(--bd2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:var(--font-playful);
+  font-size:12px;
+  font-weight:700;
+  color:var(--ac);
+  flex-shrink:0;
+  position:relative;
+  z-index:1;
+}
+
+.ai-body{flex:1;min-width:0;position:relative;z-index:1}
+.ai-t{
+  font-family:var(--font-playful);
+  font-size:14px;
+  font-weight:700;
+  color:var(--tp);
+  letter-spacing:var(--ls-gaegu);
+  line-height:1.3;
+  margin-bottom:2px;
+}
+.ai-s{font-size:11px;color:var(--tm);line-height:1.4}
+.ai-s em{font-style:normal;color:var(--ac);font-weight:700}
+.ai-arr{color:var(--ac);flex-shrink:0;position:relative;z-index:1}
+.ai-arr svg{width:14px;height:14px}
+
+/* ========== Bottom tabs ========== */
+.btmtabs{
+  position:absolute;
+  bottom:0;
+  left:0;
+  right:0;
+  height:64px;
+  background:var(--bg);
+  border-top:0.5px solid var(--bd);
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  padding:6px 12px 12px;
+  z-index:4;
+}
+
+.btmtab{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  color:var(--tm);
+  font-size:10px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.btmtab.on{color:var(--ac)}
+.btmtab svg{width:17px;height:17px}
+
+/* ========== Kebab dropdown (phone 3) ========== */
+.dropdown{
+  position:absolute;
+  top:84px;
+  right:18px;
+  background:var(--sf);
+  border:1px solid var(--bd2);
+  border-radius:14px;
+  box-shadow:0 12px 30px rgba(28,32,29,0.18);
+  padding:6px;
+  min-width:170px;
+  z-index:20;
+}
+
+.drop-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:9px 12px;
+  font-size:13px;
+  font-weight:500;
+  color:var(--tp);
+  border-radius:10px;
+  cursor:pointer;
+}
+
+.drop-item:hover{background:var(--sf2)}
+.drop-item svg{width:14px;height:14px;color:var(--ts);flex-shrink:0}
+
+.drop-divider{
+  height:0.5px;
+  background:var(--bd);
+  margin:4px 2px;
+}
+
+.drop-item.danger{color:var(--danger)}
+.drop-item.danger svg{color:var(--danger)}
+.drop-item.danger:hover{background:var(--danger-bg)}
+
+/* ========== Complete Modal (phone 3) ========== */
+.backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(28,32,29,0.45);
+  z-index:30;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  padding:0;
+  border-radius:44px;
+  overflow:hidden;
+}
+
+.modal{
+  background:var(--bg);
+  border-radius:28px 28px 0 0;
+  width:100%;
+  padding:24px 22px 32px;
+  text-align:center;
+  position:relative;
+}
+
+.modal-hand{
+  position:absolute;
+  top:10px;
+  left:50%;
+  transform:translateX(-50%);
+  width:40px;
+  height:4px;
+  background:var(--sf3);
+  border-radius:2px;
+}
+
+.modal-icon{
+  font-family:var(--font-playful);
+  font-size:36px;
+  color:var(--ac);
+  margin:6px 0 4px;
+  letter-spacing:var(--ls-gaegu);
+}
+
+.modal-t{
+  font-family:var(--font-playful);
+  font-size:22px;
+  font-weight:700;
+  color:var(--tp);
+  letter-spacing:var(--ls-gaegu);
+  margin-bottom:6px;
+  line-height:1.3;
+}
+
+.modal-s{
+  font-size:13px;
+  color:var(--ts);
+  line-height:1.55;
+  margin-bottom:16px;
+}
+
+.modal-pages{
+  display:flex;
+  justify-content:center;
+  align-items:baseline;
+  gap:6px;
+  margin-bottom:16px;
+}
+
+.modal-pages b{
+  font-family:var(--font-playful);
+  font-size:36px;
+  font-weight:700;
+  color:var(--ac);
+  letter-spacing:var(--ls-gaegu);
+  line-height:1;
+}
+
+.modal-pages span{font-size:13px;color:var(--tm);font-weight:500}
+
+.modal-ctas{display:flex;gap:8px}
+
+.modal-primary{
+  flex:1;
+  padding:13px;
+  border-radius:12px;
+  background:linear-gradient(135deg,var(--ac),var(--ac2));
+  color:var(--acc);
+  font-size:14px;
+  font-weight:700;
+  border:none;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+}
+
+.modal-primary svg{width:14px;height:14px}
+
+.modal-ghost{
+  padding:13px 16px;
+  border-radius:12px;
+  background:transparent;
+  color:var(--ts);
+  font-size:13px;
+  font-weight:600;
+  border:1px solid var(--bd);
+  cursor:pointer;
+}
+
+/* ========== Undo Toast (phone 2) ========== */
+.toast{
+  position:absolute;
+  bottom:84px;
+  left:14px;
+  right:14px;
+  background:var(--tp);
+  color:var(--acc);
+  border-radius:14px;
+  padding:12px 14px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  box-shadow:0 8px 20px rgba(28,32,29,0.3);
+  z-index:15;
+  font-size:12.5px;
+}
+
+.toast svg{width:16px;height:16px;color:var(--ac3);flex-shrink:0}
+.toast-body{flex:1;line-height:1.4}
+.toast-body b{font-family:var(--font-playful);color:var(--ac3);font-weight:700;letter-spacing:var(--ls-gaegu)}
+.toast-undo{
+  padding:4px 10px;
+  border-radius:8px;
+  background:rgba(247,243,237,0.15);
+  color:var(--acc);
+  font-size:11px;
+  font-weight:700;
+  border:none;
+  cursor:pointer;
+}
+
+/* ========== Meeting note ========== */
+.note{
+  margin:36px auto 0;
+  padding:24px 28px;
+  background:#FFFFFF;
+  border:1px solid var(--bd2);
+  border-radius:18px;
+  color:var(--tp);
+  font-size:12px;
+  line-height:1.85;
+  max-width:880px;
+}
+
+.note-title{
+  font-family:var(--font-playful);
+  font-size:18px;
+  font-weight:700;
+  color:var(--ac);
+  margin-bottom:10px;
+  letter-spacing:var(--ls-gaegu);
+}
+
+.note h4{
+  font-family:var(--font-playful);
+  font-size:14.5px;
+  font-weight:700;
+  color:var(--tp);
+  letter-spacing:var(--ls-gaegu);
+  margin:14px 0 4px;
+}
+
+.note strong{color:var(--ac);font-weight:700}
+.note ul{margin:6px 0 4px 20px}
+.note li{margin-bottom:3px}
+.note code{
+  background:var(--sf2);
+  padding:1px 6px;
+  border-radius:4px;
+  font-size:11px;
+  font-family:ui-monospace,SFMono-Regular,monospace;
+  color:var(--tp);
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title">책 상세 · 읽는 중 v3</div>
+  <div class="sub">드림팀 결론 반영 · <em>Sticky 헤더</em>로 HERO 압축 + <em>Focus Card</em>로 진행률 입력 일원화 + <em>Kebab</em> 메뉴<br>폰 3개 = 기본 상태 · Focus Card 입력 인터랙션 · 완독 자동 프롬프트</div>
+
+  <div class="phones">
+
+    <!-- ============ PHONE 1: 기본 읽는 중 상태 ============ -->
+    <div class="phone-wrap">
+      <div class="phone-badge accent">① 기본 · 읽는 중</div>
+      <div class="phone">
+        <div class="status">
+          <span>9:41</span>
+          <div class="status-right">
+            <svg width="14" height="11" viewBox="0 0 14 11" fill="currentColor"><path d="M1 4h1v5H1zM4 2.5h1V9H4zM7 1h1v8H7zM10 2.5h1V9h-1zM13 4h1v5h-1z"/></svg>
+          </div>
+        </div>
+
+        <!-- Sticky header -->
+        <div class="sticky">
+          <div class="sticky-row">
+            <div class="sticky-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+            <div class="sticky-cover">캐릭터<br>심리<br>사전</div>
+            <div class="sticky-mid">
+              <div class="sticky-title">캐릭터 심리 사전</div>
+              <div class="sticky-meta">
+                <b>245</b><span>/ 340쪽</span>
+                <span class="dot"></span>
+                <b>72%</b>
+              </div>
+            </div>
+            <div class="sticky-kebab"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></div>
+          </div>
+          <div class="sticky-bar"><div class="sticky-bar-fill" style="width:72%"></div></div>
+        </div>
+
+        <!-- Scrollable body -->
+        <div class="scroll">
+          <!-- Focus Card -->
+          <div class="focus">
+            <div class="focus-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+              오늘의 기록
+            </div>
+            <div class="focus-q">오늘 몇 쪽까지 읽었어요?</div>
+            <div class="focus-since">어제 <b>245쪽</b>에서 멈췄어요</div>
+
+            <div class="focus-chips">
+              <div class="chip">+10</div>
+              <div class="chip">+20</div>
+              <div class="chip">+30</div>
+              <div class="chip manual"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>직접</div>
+            </div>
+
+            <button class="focus-cta disabled">
+              읽은 쪽을 골라주세요
+            </button>
+          </div>
+
+          <!-- Progress visualization (view only) -->
+          <div class="prog">
+            <div class="prog-top">
+              <div class="prog-label">나의 진행률</div>
+              <div class="prog-pct">72%</div>
+            </div>
+            <div class="prog-bar"><div class="prog-bar-fill" style="width:72%"></div></div>
+            <div class="prog-grid">
+              <div><b>245</b><span>현재 쪽</span></div>
+              <div><b>340</b><span>전체 쪽</span></div>
+              <div><b>12</b><span>읽은 날</span></div>
+            </div>
+          </div>
+
+          <!-- AI 토론 entry -->
+          <div class="ai">
+            <div class="ai-avatar">방긋</div>
+            <div class="ai-body">
+              <div class="ai-t">방긋이랑 얘기해요</div>
+              <div class="ai-s">오늘 읽은 <em>주인공</em>에 대해 어떻게 생각하셨어요?</div>
+            </div>
+            <div class="ai-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+
+          <!-- Sub actions -->
+          <div class="subs">
+            <div class="sub-act">
+              <div class="sub-act-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></div>
+              <div class="sub-act-body">
+                <div class="sub-act-t">문장 긋기</div>
+                <div class="sub-act-s">마음에 닿은 한 줄</div>
+              </div>
+            </div>
+            <div class="sub-act">
+              <div class="sub-act-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+              <div class="sub-act-body">
+                <div class="sub-act-t">서평 쓰기</div>
+                <div class="sub-act-s">다 읽기 전에 남겨도</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom tabs -->
+        <div class="btmtabs">
+          <div class="btmtab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>홈</div>
+          <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>서재</div>
+          <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>캘린더</div>
+          <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>나</div>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>Sticky 헤더</strong> 88px (책+쪽+%+kebab) · <strong>Focus Card</strong>는 '오늘 입력' 전용 · <strong>진행률 섹션</strong>은 보기만 · <strong>서브 액션</strong> 2개로 단순화</div>
+    </div>
+
+    <!-- ============ PHONE 2: +20 chip active + Undo toast ============ -->
+    <div class="phone-wrap">
+      <div class="phone-badge accent">② Focus Card 입력</div>
+      <div class="phone">
+        <div class="status">
+          <span>9:42</span>
+          <div class="status-right">
+            <svg width="14" height="11" viewBox="0 0 14 11" fill="currentColor"><path d="M1 4h1v5H1zM4 2.5h1V9H4zM7 1h1v8H7zM10 2.5h1V9h-1zM13 4h1v5h-1z"/></svg>
+          </div>
+        </div>
+
+        <div class="sticky">
+          <div class="sticky-row">
+            <div class="sticky-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+            <div class="sticky-cover">캐릭터<br>심리<br>사전</div>
+            <div class="sticky-mid">
+              <div class="sticky-title">캐릭터 심리 사전</div>
+              <div class="sticky-meta">
+                <b>265</b><span>/ 340쪽</span>
+                <span class="dot"></span>
+                <b>78%</b>
+              </div>
+            </div>
+            <div class="sticky-kebab"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></div>
+          </div>
+          <div class="sticky-bar"><div class="sticky-bar-fill" style="width:78%"></div></div>
+        </div>
+
+        <div class="scroll">
+          <!-- Focus Card with active chip -->
+          <div class="focus">
+            <div class="focus-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+              오늘의 기록
+            </div>
+            <div class="focus-q">오늘 몇 쪽까지 읽었어요?</div>
+            <div class="focus-since">어제 <b>245쪽</b>에서 멈췄어요</div>
+
+            <div class="focus-chips">
+              <div class="chip">+10</div>
+              <div class="chip active">+20</div>
+              <div class="chip">+30</div>
+              <div class="chip manual"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>직접</div>
+            </div>
+
+            <button class="focus-cta">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              265쪽까지 읽었어요
+            </button>
+          </div>
+
+          <!-- Progress (updated to 78%) -->
+          <div class="prog">
+            <div class="prog-top">
+              <div class="prog-label">나의 진행률</div>
+              <div class="prog-pct">78%</div>
+            </div>
+            <div class="prog-bar"><div class="prog-bar-fill" style="width:78%"></div></div>
+            <div class="prog-grid">
+              <div><b>265</b><span>현재 쪽</span></div>
+              <div><b>340</b><span>전체 쪽</span></div>
+              <div><b>12</b><span>읽은 날</span></div>
+            </div>
+          </div>
+
+          <div class="ai">
+            <div class="ai-avatar">방긋</div>
+            <div class="ai-body">
+              <div class="ai-t">오늘도 20쪽!</div>
+              <div class="ai-s">어떤 부분이 가장 <em>인상 깊었나요?</em></div>
+            </div>
+            <div class="ai-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+
+          <div class="subs">
+            <div class="sub-act">
+              <div class="sub-act-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></div>
+              <div class="sub-act-body">
+                <div class="sub-act-t">문장 긋기</div>
+                <div class="sub-act-s">마음에 닿은 한 줄</div>
+              </div>
+            </div>
+            <div class="sub-act">
+              <div class="sub-act-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+              <div class="sub-act-body">
+                <div class="sub-act-t">서평 쓰기</div>
+                <div class="sub-act-s">다 읽기 전에 남겨도</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Undo toast -->
+        <div class="toast">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <div class="toast-body"><b>245 → 265쪽</b> 저장했어요</div>
+          <button class="toast-undo">되돌리기</button>
+        </div>
+
+        <div class="btmtabs">
+          <div class="btmtab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>홈</div>
+          <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>서재</div>
+          <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>캘린더</div>
+          <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>나</div>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>+20 칩</strong> 선택 → CTA가 <strong>"265쪽까지 읽었어요"</strong>로 활성화 · 저장 시 <strong>Undo toast</strong> 3초 표시 (Emily 엣지케이스 커버)</div>
+    </div>
+
+    <!-- ============ PHONE 3: 완독 자동 프롬프트 + Kebab ============ -->
+    <div class="phone-wrap">
+      <div class="phone-badge accent">③ 완독 도달 · Kebab</div>
+      <div class="phone">
+        <div class="status">
+          <span>9:43</span>
+          <div class="status-right">
+            <svg width="14" height="11" viewBox="0 0 14 11" fill="currentColor"><path d="M1 4h1v5H1zM4 2.5h1V9H4zM7 1h1v8H7zM10 2.5h1V9h-1zM13 4h1v5h-1z"/></svg>
+          </div>
+        </div>
+
+        <div class="sticky">
+          <div class="sticky-row">
+            <div class="sticky-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+            <div class="sticky-cover">캐릭터<br>심리<br>사전</div>
+            <div class="sticky-mid">
+              <div class="sticky-title">캐릭터 심리 사전</div>
+              <div class="sticky-meta">
+                <b>340</b><span>/ 340쪽</span>
+                <span class="dot"></span>
+                <b>100%</b>
+              </div>
+            </div>
+            <div class="sticky-kebab" style="background:color-mix(in srgb,var(--ac) 12%,var(--sf));border-color:var(--ac);color:var(--ac)"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></div>
+          </div>
+          <div class="sticky-bar"><div class="sticky-bar-fill" style="width:100%"></div></div>
+        </div>
+
+        <!-- Kebab dropdown -->
+        <div class="dropdown">
+          <div class="drop-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="8 12 11 15 16 9"/></svg>
+            완독 처리
+          </div>
+          <div class="drop-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            공유하기
+          </div>
+          <div class="drop-divider"></div>
+          <div class="drop-item danger">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            중단하기
+          </div>
+          <div class="drop-item danger">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            삭제하기
+          </div>
+        </div>
+
+        <!-- Complete modal (bottom sheet) -->
+        <div class="backdrop">
+          <div class="modal">
+            <div class="modal-hand"></div>
+            <div class="modal-icon">˚⟡˖</div>
+            <div class="modal-t">한 권을 덮었어요</div>
+            <div class="modal-s">『캐릭터 심리 사전』<br>12일 만에 완독이에요</div>
+
+            <div class="modal-pages">
+              <b>340</b><span>/ 340쪽</span>
+            </div>
+
+            <div class="modal-ctas">
+              <button class="modal-ghost">나중에</button>
+              <button class="modal-primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                서평 쓰기
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>Kebab 메뉴</strong>에 중단/삭제 안전 격리 (danger 컬러) + 완독처리·공유 한자리에 · <strong>100% 도달 시 자동 모달</strong> → 서평 쓰기 유도 (Taasha 전환 훅)</div>
+    </div>
+
+  </div>
+
+  <div class="note">
+    <div class="note-title">드림팀 · 책 상세 '읽는 중' v3 설계 근거</div>
+
+    <h4>BEFORE (현재 3개 진행률 업데이트 중복)</h4>
+    <ul>
+      <li>HERO <strong>280px 고정</strong> (어두운 그라데이션)</li>
+      <li>Quick Actions 3개 중 <strong>'진행률 업데이트'</strong> 버튼 → bottom sheet</li>
+      <li>진행률 섹션 <strong>slider + 저장</strong> 버튼 (인라인 업데이트)</li>
+      <li><strong>'오늘 읽었어요'</strong> primary 버튼 → 같은 bottom sheet</li>
+      <li><strong>'꾹 누르기' 완독</strong> — 2초 hold + 링 애니메이션</li>
+      <li>중단/삭제 — 페이지 <strong>최하단 작은 링크</strong></li>
+    </ul>
+
+    <h4>AFTER (v3)</h4>
+    <ul>
+      <li><strong>Sticky 헤더 88px</strong> — 표지(44×62) + 제목 + <code>현재/전체/%</code> inline + Kebab. 스크롤해도 언제든 '어디까지 왔는지' 보임</li>
+      <li><strong>Focus Card</strong> — "오늘 몇 쪽까지 읽었어요?" + <code>+10/+20/+30/직접</code> 칩 + 단 하나의 primary CTA. 진행률 업데이트는 이 카드 하나로 일원화</li>
+      <li><strong>진행률 섹션</strong> — <code>percentage</code> + bar + <code>3-grid</code> (현재/전체/읽은 날) · <strong>보기 전용</strong> (slider/저장 제거)</li>
+      <li><strong>AI 토론 진입</strong> — '방긋이랑 얘기해요' 카드로 대화 진입점 유지</li>
+      <li><strong>서브 액션 2개</strong> — 문장 긋기 / 서평 쓰기 (동등한 secondary, 가로 2열)</li>
+      <li><strong>Kebab 메뉴</strong> — 완독 처리 / 공유 / <code>중단</code> / <code>삭제</code> (destructive는 빨간색 분리)</li>
+      <li><strong>100% 자동 프롬프트</strong> — 완독 모달 → 서평 쓰기 유도 (Taasha 전환 훅)</li>
+      <li><strong>Undo Toast 3초</strong> — 진행률 저장 직후 실수 취소 가능 (Emily 엣지케이스)</li>
+    </ul>
+
+    <h4>엣지케이스 커버 (Emily)</h4>
+    <ul>
+      <li><strong>total_pages가 null</strong>: Focus Card 대신 '오늘 읽었어요' 단순 버튼 + Kebab의 '완독 처리' 메뉴로 수동 처리</li>
+      <li><strong>100% 초과</strong>: 직접 입력 시 <code>max(total_pages)</code> clamp</li>
+      <li><strong>완독 모달 거절 후 재진입</strong>: <code>localStorage('book_complete_dismissed_' + id)</code>로 세션 내 1회만</li>
+      <li><strong>+N 칩 연타 스팸</strong>: Dan 제안 — 1초 debounce</li>
+      <li><strong>접근성</strong>: 칩은 <code>role="radiogroup"</code>, CTA는 <code>aria-disabled</code> 시 설명 제공, 시니어 대응은 '직접' 입력에서 큰 숫자 패드 + slider fallback</li>
+    </ul>
+
+    <h4>디자인 토큰 (Gail)</h4>
+    <ul>
+      <li>배경 <code>--bg:#F7F3ED</code> cream · 카드 <code>--sf:#FFFFFF</code> · accent <code>--ac:#5FA48E</code> 민트</li>
+      <li>본문 <strong>Pretendard</strong> · 숫자/메타 하이라이트 <strong>Gaegu</strong> (일기장 메타포, 핸드라이트 온기)</li>
+      <li>Focus Card만 <code>box-shadow:0 6px 18px mint/10%</code> · 나머지는 border로만 구분 (editorial 여백)</li>
+      <li>Destructive 컬러 <code>--danger:#C55E4A</code> — 민트와 상보색, Kebab에서만 등장</li>
+    </ul>
+
+    <h4>제거되는 것들</h4>
+    <ul>
+      <li>❌ 어두운 그라데이션 HERO (280px)</li>
+      <li>❌ Quick Action '진행률 업데이트' 버튼</li>
+      <li>❌ 진행률 섹션의 slider + 저장 버튼</li>
+      <li>❌ '오늘 읽었어요' bottom sheet 모달 (Focus Card로 대체)</li>
+      <li>❌ '꾹 눌러서 완독 처리' hold 버튼 + 링 애니메이션</li>
+      <li>❌ 하단 '중단하기/삭제' 인라인 링크 (Kebab으로 이동)</li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>

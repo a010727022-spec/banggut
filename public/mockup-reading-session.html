@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>방긋 · 라이브 독서 경험</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;word-break:keep-all}
+:root{
+  --bg:#F7F3ED; --sf:#EDE7DF; --sf2:#E0D9D0; --sf3:#D0C8BC;
+  --bd:rgba(95,164,142,0.14); --bd2:rgba(95,164,142,0.28);
+  --tp:#1c201d; --ts:#4a5550; --tm:#7a8b7e;
+  --ac:#5FA48E; --ac2:#7ABBA4; --ac3:#A4D4C0; --acc:#f7f3ed;
+  --milestone:#B79556;
+}
+body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:#DCD5CA;padding:32px 20px;min-height:100vh;color:var(--tp)}
+.wrap{max-width:1800px;margin:0 auto}
+.title{font-family:'Gaegu',cursive;font-size:30px;font-weight:700;letter-spacing:0.02em;text-align:center;margin-bottom:6px}
+.sub{color:var(--ts);font-size:13px;text-align:center;margin-bottom:36px;font-weight:500}
+.sub em{font-style:normal;color:var(--ac);font-weight:700}
+
+.phones{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;max-width:380px}
+.phone-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:100px;background:#FFFFFF;border:1px solid var(--bd2);font-size:11px;font-weight:700;color:var(--ac);letter-spacing:0.5px}
+.phone{width:360px;height:800px;background:var(--bg);border-radius:40px;box-shadow:0 0 0 3px #1a1a1a,0 0 24px rgba(0,0,0,0.1);overflow:auto;position:relative}
+.phone::-webkit-scrollbar{width:0}
+.phone-desc{font-size:11px;color:var(--ts);text-align:center;line-height:1.6;max-width:360px;font-weight:500}
+.phone-desc strong{color:var(--ac)}
+
+/* 공통 */
+.nav{padding:48px 18px 14px;display:flex;justify-content:space-between;align-items:center}
+.nav-btn{width:36px;height:36px;border-radius:50%;background:var(--sf);border:0.5px solid var(--bd);display:flex;align-items:center;justify-content:center;color:var(--ts);font-size:14px}
+
+/* ═══ 1. 세션 시작 전 (책 상세) ═══ */
+.hero-card{margin:8px 18px 16px;padding:24px 20px 18px;background:linear-gradient(180deg,color-mix(in srgb,var(--ac) 10%,var(--sf)) 0%,var(--sf) 70%);border:0.5px solid var(--bd);border-radius:22px;text-align:center;position:relative;overflow:hidden}
+.hero-card::before{content:"";position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:280px;height:180px;background:radial-gradient(ellipse,color-mix(in srgb,var(--ac) 22%,transparent),transparent 65%);pointer-events:none}
+.hero-cover{position:relative;z-index:2;width:110px;height:160px;margin:0 auto 14px;border-radius:9px;background:linear-gradient(135deg,#c89060,#806040);color:#f4efe8;display:flex;align-items:flex-end;padding:8px;font-size:11px;font-weight:800;line-height:1.2;box-shadow:0 14px 30px rgba(0,0,0,0.18)}
+.hero-badge{position:relative;z-index:2;display:inline-flex;align-items:center;gap:5px;padding:3px 11px;border-radius:100px;background:var(--bg);border:0.5px solid var(--bd2);font-family:'Gaegu',cursive;font-size:11px;font-weight:700;color:var(--ac);margin-bottom:8px;letter-spacing:0.02em}
+.hero-title{position:relative;z-index:2;font-size:18px;font-weight:800;color:var(--tp);letter-spacing:-0.3px;line-height:1.3;margin-bottom:2px}
+.hero-author{position:relative;z-index:2;font-size:11px;color:var(--tm)}
+
+.start-cta{margin:0 18px 14px;padding:18px;border-radius:22px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:var(--acc);cursor:pointer;display:flex;align-items:center;gap:14px;box-shadow:0 10px 24px color-mix(in srgb,var(--ac) 30%,transparent);position:relative;overflow:hidden}
+.start-cta::before{content:"";position:absolute;top:-40px;right:-40px;width:140px;height:140px;background:radial-gradient(circle,rgba(255,255,255,0.18),transparent 70%);pointer-events:none}
+.start-cta-icon{width:54px;height:54px;border-radius:18px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;position:relative;z-index:2}
+.start-cta-body{flex:1;position:relative;z-index:2}
+.start-cta-t{font-family:'Gaegu',cursive;font-size:17px;font-weight:700;letter-spacing:0.04em;margin-bottom:3px}
+.start-cta-s{font-size:11px;opacity:0.9}
+.start-cta-arrow{font-size:18px;position:relative;z-index:2}
+
+/* 세션 히스토리 */
+.hist-sec{margin:0 18px 14px}
+.hist-label{font-size:10px;color:var(--tm);font-weight:700;letter-spacing:0.5px;margin-bottom:8px;padding:0 2px}
+.hist-row{background:var(--sf);border:0.5px solid var(--bd);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.hist-icon{width:32px;height:32px;border-radius:10px;background:color-mix(in srgb,var(--ac) 12%,var(--bg));display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.hist-body{flex:1;min-width:0}
+.hist-t{font-size:12px;font-weight:700;color:var(--tp)}
+.hist-t em{font-style:normal;color:var(--ac);font-weight:800}
+.hist-s{font-size:10.5px;color:var(--tm);margin-top:2px}
+.hist-time{font-size:10px;color:var(--tm);font-weight:600;flex-shrink:0}
+
+/* 메인 CTA 바 */
+.cta-main{width:100%;padding:13px;border-radius:100px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:var(--acc);font-family:'Gaegu',cursive;font-size:16px;font-weight:700;letter-spacing:0.04em;border:none;cursor:pointer;box-shadow:0 6px 18px color-mix(in srgb,var(--ac) 25%,transparent);display:flex;align-items:center;justify-content:center;gap:6px}
+
+.prog{margin:0 18px 12px;padding:16px;background:var(--sf);border:0.5px solid var(--bd);border-radius:18px}
+.prog-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.prog-big{font-family:'Gaegu',cursive;font-size:26px;font-weight:700;color:var(--ac);letter-spacing:-0.02em;line-height:1}
+.prog-lbl{font-size:11px;color:var(--tm);font-weight:600}
+.prog-bar{height:6px;background:var(--sf2);border-radius:100px;overflow:hidden;margin-bottom:12px}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:100px;width:72%}
+.prog-stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--bd);border-radius:10px;overflow:hidden}
+.prog-stat{padding:10px 0;text-align:center;background:var(--bg)}
+.prog-stat-v{font-size:14px;font-weight:800;color:var(--tp);letter-spacing:-0.3px;line-height:1}
+.prog-stat-l{font-size:9.5px;color:var(--tm);font-weight:600;margin-top:4px}
+
+/* ═══ 2. 세션 진행 중 (타이머 전체 화면) ═══ */
+.timer-bg{min-height:100%;background:linear-gradient(180deg,var(--bg) 0%,color-mix(in srgb,var(--ac) 8%,var(--bg)) 100%);padding:48px 20px 32px;display:flex;flex-direction:column}
+.timer-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.timer-title{font-family:'Gaegu',cursive;font-size:15px;font-weight:700;color:var(--tp);letter-spacing:0.02em}
+.timer-ind{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:100px;background:color-mix(in srgb,var(--ac) 12%,var(--bg));font-size:10.5px;font-weight:800;color:var(--ac)}
+.timer-ind::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ac);animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+.timer-book{text-align:center;margin-bottom:30px}
+.timer-book-cover{width:88px;height:128px;margin:0 auto 12px;border-radius:8px;background:linear-gradient(135deg,#c89060,#806040);color:#f4efe8;display:flex;align-items:flex-end;padding:6px;font-size:10px;font-weight:800;line-height:1.2;box-shadow:0 10px 24px rgba(0,0,0,0.15)}
+.timer-book-title{font-size:14px;font-weight:700;color:var(--tp)}
+.timer-book-page{font-size:11px;color:var(--tm);margin-top:2px}
+
+/* 원형 타이머 */
+.timer-ring-wrap{display:flex;justify-content:center;margin-bottom:20px}
+.timer-ring{position:relative;width:220px;height:220px}
+.timer-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.timer-ring circle{fill:none;stroke-width:10}
+.timer-ring .track{stroke:var(--sf2)}
+.timer-ring .prog{stroke:url(#ring-grad);stroke-linecap:round;stroke-dasharray:0 628;animation:fill 2s ease-out forwards}
+@keyframes fill{to{stroke-dasharray:176 628}}
+.timer-ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.timer-ring-v{font-family:'Gaegu',cursive;font-size:48px;font-weight:700;color:var(--tp);letter-spacing:-0.04em;line-height:1}
+.timer-ring-v span{color:var(--ac)}
+.timer-ring-l{font-size:11px;color:var(--tm);font-weight:600;letter-spacing:0.3px}
+
+.timer-mascot{text-align:center;margin-bottom:26px;font-family:'Gaegu',cursive;font-size:14px;color:var(--tp);letter-spacing:0.02em}
+.timer-mascot img{width:50px;height:50px;display:block;margin:0 auto 6px;object-fit:contain;animation:bob 2.5s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.timer-mascot em{color:var(--ac);font-style:normal;font-weight:700}
+
+.timer-actions{display:flex;gap:10px}
+.timer-act{flex:1;padding:14px;border-radius:100px;font-size:14px;font-weight:700;border:none;cursor:pointer}
+.timer-act-pause{background:var(--sf);color:var(--tp);border:0.5px solid var(--bd2)}
+.timer-act-end{background:linear-gradient(135deg,var(--ac),var(--ac2));color:var(--acc);box-shadow:0 6px 18px color-mix(in srgb,var(--ac) 25%,transparent)}
+
+/* ═══ 3. 세션 완료 시트 ═══ */
+.done-hdr{padding:48px 20px 0;text-align:center}
+.done-title{font-family:'Gaegu',cursive;font-size:22px;font-weight:700;color:var(--tp);letter-spacing:0.02em;margin-top:14px;margin-bottom:4px}
+.done-sub{font-size:12px;color:var(--tm)}
+.done-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 16px;border-radius:100px;background:color-mix(in srgb,var(--ac) 12%,var(--bg));color:var(--ac);font-family:'Gaegu',cursive;font-size:14px;font-weight:700;letter-spacing:0.02em;margin-top:14px}
+
+.done-stats{margin:24px 18px 20px;padding:18px;background:var(--sf);border:0.5px solid var(--bd);border-radius:18px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;text-align:center}
+.done-stat-v{font-family:'Gaegu',cursive;font-size:24px;font-weight:700;color:var(--tp);letter-spacing:-0.02em;line-height:1}
+.done-stat-v em{color:var(--ac);font-style:normal}
+.done-stat-l{font-size:10px;color:var(--tm);font-weight:600;margin-top:5px}
+
+.done-section{margin:0 18px 14px}
+.done-label{font-family:'Gaegu',cursive;font-size:13px;font-weight:700;color:var(--tp);letter-spacing:0.02em;margin-bottom:8px}
+.done-page-input{width:100%;padding:14px 16px;background:var(--sf);border:1px solid var(--bd);border-radius:14px;font-size:15px;font-weight:700;color:var(--tp);outline:none;font-family:inherit}
+.done-page-input:focus{border-color:var(--ac)}
+
+.done-moods{display:flex;gap:8px;flex-wrap:wrap}
+.mood{flex:1;min-width:0;padding:12px 8px;border-radius:14px;background:var(--sf);border:1px solid var(--bd);text-align:center;cursor:pointer;transition:all 0.2s}
+.mood.on{background:color-mix(in srgb,var(--ac) 10%,var(--bg));border-color:var(--ac)}
+.mood-e{font-size:22px;margin-bottom:4px}
+.mood-l{font-size:10px;color:var(--tp);font-weight:700}
+.mood.on .mood-l{color:var(--ac)}
+
+.done-ai{margin:14px 18px 0;padding:16px;background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 12%,var(--sf)),var(--sf));border:0.5px solid var(--bd2);border-radius:18px;display:flex;align-items:center;gap:14px;cursor:pointer;position:relative;overflow:hidden}
+.done-ai::before{content:"";position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:radial-gradient(circle,color-mix(in srgb,var(--ac) 20%,transparent),transparent 70%);pointer-events:none}
+.done-ai img{width:46px;height:46px;flex-shrink:0;position:relative;z-index:2;object-fit:contain}
+.done-ai-body{flex:1;position:relative;z-index:2}
+.done-ai-t{font-family:'Gaegu',cursive;font-size:14px;font-weight:700;color:var(--tp);letter-spacing:0.02em;margin-bottom:2px}
+.done-ai-s{font-size:11px;color:var(--tm)}
+.done-ai-s em{color:var(--ac);font-style:normal;font-weight:700}
+
+.done-btns{display:flex;gap:8px;padding:20px 18px}
+.done-skip{flex:1;padding:14px;border-radius:100px;background:var(--sf);border:0.5px solid var(--bd2);color:var(--tm);font-size:13px;font-weight:700;cursor:pointer}
+.done-save{flex:2;padding:14px;border-radius:100px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:var(--acc);font-family:'Gaegu',cursive;font-size:16px;font-weight:700;letter-spacing:0.04em;border:none;cursor:pointer;box-shadow:0 6px 18px color-mix(in srgb,var(--ac) 25%,transparent)}
+
+/* ═══ 4. 완독 축하 ═══ */
+.celeb-bg{min-height:100%;background:linear-gradient(180deg,var(--bg) 0%,color-mix(in srgb,var(--milestone) 10%,var(--bg)) 50%,var(--bg) 100%);padding:60px 24px 32px;display:flex;flex-direction:column;align-items:center;position:relative;overflow:hidden}
+.celeb-bg::before{content:"";position:absolute;top:20%;left:-50px;width:200px;height:200px;background:radial-gradient(circle,color-mix(in srgb,var(--milestone) 20%,transparent),transparent 70%);filter:blur(20px);pointer-events:none}
+.celeb-bg::after{content:"";position:absolute;top:40%;right:-50px;width:200px;height:200px;background:radial-gradient(circle,color-mix(in srgb,var(--ac) 20%,transparent),transparent 70%);filter:blur(20px);pointer-events:none}
+
+.celeb-badge{position:relative;z-index:2;padding:4px 14px;border-radius:100px;background:linear-gradient(135deg,color-mix(in srgb,var(--milestone) 18%,var(--bg)),var(--bg));border:0.5px solid color-mix(in srgb,var(--milestone) 35%,transparent);color:var(--milestone);font-family:'Gaegu',cursive;font-size:12px;font-weight:700;margin-bottom:18px;letter-spacing:0.02em}
+.celeb-mascot{width:140px;height:140px;margin-bottom:20px;position:relative;z-index:2}
+.celeb-mascot img{width:100%;height:100%;object-fit:contain;animation:celebrate 2s ease-in-out infinite}
+@keyframes celebrate{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-8px) rotate(2deg)}}
+.celeb-title{font-family:'Gaegu',cursive;font-size:28px;font-weight:700;color:var(--tp);letter-spacing:0.02em;text-align:center;margin-bottom:6px;position:relative;z-index:2;line-height:1.3}
+.celeb-title em{color:var(--ac);font-style:normal}
+.celeb-sub{font-size:13px;color:var(--tm);text-align:center;line-height:1.6;margin-bottom:24px;position:relative;z-index:2}
+.celeb-sub em{color:var(--tp);font-style:normal;font-weight:700}
+
+.celeb-stats{width:100%;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:24px;position:relative;z-index:2}
+.celeb-stat{padding:14px 8px;background:var(--sf);border:0.5px solid var(--bd);border-radius:14px;text-align:center}
+.celeb-stat-v{font-family:'Gaegu',cursive;font-size:22px;font-weight:700;color:var(--tp);letter-spacing:-0.02em;line-height:1}
+.celeb-stat-v em{color:var(--milestone);font-style:normal}
+.celeb-stat-l{font-size:9.5px;color:var(--tm);font-weight:700;margin-top:4px;letter-spacing:0.3px}
+
+.celeb-rating{width:100%;padding:20px;background:var(--sf);border:0.5px solid var(--bd);border-radius:18px;margin-bottom:14px;position:relative;z-index:2;text-align:center}
+.celeb-rating-l{font-family:'Gaegu',cursive;font-size:14px;font-weight:700;color:var(--tp);letter-spacing:0.02em;margin-bottom:12px}
+.stars{display:flex;justify-content:center;gap:6px;margin-bottom:10px}
+.star{font-size:30px;color:var(--sf3);cursor:pointer;transition:all 0.2s}
+.star.on{color:#e8b84a;transform:scale(1.15)}
+
+.celeb-memo{width:100%;padding:14px 16px;background:var(--sf);border:1px solid var(--bd);border-radius:14px;font-family:'Gaegu',cursive;font-size:14px;color:var(--tp);letter-spacing:0.02em;outline:none;resize:none;font-weight:400;line-height:1.5;margin-bottom:18px;position:relative;z-index:2;min-height:60px}
+
+.celeb-btns{width:100%;display:flex;flex-direction:column;gap:8px;position:relative;z-index:2}
+.celeb-cta-main{padding:15px;border-radius:100px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:var(--acc);font-family:'Gaegu',cursive;font-size:17px;font-weight:700;letter-spacing:0.04em;border:none;cursor:pointer;box-shadow:0 6px 18px color-mix(in srgb,var(--ac) 28%,transparent)}
+.celeb-cta-share{padding:13px;border-radius:100px;background:var(--sf);border:0.5px solid var(--bd2);color:var(--tp);font-size:13px;font-weight:700;cursor:pointer}
+
+/* 플로팅 타이머 바 (앱 전체에 표시) */
+.floating-bar{position:fixed;bottom:80px;left:20px;right:20px;padding:10px 14px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:var(--acc);border-radius:100px;display:flex;align-items:center;gap:10px;box-shadow:0 10px 26px color-mix(in srgb,var(--ac) 35%,transparent);cursor:pointer}
+.floating-dot{width:8px;height:8px;border-radius:50%;background:#fff;animation:pulse 1.5s infinite}
+.floating-text{flex:1;font-family:'Gaegu',cursive;font-size:13px;font-weight:700;letter-spacing:0.02em}
+.floating-time{font-family:monospace;font-size:13px;font-weight:700}
+
+.note{margin:40px auto 0;padding:24px 28px;background:#FFFFFF;border:1px solid var(--bd2);border-radius:18px;color:var(--tp);font-size:12px;line-height:1.85;max-width:900px}
+.note-title{font-family:'Gaegu',cursive;font-size:17px;font-weight:700;color:var(--ac);margin-bottom:12px}
+.note h4{font-family:'Gaegu',cursive;font-size:14px;font-weight:700;color:var(--tp);letter-spacing:0.02em;margin:12px 0 4px}
+.note strong{color:var(--ac);font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title">라이브 독서 경험</div>
+  <div class="sub">책 상세 → <em>세션 시작</em> → 진행 중 → 완료 → 완독 축하</div>
+
+  <div class="phones">
+
+    <!-- 1. 책 상세 (세션 시작 CTA) -->
+    <div class="phone-wrap">
+      <div class="phone-badge">① 책 상세 + 시작 CTA</div>
+      <div class="phone">
+        <div class="nav">
+          <div class="nav-btn">←</div>
+          <div style="display:flex;gap:6px">
+            <div class="nav-btn">↗</div>
+            <div class="nav-btn">♡</div>
+            <div class="nav-btn">⋯</div>
+          </div>
+        </div>
+
+        <div class="hero-card">
+          <div class="hero-badge">📖 읽는 중 · 12일째</div>
+          <div class="hero-cover">캐릭터<br>심리<br>사전</div>
+          <div class="hero-title">캐릭터 심리 사전</div>
+          <div class="hero-author">린다 N. 에델스타인</div>
+        </div>
+
+        <!-- 시작 CTA -->
+        <div class="start-cta">
+          <div class="start-cta-icon">📖</div>
+          <div class="start-cta-body">
+            <div class="start-cta-t">지금 읽기 시작</div>
+            <div class="start-cta-s">방긋이가 옆에서 함께해요</div>
+          </div>
+          <div class="start-cta-arrow">→</div>
+        </div>
+
+        <!-- 오늘 세션 히스토리 -->
+        <div class="hist-sec">
+          <div class="hist-label">📆 오늘의 독서</div>
+          <div class="hist-row">
+            <div class="hist-icon">⏱</div>
+            <div class="hist-body">
+              <div class="hist-t">오늘 <em>45분</em> · 18쪽</div>
+              <div class="hist-s">오전 10:12 · 오후 2:30</div>
+            </div>
+            <div class="hist-time">2회</div>
+          </div>
+        </div>
+
+        <!-- 진행률 -->
+        <div class="prog">
+          <div class="prog-top">
+            <div>
+              <div class="prog-big">72%</div>
+              <div class="prog-lbl" style="margin-top:2px">진행률</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:13px;font-weight:800;color:var(--tp)">245 / 340쪽</div>
+              <div class="prog-lbl" style="margin-top:2px">12일째 읽는 중</div>
+            </div>
+          </div>
+          <div class="prog-bar"><div class="prog-fill"></div></div>
+          <div class="prog-stat-grid">
+            <div class="prog-stat"><div class="prog-stat-v">20쪽</div><div class="prog-stat-l">일 평균</div></div>
+            <div class="prog-stat"><div class="prog-stat-v">4일</div><div class="prog-stat-l">남은 예상</div></div>
+            <div class="prog-stat"><div class="prog-stat-v">8개</div><div class="prog-stat-l">글귀</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>지금 읽기 시작</strong> CTA가 메인. 오늘 세션 히스토리로 꾸준함 시각화.</div>
+    </div>
+
+    <!-- 2. 세션 진행 중 -->
+    <div class="phone-wrap">
+      <div class="phone-badge">② 세션 진행 중</div>
+      <div class="phone">
+        <div class="timer-bg">
+          <div class="timer-nav">
+            <div class="timer-title">독서 세션</div>
+            <div class="timer-ind">LIVE</div>
+          </div>
+
+          <div class="timer-book">
+            <div class="timer-book-cover">캐릭터<br>심리<br>사전</div>
+            <div class="timer-book-title">캐릭터 심리 사전</div>
+            <div class="timer-book-page">245쪽에서 시작</div>
+          </div>
+
+          <div class="timer-ring-wrap">
+            <div class="timer-ring">
+              <svg viewBox="0 0 200 200">
+                <defs>
+                  <linearGradient id="ring-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#5FA48E"/>
+                    <stop offset="100%" stop-color="#7ABBA4"/>
+                  </linearGradient>
+                </defs>
+                <circle cx="100" cy="100" r="86" class="track"/>
+                <circle cx="100" cy="100" r="86" class="prog"/>
+              </svg>
+              <div class="timer-ring-center">
+                <div class="timer-ring-v">12:<span>34</span></div>
+                <div class="timer-ring-l">목표 25분까지 12분</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="timer-mascot">
+            <img src="/mascot-read.png" alt="">
+            <em>방긋이가</em> 조용히 지켜보는 중이에요
+          </div>
+
+          <div class="timer-actions">
+            <button class="timer-act timer-act-pause">⏸ 일시정지</button>
+            <button class="timer-act timer-act-end">독서 마치기</button>
+          </div>
+        </div>
+      </div>
+      <div class="phone-desc">뽀모도로 스타일 <strong>원형 타이머</strong>. 방긋이 함께하는 감성. 일시정지 / 마치기</div>
+    </div>
+
+    <!-- 3. 세션 완료 (시트) -->
+    <div class="phone-wrap">
+      <div class="phone-badge">③ 세션 완료</div>
+      <div class="phone">
+        <div class="done-hdr">
+          <img src="/mascot-happy.png" style="width:72px;height:72px;object-fit:contain" alt="">
+          <div class="done-title">오늘 수고했어요</div>
+          <div class="done-sub">방금 <strong style="color:var(--tp);font-weight:700">28분 7초</strong> 함께 읽었어요</div>
+          <div class="done-badge">🔥 7일 연속!</div>
+        </div>
+
+        <div class="done-stats">
+          <div><div class="done-stat-v"><em>28</em></div><div class="done-stat-l">분</div></div>
+          <div><div class="done-stat-v"><em>245→</em></div><div class="done-stat-l">시작 페이지</div></div>
+          <div><div class="done-stat-v"><em>?</em></div><div class="done-stat-l">끝 페이지</div></div>
+        </div>
+
+        <div class="done-section">
+          <div class="done-label">어디까지 읽었나요?</div>
+          <input type="text" class="done-page-input" placeholder="예: 267" value="267">
+        </div>
+
+        <div class="done-section" style="margin-top:14px">
+          <div class="done-label">오늘의 기분</div>
+          <div class="done-moods">
+            <div class="mood"><div class="mood-e">📚</div><div class="mood-l">몰입</div></div>
+            <div class="mood on"><div class="mood-e">🌿</div><div class="mood-l">잔잔</div></div>
+            <div class="mood"><div class="mood-e">💭</div><div class="mood-l">복잡</div></div>
+            <div class="mood"><div class="mood-e">😴</div><div class="mood-l">졸림</div></div>
+          </div>
+        </div>
+
+        <div class="done-ai">
+          <img src="/mascot-read.png" alt="">
+          <div class="done-ai-body">
+            <div class="done-ai-t">방긋이와 5분 대화</div>
+            <div class="done-ai-s">방금 읽은 구절로 <em>소크라테스식 →</em></div>
+          </div>
+        </div>
+
+        <div class="done-btns">
+          <button class="done-skip">나중에</button>
+          <button class="done-save">✓ 기록 저장</button>
+        </div>
+      </div>
+      <div class="phone-desc">세션 종료 즉시 페이지 + 기분 기록. <strong>AI 토론 자연스럽게 연결</strong>. 스트릭 감정 훅</div>
+    </div>
+
+    <!-- 4. 완독 축하 -->
+    <div class="phone-wrap">
+      <div class="phone-badge">④ 완독 축하 (킥!)</div>
+      <div class="phone">
+        <div class="celeb-bg">
+          <div class="celeb-badge">🏆 12번째 완독</div>
+          <div class="celeb-mascot"><img src="/mascot-happy.png" alt=""></div>
+          <div class="celeb-title">수고했어요,<br><em>지선</em>님</div>
+          <div class="celeb-sub"><em>캐릭터 심리 사전</em>을<br>13일 동안 함께 읽었어요</div>
+
+          <div class="celeb-stats">
+            <div class="celeb-stat">
+              <div class="celeb-stat-v"><em>13</em></div>
+              <div class="celeb-stat-l">일</div>
+            </div>
+            <div class="celeb-stat">
+              <div class="celeb-stat-v"><em>18</em></div>
+              <div class="celeb-stat-l">세션</div>
+            </div>
+            <div class="celeb-stat">
+              <div class="celeb-stat-v"><em>7h</em></div>
+              <div class="celeb-stat-l">총 시간</div>
+            </div>
+          </div>
+
+          <div class="celeb-rating">
+            <div class="celeb-rating-l">이 책 어땠어요?</div>
+            <div class="stars">
+              <span class="star on">★</span>
+              <span class="star on">★</span>
+              <span class="star on">★</span>
+              <span class="star on">★</span>
+              <span class="star on">★</span>
+            </div>
+            <textarea class="celeb-memo" placeholder="한 줄 감상...">정말 묵직한 여운. 한강의 문장이 오래 남아요.</textarea>
+          </div>
+
+          <div class="celeb-btns">
+            <button class="celeb-cta-main">📝 서평 쓰러 가기</button>
+            <button class="celeb-cta-share">↗ 완독 카드 공유</button>
+          </div>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>방긋이 happy</strong> + <strong>개구체 축하</strong> + 통계 + 별점 + 공유 카드. <strong>진짜 감동 모먼트</strong></div>
+    </div>
+
+  </div>
+
+  <!-- 플로팅 바 설명 -->
+  <div style="margin:32px auto 0;max-width:900px;padding:24px 28px;background:#FFFFFF;border:1px solid var(--bd2);border-radius:18px">
+    <div style="font-family:'Gaegu',cursive;font-size:17px;font-weight:700;color:var(--ac);margin-bottom:10px">🔔 보너스: 플로팅 타이머 바</div>
+    <div style="font-size:12px;color:var(--ts);line-height:1.7">
+      독서 세션 중에 다른 화면(홈/캘린더/모임)으로 이동해도 하단에 <strong style="color:var(--ac);font-weight:700">플로팅 바</strong> 고정:
+    </div>
+    <div style="margin:14px auto;max-width:340px;padding:10px 14px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:var(--acc);border-radius:100px;display:flex;align-items:center;gap:10px;box-shadow:0 10px 26px color-mix(in srgb,var(--ac) 35%,transparent)">
+      <div style="width:8px;height:8px;border-radius:50%;background:#fff;animation:pulse 1.5s infinite"></div>
+      <span style="flex:1;font-family:'Gaegu',cursive;font-size:13px;font-weight:700;letter-spacing:0.02em">캐릭터 심리 사전 읽는 중</span>
+      <span style="font-family:monospace;font-size:13px;font-weight:700">12:34</span>
+    </div>
+    <div style="font-size:11px;color:var(--tm);text-align:center">탭 시 세션 화면으로 복귀</div>
+  </div>
+
+  <div class="note">
+    <div class="note-title">🎯 핵심 기능 요약</div>
+
+    <h4>① 지금 읽기 시작 (Start Session)</h4>
+    책 상세 <strong>가장 큰 CTA</strong>. 탭 시 타이머 시작 + 세션 화면 전환.
+
+    <h4>② 라이브 세션 (뽀모도로 스타일)</h4>
+    원형 타이머 · 목표(15/25/45분) 선택 가능 · 방긋이 옆에서 동반 · 일시정지/마치기
+
+    <h4>③ 세션 완료 (기록)</h4>
+    끝 페이지 입력 · 기분 선택(몰입/잔잔/복잡/졸림) · <strong>AI 토론 자연스레 연결</strong>
+
+    <h4>④ 완독 축하 (킥!)</h4>
+    방긋이 happy + 개구체 축하 + 통계(일/세션/시간) + 별점 + 한줄감상 + <strong>공유 카드 생성</strong>
+
+    <h4>보너스 · 플로팅 바</h4>
+    앱 전체에서 세션 상태 표시. 어디 가도 타이머 살아있음.
+
+    <h4>DB 확장</h4>
+    <code style="font-family:monospace;font-size:11px;background:var(--sf);padding:2px 6px;border-radius:4px">reading_sessions</code>에 <strong>start_at, end_at, duration_seconds, mood</strong> 추가
+
+    <br><br>
+    <strong>이 방향 OK면 구현 시작할게요!</strong> 각 화면별로 순서대로:
+    <br>1. 세션 타이머 UI + 백그라운드 지속 (localStorage)
+    <br>2. 완료 시트 + 기분 기록
+    <br>3. 완독 축하 화면 + 공유 카드
+    <br>4. 플로팅 타이머 바
+  </div>
+</div>
+</body>
+</html>

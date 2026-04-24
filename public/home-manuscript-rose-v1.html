@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>방긋 · Manuscript Rose — 3040 중성 버전</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=VT323&family=Crimson+Pro:wght@400;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    font-family: "Pretendard Variable", Pretendard, -apple-system, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background: #18140F;
+    padding: 40px 24px 60px;
+    min-height: 100vh;
+    color: #E8DED0;
+  }
+
+  .page-hdr { max-width: 1280px; margin: 0 auto 24px; text-align: center; }
+  .page-hdr h1 {
+    font-family: "Gaegu", cursive;
+    font-size: 28px;
+    color: #E8C8C8;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: -0.3px;
+  }
+  .page-hdr p {
+    font-size: 13px;
+    color: #A89078;
+    line-height: 1.55;
+  }
+
+  /* 팔레트 비교 스트립 */
+  .palette-compare {
+    max-width: 900px;
+    margin: 0 auto 34px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .pal-card {
+    background: #231D18;
+    border: 1px solid #3A302B;
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .pal-card.v2 { border-color: #B84E57; }
+  .pal-card .label {
+    font-family: monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: #A89078;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  .pal-card .name {
+    font-family: "Gaegu", cursive;
+    font-size: 16px;
+    color: #E8DED0;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .pal-card.v2 .name { color: #E8C8C8; }
+  .pal-row { display: flex; gap: 5px; }
+  .sw {
+    flex: 1;
+    height: 36px;
+    border-radius: 5px;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 3px;
+    font-family: monospace;
+    font-size: 8.5px;
+    font-weight: 700;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  /* 스테이지 */
+  .stage {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .phone-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .phone-label {
+    font-family: "Gaegu", cursive;
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .phone-sub {
+    font-size: 11px;
+    color: #A89078;
+    text-align: center;
+    margin-top: -4px;
+  }
+
+  /* 공통 폰 프레임 */
+  .phone {
+    width: 360px;
+    height: 812px;
+    border-radius: 38px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 20px 50px rgba(0,0,0,0.55),
+      0 6px 18px rgba(0,0,0,0.35);
+  }
+
+  /* ═══════════════════════════════════════════════════ */
+  /* PHONE 1: TAMAGOTCHI ROSE (v1)                      */
+  /* ═══════════════════════════════════════════════════ */
+  .p-v1 {
+    --bg: #F0EBE2;
+    --sf: #E5DFD2;
+    --sf2: #FBF6EC;
+    --sf3: #F8F1E2;
+    --tp: #1E1A16;
+    --ts: #3F3A32;
+    --tm: #847C70;
+    --ac: #E85A7A;
+    --ac2: #F2849E;
+    --ac3: #F5C6D0;
+    --ac-deep: #8E2E48;
+    --pop: #E8B84F;
+    --book1: #2B2320;
+    --book2: #0F0D0C;
+    --outline: 1.5px;
+    --shadow: 3px;
+    --radius-sq: 14px;
+    background: var(--bg);
+    border: 10px solid #0F0D0C;
+  }
+  .p-v1 .status, .p-v1 .screen { color: var(--tp); }
+
+  /* ═══════════════════════════════════════════════════ */
+  /* PHONE 2: MANUSCRIPT ROSE (v2) — 3040 중성          */
+  /* ═══════════════════════════════════════════════════ */
+  .p-v2 {
+    --bg: #EDE8DD;               /* 살짝 쿨 페이퍼 */
+    --sf: #E1DBCE;
+    --sf2: #F8F3E6;
+    --sf3: #F2ECDB;
+    --tp: #1C1815;               /* 딥 잉크 */
+    --ts: #3E3932;
+    --tm: #857D73;
+    --graphite: #5A5048;         /* 중간톤 (신규) */
+    --ac: #B84E57;               /* 브릭 로즈 */
+    --ac2: #C66B70;
+    --ac3: #E8C8C8;              /* 드라이드 로즈 */
+    --ac-deep: #6E2E38;          /* 옥스블러드 */
+    --pop: #C79538;              /* 오크르 */
+    --book1: #2A2420;
+    --book2: #0E0B0A;
+    --outline: 1px;              /* 얇은 아웃라인 */
+    --shadow: 2px;               /* 절제된 그림자 */
+    --radius-sq: 10px;           /* 덜 둥근 squircle */
+    background: var(--bg);
+    border: 10px solid #0E0B0A;
+  }
+  .p-v2 .status, .p-v2 .screen { color: var(--tp); }
+
+  /* 스테이터스 바 */
+  .statusbar {
+    height: 44px;
+    padding: 0 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--tp);
+    position: relative;
+  }
+  .statusbar .notch {
+    position: absolute;
+    left: 50%;
+    top: 8px;
+    transform: translateX(-50%);
+    width: 84px;
+    height: 24px;
+    background: #0F0D0C;
+    border-radius: 100px;
+    z-index: 5;
+  }
+  .statusbar .right { display: flex; gap: 5px; align-items: center; }
+  .statusbar .right svg { width: 14px; height: 14px; }
+
+  .screen {
+    height: calc(812px - 44px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 80px;
+    position: relative;
+  }
+  .screen::-webkit-scrollbar { display: none; }
+
+  /* ───────── 앱 헤더 ───────── */
+  .app-hdr {
+    padding: 8px 20px 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-family: "Gaegu", cursive;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--tp);
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  /* V1 전용: LV 배지 (다마고치 아이덴티티) */
+  .p-v1 .logo-badge {
+    width: 22px;
+    height: 13px;
+    background: var(--pop);
+    border: var(--outline) solid var(--tp);
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "VT323", monospace;
+    font-size: 11px;
+    color: var(--tp);
+    letter-spacing: 0.5px;
+    line-height: 1;
+    padding-top: 1px;
+    box-shadow: 1.5px 1.5px 0 var(--tp);
+  }
+  /* V2: LV 배지 제거 대신 얇은 구분선 */
+  .p-v2 .logo-badge { display: none; }
+  .p-v2 .logo-sub {
+    font-family: "Crimson Pro", serif;
+    font-size: 11px;
+    color: var(--graphite);
+    font-weight: 500;
+    font-style: italic;
+    margin-left: 4px;
+    border-left: 1px solid var(--graphite);
+    padding-left: 8px;
+    line-height: 1.2;
+  }
+  .p-v1 .logo-sub { display: none; }
+
+  .icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sq);
+    background: var(--sf2);
+    border: var(--outline) solid var(--tp);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--tp);
+    position: relative;
+    box-shadow: var(--shadow) var(--shadow) 0 var(--tp);
+    cursor: pointer;
+  }
+  .icon-btn svg { width: 16px; height: 16px; }
+  .icon-btn.dot::after {
+    content: "";
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: var(--ac);
+    border: var(--outline) solid var(--tp);
+    border-radius: 2px;
+    top: -3px;
+    right: -3px;
+  }
+
+  /* ───────── 인사말 ───────── */
+  .greet {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px 6px;
+  }
+  .greet-mascot {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-sq);
+    background: linear-gradient(135deg, #C8E8D6, #7ABBA4 60%, #3A6B56);
+    border: var(--outline) solid var(--tp);
+    box-shadow: var(--shadow) var(--shadow) 0 var(--tp);
+    flex-shrink: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+  }
+  .greet-mascot img { width: 100%; height: 100%; object-fit: cover; }
+  .greet-txt { flex: 1; min-width: 0; }
+  .p-v1 .greet-hello {
+    font-family: "VT323", monospace;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    color: var(--tm);
+    line-height: 1.3;
+  }
+  .p-v2 .greet-hello {
+    font-family: "Crimson Pro", serif;
+    font-style: italic;
+    font-size: 12px;
+    color: var(--graphite);
+    line-height: 1.3;
+  }
+  .greet-name {
+    font-family: "Gaegu", cursive;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--tp);
+    line-height: 1.2;
+    margin-top: 2px;
+  }
+  .p-v1 .greet-mark { color: var(--ac); margin-left: 2px; }
+  .p-v2 .greet-mark {
+    color: var(--ac-deep);
+    margin-left: 3px;
+    font-family: "Crimson Pro", serif;
+    font-weight: 400;
+  }
+
+  /* ───────── 이어읽기 히어로 ───────── */
+  .hero-read {
+    margin: 14px 20px 0;
+    border-radius: 16px;
+    padding: 14px;
+    background: var(--sf2);
+    border: var(--outline) solid var(--tp);
+    position: relative;
+    box-shadow: var(--shadow) var(--shadow) 0 var(--tp);
+  }
+  /* V1: LCD 태그 (튀어나옴) */
+  .p-v1 .hero-lcd-tag {
+    position: absolute;
+    top: -8px;
+    left: 16px;
+    background: var(--pop);
+    border: var(--outline) solid var(--tp);
+    border-radius: 4px;
+    padding: 2px 8px 1px;
+    font-family: "VT323", monospace;
+    font-size: 12px;
+    color: var(--tp);
+    letter-spacing: 0.8px;
+    line-height: 1;
+    box-shadow: 1.5px 1.5px 0 var(--tp);
+  }
+  /* V2: 얇은 serif 태그 (내부 상단) */
+  .p-v2 .hero-lcd-tag {
+    display: block;
+    font-family: "Crimson Pro", serif;
+    font-style: italic;
+    font-size: 11px;
+    color: var(--graphite);
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    border-bottom: 0.5px solid var(--graphite);
+    padding-bottom: 6px;
+  }
+  /* V1 픽셀 그리드 (제거 V2) */
+  .p-v1 .hero-pixel-grid {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    display: grid;
+    grid-template-columns: repeat(3, 3px);
+    gap: 2px;
+  }
+  .p-v1 .hero-pixel-grid div {
+    width: 3px;
+    height: 3px;
+    background: var(--tp);
+    opacity: 0.35;
+    border-radius: 1px;
+  }
+  .p-v2 .hero-pixel-grid { display: none; }
+
+  .hero-read-row {
+    display: flex;
+    gap: 14px;
+    margin-top: 2px;
+  }
+  .book-cover {
+    width: 76px;
+    height: 108px;
+    border-radius: 5px;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, var(--book1), var(--book2));
+    border: var(--outline) solid var(--tp);
+    box-shadow: var(--shadow) var(--shadow) 0 var(--tp);
+    position: relative;
+    overflow: hidden;
+  }
+  .book-cover::before {
+    content: "";
+    position: absolute;
+    left: 4px; top: 0; bottom: 0;
+    width: 1px;
+    background: rgba(255,255,255,0.15);
+  }
+  .p-v1 .book-cover-title {
+    position: absolute;
+    top: 14px; left: 10px; right: 8px;
+    font-family: "Gaegu", cursive;
+    font-size: 11px;
+    color: var(--ac3);
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    line-height: 1.2;
+  }
+  .p-v1 .book-cover-author {
+    position: absolute;
+    bottom: 8px; left: 10px; right: 8px;
+    font-family: "VT323", monospace;
+    font-size: 10px;
+    color: rgba(245,198,208,0.6);
+    letter-spacing: 1px;
+  }
+  /* V2 북커버: Serif 제목 */
+  .p-v2 .book-cover-title {
+    position: absolute;
+    top: 16px; left: 10px; right: 8px;
+    font-family: "Crimson Pro", serif;
+    font-size: 12px;
+    color: var(--ac3);
+    font-weight: 700;
+    line-height: 1.15;
+  }
+  .p-v2 .book-cover-author {
+    position: absolute;
+    bottom: 9px; left: 10px; right: 8px;
+    font-family: "Crimson Pro", serif;
+    font-style: italic;
+    font-size: 9px;
+    color: rgba(232,200,200,0.55);
+    letter-spacing: 0.3px;
+  }
+
+  .hero-info { flex: 1; min-width: 0; padding-top: 2px; }
+  .p-v1 .hero-kicker {
+    font-family: "VT323", monospace;
+    font-size: 14px;
+    color: var(--ac-deep);
+    letter-spacing: 1.5px;
+    margin-bottom: 3px;
+    line-height: 1;
+  }
+  .p-v2 .hero-kicker {
+    font-family: "Crimson Pro", serif;
+    font-style: italic;
+    font-size: 11.5px;
+    color: var(--ac-deep);
+    letter-spacing: 0.4px;
+    margin-bottom: 4px;
+    line-height: 1.1;
+  }
+  .hero-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--tp);
+    line-height: 1.22;
+    margin-bottom: 2px;
+  }
+  .hero-author { font-size: 11.5px; color: var(--tm); margin-bottom: 10px; }
+
+  /* V1: 픽셀 프로그레스 */
+  .p-v1 .progress-pixel {
+    display: flex;
+    gap: 2px;
+    height: 8px;
+    margin-bottom: 5px;
+  }
+  .p-v1 .progress-pixel .cell {
+    flex: 1;
+    background: var(--ac3);
+    border-radius: 2px;
+  }
+  .p-v1 .progress-pixel .cell.on { background: var(--ac); }
+  .p-v2 .progress-pixel { display: none; }
+
+  /* V2: 타자기 눈금 바 */
+  .p-v2 .progress-ruler {
+    position: relative;
+    height: 14px;
+    margin-bottom: 6px;
+  }
+  .p-v2 .progress-ruler .track {
+    position: absolute;
+    left: 0; right: 0; top: 5px;
+    height: 4px;
+    background: var(--ac3);
+    border-radius: 2px;
+  }
+  .p-v2 .progress-ruler .fill {
+    position: absolute;
+    left: 0; top: 5px;
+    height: 4px;
+    width: 58%;
+    background: var(--ac);
+    border-radius: 2px;
+  }
+  .p-v2 .progress-ruler .notches {
+    position: absolute;
+    left: 0; right: 0; top: 0;
+    display: flex;
+    justify-content: space-between;
+  }
+  .p-v2 .progress-ruler .notches div {
+    width: 1px;
+    height: 5px;
+    background: var(--graphite);
+    opacity: 0.55;
+  }
+  .p-v2 .progress-ruler .notches div.major {
+    height: 9px;
+    opacity: 0.9;
+  }
+  .p-v1 .progress-ruler { display: none; }
+
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10.5px;
+    color: var(--ts);
+  }
+  .p-v1 .progress-meta {
+    font-family: "VT323", monospace;
+    letter-spacing: 0.8px;
+  }
+  .p-v2 .progress-meta {
+    font-family: "Crimson Pro", serif;
+    letter-spacing: 0.2px;
+    font-size: 11px;
+  }
+  .progress-meta b { color: var(--tp); font-family: "Pretendard Variable", sans-serif; }
+
+  .hero-context {
+    margin-top: 12px;
+    padding: 9px 11px;
+    background: var(--sf3);
+    border-radius: 6px;
+    border: var(--outline) solid var(--tp);
+    border-left-width: 3px;
+    border-left-color: var(--pop);
+    font-size: 11.5px;
+    color: var(--ts);
+    line-height: 1.5;
+  }
+  .hero-context b { color: var(--tp); font-weight: 700; }
+
+  .hero-cta {
+    margin-top: 12px;
+    width: 100%;
+    padding: 13px 14px;
+    border: var(--outline) solid var(--tp);
+    border-radius: 10px;
+    background: var(--ac);
+    color: #fff;
+    font-family: "Pretendard Variable", sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: -0.1px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    box-shadow: var(--shadow) var(--shadow) 0 var(--tp);
+  }
+  .hero-cta svg { width: 14px; height: 14px; }
+
+  /* ───────── 주간 캘린더 ───────── */
+  .cal-card {
+    margin: 14px 20px 0;
+    background: var(--sf2);
+    border: var(--outline) solid var(--tp);
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: var(--shadow) var(--shadow) 0 var(--tp);
+  }
+  .cal-hdr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .cal-ttl-row { display: flex; align-items: center; gap: 8px; }
+  .cal-ttl {
+    font-family: "Gaegu", cursive;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--tp);
+  }
+  /* V1: STREAK 7 LCD 배지 */
+  .p-v1 .cal-streak-badge {
+    font-family: "VT323", monospace;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--tp);
+    background: var(--pop);
+    border: var(--outline) solid var(--tp);
+    padding: 2px 8px 1px;
+    border-radius: 4px;
+    letter-spacing: 0.6px;
+    line-height: 1;
+    box-shadow: 1.5px 1.5px 0 var(--tp);
+  }
+  /* V2: 7일 한글 배지 */
+  .p-v2 .cal-streak-badge {
+    font-family: "Pretendard Variable", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--tp);
+    background: var(--pop);
+    border: var(--outline) solid var(--tp);
+    padding: 3px 9px 2px;
+    border-radius: 4px;
+    letter-spacing: 0;
+    line-height: 1;
+    box-shadow: 1.5px 1.5px 0 var(--tp);
+  }
+
+  .cal-see-all {
+    font-size: 11px;
+    color: var(--ac-deep);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+  .p-v1 .cal-see-all {
+    font-family: "VT323", monospace;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.8px;
+  }
+  .p-v2 .cal-see-all {
+    font-family: "Crimson Pro", serif;
+    font-style: italic;
+    font-size: 12px;
+  }
+  .cal-see-all svg { width: 12px; height: 12px; }
+
+  .cal-days {
+    display: flex;
+    justify-content: space-between;
+    gap: 4px;
+    margin-bottom: 14px;
+  }
+  .cal-day {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+  .p-v1 .cal-day-label {
+    font-family: "VT323", monospace;
+    font-size: 12px;
+    color: var(--tm);
+    letter-spacing: 0.6px;
+    line-height: 1;
+  }
+  .p-v2 .cal-day-label {
+    font-family: "Pretendard Variable", sans-serif;
+    font-size: 10px;
+    color: var(--tm);
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .cal-day-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: var(--outline) solid var(--tp);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--sf);
+    color: var(--tm);
+  }
+  .cal-day-dot.read {
+    background: var(--ac);
+    color: #fff;
+    box-shadow: 1.5px 1.5px 0 var(--tp);
+  }
+  .cal-day-dot.today {
+    background: var(--pop);
+    color: var(--tp);
+    box-shadow: 1.5px 1.5px 0 var(--tp);
+  }
+
+  /* 이벤트 리스트 */
+  .evt-list { display: flex; flex-direction: column; gap: 8px; }
+  .evt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 11px;
+    background: var(--sf3);
+    border: var(--outline) solid var(--tp);
+    border-radius: 8px;
+  }
+  .evt-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    border: var(--outline) solid var(--tp);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .evt-icon.rose { background: var(--ac); }
+  .evt-icon.pop { background: var(--pop); }
+  .evt-icon svg { width: 11px; height: 11px; color: #fff; }
+  .evt-icon.pop svg { color: var(--tp); }
+  .evt-info { flex: 1; min-width: 0; }
+  .evt-ttl {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--tp);
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .p-v1 .evt-meta {
+    font-family: "VT323", monospace;
+    font-size: 11px;
+    color: var(--tm);
+    letter-spacing: 0.5px;
+    margin-top: 1px;
+  }
+  .p-v2 .evt-meta {
+    font-family: "Pretendard Variable", sans-serif;
+    font-size: 10.5px;
+    color: var(--tm);
+    margin-top: 1px;
+    letter-spacing: -0.1px;
+  }
+  .p-v1 .evt-dday {
+    font-family: "VT323", monospace;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--tp);
+    background: var(--ac3);
+    border: var(--outline) solid var(--tp);
+    padding: 2px 7px 1px;
+    border-radius: 4px;
+    line-height: 1;
+    letter-spacing: 0.6px;
+    box-shadow: 1.5px 1.5px 0 var(--tp);
+  }
+  .p-v2 .evt-dday {
+    font-family: "Pretendard Variable", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--tp);
+    background: var(--ac3);
+    border: var(--outline) solid var(--tp);
+    padding: 3px 8px 2px;
+    border-radius: 4px;
+    line-height: 1;
+    letter-spacing: -0.1px;
+    box-shadow: 1.5px 1.5px 0 var(--tp);
+  }
+  .evt-dday.urgent {
+    background: var(--ac);
+    color: #fff;
+  }
+
+  /* ───────── 커뮤니티 ───────── */
+  .feed-card {
+    margin: 14px 20px 0;
+    background: var(--sf2);
+    border: var(--outline) solid var(--tp);
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: var(--shadow) var(--shadow) 0 var(--tp);
+  }
+  .feed-hdr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .feed-ttl {
+    font-family: "Gaegu", cursive;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--tp);
+  }
+  .feed-item {
+    display: flex;
+    gap: 10px;
+    padding: 10px 11px;
+    background: var(--sf3);
+    border: var(--outline) solid var(--tp);
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+  .feed-item:last-child { margin-bottom: 0; }
+  .feed-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: var(--outline) solid var(--tp);
+    background: linear-gradient(135deg, #F0C394, #D18F58);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    box-shadow: 1.5px 1.5px 0 var(--tp);
+  }
+  .feed-avatar.b { background: linear-gradient(135deg, #A6D3D9, #6A9BA8); }
+  .feed-body { flex: 1; min-width: 0; }
+  .feed-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--tp);
+    margin-bottom: 2px;
+  }
+  .p-v1 .feed-name span {
+    font-family: "VT323", monospace;
+    font-size: 11px;
+    color: var(--tm);
+    font-weight: 400;
+    margin-left: 4px;
+    letter-spacing: 0.4px;
+  }
+  .p-v2 .feed-name span {
+    font-family: "Crimson Pro", serif;
+    font-style: italic;
+    font-size: 10.5px;
+    color: var(--tm);
+    font-weight: 400;
+    margin-left: 6px;
+  }
+  .feed-text {
+    font-size: 12px;
+    color: var(--ts);
+    line-height: 1.4;
+  }
+  .p-v1 .feed-quote {
+    font-family: "Gaegu", cursive;
+    font-size: 13px;
+    color: var(--tp);
+    line-height: 1.45;
+    padding: 7px 9px;
+    background: #fff;
+    border: var(--outline) solid var(--tp);
+    border-left-width: 4px;
+    border-left-color: var(--ac);
+    border-radius: 6px;
+    margin-top: 6px;
+  }
+  .p-v2 .feed-quote {
+    font-family: "Crimson Pro", serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--tp);
+    line-height: 1.5;
+    padding: 8px 10px;
+    background: #fff;
+    border: var(--outline) solid var(--tp);
+    border-left-width: 3px;
+    border-left-color: var(--ac);
+    border-radius: 6px;
+    margin-top: 6px;
+  }
+  .feed-stats {
+    display: flex;
+    gap: 12px;
+    margin-top: 7px;
+    font-size: 11px;
+    color: var(--tm);
+    align-items: center;
+  }
+  .p-v1 .feed-stats {
+    font-family: "VT323", monospace;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+  }
+  .p-v2 .feed-stats {
+    font-family: "Pretendard Variable", sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .feed-stats span { display: flex; align-items: center; gap: 3px; }
+  .feed-stats svg { width: 12px; height: 12px; }
+
+  /* 탭바 */
+  .tabbar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 72px;
+    padding: 10px 16px 20px 16px;
+    background: var(--bg);
+    border-top: var(--outline) solid var(--tp);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+  .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    color: var(--tm);
+    padding: 4px 10px;
+    border-radius: 6px;
+  }
+  .p-v1 .tab {
+    font-family: "VT323", monospace;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+  }
+  .p-v2 .tab {
+    font-family: "Pretendard Variable", sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+  }
+  .tab.active {
+    color: var(--tp);
+    background: var(--ac3);
+    border: var(--outline) solid var(--tp);
+    padding: 3px 9px;
+  }
+  .tab svg { width: 20px; height: 20px; }
+
+  /* 디테일 사이드 */
+  .detail-col {
+    flex: 1;
+    min-width: 260px;
+    max-width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    color: #D8CFBE;
+  }
+  .detail-card {
+    background: #231D18;
+    border: 1px solid #3A302B;
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .detail-card h3 {
+    font-family: "Gaegu", cursive;
+    font-size: 16px;
+    color: #E8C8C8;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .detail-card ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .detail-card li {
+    padding-left: 16px;
+    position: relative;
+    font-size: 12px;
+    line-height: 1.55;
+    color: #C9BFB0;
+  }
+  .detail-card li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 6px;
+    width: 7px;
+    height: 7px;
+    background: #B84E57;
+    border-radius: 2px;
+  }
+  .detail-card code {
+    background: #1A1512;
+    color: #C79538;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 11px;
+  }
+  .detail-card b { color: #E8C8C8; }
+</style>
+</head>
+<body>
+
+<div class="page-hdr">
+  <h1>방긋 · Manuscript Rose</h1>
+  <p>v1 Tamagotchi Rose(20대 게임 감성) → v2 Manuscript Rose(3040 중성 만년필 감성)</p>
+</div>
+
+<!-- 팔레트 비교 -->
+<div class="palette-compare">
+  <div class="pal-card v1">
+    <div class="label">v1 · Tamagotchi Rose</div>
+    <div class="name">비비드, 놀이</div>
+    <div class="pal-row">
+      <div class="sw" style="background:#E85A7A;color:#fff;">E85A7A</div>
+      <div class="sw" style="background:#8E2E48;color:#fff;">8E2E48</div>
+      <div class="sw" style="background:#F5C6D0;color:#8E2E48;">F5C6D0</div>
+      <div class="sw" style="background:#E8B84F;color:#1E1A16;">E8B84F</div>
+      <div class="sw" style="background:#F0EBE2;color:#1E1A16;">F0EBE2</div>
+      <div class="sw" style="background:#1E1A16;color:#F5C6D0;">1E1A16</div>
+    </div>
+  </div>
+  <div class="pal-card v2">
+    <div class="label" style="color:#C66B70;">v2 · Manuscript Rose ★3040 중성</div>
+    <div class="name">차분, 장인</div>
+    <div class="pal-row">
+      <div class="sw" style="background:#B84E57;color:#fff;">B84E57</div>
+      <div class="sw" style="background:#6E2E38;color:#fff;">6E2E38</div>
+      <div class="sw" style="background:#E8C8C8;color:#6E2E38;">E8C8C8</div>
+      <div class="sw" style="background:#C79538;color:#1C1815;">C79538</div>
+      <div class="sw" style="background:#EDE8DD;color:#1C1815;">EDE8DD</div>
+      <div class="sw" style="background:#5A5048;color:#E8C8C8;">5A5048</div>
+    </div>
+  </div>
+</div>
+
+<!-- 스테이지: 폰 2개 + 디테일 -->
+<div class="stage">
+
+  <!-- PHONE 1: Tamagotchi Rose v1 -->
+  <div class="phone-col">
+    <div class="phone-label" style="color:#F5C6D0;">v1 · Tamagotchi</div>
+    <div class="phone-sub">20대 · 게임 · 캔디</div>
+    <div class="phone p-v1">
+      <div class="statusbar">
+        <div class="notch"></div>
+        <div>9:41</div>
+        <div class="right">●●●</div>
+      </div>
+      <div class="screen">
+        <div class="app-hdr">
+          <div class="logo">
+            방긋
+            <div class="logo-badge">LV7</div>
+          </div>
+          <div class="icon-btn dot">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>
+          </div>
+        </div>
+        <div class="greet">
+          <div class="greet-mascot">
+            <img src="mascot-morning.png" alt="방긋이" onerror="this.style.display='none'"/>
+          </div>
+          <div class="greet-txt">
+            <div class="greet-hello">GOOD MORNING</div>
+            <div class="greet-name">민지님, 오늘도 한 쪽<span class="greet-mark">♡</span></div>
+          </div>
+        </div>
+        <div class="hero-read">
+          <div class="hero-lcd-tag">NOW READING</div>
+          <div class="hero-pixel-grid">
+            <div></div><div></div><div></div>
+            <div></div><div></div><div></div>
+            <div></div><div></div><div></div>
+          </div>
+          <div class="hero-read-row">
+            <div class="book-cover">
+              <div class="book-cover-title">작별하지<br/>않는다</div>
+              <div class="book-cover-author">한강</div>
+            </div>
+            <div class="hero-info">
+              <div class="hero-kicker">CH. 3 / 7</div>
+              <div class="hero-title">작별하지 않는다</div>
+              <div class="hero-author">한강</div>
+              <div class="progress-pixel">
+                <div class="cell on"></div><div class="cell on"></div><div class="cell on"></div>
+                <div class="cell on"></div><div class="cell on"></div><div class="cell on"></div>
+                <div class="cell on"></div><div class="cell"></div><div class="cell"></div>
+                <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+              </div>
+              <div class="progress-meta"><span><b>152</b> / 264 쪽</span><span>58%</span></div>
+            </div>
+          </div>
+          <div class="hero-context">어제는 <b>눈 덮인 제주 집 앞</b>에서 멈추셨어요.<br/>오늘 목표 <b>170쪽</b>까지 · 18쪽</div>
+          <button class="hero-cta">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l14 9-14 9V3z"/></svg>
+            152쪽부터 이어 읽기
+          </button>
+        </div>
+        <div class="cal-card">
+          <div class="cal-hdr">
+            <div class="cal-ttl-row">
+              <div class="cal-ttl">이번 주</div>
+              <div class="cal-streak-badge">STREAK 7</div>
+            </div>
+            <div class="cal-see-all">ALL
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+          <div class="cal-days">
+            <div class="cal-day"><div class="cal-day-label">MON</div><div class="cal-day-dot read">15</div></div>
+            <div class="cal-day"><div class="cal-day-label">TUE</div><div class="cal-day-dot read">16</div></div>
+            <div class="cal-day"><div class="cal-day-label">WED</div><div class="cal-day-dot read">17</div></div>
+            <div class="cal-day"><div class="cal-day-label">THU</div><div class="cal-day-dot read">18</div></div>
+            <div class="cal-day"><div class="cal-day-label">FRI</div><div class="cal-day-dot read">19</div></div>
+            <div class="cal-day"><div class="cal-day-label">SAT</div><div class="cal-day-dot read">20</div></div>
+            <div class="cal-day"><div class="cal-day-label">SUN</div><div class="cal-day-dot today">21</div></div>
+          </div>
+          <div class="evt-list">
+            <div class="evt">
+              <div class="evt-icon pop">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              </div>
+              <div class="evt-info">
+                <div class="evt-ttl">독서모임 · 작별하지 않는다</div>
+                <div class="evt-meta">04.24 WED · 19:00</div>
+              </div>
+              <div class="evt-dday">D-3</div>
+            </div>
+            <div class="evt">
+              <div class="evt-icon rose">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              </div>
+              <div class="evt-info">
+                <div class="evt-ttl">도서관 반납 · 소년이 온다</div>
+                <div class="evt-meta">중앙도서관</div>
+              </div>
+              <div class="evt-dday urgent">D-2</div>
+            </div>
+          </div>
+        </div>
+        <div class="feed-card">
+          <div class="feed-hdr">
+            <div class="feed-ttl">방긋 친구들</div>
+            <div class="cal-see-all">MORE
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+          <div class="feed-item">
+            <div class="feed-avatar">수</div>
+            <div class="feed-body">
+              <div class="feed-name">수민 <span>3 MIN AGO</span></div>
+              <div class="feed-text">『파친코』 4부 시작!</div>
+              <div class="feed-quote">시간이 사람을 만든다고, 할머니는 자주 말했다.</div>
+              <div class="feed-stats">
+                <span><svg viewBox="0 0 24 24" fill="currentColor" style="color:#E85A7A;"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 11c0 5.5-7 10-7 10z"/></svg>12</span>
+                <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12c0 4-4 7-9 7-1.3 0-2.5-.2-3.5-.5L3 20l1.5-4C3.5 15 3 13.5 3 12c0-4 4-7 9-7s9 3 9 7z"/></svg>3</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="height: 20px;"></div>
+      </div>
+      <div class="tabbar">
+        <div class="tab active">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/></svg>HOME
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>책장
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 11c0 5.5-7 10-7 10z"/></svg>위시
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>친구
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>나
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHONE 2: Manuscript Rose v2 -->
+  <div class="phone-col">
+    <div class="phone-label" style="color:#E8C8C8;">v2 · Manuscript ★</div>
+    <div class="phone-sub">3040 · 만년필 · 중성</div>
+    <div class="phone p-v2">
+      <div class="statusbar">
+        <div class="notch"></div>
+        <div>9:41</div>
+        <div class="right">●●●</div>
+      </div>
+      <div class="screen">
+        <div class="app-hdr">
+          <div class="logo">
+            방긋
+            <span class="logo-sub">reading journal</span>
+          </div>
+          <div class="icon-btn dot">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>
+          </div>
+        </div>
+        <div class="greet">
+          <div class="greet-mascot">
+            <img src="mascot-morning.png" alt="방긋이" onerror="this.style.display='none'"/>
+          </div>
+          <div class="greet-txt">
+            <div class="greet-hello">오늘의 페이지 — 4월 21일</div>
+            <div class="greet-name">민지님, 오늘도 한 쪽<span class="greet-mark">.</span></div>
+          </div>
+        </div>
+        <div class="hero-read">
+          <div class="hero-lcd-tag">읽는 중 · No. 03</div>
+          <div class="hero-read-row">
+            <div class="book-cover">
+              <div class="book-cover-title">작별하지<br/>않는다</div>
+              <div class="book-cover-author">Han Kang</div>
+            </div>
+            <div class="hero-info">
+              <div class="hero-kicker">3장 중 3번째</div>
+              <div class="hero-title">작별하지 않는다</div>
+              <div class="hero-author">한강</div>
+              <div class="progress-ruler">
+                <div class="track"></div>
+                <div class="fill"></div>
+                <div class="notches">
+                  <div class="major"></div>
+                  <div></div><div></div><div></div><div></div>
+                  <div class="major"></div>
+                  <div></div><div></div><div></div><div></div>
+                  <div class="major"></div>
+                </div>
+              </div>
+              <div class="progress-meta"><span><b>152</b> / 264쪽</span><span>58%</span></div>
+            </div>
+          </div>
+          <div class="hero-context">어제는 <b>눈 덮인 제주 집 앞</b>에서 멈추셨어요.<br/>오늘 목표 <b>170쪽</b>까지 · 약 18쪽</div>
+          <button class="hero-cta">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l14 9-14 9V3z"/></svg>
+            152쪽부터 이어 읽기
+          </button>
+        </div>
+        <div class="cal-card">
+          <div class="cal-hdr">
+            <div class="cal-ttl-row">
+              <div class="cal-ttl">이번 주</div>
+              <div class="cal-streak-badge">7일 연속</div>
+            </div>
+            <div class="cal-see-all">전체 보기
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+          <div class="cal-days">
+            <div class="cal-day"><div class="cal-day-label">월</div><div class="cal-day-dot read">15</div></div>
+            <div class="cal-day"><div class="cal-day-label">화</div><div class="cal-day-dot read">16</div></div>
+            <div class="cal-day"><div class="cal-day-label">수</div><div class="cal-day-dot read">17</div></div>
+            <div class="cal-day"><div class="cal-day-label">목</div><div class="cal-day-dot read">18</div></div>
+            <div class="cal-day"><div class="cal-day-label">금</div><div class="cal-day-dot read">19</div></div>
+            <div class="cal-day"><div class="cal-day-label">토</div><div class="cal-day-dot read">20</div></div>
+            <div class="cal-day"><div class="cal-day-label">일</div><div class="cal-day-dot today">21</div></div>
+          </div>
+          <div class="evt-list">
+            <div class="evt">
+              <div class="evt-icon pop">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              </div>
+              <div class="evt-info">
+                <div class="evt-ttl">독서모임 · 작별하지 않는다</div>
+                <div class="evt-meta">4월 24일 수요일 · 오후 7시</div>
+              </div>
+              <div class="evt-dday">D-3</div>
+            </div>
+            <div class="evt">
+              <div class="evt-icon rose">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              </div>
+              <div class="evt-info">
+                <div class="evt-ttl">도서관 반납 · 소년이 온다</div>
+                <div class="evt-meta">중앙도서관</div>
+              </div>
+              <div class="evt-dday urgent">D-2</div>
+            </div>
+          </div>
+        </div>
+        <div class="feed-card">
+          <div class="feed-hdr">
+            <div class="feed-ttl">방긋 친구들</div>
+            <div class="cal-see-all">더 보기
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+          <div class="feed-item">
+            <div class="feed-avatar">수</div>
+            <div class="feed-body">
+              <div class="feed-name">수민 <span>3분 전</span></div>
+              <div class="feed-text">『파친코』 4부 시작</div>
+              <div class="feed-quote">시간이 사람을 만든다고, 할머니는 자주 말했다.</div>
+              <div class="feed-stats">
+                <span><svg viewBox="0 0 24 24" fill="currentColor" style="color:#B84E57;"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 11c0 5.5-7 10-7 10z"/></svg>12</span>
+                <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12c0 4-4 7-9 7-1.3 0-2.5-.2-3.5-.5L3 20l1.5-4C3.5 15 3 13.5 3 12c0-4 4-7 9-7s9 3 9 7z"/></svg>3</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="height: 20px;"></div>
+      </div>
+      <div class="tabbar">
+        <div class="tab active">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/></svg>홈
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>책장
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 11c0 5.5-7 10-7 10z"/></svg>위시
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>친구
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>나
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 디테일 사이드 -->
+  <div class="detail-col">
+    <div class="detail-card">
+      <h3>🎯 3040 중성 전환 포인트</h3>
+      <ul>
+        <li><b>채도 -30%</b> — 비비드 로즈 <code>#E85A7A</code> → 브릭 로즈 <code>#B84E57</code>. 흙빛이 섞여 성숙해짐.</li>
+        <li><b>옐로 → 오크르</b> — <code>#E8B84F</code>(장난감) → <code>#C79538</code>(Kinfolk).</li>
+        <li><b>아웃라인 -33%</b> — 1.5px → 1px. 덜 cartoony, 더 문서적.</li>
+        <li><b>Shadow 2px</b> — 3px의 과장된 bounce 대신 절제된 weight.</li>
+        <li><b>Radius 10px</b> — squircle 유지하되 덜 둥글게.</li>
+      </ul>
+    </div>
+
+    <div class="detail-card">
+      <h3>✍️ 타이포그래피 재배치</h3>
+      <ul>
+        <li><b>VT323 LCD 폰트 대폭 축소</b> — 거의 사용 안 함. 메타는 Pretendard/Crimson Pro로.</li>
+        <li><b>Crimson Pro Italic 추가</b> — 만년필 필기체 느낌. 서브 라벨·인용·저자명에.</li>
+        <li>
+          <b>한글화</b> —<br/>
+          <code>GOOD MORNING</code> → <code>오늘의 페이지 — 4월 21일</code><br/>
+          <code>NOW READING</code> → <code>읽는 중 · No. 03</code><br/>
+          <code>CH. 3 / 7</code> → <code>3장 중 3번째</code><br/>
+          <code>STREAK 7</code> → <code>7일 연속</code><br/>
+          <code>MORE</code> → <code>더 보기</code>
+        </li>
+        <li><b>하트 ♡ 제거</b> — 마침표 <code>.</code> 로 교체 (중성·문장 종결).</li>
+      </ul>
+    </div>
+
+    <div class="detail-card">
+      <h3>📐 장식 요소 정제</h3>
+      <ul>
+        <li><b>픽셀 progress → 타자기 눈금자</b> — 12 블록 대신 얇은 바 + notches. 공간 효율 ↑, 성숙한 감성.</li>
+        <li><b>픽셀 3×3 스피커 그릴 제거</b> — 너무 직접적인 레트로 코드.</li>
+        <li><b>LV7 배지 제거</b> — 대신 <i>reading journal</i> 서브타이틀 (에세이 정간지 느낌).</li>
+        <li><b>북커버 타이틀 serif</b> — Gaegu → Crimson Pro. 고전 양장본 감성.</li>
+      </ul>
+    </div>
+
+    <div class="detail-card">
+      <h3>🎨 유지한 것</h3>
+      <ul>
+        <li><b>잉크 아웃라인</b> — 전체 아이덴티티. 얇아져도 유지.</li>
+        <li><b>Chunky shadow</b> — 약해졌지만 있음. 물리감 유지.</li>
+        <li><b>Squircle</b> — 원 대신 둥근 사각형.</li>
+        <li><b>Gaegu</b> — 타이틀/인사말. 방긋다움 유지.</li>
+        <li><b>방긋이 캐릭터 이미지</b> — 그대로. 민트 그린 vs 브릭 로즈 보색 대비로 캐릭터 더 돋보임.</li>
+        <li><b>개구체 없음</b> — blur halo 없음, 모든 원형 squircle로.</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

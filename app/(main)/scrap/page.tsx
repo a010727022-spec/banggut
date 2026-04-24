@@ -11,14 +11,12 @@ import { BookOpen, Star, User, Clock } from "lucide-react";
 import AppHeader from "@/components/shared/AppHeader";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useLibraryStore } from "@/stores/useLibraryStore";
+import { coverPalette } from "@/lib/reading-utils";
 
 function upgradeCoverUrl(url: string | null | undefined): string | null {
   if (!url) return null;
   return url.replace("/cover/", "/cover500/").replace("/cover200/", "/cover500/").replace("/coversum/", "/cover500/").replace("http://", "https://");
 }
-
-const COVER_PALETTES = [["#90C4E4","#2B6CB0"],["#7FAF8A","#2B4C3F"],["#C4A35A","#8B6F3C"],["#F0A8C4","#B0557A"],["#94B8B0","#3D6B5A"],["#B8A9D4","#5B4A8A"]];
-const coverPalette = (t: string) => COVER_PALETTES[t.charCodeAt(0) % COVER_PALETTES.length];
 
 type FeedTab = "feed" | "mine";
 

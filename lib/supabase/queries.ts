@@ -1,5 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
-import type { Book, Message, Scrap, Underline, Review, User, ReadingSession } from "@/lib/types";
+import type { Book, Message, Scrap, Underline, Review, User, ReadingSession, FocusSession } from "@/lib/types";
 
 // --- Users ---
 export async function getProfile(supabase: SupabaseClient, userId: string) {
@@ -379,6 +379,55 @@ export async function upsertReadingSession(supabase: SupabaseClient, session: Om
     .single();
   if (error) throw error;
   return data as ReadingSession;
+}
+
+// --- Focus Sessions (집중 읽기 블록 · 뽀모도로 + 스톱워치) ---
+export async function createFocusSession(
+  supabase: SupabaseClient,
+  session: Omit<FocusSession, "id" | "created_at">,
+) {
+  // mode 필드는 FocusSession 타입에 포함되어 있어 payload에 자동 포함돼요.
+  const { data, error } = await supabase
+    .from("focus_sessions")
+    .insert(session)
+    .select()
+    .single();
+  if (error) throw error;
+  return data as FocusSession;
+}
+
+export async function getRecentFocusSessions(
+  supabase: SupabaseClient,
+  bookId: string,
+  limit = 5,
+) {
+  const { data } = await supabase
+    .from("focus_sessions")
+    .select("*")
+    .eq("book_id", bookId)
+    .order("started_at", { ascending: false })
+    .limit(limit);
+  return (data || []) as FocusSession[];
+}
+
+/**
+ * 특정 책의 focus_sessions 중 `sinceIso` 이후 시작된 것만 조회.
+ *
+ * 반환 순서는 `started_at DESC`. 통계/ETA/캘린더 도장용으로 쓰여요.
+ * 타임존: 클라이언트에서 ISO로 넘긴 그대로 TIMESTAMPTZ와 비교되므로 주의.
+ */
+export async function getFocusSessionsSince(
+  supabase: SupabaseClient,
+  bookId: string,
+  sinceIso: string,
+) {
+  const { data } = await supabase
+    .from("focus_sessions")
+    .select("*")
+    .eq("book_id", bookId)
+    .gte("started_at", sinceIso)
+    .order("started_at", { ascending: false });
+  return (data || []) as FocusSession[];
 }
 
 // --- Reading Streaks ---

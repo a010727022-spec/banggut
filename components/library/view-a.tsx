@@ -453,48 +453,55 @@ function BookShelfPane({
   emptyCta?: { label: string; onClick: () => void };
 }) {
   if (books.length === 0) {
+    // 진짜 책장처럼 크기 유지 — 책이 있을 때와 같은 최소 높이(150)를
+    // 확보하고 가운데에 빈 메시지 + CTA 를 띄운 뒤 바닥 선반을 깔아요.
     return (
-      <div style={{ padding: "4px 0 0" }}>
+      <div style={{ margin: "0 -2px", padding: "4px 2px 0" }}>
         <div
           style={{
-            fontSize: 12,
-            color: "var(--ts)",
-            background: "var(--sf2)",
-            border: "1px dashed var(--bd2)",
-            borderRadius: 12,
-            padding: "18px 16px",
+            minHeight: 150,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px 16px",
             textAlign: "center",
-            lineHeight: 1.5,
-            marginBottom: 0,
+            gap: 10,
           }}
         >
-          {emptyMessage}
+          <div
+            style={{
+              fontSize: 12,
+              color: "var(--ts)",
+              lineHeight: 1.5,
+            }}
+          >
+            {emptyMessage}
+          </div>
           {emptyCta && (
-            <div style={{ marginTop: 10 }}>
-              <button
-                type="button"
-                onClick={emptyCta.onClick}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 4,
-                  padding: "8px 16px",
-                  borderRadius: 999,
-                  background: "var(--ac)",
-                  color: "var(--acc)",
-                  fontSize: 12,
-                  fontWeight: 700,
-                  border: "none",
-                  cursor: "pointer",
-                  fontFamily: "inherit",
-                  minHeight: 32,
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                <Plus size={12} strokeWidth={2.5} />
-                {emptyCta.label}
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={emptyCta.onClick}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
+                padding: "8px 16px",
+                borderRadius: 999,
+                background: "var(--ac)",
+                color: "var(--acc)",
+                fontSize: 12,
+                fontWeight: 700,
+                border: "none",
+                cursor: "pointer",
+                fontFamily: "inherit",
+                minHeight: 32,
+                letterSpacing: "-0.01em",
+              }}
+            >
+              <Plus size={12} strokeWidth={2.5} />
+              {emptyCta.label}
+            </button>
           )}
         </div>
         <ShelfWood stretch />
@@ -513,42 +520,37 @@ function BookShelfPane({
     );
   }
 
-  // 책등 모드 — 선반 위에 세로 책등이 빽빽하게
+  // 책등 모드 — 선반 위에 세로 책등이 빽빽하게, 넘치면 아래로 단이 생겨요.
+  const SPINES_PER_ROW = 7;
+  const spineRows: Book[][] = [];
+  for (let i = 0; i < books.length; i += SPINES_PER_ROW) {
+    spineRows.push(books.slice(i, i + SPINES_PER_ROW));
+  }
+
   return (
-    <div
-      style={{
-        margin: "0 -2px",
-        overflowX: "auto",
-        scrollbarWidth: "none",
-      }}
-    >
-      <div
-        style={{
-          display: "inline-flex",
-          flexDirection: "column",
-          minWidth: "100%",
-          padding: "4px 2px 0",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            gap: 3,
-            alignItems: "flex-end",
-            minHeight: 150,
-          }}
-        >
-          {books.map((b) => (
-            <BookSpineLarge
-              key={b.id}
-              title={b.title}
-              coverUrl={upgradeCoverUrl(b.cover_url)}
-              onClick={onBookClick ? () => onBookClick(b.id) : undefined}
-            />
-          ))}
+    <div style={{ margin: "0 -2px", padding: "4px 2px 0" }}>
+      {spineRows.map((rowBooks, idx) => (
+        <div key={idx} style={{ marginTop: idx === 0 ? 0 : 8 }}>
+          <div
+            style={{
+              display: "flex",
+              gap: 3,
+              alignItems: "flex-end",
+              minHeight: 150,
+            }}
+          >
+            {rowBooks.map((b) => (
+              <BookSpineLarge
+                key={b.id}
+                title={b.title}
+                coverUrl={upgradeCoverUrl(b.cover_url)}
+                onClick={onBookClick ? () => onBookClick(b.id) : undefined}
+              />
+            ))}
+          </div>
+          <ShelfWood stretch />
         </div>
-        <ShelfWood stretch />
-      </div>
+      ))}
     </div>
   );
 }
@@ -627,7 +629,6 @@ function BookSpineLarge({
         style={{
           position: "relative",
           writingMode: "vertical-rl",
-          transform: "rotate(180deg)",
           fontSize: 11.5,
           fontWeight: 700,
           letterSpacing: "-0.01em",

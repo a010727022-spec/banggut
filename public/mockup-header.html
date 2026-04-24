@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>방긋 · 상단 헤더 비교</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;word-break:keep-all;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#F7F3ED; --sf:#EDE7DF; --sf2:#E0D9D0; --sf3:#D0C8BC;
+  --bd:rgba(95,164,142,0.14); --bd2:rgba(95,164,142,0.28);
+  --tp:#1c201d; --ts:#4a5550; --tm:#7a8b7e;
+  --ac:#5FA48E; --ac2:#7ABBA4; --ac3:#A4D4C0; --acc:#f7f3ed;
+  --milestone:#B79556;
+}
+body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:#DCD5CA;padding:40px 20px;min-height:100vh;color:var(--tp)}
+.wrap{max-width:1600px;margin:0 auto}
+.title{font-family:'Gaegu',cursive;font-size:30px;font-weight:700;letter-spacing:0.02em;text-align:center;margin-bottom:6px}
+.sub{color:var(--ts);font-size:13px;text-align:center;margin-bottom:40px;font-weight:500}
+.sub em{font-style:normal;color:var(--ac);font-weight:700}
+
+.phones{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;max-width:360px}
+.phone-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:100px;background:#FFFFFF;border:1px solid var(--bd2);font-size:11px;font-weight:700;color:var(--ac);letter-spacing:0.5px}
+.phone-badge.current{color:#c05a48;border-color:rgba(192,90,72,0.3);background:rgba(192,90,72,0.05)}
+.phone-badge.recommend{background:linear-gradient(135deg, color-mix(in srgb,var(--ac) 15%,#FFFFFF), #FFFFFF);border-color:var(--ac);color:var(--ac)}
+.phone{width:340px;height:720px;background:var(--bg);border-radius:40px;box-shadow:0 0 0 3px #1a1a1a,0 0 24px rgba(0,0,0,0.1);overflow:auto;padding-bottom:68px;position:relative}
+.phone::-webkit-scrollbar{width:0}
+.phone-desc{font-size:11px;color:var(--ts);text-align:center;line-height:1.6;max-width:340px;font-weight:500}
+.phone-desc strong{color:var(--ac)}
+
+/* ═══ CURRENT (as-is) ═══ */
+.current-hero{position:relative;height:180px;overflow:hidden;background:linear-gradient(135deg,#1e3d2e,#355c45)}
+.current-hero::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 30% 60%,rgba(95,164,142,0.4),transparent 70%),radial-gradient(ellipse at 70% 40%,rgba(95,164,142,0.3),transparent 60%);filter:blur(20px)}
+.current-bottom{padding:0 20px;margin-top:-60px;position:relative;z-index:2}
+.current-profile{display:flex;align-items:flex-end;gap:14px;margin-bottom:12px}
+.current-avatar{width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,#1e3d2e,#355c45,var(--ac));border:3px solid var(--bg);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:30px}
+.current-text{flex:1;padding-bottom:3px}
+.current-nick{font-size:18px;font-weight:800;color:var(--tp);letter-spacing:-0.4px}
+.current-tag{font-size:11px;color:var(--tm);margin-top:2px}
+.current-counts{display:flex;gap:12px;margin-top:6px}
+.current-count{font-size:12px;color:var(--tp)}
+.current-count em{font-style:normal;font-weight:800}
+.current-actions{display:flex;gap:6px;margin-bottom:14px}
+.current-action{flex:1;padding:8px;border-radius:10px;border:0.5px solid var(--bd2);background:var(--sf);color:var(--ac2);font-size:12px;font-weight:700;cursor:pointer}
+.current-iconbtn{width:38px;height:38px;border-radius:10px;border:0.5px solid var(--bd2);background:var(--sf);display:flex;align-items:center;justify-content:center;cursor:pointer}
+
+/* 공통 스탯 위젯 */
+.stat-widget{margin:0 -0px;padding:12px 20px;background:var(--sf);border-top:0.5px solid var(--bd);border-bottom:0.5px solid var(--bd)}
+.stat-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.stat-label{font-family:'Gaegu',cursive;font-size:13px;font-weight:700;color:var(--tp);letter-spacing:0.02em}
+.stat-label em{font-style:normal;color:var(--ac)}
+.stat-pct{font-size:11px;color:var(--tm);font-weight:700}
+.stat-bar{height:8px;background:var(--sf2);border-radius:100px;overflow:hidden;margin-bottom:6px}
+.stat-fill{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:100px;width:60%}
+.stat-detail{display:flex;justify-content:space-between;font-size:10.5px;color:var(--tm);font-weight:600;margin-bottom:10px}
+.stat-detail em{font-style:normal;color:var(--ac);font-weight:800}
+.stat-footer{display:flex;justify-content:space-between;padding-top:10px;border-top:0.5px solid var(--bd);font-size:11px;color:var(--ts);font-weight:600}
+.stat-footer em{font-style:normal;color:var(--tp);font-weight:800}
+
+/* 탭바 */
+.tabs{display:flex;padding:8px 18px;gap:4px;overflow-x:auto;scrollbar-width:none;border-bottom:0.5px solid var(--bd)}
+.tabs::-webkit-scrollbar{height:0}
+.tab{padding:6px 10px;font-size:11.5px;font-weight:700;color:var(--tm);background:transparent;border:none;cursor:pointer;white-space:nowrap;position:relative}
+.tab.on{color:var(--ac)}
+.tab.on::after{content:"";position:absolute;bottom:-8.5px;left:10%;right:10%;height:2px;background:var(--ac);border-radius:2px}
+
+/* ═══ A: 완전 미니멀 ═══ */
+.a-header{padding:44px 18px 14px;display:flex;align-items:center;gap:10px;border-bottom:0.5px solid var(--bd)}
+.a-menu{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:var(--ts);background:var(--sf);border:0.5px solid var(--bd)}
+.a-text{flex:1}
+.a-greet{font-family:'Gaegu',cursive;font-size:16px;font-weight:700;color:var(--tp);letter-spacing:0.02em;line-height:1.2}
+.a-greet em{color:var(--ac);font-style:normal}
+.a-sub{font-size:11px;color:var(--tm);margin-top:2px}
+.a-bell{width:36px;height:36px;border-radius:50%;background:var(--sf);border:0.5px solid var(--bd);display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer}
+.a-bell svg{width:16px;height:16px;stroke:var(--ts);fill:none;stroke-width:2}
+.a-bell .dot{position:absolute;top:7px;right:7px;width:6px;height:6px;border-radius:50%;background:var(--ac);border:1.5px solid var(--bg)}
+
+/* ═══ B: 컴팩트 프로필 ═══ */
+.b-header{padding:44px 18px 12px;display:flex;align-items:center;gap:12px;border-bottom:0.5px solid var(--bd)}
+.b-avatar{width:44px;height:44px;border-radius:50%;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,#1e3d2e,var(--ac));display:flex;align-items:center;justify-content:center}
+.b-avatar-inner{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:22px}
+.b-info{flex:1;min-width:0}
+.b-row{display:flex;gap:6px;align-items:baseline}
+.b-nick{font-size:15px;font-weight:800;color:var(--tp);letter-spacing:-0.2px}
+.b-nick-sub{font-size:10.5px;color:var(--tm);font-weight:500}
+.b-sub{font-size:10.5px;color:var(--tm);margin-top:2px}
+.b-actions{display:flex;gap:6px;flex-shrink:0}
+.b-action{width:32px;height:32px;border-radius:10px;background:var(--sf);border:0.5px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.b-action svg{width:14px;height:14px;stroke:var(--ts);fill:none;stroke-width:2}
+.b-action .dot{position:absolute;top:5px;right:5px;width:5px;height:5px;border-radius:50%;background:var(--ac)}
+
+/* ═══ C: 인사 카드 ═══ */
+.c-header{padding:44px 18px 14px;border-bottom:0.5px solid var(--bd)}
+.c-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.c-logo{font-family:'Gaegu',cursive;font-size:15px;font-weight:700;color:var(--ac);letter-spacing:0.02em}
+.c-bell{width:32px;height:32px;border-radius:50%;background:var(--sf);border:0.5px solid var(--bd);display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer}
+.c-bell svg{width:14px;height:14px;stroke:var(--ts);fill:none;stroke-width:2}
+.c-bell .dot{position:absolute;top:6px;right:6px;width:5px;height:5px;border-radius:50%;background:var(--ac)}
+.c-card{display:flex;gap:12px;padding:14px;background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 10%,var(--sf)),var(--sf));border:0.5px solid var(--bd);border-radius:16px;align-items:center;position:relative;overflow:hidden}
+.c-card::before{content:"";position:absolute;top:-15px;right:-15px;width:80px;height:80px;background:radial-gradient(circle,color-mix(in srgb,var(--ac) 20%,transparent),transparent 70%);pointer-events:none}
+.c-mascot{width:52px;height:52px;flex-shrink:0;position:relative;z-index:2;animation:bob 3s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-3px) rotate(3deg)}}
+.c-greeting{flex:1;min-width:0;position:relative;z-index:2}
+.c-greet-title{font-family:'Gaegu',cursive;font-size:14px;font-weight:700;color:var(--tp);letter-spacing:0.02em;line-height:1.3;margin-bottom:3px}
+.c-greet-title em{color:var(--ac);font-style:normal}
+.c-greet-sub{font-size:10.5px;color:var(--tm);line-height:1.4}
+
+/* ═══ D (A+C): 미니멀 + 맥락 인사 ═══ */
+.d-header{padding:44px 18px 10px;display:flex;align-items:center;gap:10px;border-bottom:0.5px solid var(--bd)}
+.d-menu{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ts);background:var(--sf);border:0.5px solid var(--bd)}
+.d-menu svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2}
+.d-text{flex:1;display:flex;align-items:center;gap:10px}
+.d-mascot{width:32px;height:32px;flex-shrink:0;animation:bob 3s ease-in-out infinite}
+.d-body{flex:1;min-width:0}
+.d-greet{font-family:'Gaegu',cursive;font-size:15px;font-weight:700;color:var(--tp);letter-spacing:0.02em;line-height:1.2}
+.d-greet em{color:var(--ac);font-style:normal}
+.d-sub{font-size:10.5px;color:var(--tm);margin-top:1px}
+.d-bell{width:36px;height:36px;border-radius:50%;background:var(--sf);border:0.5px solid var(--bd);display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer}
+.d-bell svg{width:16px;height:16px;stroke:var(--ts);fill:none;stroke-width:2}
+.d-bell .dot{position:absolute;top:7px;right:7px;width:6px;height:6px;border-radius:50%;background:var(--ac);border:1.5px solid var(--bg)}
+
+/* 컨텐츠 미리보기 */
+.content-preview{padding:14px 20px;color:var(--tm);font-size:11px;line-height:1.7}
+.content-row{display:flex;gap:10px;margin-bottom:12px;background:var(--sf);border-radius:14px;padding:12px;align-items:center}
+.content-cover{width:50px;height:72px;border-radius:6px;background:linear-gradient(135deg,#2d5a3f,#1a3a2a);color:#f4efe8;display:flex;align-items:flex-end;padding:5px;font-size:9px;font-weight:700;line-height:1.2;flex-shrink:0}
+.content-info{flex:1;min-width:0}
+.content-title{font-size:13px;font-weight:800;color:var(--tp);line-height:1.3;margin-bottom:2px}
+.content-author{font-size:10.5px;color:var(--tm)}
+
+/* 주석 */
+.annotation{position:absolute;font-size:9px;font-weight:700;padding:2px 6px;border-radius:6px;background:rgba(192,90,72,0.95);color:#fff;letter-spacing:0.3px;z-index:10}
+
+.note{margin:40px auto 0;padding:24px 28px;background:#FFFFFF;border:1px solid var(--bd2);border-radius:18px;color:var(--tp);font-size:12px;line-height:1.85;max-width:800px}
+.note-title{font-family:'Gaegu',cursive;font-size:17px;font-weight:700;color:var(--ac);margin-bottom:12px}
+.note h4{font-family:'Gaegu',cursive;font-size:14px;font-weight:700;color:var(--tp);letter-spacing:0.02em;margin:12px 0 6px}
+.note strong{color:var(--ac);font-weight:700}
+.note em{font-style:normal;color:#8B9A3A;font-weight:700}
+.note-height{color:var(--milestone);font-weight:800}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title">상단 헤더 · 4가지 비교</div>
+  <div class="sub">현재 문제 · A 미니멀 · B 컴팩트 · C 인사카드 · <em>D (A+C) 추천</em></div>
+
+  <div class="phones">
+
+    <!-- 현재 -->
+    <div class="phone-wrap">
+      <div class="phone-badge current">❌ 현재 (문제)</div>
+      <div class="phone">
+        <div class="current-hero">
+          <span class="annotation" style="top:10px;right:10px">높이 180px 낭비</span>
+        </div>
+        <div class="current-bottom">
+          <div class="current-profile">
+            <div class="current-avatar">🎣</div>
+            <div class="current-text">
+              <div class="current-nick">a01072748022</div>
+              <div class="current-tag">읽고, 긋고, 방긋.</div>
+              <div class="current-counts">
+                <div class="current-count"><em>0</em> 완독</div>
+                <div class="current-count"><em>1</em> 읽는 중</div>
+                <div class="current-count"><em>1</em> 위시</div>
+              </div>
+            </div>
+          </div>
+          <div class="current-actions">
+            <button class="current-action">프로필 편집</button>
+            <button class="current-iconbtn">🔍</button>
+            <button class="current-iconbtn">↗</button>
+          </div>
+        </div>
+        <div class="stat-widget">
+          <div class="stat-top">
+            <div class="stat-label">오늘 목표 · <em>30쪽</em></div>
+            <div class="stat-pct">0%</div>
+          </div>
+          <div class="stat-bar"><div class="stat-fill" style="width:0%"></div></div>
+          <div class="stat-detail">
+            <span><em>0쪽</em> 읽었어요</span>
+            <span>30쪽 남음</span>
+          </div>
+          <div class="stat-footer">
+            <span>🔥 <em>0</em>일 연속</span>
+            <span>📚 올해 <em>0</em>권</span>
+          </div>
+        </div>
+        <div class="tabs">
+          <div class="tab on">오늘</div>
+          <div class="tab">읽는 중</div>
+          <div class="tab">완독</div>
+          <div class="tab">위시</div>
+        </div>
+      </div>
+      <div class="phone-desc">블러 캔버스 + 큰 프로필 + 카운트 + 3버튼. <strong style="color:#c05a48">공간 낭비 · 중복 · 정체성 불명</strong></div>
+    </div>
+
+    <!-- A: 미니멀 -->
+    <div class="phone-wrap">
+      <div class="phone-badge">A · 완전 미니멀</div>
+      <div class="phone">
+        <div class="a-header">
+          <div class="a-menu">☰</div>
+          <div class="a-text">
+            <div class="a-greet">안녕, <em>지선</em>님</div>
+            <div class="a-sub">어제 245쪽에서 멈췄어요</div>
+          </div>
+          <div class="a-bell">
+            <svg viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 00-4-5.7V5a2 2 0 00-4 0v.3A6 6 0 006 11v3.2c0 .5-.2 1-.6 1.4L4 17h5"/></svg>
+            <div class="dot"></div>
+          </div>
+        </div>
+        <div class="stat-widget">
+          <div class="stat-top">
+            <div class="stat-label">오늘 목표 · <em>30쪽</em></div>
+            <div class="stat-pct">60%</div>
+          </div>
+          <div class="stat-bar"><div class="stat-fill"></div></div>
+          <div class="stat-detail">
+            <span><em>18쪽</em> 읽었어요</span>
+            <span>12쪽 남음</span>
+          </div>
+          <div class="stat-footer">
+            <span>🔥 <em>7</em>일 연속</span>
+            <span>📚 올해 <em>12</em> / 24권</span>
+          </div>
+        </div>
+        <div class="tabs">
+          <div class="tab on">오늘</div>
+          <div class="tab">읽는 중</div>
+          <div class="tab">완독</div>
+          <div class="tab">위시</div>
+        </div>
+        <div class="content-preview">
+          <div class="content-row">
+            <div class="content-cover">작별하지<br>않는다</div>
+            <div class="content-info">
+              <div class="content-title">작별하지 않는다</div>
+              <div class="content-author">한강 · 72%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>높이 80px</strong> · 햄버거 + 인사 + 알림. 깔끔하고 기능 집중</div>
+    </div>
+
+    <!-- B: 컴팩트 -->
+    <div class="phone-wrap">
+      <div class="phone-badge">B · 컴팩트 프로필</div>
+      <div class="phone">
+        <div class="b-header">
+          <div class="b-avatar"><div class="b-avatar-inner">🎣</div></div>
+          <div class="b-info">
+            <div class="b-row">
+              <div class="b-nick">지선</div>
+              <div class="b-nick-sub">· 7일 연속</div>
+            </div>
+            <div class="b-sub">어제 245쪽에서 멈췄어요</div>
+          </div>
+          <div class="b-actions">
+            <div class="b-action">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+            <div class="b-action">
+              <svg viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 00-4-5.7V5a2 2 0 00-4 0v.3A6 6 0 006 11v3.2c0 .5-.2 1-.6 1.4L4 17h5"/></svg>
+              <div class="dot"></div>
+            </div>
+          </div>
+        </div>
+        <div class="stat-widget">
+          <div class="stat-top">
+            <div class="stat-label">오늘 목표 · <em>30쪽</em></div>
+            <div class="stat-pct">60%</div>
+          </div>
+          <div class="stat-bar"><div class="stat-fill"></div></div>
+          <div class="stat-detail">
+            <span><em>18쪽</em> 읽었어요</span>
+            <span>12쪽 남음</span>
+          </div>
+          <div class="stat-footer">
+            <span>🔥 <em>7</em>일</span>
+            <span>📚 올해 <em>12</em> / 24권</span>
+          </div>
+        </div>
+        <div class="tabs">
+          <div class="tab on">오늘</div>
+          <div class="tab">읽는 중</div>
+          <div class="tab">완독</div>
+          <div class="tab">위시</div>
+        </div>
+        <div class="content-preview">
+          <div class="content-row">
+            <div class="content-cover">작별하지<br>않는다</div>
+            <div class="content-info">
+              <div class="content-title">작별하지 않는다</div>
+              <div class="content-author">한강 · 72%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>높이 76px</strong> · 작은 아바타 + 검색/알림. 인스타 계정 느낌 유지</div>
+    </div>
+
+    <!-- C: 인사 카드 -->
+    <div class="phone-wrap">
+      <div class="phone-badge">C · 방긋이 인사 카드</div>
+      <div class="phone">
+        <div class="c-header">
+          <div class="c-top">
+            <div class="c-logo">방긋</div>
+            <div class="c-bell">
+              <svg viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 00-4-5.7V5a2 2 0 00-4 0v.3A6 6 0 006 11v3.2c0 .5-.2 1-.6 1.4L4 17h5"/></svg>
+              <div class="dot"></div>
+            </div>
+          </div>
+          <div class="c-card">
+            <img src="/mascot-read.png" class="c-mascot" alt="">
+            <div class="c-greeting">
+              <div class="c-greet-title">안녕 <em>지선</em>님, 오늘도 한 장만 같이</div>
+              <div class="c-greet-sub">어제 245쪽에서 멈췄어요 · 72%</div>
+            </div>
+          </div>
+        </div>
+        <div class="stat-widget">
+          <div class="stat-top">
+            <div class="stat-label">오늘 목표 · <em>30쪽</em></div>
+            <div class="stat-pct">60%</div>
+          </div>
+          <div class="stat-bar"><div class="stat-fill"></div></div>
+          <div class="stat-detail">
+            <span><em>18쪽</em> 읽었어요</span>
+            <span>12쪽 남음</span>
+          </div>
+          <div class="stat-footer">
+            <span>🔥 <em>7</em>일</span>
+            <span>📚 올해 <em>12</em> / 24권</span>
+          </div>
+        </div>
+        <div class="tabs">
+          <div class="tab on">오늘</div>
+          <div class="tab">읽는 중</div>
+          <div class="tab">완독</div>
+          <div class="tab">위시</div>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>높이 110px</strong> · 방긋이 카드 인사 + 감정적 · <strong style="color:var(--milestone)">따뜻함</strong></div>
+    </div>
+
+    <!-- D: A+C 결합 -->
+    <div class="phone-wrap">
+      <div class="phone-badge recommend">💚 D · 추천 (A+C)</div>
+      <div class="phone">
+        <div class="d-header">
+          <div class="d-menu"><svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></div>
+          <div class="d-text">
+            <img src="/mascot-read.png" class="d-mascot" alt="">
+            <div class="d-body">
+              <div class="d-greet">안녕, <em>지선</em>님</div>
+              <div class="d-sub">어제 245쪽에서 멈췄어요</div>
+            </div>
+          </div>
+          <div class="d-bell">
+            <svg viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 00-4-5.7V5a2 2 0 00-4 0v.3A6 6 0 006 11v3.2c0 .5-.2 1-.6 1.4L4 17h5"/></svg>
+            <div class="dot"></div>
+          </div>
+        </div>
+        <div class="stat-widget">
+          <div class="stat-top">
+            <div class="stat-label">오늘 목표 · <em>30쪽</em></div>
+            <div class="stat-pct">60%</div>
+          </div>
+          <div class="stat-bar"><div class="stat-fill"></div></div>
+          <div class="stat-detail">
+            <span><em>18쪽</em> 읽었어요</span>
+            <span>12쪽 남음</span>
+          </div>
+          <div class="stat-footer">
+            <span>🔥 <em>7</em>일 연속</span>
+            <span>📚 올해 <em>12</em> / 24권</span>
+          </div>
+        </div>
+        <div class="tabs">
+          <div class="tab on">오늘</div>
+          <div class="tab">읽는 중</div>
+          <div class="tab">완독</div>
+          <div class="tab">위시</div>
+        </div>
+        <div class="content-preview">
+          <div class="content-row">
+            <div class="content-cover">작별하지<br>않는다</div>
+            <div class="content-info">
+              <div class="content-title">작별하지 않는다</div>
+              <div class="content-author">한강 · 72%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>높이 80px</strong> · 햄버거 + 방긋이 인사 + 알림. <strong>기능 + 감성 균형</strong></div>
+    </div>
+
+  </div>
+
+  <div class="note">
+    <div class="note-title">🎯 비교 요약</div>
+
+    <h4>❌ 현재</h4>
+    <strong style="color:#c05a48">180px 높이 낭비</strong> · 블러 캔버스 + 큰 프로필 + 카운트 + 3버튼 → 중복·정체성 불명
+
+    <h4>A · 완전 미니멀 (80px)</h4>
+    햄버거 + 인사 + 알림 · <strong>기능만</strong>. 가장 콤팩트. 감성 없음.
+
+    <h4>B · 컴팩트 프로필 (76px)</h4>
+    작은 아바타 + 이름 + 검색/알림 · <strong>인스타 계정 느낌</strong>. 개성 유지.
+
+    <h4>C · 방긋이 카드 (110px)</h4>
+    방긋 로고 + 인사 카드 · <strong>따뜻함</strong>. 매일 다르면 재방문 훅 강함.
+
+    <h4>💚 D · A+C (추천, 80px)</h4>
+    햄버거 + <strong>방긋이 소형 + 인사</strong> + 알림. <em>기능 + 감성 밸런스</em>.
+    방긋이는 가운데 32px로 작게, 매일 다른 메시지 (어제 페이지 / 내일 목표일 등).
+
+    <br><br>
+    <strong>공통점</strong>: 블러 캔버스 <span class="note-height">전부 제거</span> · 높이 <span class="note-height">100px 이상 절약</span> · 완독/위시 탭의 인스타 프로필은 유지<br>
+    <br>
+    <strong>질문</strong>: A / B / C / D 중 어느 방향이 가장 좋으세요?
+  </div>
+</div>
+</body>
+</html>

@@ -196,6 +196,25 @@ export interface ReadingSession {
   created_at: string;
 }
 
+/**
+ * 집중 읽기 세션 로그 (v9 · 뽀모도로 + 스톱워치).
+ * 기존 ReadingSession(일별 스냅샷)과 다르게, 개별 집중 블록을 저장해요.
+ */
+export type FocusMode = "pomodoro" | "stopwatch";
+
+export interface FocusSession {
+  id: string;
+  book_id: string;
+  user_id: string;
+  mode: FocusMode; // 'pomodoro' = 25분 고정, 'stopwatch' = 자유 카운트업
+  started_at: string; // ISO
+  ended_at: string | null; // ISO — 완료 또는 중단 시점
+  duration_seconds: number; // 실제 경과 (일시정지 제외)
+  pages_read_delta: number; // 이 세션 동안 읽은 쪽수
+  completed: boolean; // true = 사용자가 끝까지 완료, false = 중간 중단
+  created_at: string;
+}
+
 export const AVATAR_IMAGES = [
   { id: "hemingway",      label: "헤밍웨이",       src: "/avatars/hemingway.png" },
   { id: "woolf",          label: "버지니아 울프",   src: "/avatars/woolf.png" },

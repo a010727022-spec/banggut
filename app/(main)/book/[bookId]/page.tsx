@@ -20,7 +20,7 @@ import type { Book, Message, Scrap, Review, ReadingStatus, Diagnosis } from "@/l
 import { fetchWithAuth } from "@/lib/fetch-with-auth";
 import { useAuthStore } from "@/stores/useAuthStore";
 import Link from "next/link";
-import { ArrowLeft, Star, Camera, Eye, EyeOff, Check, RotateCcw, X, Trash2, ImagePlus, Lock, Sparkles, Pencil, BookOpen, MessageCircle, PenLine, Highlighter, Bookmark } from "lucide-react";
+import { ArrowLeft, Star, Camera, Eye, EyeOff, Check, RotateCcw, X, Trash2, ImagePlus, Lock, Sparkles, Pencil, BookOpen, MessageCircle, PenLine, Highlighter, Bookmark, Heart, Share2 } from "lucide-react";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { countMeaningfulTurns, REQUIRED_MEANINGFUL_TURNS } from "@/lib/meaningful-turns";
 import { Textarea } from "@/components/ui/textarea";
@@ -30,6 +30,8 @@ import { ko } from "date-fns/locale";
 import dynamic from "next/dynamic";
 
 const CompletionFlow = dynamic(() => import("@/components/CompletionFlow"), { ssr: false });
+const FocusSessionCard = dynamic(() => import("@/components/book-detail/FocusSessionCard"), { ssr: false });
+import LockedTabCard from "@/components/book-detail/LockedTabCard";
 
 type Tab = "scraps" | "discussion" | "review";
 
@@ -465,6 +467,14 @@ export default function BookDetailPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showUndoComplete, setShowUndoComplete] = useState(false);
+  // Sheet states
+  const [showEbookSheet, setShowEbookSheet] = useState(false);
+  const [showLibrarySheet, setShowLibrarySheet] = useState(false);
+  const [showPlanDateSheet, setShowPlanDateSheet] = useState(false);
+  const [planDateInput, setPlanDateInput] = useState("");
+  // 도서관 소장 상태
+  const [libraryHolding, setLibraryHolding] = useState<{ status: "loading" | "available" | "checked_out" | "not_owned" | "no_lib" | "no_isbn" | "error"; libName?: string | null } | null>(null);
+  const [userFavLibrary, setUserFavLibrary] = useState<{ code: string | null; name: string | null } | null>(null);
   const [showFormatPicker, setShowFormatPicker] = useState(false);
 
   // Abandon state
@@ -769,6 +779,263 @@ export default function BookDetailPage() {
     }
   }
 
+  async function handleToggleFavorite() {
+    if (!book) return;
+    const next = !book.is_favorite;
+    // Optimistic update
+    setBook({ ...book, is_favorite: next });
+    try {
+      await updateBook(supabaseRef.current, book.id, { is_favorite: next });
+      toast.success(next ? "인생책에 담았어요" : "인생책에서 뺐어요");
+    } catch {
+      // 실패 시 원복
+      setBook({ ...book, is_favorite: !next });
+      toast.error("즐겨찾기 변경에 실패했어요");
+    }
+  }
+
+  // 프로필의 자주 가는 도서관 로드
+  useEffect(() => {
+    if (!user) return;
+    const sb = createClient();
+    sb.from("profiles").select("favorite_library_code, favorite_library_name").eq("id", user.id).maybeSingle().then(({ data }) => {
+      if (data) setUserFavLibrary({ code: data.favorite_library_code, name: data.favorite_library_name });
+    });
+  }, [user]);
+
+  // 도서관 시트 열릴 때 소장 조회
+  async function checkLibraryHolding() {
+    if (!userFavLibrary?.code) {
+      setLibraryHolding({ status: "no_lib" });
+      return;
+    }
+    // ISBN 필드 없으니 context_data에서 찾거나 검색. 일단 간단히 처리.
+    const isbn = (book as Record<string, unknown> | null)?.isbn as string | undefined;
+    if (!isbn) {
+      setLibraryHolding({ status: "no_isbn", libName: userFavLibrary.name });
+      return;
+    }
+    setLibraryHolding({ status: "loading", libName: userFavLibrary.name });
+    try {
+      const res = await fetch(`/api/library-holdings?isbn13=${isbn}&libCode=${userFavLibrary.code}`);
+      const data = await res.json();
+      setLibraryHolding({ status: data.status as "available" | "checked_out" | "not_owned", libName: userFavLibrary.name });
+    } catch {
+      setLibraryHolding({ status: "error", libName: userFavLibrary.name });
+    }
+  }
+
+  // 계획일 저장
+  async function savePlanDate() {
+    if (!book) return;
+    try {
+      const updated = await updateBook(supabaseRef.current, book.id, { plan_to_start_at: planDateInput || null });
+      setBook(updated);
+      setShowPlanDateSheet(false);
+      toast.success(planDateInput ? "계획일을 저장했어요" : "계획일을 지웠어요");
+    } catch {
+      toast.error("저장에 실패했어요");
+    }
+  }
+
+  // 공통 바텀시트 렌더러 — eBook / 도서관 / 계획일
+  function renderExtraSheets() {
+    if (!book) return null;
+    const title = book.title;
+    const author = book.author || "";
+    // 각 플랫폼 검색 URL — 없으면 빈 결과 나오지만 적어도 유저가 확인 가능
+    const EBOOK_PLATFORMS: Array<{ emoji: string; name: string; type: string; url: string }> = [
+      { emoji: "📘", name: "리디북스", type: "eBook", url: `https://ridibooks.com/search?q=${encodeURIComponent(title)}` },
+      { emoji: "📖", name: "교보 eBook", type: "eBook", url: `https://search.kyobobook.co.kr/search?keyword=${encodeURIComponent(title)}&gbCode=EBK` },
+      { emoji: "📙", name: "예스24", type: "eBook", url: `https://www.yes24.com/product/search?domain=EBOOK&query=${encodeURIComponent(title)}` },
+      { emoji: "📕", name: "밀리의서재", type: "구독", url: `https://www.millie.co.kr/v3/search?keyword=${encodeURIComponent(title)}` },
+      { emoji: "🎧", name: "윌라", type: "오디오", url: `https://www.welaaa.com/search/keyword?keyword=${encodeURIComponent(title)}` },
+      { emoji: "🎙", name: "스토리텔", type: "오디오", url: `https://www.storytel.com/kr/ko/search-${encodeURIComponent(title)}` },
+    ];
+
+    return (
+      <>
+        {/* eBook 시트 */}
+        {showEbookSheet && (
+          <>
+            <div onClick={() => setShowEbookSheet(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 200 }} />
+            <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 210, background: "var(--bg)", borderRadius: "24px 24px 0 0", padding: "12px 0 34px", boxShadow: "0 -8px 24px rgba(0,0,0,0.15)", maxHeight: "85vh", overflow: "auto" }}>
+              <div style={{ width: 36, height: 4, background: "var(--bd2)", borderRadius: 100, margin: "0 auto 16px" }} />
+              <div style={{ fontFamily: "'Gaegu', cursive", fontSize: 18, fontWeight: 700, color: "var(--tp)", letterSpacing: "0.02em", textAlign: "center", marginBottom: 6 }}>어디서 읽을까요?</div>
+              <div style={{ fontSize: 12, color: "var(--tm)", textAlign: "center", marginBottom: 4, padding: "0 20px" }}>각 플랫폼에서 <strong style={{ color: "var(--tp)" }}>{title}</strong> 을(를) 검색해드려요</div>
+              <div style={{ fontSize: 11, color: "var(--tm)", textAlign: "center", marginBottom: 16, opacity: 0.75 }}>※ 플랫폼에 없을 수도 있어요</div>
+              <div style={{ padding: "0 16px" }}>
+                {EBOOK_PLATFORMS.map((p) => (
+                  <a
+                    key={p.name}
+                    href={p.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setShowEbookSheet(false)}
+                    style={{ display: "flex", alignItems: "center", gap: 14, padding: "13px 16px", borderRadius: 16, background: "var(--sf)", border: "0.5px solid var(--bd)", marginBottom: 8, textDecoration: "none", transition: "all 0.15s" }}
+                  >
+                    <div style={{ width: 42, height: 42, borderRadius: 14, background: "var(--sf2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>{p.emoji}</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: "var(--tp)", lineHeight: 1.2 }}>{p.name}<span style={{ fontSize: 10, fontWeight: 600, color: "var(--tm)", marginLeft: 6 }}>· {p.type}</span></div>
+                      <div style={{ fontSize: 11, color: "var(--tm)", marginTop: 2 }}>{p.name}에서 검색</div>
+                    </div>
+                    <div style={{ fontSize: 14, color: "var(--tm)" }}>→</div>
+                  </a>
+                ))}
+              </div>
+              {/* 폴백: 통합 검색 (네이버 책) */}
+              <div style={{ padding: "4px 16px 0", marginTop: 10, borderTop: "0.5px solid var(--bd)" }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: "var(--tm)", letterSpacing: "0.5px", padding: "14px 4px 8px" }}>위에 없으면</div>
+                <a
+                  href={`https://search.naver.com/search.naver?query=${encodeURIComponent(title + " " + author + " 전자책")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setShowEbookSheet(false)}
+                  style={{ display: "flex", alignItems: "center", gap: 14, padding: "13px 16px", borderRadius: 16, background: "color-mix(in srgb, var(--ac) 8%, var(--bg))", border: "0.5px solid color-mix(in srgb, var(--ac) 30%, transparent)", textDecoration: "none" }}
+                >
+                  <div style={{ width: 42, height: 42, borderRadius: 14, background: "color-mix(in srgb, var(--ac) 15%, var(--bg))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🔍</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ac)", lineHeight: 1.2 }}>네이버 통합검색</div>
+                    <div style={{ fontSize: 11, color: "var(--tm)", marginTop: 2 }}>다른 플랫폼도 한 번에 찾기</div>
+                  </div>
+                  <div style={{ fontSize: 14, color: "var(--ac)" }}>→</div>
+                </a>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* 도서관 시트 */}
+        {showLibrarySheet && (
+          <>
+            <div onClick={() => setShowLibrarySheet(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 200 }} />
+            <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 210, background: "var(--bg)", borderRadius: "24px 24px 0 0", padding: "12px 0 34px", boxShadow: "0 -8px 24px rgba(0,0,0,0.15)" }}>
+              <div style={{ width: 36, height: 4, background: "var(--bd2)", borderRadius: 100, margin: "0 auto 16px" }} />
+              <div style={{ fontFamily: "'Gaegu', cursive", fontSize: 18, fontWeight: 700, color: "var(--tp)", letterSpacing: "0.02em", textAlign: "center", marginBottom: 16 }}>도서관에 있나요?</div>
+              <div style={{ padding: "0 20px" }}>
+                {!userFavLibrary?.code ? (
+                  <div style={{ textAlign: "center", padding: "20px 0" }}>
+                    <div style={{ fontSize: 13, color: "var(--tp)", lineHeight: 1.6, marginBottom: 14 }}>
+                      자주 가는 도서관을 먼저<br />
+                      프로필에서 설정해 주세요
+                    </div>
+                    <button
+                      onClick={() => { setShowLibrarySheet(false); router.push("/profile"); }}
+                      style={{ padding: "10px 22px", borderRadius: 100, background: "var(--ac)", color: "var(--acc)", fontSize: 13, fontWeight: 700, border: "none", cursor: "pointer" }}
+                    >
+                      도서관 설정하러 가기
+                    </button>
+                  </div>
+                ) : libraryHolding === null ? (
+                  <div style={{ textAlign: "center", padding: "16px 0" }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--tp)", marginBottom: 4 }}>{userFavLibrary.name}</div>
+                    <div style={{ fontSize: 12, color: "var(--tm)", marginBottom: 16 }}>이 책이 있는지 확인해볼게요</div>
+                    <button
+                      onClick={checkLibraryHolding}
+                      style={{ padding: "12px 22px", borderRadius: 100, background: "var(--ac)", color: "var(--acc)", fontSize: 13, fontWeight: 700, border: "none", cursor: "pointer" }}
+                    >
+                      소장 여부 확인
+                    </button>
+                  </div>
+                ) : libraryHolding.status === "loading" ? (
+                  <div style={{ textAlign: "center", padding: "24px 0", fontSize: 13, color: "var(--tm)" }}>조회 중...</div>
+                ) : libraryHolding.status === "no_isbn" ? (
+                  <div style={{ textAlign: "center", padding: "20px 0", fontSize: 13, color: "var(--tm)" }}>
+                    이 책의 ISBN 정보가 없어 조회할 수 없어요
+                  </div>
+                ) : libraryHolding.status === "error" ? (
+                  <div style={{ textAlign: "center", padding: "20px 0", fontSize: 13, color: "var(--tm)" }}>조회에 실패했어요</div>
+                ) : (
+                  <div style={{ textAlign: "center", padding: "20px 0" }}>
+                    <div style={{ fontSize: 14, color: "var(--tm)", marginBottom: 6 }}>{libraryHolding.libName}</div>
+                    {libraryHolding.status === "available" && (
+                      <>
+                        <div style={{ fontSize: 22, fontWeight: 800, color: "var(--ac)", marginBottom: 4 }}>✓ 지금 빌릴 수 있어요</div>
+                        <div style={{ fontSize: 12, color: "var(--tm)" }}>도서관에 가면 바로 대출 가능해요</div>
+                      </>
+                    )}
+                    {libraryHolding.status === "checked_out" && (
+                      <>
+                        <div style={{ fontSize: 22, fontWeight: 800, color: "var(--milestone)", marginBottom: 4 }}>📚 대출 중</div>
+                        <div style={{ fontSize: 12, color: "var(--tm)" }}>예약은 도서관 사이트에서 할 수 있어요</div>
+                      </>
+                    )}
+                    {libraryHolding.status === "not_owned" && (
+                      <>
+                        <div style={{ fontSize: 20, fontWeight: 700, color: "var(--tm)", marginBottom: 4 }}>이 도서관엔 없어요</div>
+                        <div style={{ fontSize: 12, color: "var(--tm)" }}>다른 방법으로 찾아볼까요</div>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* 계획일 시트 */}
+        {showPlanDateSheet && (
+          <>
+            <div onClick={() => setShowPlanDateSheet(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 200 }} />
+            <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 210, background: "var(--bg)", borderRadius: "24px 24px 0 0", padding: "12px 20px 34px", boxShadow: "0 -8px 24px rgba(0,0,0,0.15)" }}>
+              <div style={{ width: 36, height: 4, background: "var(--bd2)", borderRadius: 100, margin: "0 auto 16px" }} />
+              <div style={{ fontFamily: "'Gaegu', cursive", fontSize: 18, fontWeight: 700, color: "var(--tp)", letterSpacing: "0.02em", textAlign: "center", marginBottom: 8 }}>언제부터 읽을까요?</div>
+              <div style={{ fontSize: 12, color: "var(--tm)", textAlign: "center", marginBottom: 16 }}>그날이 오면 방긋이가 알려드릴게요</div>
+              <input
+                type="date"
+                value={planDateInput}
+                onChange={(e) => setPlanDateInput(e.target.value)}
+                min={new Date().toISOString().slice(0, 10)}
+                style={{ width: "100%", height: 48, padding: "0 18px", borderRadius: 16, border: "1px solid var(--bd2)", background: "var(--sf)", color: "var(--tp)", fontSize: 14, outline: "none", fontFamily: "inherit", marginBottom: 12 }}
+              />
+              <div style={{ display: "flex", gap: 8 }}>
+                {planDateInput && (
+                  <button
+                    onClick={() => { setPlanDateInput(""); savePlanDate(); }}
+                    style={{ flex: 1, height: 46, borderRadius: 100, background: "var(--sf)", border: "0.5px solid var(--bd)", color: "var(--tm)", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
+                  >
+                    지우기
+                  </button>
+                )}
+                <button
+                  onClick={savePlanDate}
+                  style={{ flex: 2, height: 46, borderRadius: 100, background: "var(--ac)", color: "var(--acc)", fontSize: 14, fontWeight: 700, border: "none", cursor: "pointer" }}
+                >
+                  저장
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+      </>
+    );
+  }
+
+  async function handleShare() {
+    if (!book || !user) return;
+    // 같이 읽자 초대 링크 — 인비테이션 페이지로 연결
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const url = `${origin}/invite/${book.id}?from=${user.id}`;
+    const title = `방긋 · ${book.title}`;
+    const statusText =
+      book.reading_status === "want_to_read"
+        ? "궁금해 하고 있어요. 같이 읽어요"
+        : book.reading_status === "finished"
+        ? "정말 좋았어요. 같이 이야기해요"
+        : "같이 읽고 있어요";
+    const text = `${book.title}${book.author ? ` · ${book.author}` : ""}\n방긋에서 ${statusText} 📖`;
+    try {
+      if (typeof navigator !== "undefined" && "share" in navigator) {
+        await (navigator as Navigator & { share: (data: ShareData) => Promise<void> }).share({ title, text, url });
+      } else if (typeof navigator !== "undefined" && (navigator as Navigator).clipboard) {
+        await (navigator as Navigator).clipboard.writeText(`${text}\n${url}`);
+        toast.success("같이 읽자고 보낼 링크를 복사했어요");
+      }
+    } catch {
+      // 사용자가 공유 취소 — 조용히
+    }
+  }
+
   /* ── Loading / Not found ── */
 
   if (isLoading) {
@@ -801,10 +1068,17 @@ export default function BookDetailPage() {
       ? Math.min(100, Math.round((book.current_page / book.total_pages) * 100))
       : 0);
 
-  const tabs: { key: Tab; label: string; count?: number }[] = [
+  // 읽는 중에는 토론/서평이 잠겨 있어요 (v8 완독 후 해금 패턴)
+  const isReviewUnlocked = book.reading_status === "finished";
+  const tabs: { key: Tab; label: string; count?: number; locked?: boolean }[] = [
     { key: "scraps", label: "스크랩", count: scraps.length },
-    { key: "discussion", label: "토론", count: messages.length },
-    { key: "review", label: "서평" },
+    {
+      key: "discussion",
+      label: "토론",
+      count: isReviewUnlocked ? messages.length : undefined,
+      locked: !isReviewUnlocked,
+    },
+    { key: "review", label: "서평", locked: !isReviewUnlocked },
   ];
 
   const startedDaysAgo = book.started_at
@@ -931,34 +1205,50 @@ export default function BookDetailPage() {
     return (
       <div style={{ minHeight: "100vh", background: "var(--bg)", paddingBottom: 100, transition: "background 0.4s" }}>
 
-        {/* ═══ WISH HERO ═══ */}
+        {/* ═══ WISH HERO — 테마 친화 ═══ */}
         <div style={{ position: "relative", overflow: "hidden" }}>
-          {/* 블러 배경 */}
-          {book.cover_url && (
-            <div style={{ position: "absolute", inset: -20, width: "calc(100% + 40px)", height: "calc(100% + 40px)" }}>
-              <img src={book.cover_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", filter: "blur(30px) brightness(0.25)", opacity: 0.8 }} />
-            </div>
-          )}
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, var(--bg) 0%, rgba(12,15,13,0.4) 60%, rgba(12,15,13,0.2) 100%)", transition: "background 0.4s" }} />
+          {/* 은은한 민트 글로우 (블러 대신) */}
+          <div style={{
+            position: "absolute",
+            top: -40,
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: 340,
+            height: 340,
+            borderRadius: "50%",
+            background: "radial-gradient(circle, color-mix(in srgb, var(--ac) 18%, transparent) 0%, transparent 70%)",
+            pointerEvents: "none",
+          }} />
 
           {/* 상단 네비 */}
           <div style={{ position: "relative", zIndex: 10, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 18px 0" }}>
-            <button onClick={() => router.back()} style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(0,0,0,0.42)", backdropFilter: "blur(12px)", border: "0.5px solid rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-              <ArrowLeft size={16} color="rgba(255,255,255,0.85)" strokeWidth={2.2} />
+            <button
+              onClick={() => router.back()}
+              style={{ width: 40, height: 40, borderRadius: "50%", background: "var(--sf)", border: "0.5px solid var(--bd)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}
+            >
+              <ArrowLeft size={16} color="var(--ts)" strokeWidth={2} />
             </button>
             <div style={{ display: "flex", gap: 8 }}>
-              <button style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(0,0,0,0.42)", backdropFilter: "blur(12px)", border: "0.5px solid rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-                <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth={2.2}><circle cx={18} cy={5} r={3}/><circle cx={6} cy={12} r={3}/><circle cx={18} cy={19} r={3}/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              <button
+                onClick={handleShare}
+                aria-label="공유"
+                style={{ width: 40, height: 40, borderRadius: "50%", background: "var(--sf)", border: "0.5px solid var(--bd)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}
+              >
+                <Share2 size={15} color="var(--ts)" strokeWidth={2} />
               </button>
-              <button style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(0,0,0,0.42)", backdropFilter: "blur(12px)", border: "0.5px solid rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-                <svg width={16} height={16} viewBox="0 0 24 24" fill="rgba(255,255,255,0.85)" stroke="rgba(255,255,255,0.85)" strokeWidth={1.5}><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+              <button
+                onClick={handleToggleFavorite}
+                aria-label="즐겨찾기"
+                style={{ width: 40, height: 40, borderRadius: "50%", background: book.is_favorite ? "color-mix(in srgb, var(--ac) 12%, var(--bg))" : "var(--sf)", border: `0.5px solid ${book.is_favorite ? "var(--ac)" : "var(--bd)"}`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 6px rgba(0,0,0,0.04)", transition: "all 0.2s" }}
+              >
+                <Heart size={15} color={book.is_favorite ? "var(--ac)" : "var(--ts)"} strokeWidth={2} fill={book.is_favorite ? "var(--ac)" : "none"} />
               </button>
             </div>
           </div>
 
           {/* 센터 커버 */}
-          <div style={{ position: "relative", zIndex: 5, display: "flex", justifyContent: "center", padding: "24px 0 20px" }}>
-            <div style={{ width: 130, height: 190, borderRadius: 10, overflow: "hidden", boxShadow: "0 12px 40px rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.08)" }}>
+          <div style={{ position: "relative", zIndex: 5, display: "flex", justifyContent: "center", padding: "28px 0 20px" }}>
+            <div style={{ width: 130, height: 190, borderRadius: 10, overflow: "hidden", boxShadow: "0 16px 40px color-mix(in srgb, var(--ac) 18%, rgba(0,0,0,0.12))", border: "0.5px solid var(--bd)" }}>
               {book.cover_url ? (
                 <img src={book.cover_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               ) : (
@@ -969,14 +1259,51 @@ export default function BookDetailPage() {
             </div>
           </div>
 
-          {/* 타이틀 영역 */}
+          {/* 타이틀 영역 — 테마 텍스트 */}
           <div style={{ position: "relative", zIndex: 5, textAlign: "center", padding: "0 24px 24px" }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "4px 12px", borderRadius: 100, fontSize: 10, fontWeight: 800, marginBottom: 10, background: "rgba(200,160,48,0.85)", color: "#1a1000" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "4px 12px", borderRadius: 100, fontSize: 10, fontWeight: 700, marginBottom: 12, background: "color-mix(in srgb, var(--milestone) 18%, var(--bg))", color: "var(--milestone)", border: "0.5px solid color-mix(in srgb, var(--milestone) 40%, transparent)" }}>
               <Bookmark size={10} strokeWidth={2.5} />
               위시리스트
             </div>
-            <div style={{ fontSize: 20, fontWeight: 800, color: "#fff", letterSpacing: "-0.5px", lineHeight: 1.3, textShadow: "0 2px 12px rgba(0,0,0,0.6)", marginBottom: 6, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{book.title}</div>
-            {book.author && <div style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{book.author}{book.genre ? ` · ${book.genre.split(">")[0]?.trim()}` : ""}</div>}
+            <div style={{ fontSize: 22, fontWeight: 800, color: "var(--tp)", letterSpacing: "-0.5px", lineHeight: 1.3, marginBottom: 6, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{book.title}</div>
+            {book.author && <div style={{ fontSize: 12, color: "var(--tm)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{book.author}{book.genre ? ` · ${book.genre.split(">")[0]?.trim()}` : ""}</div>}
+
+            {/* 계획일 뱃지 (편집 가능) */}
+            <button
+              onClick={() => {
+                setPlanDateInput(book.plan_to_start_at || "");
+                setShowPlanDateSheet(true);
+              }}
+              style={{
+                marginTop: 12,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 5,
+                padding: "5px 12px",
+                borderRadius: 100,
+                fontSize: 11,
+                fontWeight: 700,
+                background: book.plan_to_start_at ? "color-mix(in srgb, var(--ac) 10%, var(--bg))" : "var(--sf)",
+                color: book.plan_to_start_at ? "var(--ac)" : "var(--tm)",
+                border: `1px dashed ${book.plan_to_start_at ? "color-mix(in srgb, var(--ac) 40%, transparent)" : "var(--bd2)"}`,
+                cursor: "pointer",
+              }}
+            >
+              {book.plan_to_start_at ? (
+                (() => {
+                  const date = new Date(book.plan_to_start_at);
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+                  const days = Math.ceil((date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+                  if (days <= 0) return "📖 지금 시작해볼까요?";
+                  if (days === 1) return `📅 내일부터 시작 · ${date.getMonth() + 1}/${date.getDate()}`;
+                  if (days <= 7) return `📅 ${days}일 뒤 · ${date.getMonth() + 1}/${date.getDate()}`;
+                  return `📅 ${date.getMonth() + 1}/${date.getDate()}부터`;
+                })()
+              ) : (
+                "📅 언제부터 읽을까요?"
+              )}
+            </button>
           </div>
         </div>
 
@@ -1010,14 +1337,18 @@ export default function BookDetailPage() {
             style={{ flex: 1, padding: "10px 0", borderRadius: 10, border: "0.5px solid var(--bd2)", background: "var(--sf)", fontSize: 11, fontWeight: 700, color: "var(--ac2)", textAlign: "center", textDecoration: "none", cursor: "pointer", transition: "all 0.2s" }}>
             알라딘 구매
           </a>
-          <a href={`https://search.kyobobook.co.kr/search?keyword=${encodeURIComponent(book.title)}&gbCode=EBK`} target="_blank" rel="noopener noreferrer"
-            style={{ flex: 1, padding: "10px 0", borderRadius: 10, border: "0.5px solid var(--bd2)", background: "var(--sf)", fontSize: 11, fontWeight: 700, color: "var(--ac2)", textAlign: "center", textDecoration: "none", cursor: "pointer", transition: "all 0.2s" }}>
+          <button
+            onClick={() => setShowEbookSheet(true)}
+            style={{ flex: 1, padding: "10px 0", borderRadius: 10, border: "0.5px solid var(--bd2)", background: "var(--sf)", fontSize: 11, fontWeight: 700, color: "var(--ac2)", textAlign: "center", cursor: "pointer", transition: "all 0.2s" }}
+          >
             eBook
-          </a>
-          <a href={`https://www.nl.go.kr/seoji/contents/S80100000000.do?schM=intgr_detail_view_isbn&page=1&schStr=${encodeURIComponent(book.title)}`} target="_blank" rel="noopener noreferrer"
-            style={{ flex: 1, padding: "10px 0", borderRadius: 10, border: "0.5px solid var(--bd2)", background: "var(--sf)", fontSize: 11, fontWeight: 700, color: "var(--ac2)", textAlign: "center", textDecoration: "none", cursor: "pointer", transition: "all 0.2s" }}>
+          </button>
+          <button
+            onClick={() => setShowLibrarySheet(true)}
+            style={{ flex: 1, padding: "10px 0", borderRadius: 10, border: "0.5px solid var(--bd2)", background: "var(--sf)", fontSize: 11, fontWeight: 700, color: "var(--ac2)", textAlign: "center", cursor: "pointer", transition: "all 0.2s" }}
+          >
             도서관
-          </a>
+          </button>
         </div>
 
         {/* ═══ 탭 + 콘텐츠 ═══ */}
@@ -1063,38 +1394,59 @@ export default function BookDetailPage() {
             </div>
           </>
         )}
+
+        {renderExtraSheets()}
       </div>
     );
   }
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", paddingBottom: 100, transition: "background 0.4s" }}>
+      {renderExtraSheets()}
 
-      {/* ═══ HERO (HTML .book-hero, 280px) ═══ */}
+      {/* ═══ HERO — 테마 친화 (280px) ═══ */}
       <div style={{ position: "relative", height: 280, overflow: "hidden" }}>
-        {book.cover_url && (
-          <img src={book.cover_url} alt="" style={{ position: "absolute", inset: -20, width: "calc(100% + 40px)", height: "calc(100% + 40px)", objectFit: "cover", filter: "blur(30px) brightness(0.25)", opacity: 0.7 }} />
-        )}
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, var(--bg) 0%, rgba(12,15,13,0.55) 50%, rgba(12,15,13,0.35) 100%)", transition: "background 0.4s" }} />
+        {/* 은은한 민트 글로우 */}
+        <div style={{
+          position: "absolute",
+          top: -40,
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: 380,
+          height: 280,
+          background: "radial-gradient(ellipse at center, color-mix(in srgb, var(--ac) 14%, transparent) 0%, transparent 65%)",
+          pointerEvents: "none",
+        }} />
 
         {/* 상단 네비 */}
         <div style={{ position: "absolute", top: 14, left: 0, right: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 18px", zIndex: 10 }}>
-          <button onClick={() => router.back()} style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(0,0,0,0.42)", backdropFilter: "blur(12px)", border: "0.5px solid rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-            <ArrowLeft size={16} color="rgba(255,255,255,0.85)" strokeWidth={2.2} />
+          <button onClick={() => router.back()} style={{ width: 40, height: 40, borderRadius: "50%", background: "var(--sf)", border: "0.5px solid var(--bd)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}>
+            <ArrowLeft size={16} color="var(--ts)" strokeWidth={2} />
           </button>
           <div style={{ display: "flex", gap: 8 }}>
-            <button style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(0,0,0,0.42)", backdropFilter: "blur(12px)", border: "0.5px solid rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-              <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth={2.2}><circle cx={18} cy={5} r={3}/><circle cx={6} cy={12} r={3}/><circle cx={18} cy={19} r={3}/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            <button
+              onClick={handleShare}
+              aria-label="공유"
+              style={{ width: 40, height: 40, borderRadius: "50%", background: "var(--sf)", border: "0.5px solid var(--bd)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}
+            >
+              <Share2 size={15} color="var(--ts)" strokeWidth={2} />
             </button>
-            <button onClick={() => setShowDeleteConfirm(true)} style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(0,0,0,0.42)", backdropFilter: "blur(12px)", border: "0.5px solid rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-              <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth={2.2}><circle cx={12} cy={12} r={1}/><circle cx={19} cy={12} r={1}/><circle cx={5} cy={12} r={1}/></svg>
+            <button
+              onClick={handleToggleFavorite}
+              aria-label="즐겨찾기"
+              style={{ width: 40, height: 40, borderRadius: "50%", background: book.is_favorite ? "color-mix(in srgb, var(--ac) 12%, var(--bg))" : "var(--sf)", border: `0.5px solid ${book.is_favorite ? "var(--ac)" : "var(--bd)"}`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 6px rgba(0,0,0,0.04)", transition: "all 0.2s" }}
+            >
+              <Heart size={15} color={book.is_favorite ? "var(--ac)" : "var(--ts)"} strokeWidth={2} fill={book.is_favorite ? "var(--ac)" : "none"} />
+            </button>
+            <button onClick={() => setShowDeleteConfirm(true)} aria-label="더 보기" style={{ width: 40, height: 40, borderRadius: "50%", background: "var(--sf)", border: "0.5px solid var(--bd)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}>
+              <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="var(--ts)" strokeWidth={2}><circle cx={12} cy={12} r={1}/><circle cx={19} cy={12} r={1}/><circle cx={5} cy={12} r={1}/></svg>
             </button>
           </div>
         </div>
 
         {/* 모임 필 */}
         {book.group_book_id && (
-          <div style={{ position: "absolute", top: 58, left: 18, zIndex: 10, display: "flex", alignItems: "center", gap: 5, background: "rgba(0,0,0,0.42)", backdropFilter: "blur(12px)", border: "0.5px solid rgba(107,158,138,0.38)", borderRadius: 100, padding: "5px 11px", fontSize: 10, fontWeight: 800, color: "var(--ac2)", cursor: "pointer" }}>
+          <div style={{ position: "absolute", top: 58, left: 18, zIndex: 10, display: "flex", alignItems: "center", gap: 5, background: "rgba(0,0,0,0.42)", backdropFilter: "blur(12px)", border: "0.5px solid color-mix(in srgb, var(--ac2) 38%, transparent)", borderRadius: 100, padding: "5px 11px", fontSize: 10, fontWeight: 800, color: "var(--ac2)", cursor: "pointer" }}>
             <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#4ade80", animation: "pulseDot 1.4s infinite" }} />
             {book.group_books?.reading_groups?.name || "모임"}
           </div>
@@ -1136,60 +1488,23 @@ export default function BookDetailPage() {
             <PenLine size={14} strokeWidth={2.5} />
             문장 긋기
           </button>
-          <button onClick={() => setActiveTab("review")} style={{ flex: 1, padding: "10px 0", borderRadius: 12, border: "0.5px solid var(--bd2)", background: "var(--sf)", fontSize: 12, fontWeight: 700, color: "var(--ac2)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, transition: "all 0.2s" }}>
-            <PenLine size={14} strokeWidth={2.5} />
+          <button
+            onClick={() => toast("완독 후 서평이 열려요", { description: "감상을 서두르지 않고, 책과 나 둘만의 시간을 먼저 쌓아볼게요" })}
+            aria-disabled="true"
+            style={{ flex: 1, padding: "10px 0", borderRadius: 12, border: "0.5px solid var(--bd)", background: "var(--sf2)", fontSize: 12, fontWeight: 700, color: "var(--tm)", cursor: "default", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, transition: "all 0.2s", opacity: 0.62 }}
+          >
+            <Lock size={12} strokeWidth={2.5} />
             서평 쓰기
           </button>
         </div>
       )}
 
-      {/* ═══ 진행률 섹션 (HTML .prog-section) ═══ */}
-      {book.reading_status === "reading" && (
-        <div style={{ margin: "4px 18px 12px", background: "var(--sf)", borderRadius: 16, border: "0.5px solid var(--bd)", overflow: "hidden", transition: "all 0.4s" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "13px 14px 10px" }}>
-            <span style={{ fontSize: 10, fontWeight: 800, color: "var(--tm)", letterSpacing: "1px", textTransform: "uppercase", transition: "color 0.4s" }}>나의 진행률</span>
-            <span style={{ fontSize: 22, fontWeight: 800, color: "var(--ac)", letterSpacing: "-1px", transition: "color 0.4s" }}>{progressPercent}%</span>
-          </div>
-          <div style={{ height: 6, background: "var(--sf3)", borderRadius: 3, overflow: "hidden", margin: "0 14px", transition: "background 0.4s" }}>
-            <div style={{ height: "100%", borderRadius: 3, background: "linear-gradient(90deg, var(--ac), var(--ac2))", width: `${progressPercent}%`, transition: "width 0.6s cubic-bezier(0.22,1,0.36,1), background 0.4s" }} />
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", borderTop: "0.5px solid var(--bd)", marginTop: 10, transition: "border-color 0.4s" }}>
-            <div style={{ padding: "10px 0", textAlign: "center", borderRight: "0.5px solid var(--bd)", transition: "border-color 0.4s" }}>
-              <div style={{ fontSize: 15, fontWeight: 800, color: "var(--tp)", letterSpacing: "-0.5px", transition: "color 0.4s" }}>{book.current_page || 0}<span style={{ fontSize: 9, fontWeight: 500, color: "var(--tm)", marginLeft: 1 }}>p</span></div>
-              <div style={{ fontSize: 9, fontWeight: 700, color: "var(--tm)", textTransform: "uppercase", letterSpacing: "0.5px", marginTop: 2, transition: "color 0.4s" }}>현재 페이지</div>
-            </div>
-            <div style={{ padding: "10px 0", textAlign: "center", borderRight: "0.5px solid var(--bd)", transition: "border-color 0.4s" }}>
-              <div style={{ fontSize: 15, fontWeight: 800, color: "var(--tp)", letterSpacing: "-0.5px", transition: "color 0.4s" }}>{book.total_pages || 0}<span style={{ fontSize: 9, fontWeight: 500, color: "var(--tm)", marginLeft: 1 }}>p</span></div>
-              <div style={{ fontSize: 9, fontWeight: 700, color: "var(--tm)", textTransform: "uppercase", letterSpacing: "0.5px", marginTop: 2, transition: "color 0.4s" }}>전체 페이지</div>
-            </div>
-            <div style={{ padding: "10px 0", textAlign: "center" }}>
-              <div style={{ fontSize: 15, fontWeight: 800, color: "var(--tp)", letterSpacing: "-0.5px", transition: "color 0.4s" }}>{startedDaysAgo}<span style={{ fontSize: 9, fontWeight: 500, color: "var(--tm)", marginLeft: 1 }}>일</span></div>
-              <div style={{ fontSize: 9, fontWeight: 700, color: "var(--tm)", textTransform: "uppercase", letterSpacing: "0.5px", marginTop: 2, transition: "color 0.4s" }}>읽은 기간</div>
-            </div>
-          </div>
-          {/* 슬라이더 업데이트 */}
-          <div style={{ padding: "10px 14px", borderTop: "0.5px solid var(--bd)", transition: "border-color 0.4s" }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: "var(--tm)", marginBottom: 8, transition: "color 0.4s" }}>오늘 어디까지 읽었나요?</div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <input type="range" min={0} max={book.total_pages || 100}
-                value={todayPageInput || book.current_page || 0}
-                onChange={(e) => setTodayPageInput(e.target.value)}
-                style={{ flex: 1, height: 4, appearance: "none", background: "var(--sf3)", borderRadius: 2, outline: "none", cursor: "pointer", accentColor: "var(--ac)" }} />
-              <input type="text" value={todayPageInput}
-                onChange={(e) => setTodayPageInput(e.target.value)}
-                style={{ width: 52, background: "var(--sf2)", border: "0.5px solid var(--bd2)", borderRadius: 8, padding: "5px 8px", fontSize: 12, fontWeight: 700, color: "var(--tp)", textAlign: "center", outline: "none", transition: "all 0.4s" }} />
-              <button onClick={() => {
-                const val = parseInt(todayPageInput);
-                if (!val || val <= 0) return;
-                if (isEbook) saveField({ progress_percent: Math.min(val, 100) });
-                else saveField({ current_page: Math.min(val, book.total_pages || 99999) });
-              }} style={{ padding: "6px 14px", background: "var(--ac)", color: "var(--acc)", borderRadius: 100, fontSize: 11, fontWeight: 800, border: "none", cursor: "pointer", transition: "all 0.15s" }}>저장</button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* 위시 읽기시작은 early return에서 처리 */}
+
+      {/* ═══ 집중 읽기 카드 (v6 refined: 진행률 · 오늘 쌓은 시간 · ETA 통합) ═══ */}
+      {book.reading_status === "reading" && user?.id && (
+        <FocusSessionCard book={book} userId={user.id} />
+      )}
 
       {/* ── 상태별 액션 버튼 ── */}
       {book.reading_status === "reading" && (
@@ -1668,12 +1983,18 @@ export default function BookDetailPage() {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`flex-1 text-sm font-semibold py-2.5 transition-all ${
+              aria-disabled={tab.locked ? "true" : undefined}
+              className={`flex-1 text-sm font-semibold py-2.5 transition-all inline-flex items-center justify-center gap-1 ${
                 activeTab === tab.key
                   ? "border-b-2 border-ink-green text-ink-green"
+                  : tab.locked
+                  ? "text-warmgray/60"
                   : "text-warmgray"
               }`}
             >
+              {tab.locked && (
+                <Lock size={11} strokeWidth={2.4} className="opacity-70" />
+              )}
               {tab.label}
               {tab.count !== undefined && tab.count > 0 && (
                 <span className="ml-1 text-[11px] bg-ink-green/10 text-ink-green rounded-full px-1.5 py-0.5">
@@ -1697,26 +2018,34 @@ export default function BookDetailPage() {
           />
         )}
         {activeTab === "discussion" && (
-          <DiscussionTab
-            bookId={bookId}
-            messages={messages}
-            scrapsCount={scraps.length}
-            contextStatus={contextStatus}
-            contextData={book?.context_data}
-          />
+          isReviewUnlocked ? (
+            <DiscussionTab
+              bookId={bookId}
+              messages={messages}
+              scrapsCount={scraps.length}
+              contextStatus={contextStatus}
+              contextData={book?.context_data}
+            />
+          ) : (
+            <LockedTabCard kind="discussion" />
+          )
         )}
         {activeTab === "review" && (
-          <ReviewTab
-            bookId={bookId}
-            review={review}
-            messages={messages}
-            rating={rating}
-            oneLiner={oneLiner}
-            onRatingChange={handleRatingChange}
-            onOneLinerChange={setOneLiner}
-            onOneLinerBlur={handleOneLinerBlur}
-            onReviewDeleted={() => setReview(null)}
-          />
+          isReviewUnlocked ? (
+            <ReviewTab
+              bookId={bookId}
+              review={review}
+              messages={messages}
+              rating={rating}
+              oneLiner={oneLiner}
+              onRatingChange={handleRatingChange}
+              onOneLinerChange={setOneLiner}
+              onOneLinerBlur={handleOneLinerBlur}
+              onReviewDeleted={() => setReview(null)}
+            />
+          ) : (
+            <LockedTabCard kind="review" />
+          )
         )}
       </div>
 

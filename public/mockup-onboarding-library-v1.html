@@ -1,0 +1,1527 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>완독콩 · Onboarding · 서재 스타일 선택 v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet" />
+
+<style>
+  :root,
+  :root[data-theme="mint"] {
+    /* ── Fresh Mint ────────────── */
+    --cream: #F7F3ED;
+    --cream-sub: #EFE8DB;
+    --paper: #FFFFFF;
+    --mint: #5FA48E;
+    --mint-deep: #3F7A66;
+    --mint-soft: #CDE4DB;
+    --peach: #F4C8A8;
+    --peach-deep: #C78A5B;
+    --ink: #1E1B16;
+    --ink-sub: #5A5348;
+    --ink-mute: #8E8778;
+    --line: rgba(30, 27, 22, 0.08);
+    --line-strong: rgba(30, 27, 22, 0.16);
+    --shadow: 0 2px 12px rgba(30, 27, 22, 0.06), 0 8px 28px rgba(30, 27, 22, 0.04);
+    --radius: 18px;
+
+    --page-bg: #1C1814;
+    --page-text: #EDE5D4;
+    --page-kicker: #B5A989;
+    --page-body: #9E9478;
+
+    --hero-glow: rgba(95, 164, 142, 0.12);
+    --mascot-shadow-sm: 0 3px 6px rgba(95, 164, 142, 0.22);
+    --mascot-shadow-lg: 0 10px 16px rgba(63, 122, 102, 0.28);
+  }
+
+  :root[data-theme="blackbeige"] {
+    /* ── Chic Black Beige (v5.3) ── */
+    --cream: #FBF5E0;
+    --cream-sub: #F3E8CA;
+    --paper: #FEFBEE;
+    --mint: #0F0E0C;
+    --mint-deep: #8A6B42;
+    --mint-soft: #E1D4B2;
+    --peach: #D6B58A;
+    --peach-deep: #6E5231;
+    --ink: #0F0E0C;
+    --ink-sub: #2D2820;
+    --ink-mute: #7A7164;
+    --line: rgba(15, 14, 12, 0.10);
+    --line-strong: rgba(15, 14, 12, 0.22);
+    --shadow: 0 2px 12px rgba(15, 14, 12, 0.08), 0 8px 28px rgba(15, 14, 12, 0.05);
+    --radius: 18px;
+
+    --page-bg: #0A0906;
+    --page-text: #EDE5CE;
+    --page-kicker: #A89C7E;
+    --page-body: #8F8569;
+
+    --hero-glow: rgba(138, 107, 66, 0.10);
+    --mascot-shadow-sm: 0 3px 6px rgba(15, 14, 12, 0.18);
+    --mascot-shadow-lg: 0 10px 18px rgba(15, 14, 12, 0.26);
+
+    --saff-pattern:
+      repeating-linear-gradient(45deg,
+        transparent 0, transparent 3px,
+        rgba(85, 62, 22, 0.11) 3px, rgba(85, 62, 22, 0.11) 3.6px),
+      repeating-linear-gradient(-45deg,
+        transparent 0, transparent 3px,
+        rgba(85, 62, 22, 0.11) 3px, rgba(85, 62, 22, 0.11) 3.6px);
+
+    --silver:
+      linear-gradient(140deg,
+        #F4EEE0 0%,
+        #C5BDA9 34%,
+        #7A7464 52%,
+        #E0D9C4 74%,
+        #524D42 100%);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    font-family: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
+    background: var(--page-bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    transition: background .4s ease;
+  }
+  body {
+    min-height: 100vh;
+    padding: 48px 32px 96px;
+  }
+
+  /* ─── Page hero ─────────────────────────── */
+  .page-hero {
+    max-width: 1280px;
+    margin: 0 auto 32px;
+    color: var(--page-text);
+  }
+  .page-hero .kicker {
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    color: var(--page-kicker);
+    margin-bottom: 10px;
+  }
+  .page-hero h1 {
+    font-weight: 700;
+    font-size: 32px;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+  .page-hero p {
+    color: var(--page-body);
+    font-size: 14px;
+    max-width: 720px;
+    line-height: 1.6;
+  }
+
+  /* ─── Theme picker ──────────────────────── */
+  .theme-picker {
+    max-width: 1280px;
+    margin: 0 auto 36px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .theme-opt {
+    flex: 1 1 240px;
+    min-width: 240px;
+    position: relative;
+    padding: 16px 18px 14px;
+    border-radius: 14px;
+    background: rgba(237, 229, 212, 0.04);
+    border: 1px solid rgba(237, 229, 212, 0.12);
+    color: var(--page-text);
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background .25s ease, border-color .25s ease, transform .15s ease;
+  }
+  .theme-opt:hover {
+    background: rgba(237, 229, 212, 0.08);
+    border-color: rgba(237, 229, 212, 0.3);
+  }
+  .theme-opt.active {
+    background: rgba(237, 229, 212, 0.12);
+    border-color: var(--page-text);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  }
+  .theme-opt.active::after {
+    content: "";
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--page-text);
+  }
+  .theme-swatches { display: flex; gap: 6px; margin-bottom: 12px; }
+  .theme-swatches span {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    display: block;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+  }
+  .theme-name {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 3px;
+    color: var(--page-text);
+  }
+  .theme-sub {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--page-kicker);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ─── Grid ─────────────────────────────────── */
+  .phones-grid {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    justify-items: center;
+  }
+  @media (max-width: 1100px) { .phones-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 760px)  { .phones-grid { grid-template-columns: 1fr; } }
+
+  .phone-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .phone-label {
+    color: var(--page-text);
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .phone-label .sub {
+    display: block;
+    color: var(--page-body);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: none;
+    margin-top: 4px;
+  }
+
+  /* ─── Phone frame ──────────────────────────── */
+  .phone {
+    width: 360px;
+    height: 812px;
+    border-radius: 40px;
+    background: var(--cream);
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 8px #0F0C09,
+      0 0 0 9px #2A241D,
+      0 30px 60px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+  }
+  .status {
+    height: 40px;
+    padding: 12px 26px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    flex-shrink: 0;
+  }
+  .status-icons { display: flex; gap: 5px; align-items: center; }
+  .status-icons svg { width: 14px; height: 14px; }
+
+  .body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 20px 0;
+    position: relative;
+  }
+  .body::-webkit-scrollbar { display: none; }
+
+  /* ═══════════════════════════════════════════════════
+     ONBOARDING 공통 컴포넌트
+     ═══════════════════════════════════════════════════ */
+
+  /* 상단 완독콩 헤더 — 말풍선 옆에 앉은 느낌 */
+  .onb-top {
+    padding: 6px 0 6px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .onb-mascot {
+    width: 54px;
+    height: 54px;
+    flex-shrink: 0;
+    filter: drop-shadow(var(--mascot-shadow-sm));
+  }
+  .onb-mascot img {
+    width: 100%; height: 100%;
+    display: block;
+    object-fit: contain;
+  }
+  .onb-bubble {
+    flex: 1;
+    position: relative;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 10px 14px;
+    font-family: "Gaegu", sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--ink);
+    line-height: 1.35;
+    box-shadow: 0 2px 8px rgba(30, 27, 22, 0.04);
+  }
+  .onb-bubble::before {
+    content: "";
+    position: absolute;
+    left: -6px;
+    top: 18px;
+    width: 12px;
+    height: 12px;
+    background: var(--paper);
+    border-left: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    transform: rotate(45deg);
+  }
+
+  /* 타이틀 영역 */
+  .onb-title-area {
+    padding: 18px 2px 8px;
+  }
+  .onb-kicker {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--mint-deep);
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .onb-headline {
+    font-family: "Gaegu", sans-serif;
+    font-weight: 700;
+    font-size: 26px;
+    color: var(--ink);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+  .onb-headline em {
+    color: var(--mint-deep);
+    font-style: normal;
+  }
+  .onb-sub {
+    margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--ink-mute);
+    background: var(--cream-sub);
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .onb-sub svg { width: 11px; height: 11px; }
+
+  /* 3-탭 썸네일 */
+  .style-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 18px 0 14px;
+  }
+  .style-tab {
+    position: relative;
+    padding: 12px 8px 10px;
+    background: var(--paper);
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    transition: all .2s ease;
+  }
+  .style-tab.active {
+    border-color: var(--mint);
+    background: var(--mint-soft);
+    box-shadow: 0 4px 12px rgba(95, 164, 142, 0.18);
+  }
+  .style-tab .st-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-sub);
+  }
+  .style-tab.active .st-icon {
+    color: var(--mint-deep);
+  }
+  .style-tab .st-icon svg { width: 28px; height: 28px; }
+  .style-tab .st-name {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .style-tab.active .st-name {
+    color: var(--mint-deep);
+  }
+  .style-tab.active::after {
+    content: "";
+    position: absolute;
+    bottom: -7px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 10px;
+    height: 10px;
+    background: var(--mint-soft);
+    border-right: 1.5px solid var(--mint);
+    border-bottom: 1.5px solid var(--mint);
+  }
+
+  /* Live Preview 프레임 */
+  .preview-frame {
+    position: relative;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px 14px;
+    box-shadow: var(--shadow);
+    min-height: 260px;
+    overflow: hidden;
+  }
+  .preview-label {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .preview-label::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    background: #E05050;
+    border-radius: 50%;
+    animation: livePulse 1.8s ease-in-out infinite;
+  }
+  @keyframes livePulse {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50%      { opacity: 1; transform: scale(1.18); }
+  }
+
+  /* ── Scene: SHELF (책꽂이형) ─────────────────── */
+  .scene-shelf {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 16px;
+  }
+  .scene-shelf .shelf-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 118px;
+  }
+  .scene-shelf .shf-sp {
+    width: 22px;
+    height: 108px;
+    border-radius: 3px 3px 1px 1px;
+    box-shadow:
+      inset 2px 0 0 rgba(255,255,255,0.2),
+      inset -2px 0 0 rgba(0,0,0,0.18);
+    position: relative;
+    font-family: "Gaegu", sans-serif;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: 9px;
+    color: rgba(255,255,255,0.85);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 2px;
+  }
+  .scene-shelf .shf-sp.tall  { height: 116px; }
+  .scene-shelf .shf-sp.short { height: 94px; }
+  .scene-shelf .shf-sp.mid   { height: 104px; }
+  .scene-shelf .shf-sp.c1 { background: linear-gradient(180deg, #7A9B8E, #5A7B6E); }
+  .scene-shelf .shf-sp.c2 { background: linear-gradient(180deg, #D4B58A, #9A7A52); color: #3A2914; }
+  .scene-shelf .shf-sp.c3 { background: linear-gradient(180deg, #C88B7B, #9A5E52); }
+  .scene-shelf .shf-sp.c4 { background: linear-gradient(180deg, #2B2520, #1A1512); }
+  .scene-shelf .shf-sp.c5 { background: linear-gradient(180deg, #B8C0AA, #8A9276); color: #2A2F20; }
+  .scene-shelf .shf-sp.c6 { background: linear-gradient(180deg, #D2A2B8, #A47288); }
+  .scene-shelf .shf-sp.c7 { background: linear-gradient(180deg, #8EA598, #617366); }
+  .scene-shelf .shf-sp.c8 { background: linear-gradient(180deg, #E2C89A, #B89A5E); color: #3A2914; }
+  .scene-shelf .shf-sp:nth-child(8) {
+    animation: bookSlideIn 3s ease-in-out infinite;
+  }
+  @keyframes bookSlideIn {
+    0%   { transform: rotate(180deg) translateY(-110px); opacity: 0; }
+    25%  { transform: rotate(180deg) translateY(0); opacity: 1; }
+    85%  { transform: rotate(180deg) translateY(0); opacity: 1; }
+    100% { transform: rotate(180deg) translateY(-110px); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .scene-shelf .shf-sp:nth-child(8) { animation: none; }
+  }
+  .scene-shelf .shelf-wood {
+    width: 100%;
+    height: 10px;
+    margin-top: 0;
+    background: linear-gradient(180deg, #9A7A5A, #6E5338 40%, #3F2E1E);
+    border-radius: 2px;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.2),
+      0 2px 4px rgba(0,0,0,0.3);
+  }
+  .scene-shelf .sc-caption {
+    font-size: 10px;
+    color: var(--ink-mute);
+    text-align: center;
+    margin-top: 14px;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+  }
+
+  /* ── Scene: CURATOR (큐레이터형) ─────────────── */
+  .scene-curator {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 16px;
+  }
+  .scene-curator.active { display: flex; }
+  .cu-card {
+    display: flex;
+    gap: 8px;
+    padding: 10px 10px;
+    background: var(--cream-sub);
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    align-items: center;
+    animation: curatorSlide 3s ease-in-out infinite;
+  }
+  .cu-card:nth-child(2) { animation-delay: 0.3s; }
+  .cu-card:nth-child(3) { animation-delay: 0.6s; }
+  @keyframes curatorSlide {
+    0%, 10%  { transform: translateX(20px); opacity: 0; }
+    25%, 85% { transform: translateX(0); opacity: 1; }
+    100%     { transform: translateX(20px); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cu-card { animation: none; transform: none; opacity: 1; }
+  }
+  .cu-thumbs {
+    display: flex;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+  .cu-th {
+    width: 14px;
+    height: 22px;
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+  }
+  .cu-th.c1 { background: linear-gradient(135deg, #7A9B8E, #4F6C5E); }
+  .cu-th.c2 { background: linear-gradient(135deg, #D4B58A, #9A7A52); }
+  .cu-th.c3 { background: linear-gradient(135deg, #2B2520, #1A1512); }
+  .cu-th.c4 { background: linear-gradient(135deg, #C88B7B, #9A5E52); }
+  .cu-th.c5 { background: linear-gradient(135deg, #B8A2C8, #7A6290); }
+  .cu-th.c6 { background: linear-gradient(135deg, #D2A2B8, #A47288); }
+  .cu-body { flex: 1; min-width: 0; }
+  .cu-body .tt {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .cu-body .ct {
+    font-size: 9px;
+    color: var(--ink-mute);
+    margin-top: 2px;
+  }
+  .cu-count {
+    font-size: 10px;
+    color: var(--mint-deep);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+
+  /* ── Scene: STACKS (스택형) ──────────────── */
+  .scene-stacks {
+    display: none;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding-top: 14px;
+  }
+  .scene-stacks.active { display: grid; }
+  .sk-card {
+    background: var(--cream-sub);
+    border-radius: 10px;
+    padding: 10px 10px 8px;
+    border: 1px solid var(--line);
+    position: relative;
+    min-height: 96px;
+    display: flex;
+    flex-direction: column;
+  }
+  .sk-card .sn {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .sk-card .sc {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .sk-card .sc .unit {
+    font-size: 10px;
+    color: var(--ink-mute);
+    font-weight: 600;
+    margin-left: 2px;
+  }
+  .sk-pile {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .sk-pile .pc {
+    width: 22px;
+    height: 4px;
+    border-radius: 1px;
+    animation: stackBounce 3s ease-in-out infinite;
+  }
+  .sk-card:nth-child(1) .sk-pile .pc:nth-child(1) { background: #5FA48E; animation-delay: 0.0s; }
+  .sk-card:nth-child(1) .sk-pile .pc:nth-child(2) { background: #7AC0A8; animation-delay: 0.15s; }
+  .sk-card:nth-child(1) .sk-pile .pc:nth-child(3) { background: #A6D6C4; animation-delay: 0.3s; }
+  .sk-card:nth-child(2) .sk-pile .pc:nth-child(1) { background: #C78A5B; animation-delay: 0.0s; }
+  .sk-card:nth-child(2) .sk-pile .pc:nth-child(2) { background: #D4A578; animation-delay: 0.15s; }
+  .sk-card:nth-child(2) .sk-pile .pc:nth-child(3) { background: #E4C398; animation-delay: 0.3s; }
+  .sk-card:nth-child(3) .sk-pile .pc:nth-child(1) { background: #8A7358; animation-delay: 0.0s; }
+  .sk-card:nth-child(3) .sk-pile .pc:nth-child(2) { background: #A89278; animation-delay: 0.15s; }
+  .sk-card:nth-child(4) .sk-pile .pc:nth-child(1) { background: #9AA58E; animation-delay: 0.0s; }
+  .sk-card:nth-child(4) .sk-pile .pc:nth-child(2) { background: #B8C2A8; animation-delay: 0.15s; }
+  @keyframes stackBounce {
+    0%, 100% { transform: translateY(0); opacity: 0.8; }
+    50%      { transform: translateY(-2px); opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sk-pile .pc { animation: none; }
+  }
+
+  /* 설명 카드 */
+  .desc-card {
+    margin-top: 14px;
+    padding: 14px 16px 16px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+  }
+  .desc-head {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .desc-head .dn {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+  .desc-head .dn-tag {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: var(--mint-deep);
+    background: var(--mint-soft);
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .desc-body {
+    font-size: 12.5px;
+    color: var(--ink-sub);
+    line-height: 1.55;
+  }
+  .desc-foot {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--line-strong);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--ink-mute);
+  }
+  .desc-foot svg {
+    width: 12px;
+    height: 12px;
+    color: var(--peach-deep);
+    flex-shrink: 0;
+  }
+  .desc-foot b {
+    color: var(--ink-sub);
+    font-weight: 700;
+    margin-right: 2px;
+  }
+
+  /* 하단 CTA 영역 */
+  .cta-bar {
+    padding: 12px 20px 22px;
+    background: var(--cream);
+    border-top: 1px solid var(--line);
+    flex-shrink: 0;
+  }
+  .cta-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--mint);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 800;
+    padding: 15px 18px;
+    border-radius: 14px;
+    border: none;
+    cursor: pointer;
+    letter-spacing: -0.01em;
+    box-shadow: 0 6px 16px rgba(95, 164, 142, 0.28);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .cta-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(95, 164, 142, 0.35);
+  }
+  .cta-btn svg { width: 16px; height: 16px; }
+  .cta-hint {
+    text-align: center;
+    font-size: 10.5px;
+    color: var(--ink-mute);
+    margin-top: 8px;
+    letter-spacing: 0.02em;
+  }
+  .cta-hint b {
+    color: var(--ink-sub);
+    font-weight: 700;
+  }
+
+  /* ═══════════════════════════════════════════════════
+     BLACKBEIGE 오버라이드 (프라다 부티크 톤)
+     페이지 토글 + 개별 폰 강제(data-theme="blackbeige") 양쪽 모두 지원
+     ═══════════════════════════════════════════════════ */
+
+  /* 개별 폰에 강제된 blackbeige: CSS 변수 재선언으로 스코프 격리 */
+  .phone[data-theme="blackbeige"] {
+    --cream: #FBF5E0;
+    --cream-sub: #F3E8CA;
+    --paper: #FEFBEE;
+    --mint: #0F0E0C;
+    --mint-deep: #8A6B42;
+    --mint-soft: #E1D4B2;
+    --peach: #D6B58A;
+    --peach-deep: #6E5231;
+    --ink: #0F0E0C;
+    --ink-sub: #2D2820;
+    --ink-mute: #7A7164;
+    --line: rgba(15, 14, 12, 0.10);
+    --line-strong: rgba(15, 14, 12, 0.22);
+    --shadow: 0 2px 12px rgba(15, 14, 12, 0.08), 0 8px 28px rgba(15, 14, 12, 0.05);
+    --hero-glow: rgba(138, 107, 66, 0.10);
+    --mascot-shadow-sm: 0 3px 6px rgba(15, 14, 12, 0.18);
+    --mascot-shadow-lg: 0 10px 18px rgba(15, 14, 12, 0.26);
+    --saff-pattern:
+      repeating-linear-gradient(45deg,
+        transparent 0, transparent 3px,
+        rgba(85, 62, 22, 0.11) 3px, rgba(85, 62, 22, 0.11) 3.6px),
+      repeating-linear-gradient(-45deg,
+        transparent 0, transparent 3px,
+        rgba(85, 62, 22, 0.11) 3px, rgba(85, 62, 22, 0.11) 3.6px);
+  }
+
+  .phone[data-theme="blackbeige"] {
+    background: var(--cream);
+  }
+  .phone[data-theme="blackbeige"]::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--saff-pattern);
+    pointer-events: none;
+    opacity: 0.7;
+    z-index: 0;
+  }
+  .phone[data-theme="blackbeige"] .body,
+  .phone[data-theme="blackbeige"] .cta-bar,
+  .phone[data-theme="blackbeige"] .status {
+    position: relative;
+    z-index: 1;
+  }
+  /* Gaegu → Pretendard (프라다 톤은 손글씨 대신 정제된 세리프 느낌) */
+  .phone[data-theme="blackbeige"] .onb-bubble,
+  .phone[data-theme="blackbeige"] .onb-headline {
+    font-family: "Pretendard Variable", serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .phone[data-theme="blackbeige"] .onb-headline em {
+    color: var(--mint-deep);
+  }
+  .phone[data-theme="blackbeige"] .onb-kicker {
+    color: var(--mint-deep);
+  }
+  .phone[data-theme="blackbeige"] .onb-bubble {
+    background: var(--paper);
+    border-color: var(--line);
+    color: var(--ink);
+  }
+  .phone[data-theme="blackbeige"] .onb-bubble::before {
+    background: var(--paper);
+  }
+  .phone[data-theme="blackbeige"] .onb-sub {
+    background: var(--cream-sub);
+    color: var(--ink-sub);
+  }
+  /* 3-tab */
+  .phone[data-theme="blackbeige"] .style-tab {
+    background: var(--paper);
+    border-color: var(--line-strong);
+  }
+  .phone[data-theme="blackbeige"] .style-tab.active {
+    background: var(--ink);
+    border-color: var(--ink);
+    box-shadow: 0 4px 14px rgba(15,14,12,0.25);
+  }
+  .phone[data-theme="blackbeige"] .style-tab.active .st-icon {
+    color: var(--cream);
+  }
+  .phone[data-theme="blackbeige"] .style-tab.active .st-name {
+    color: var(--cream);
+  }
+  .phone[data-theme="blackbeige"] .style-tab.active::after {
+    background: var(--ink);
+    border-right-color: var(--ink);
+    border-bottom-color: var(--ink);
+  }
+  /* Live preview */
+  .phone[data-theme="blackbeige"] .preview-frame {
+    background: var(--paper);
+    border-color: var(--line-strong);
+  }
+  .phone[data-theme="blackbeige"] .preview-label {
+    color: var(--ink-mute);
+  }
+  /* Shelf 씬 블랙베이지 컬러 */
+  .phone[data-theme="blackbeige"] .scene-shelf .shf-sp.c1 { background: linear-gradient(180deg, #3F3628, #1F1810); color: #D6C5A0; }
+  .phone[data-theme="blackbeige"] .scene-shelf .shf-sp.c2 { background: linear-gradient(180deg, #8A6B42, #3F2D1A); color: #F5E9CC; }
+  .phone[data-theme="blackbeige"] .scene-shelf .shf-sp.c3 { background: linear-gradient(180deg, #5E3F3A, #2B1A16); color: #E4D4B4; }
+  .phone[data-theme="blackbeige"] .scene-shelf .shf-sp.c4 { background: linear-gradient(180deg, #0A0806, #000); color: #D6C5A0; }
+  .phone[data-theme="blackbeige"] .scene-shelf .shf-sp.c5 { background: linear-gradient(180deg, #D6C5A0, #8A7B58); color: #2B2014; }
+  .phone[data-theme="blackbeige"] .scene-shelf .shf-sp.c6 { background: linear-gradient(180deg, #4C2D1E, #1E0F0A); color: #E4D4B4; }
+  .phone[data-theme="blackbeige"] .scene-shelf .shf-sp.c7 { background: linear-gradient(180deg, #3C3045, #1A1424); color: #D6C5A0; }
+  .phone[data-theme="blackbeige"] .scene-shelf .shf-sp.c8 { background: linear-gradient(180deg, #5C4226, #2E1D0F); color: #E4D4B4; }
+  .phone[data-theme="blackbeige"] .scene-shelf .shelf-wood {
+    background: linear-gradient(180deg, #5C4226, #2E1D0F 40%, #15090A);
+  }
+  .phone[data-theme="blackbeige"] .scene-shelf .sc-caption { color: var(--ink-mute); }
+  /* Curator 씬 */
+  .phone[data-theme="blackbeige"] .cu-card {
+    background: var(--cream-sub);
+    border-color: var(--line-strong);
+  }
+  .phone[data-theme="blackbeige"] .cu-th.c1 { background: linear-gradient(135deg, #3F3628, #1F1810); }
+  .phone[data-theme="blackbeige"] .cu-th.c2 { background: linear-gradient(135deg, #8A6B42, #3F2D1A); }
+  .phone[data-theme="blackbeige"] .cu-th.c3 { background: linear-gradient(135deg, #0A0806, #000); }
+  .phone[data-theme="blackbeige"] .cu-th.c4 { background: linear-gradient(135deg, #5E3F3A, #2B1A16); }
+  .phone[data-theme="blackbeige"] .cu-th.c5 { background: linear-gradient(135deg, #3C3045, #1A1424); }
+  .phone[data-theme="blackbeige"] .cu-th.c6 { background: linear-gradient(135deg, #4C2D1E, #1E0F0A); }
+  .phone[data-theme="blackbeige"] .cu-count { color: var(--mint-deep); }
+  /* Stacks 씬 */
+  .phone[data-theme="blackbeige"] .sk-card {
+    background: var(--cream-sub);
+    border-color: var(--line-strong);
+  }
+  .phone[data-theme="blackbeige"] .sk-card:nth-child(1) .sk-pile .pc:nth-child(1) { background: #0F0E0C; }
+  .phone[data-theme="blackbeige"] .sk-card:nth-child(1) .sk-pile .pc:nth-child(2) { background: #2D2820; }
+  .phone[data-theme="blackbeige"] .sk-card:nth-child(1) .sk-pile .pc:nth-child(3) { background: #4A4234; }
+  .phone[data-theme="blackbeige"] .sk-card:nth-child(2) .sk-pile .pc:nth-child(1) { background: #8A6B42; }
+  .phone[data-theme="blackbeige"] .sk-card:nth-child(2) .sk-pile .pc:nth-child(2) { background: #A8884F; }
+  .phone[data-theme="blackbeige"] .sk-card:nth-child(2) .sk-pile .pc:nth-child(3) { background: #C2A368; }
+  .phone[data-theme="blackbeige"] .sk-card:nth-child(3) .sk-pile .pc:nth-child(1) { background: #5C4226; }
+  .phone[data-theme="blackbeige"] .sk-card:nth-child(3) .sk-pile .pc:nth-child(2) { background: #7A5E40; }
+  .phone[data-theme="blackbeige"] .sk-card:nth-child(4) .sk-pile .pc:nth-child(1) { background: #D6C5A0; }
+  .phone[data-theme="blackbeige"] .sk-card:nth-child(4) .sk-pile .pc:nth-child(2) { background: #E4D4B4; }
+  /* 설명 카드 */
+  .phone[data-theme="blackbeige"] .desc-card {
+    background: var(--paper);
+    border-color: var(--line-strong);
+  }
+  .phone[data-theme="blackbeige"] .desc-head .dn-tag {
+    background: var(--ink);
+    color: var(--cream);
+    letter-spacing: 0.18em;
+  }
+  .phone[data-theme="blackbeige"] .desc-foot svg { color: var(--mint-deep); }
+  /* CTA */
+  .phone[data-theme="blackbeige"] .cta-bar {
+    background: var(--cream);
+    border-top-color: var(--line-strong);
+  }
+  .phone[data-theme="blackbeige"] .cta-btn {
+    background: var(--ink);
+    color: var(--cream);
+    box-shadow: 0 6px 18px rgba(15,14,12,0.35);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .phone[data-theme="blackbeige"] .cta-btn:hover {
+    box-shadow: 0 8px 22px rgba(15,14,12,0.45);
+  }
+  /* 완독콩 실버 플라크 (프라다 트라이앵글 재해석) */
+  .phone[data-theme="blackbeige"] .onb-mascot {
+    filter: drop-shadow(var(--mascot-shadow-sm)) grayscale(0.4) contrast(1.05);
+  }
+
+  /* 참고 설명 노트 */
+  .notes {
+    max-width: 1280px;
+    margin: 54px auto 0;
+    padding: 28px 32px;
+    border-radius: 18px;
+    background: rgba(237, 229, 212, 0.04);
+    border: 1px solid rgba(237, 229, 212, 0.1);
+    color: var(--page-body);
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .notes h4 {
+    color: var(--page-text);
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .notes ul { list-style: none; padding: 0; }
+  .notes li { padding-left: 16px; position: relative; margin-bottom: 6px; }
+  .notes li::before {
+    content: "·";
+    position: absolute;
+    left: 4px;
+    color: var(--page-kicker);
+    font-weight: 700;
+  }
+  .notes b {
+    color: var(--page-text);
+    font-weight: 700;
+  }
+</style>
+</head>
+<body data-theme="mint">
+
+<!-- Page hero -->
+<header class="page-hero">
+  <div class="kicker">ONBOARDING · LIBRARY STYLE PICKER · v1</div>
+  <h1>책과 어떻게 살아갈까요 — 서재 스타일 선택</h1>
+  <p>첫 책 등록 직후 자연스럽게 등장하는 온보딩 화면. 세 가지 서재 스타일(책꽂이형 / 큐레이터형 / 스택형) 중에서 독자가 자신의 독서 방식에 맞는 공간을 선택해요. 기본값은 책꽂이형으로 선택되어 있고 탭을 눌러 Live Preview를 바꿔볼 수 있어요. 언제든 설정에서 바꿀 수 있다는 점을 서브헤더에서 명시해 선택 스트레스를 낮췄어요.</p>
+</header>
+
+<!-- Theme picker -->
+<div class="theme-picker" role="tablist" aria-label="컬러 테마 선택">
+  <button class="theme-opt active" data-theme-set="mint" aria-selected="true">
+    <div class="theme-swatches">
+      <span style="background:#F7F3ED"></span>
+      <span style="background:#5FA48E"></span>
+      <span style="background:#F4C8A8"></span>
+      <span style="background:#1E1B16"></span>
+    </div>
+    <div class="theme-name">산뜻한 민트</div>
+    <div class="theme-sub">F7F3ED × 5FA48E</div>
+  </button>
+  <button class="theme-opt" data-theme-set="blackbeige" aria-selected="false">
+    <div class="theme-swatches">
+      <span style="background:#FBF5E0"></span>
+      <span style="background:#0F0E0C"></span>
+      <span style="background:#8A6B42"></span>
+      <span style="background:#D6B58A"></span>
+    </div>
+    <div class="theme-name">시크한 블랙베이지</div>
+    <div class="theme-sub">FBF5E0 × 0F0E0C</div>
+  </button>
+</div>
+
+<!-- ========================== 3 Phones ========================== -->
+<div class="phones-grid">
+
+  <!-- ══════════════════════════ PHONE A ══════════════════════════
+       Mint 테마 · 따뜻한 완독콩 인사 · 기본값: 책꽂이형
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="phone-col">
+    <div class="phone-label">A · 따뜻한 인사<span class="sub">Mint · 기본 = 책꽂이형</span></div>
+    <div class="phone a">
+      <div class="status">
+        <span>9:41</span>
+        <div class="status-icons">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 8l2 2 3-4 3 3 5-6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+          <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="6" width="13" height="5" rx="1" fill="none" stroke="currentColor" stroke-width="1.2"/><rect x="14.5" y="7.5" width="1" height="2" fill="currentColor"/><rect x="2" y="7" width="9" height="3" fill="currentColor"/></svg>
+        </div>
+      </div>
+
+      <div class="body">
+
+        <!-- 완독콩 마스코트 + 말풍선 -->
+        <div class="onb-top">
+          <div class="onb-mascot">
+            <img src="/mascot-welcome.png" alt="완독콩이 반갑게 인사해요" />
+          </div>
+          <div class="onb-bubble">
+            지선 님, 서재를 꾸며볼까요?<br/>
+            어떤 스타일이 편하세요?
+          </div>
+        </div>
+
+        <!-- 타이틀 -->
+        <div class="onb-title-area">
+          <div class="onb-kicker">STEP 2 OF 2</div>
+          <div class="onb-headline">책과 어떻게<br/><em>살아갈까요?</em></div>
+          <div class="onb-sub">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+              <path d="M2 8a6 6 0 0 1 10.5-4M14 8a6 6 0 0 1-10.5 4"/>
+              <path d="M12.5 1.5v2.5h-2.5M3.5 14.5V12h2.5"/>
+            </svg>
+            나중에 설정에서 바꿀 수 있어요
+          </div>
+        </div>
+
+        <!-- 3-탭 썸네일 -->
+        <div class="style-tabs">
+          <button class="style-tab active" data-style="shelf">
+            <div class="st-icon">
+              <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <rect x="5" y="5" width="3" height="16"/>
+                <rect x="10" y="4" width="3" height="17"/>
+                <rect x="15" y="6" width="3" height="15"/>
+                <rect x="20" y="3" width="3" height="18"/>
+                <line x1="3" y1="22" x2="25" y2="22" stroke-width="2.2"/>
+              </svg>
+            </div>
+            <div class="st-name">책꽂이형</div>
+          </button>
+          <button class="style-tab" data-style="curator">
+            <div class="st-icon">
+              <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <rect x="4" y="5" width="20" height="8" rx="1.5"/>
+                <rect x="4" y="16" width="20" height="6" rx="1.5"/>
+                <line x1="8" y1="9" x2="12" y2="9"/>
+                <line x1="8" y1="19" x2="12" y2="19"/>
+              </svg>
+            </div>
+            <div class="st-name">큐레이터형</div>
+          </button>
+          <button class="style-tab" data-style="stacks">
+            <div class="st-icon">
+              <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <rect x="4" y="4" width="9" height="9" rx="1"/>
+                <rect x="15" y="4" width="9" height="9" rx="1"/>
+                <rect x="4" y="15" width="9" height="9" rx="1"/>
+                <rect x="15" y="15" width="9" height="9" rx="1"/>
+              </svg>
+            </div>
+            <div class="st-name">스택형</div>
+          </button>
+        </div>
+
+        <!-- Live Preview (Shelf 활성) -->
+        <div class="preview-frame">
+          <div class="preview-label">Live</div>
+          <div class="scene-shelf">
+            <div class="shelf-row">
+              <div class="shf-sp c1 tall">소년이 온다</div>
+              <div class="shf-sp c2 mid">작별하지 않는다</div>
+              <div class="shf-sp c3 mid">아몬드</div>
+              <div class="shf-sp c4 tall">시녀 이야기</div>
+              <div class="shf-sp c5 short">데미안</div>
+              <div class="shf-sp c6 mid">어린 왕자</div>
+              <div class="shf-sp c7 tall">한낮의 우울</div>
+              <div class="shf-sp c8 short">오늘 새로</div>
+            </div>
+            <div class="shelf-wood"></div>
+            <div class="sc-caption">새로 들인 책이 책장에 꽂혀요</div>
+          </div>
+        </div>
+
+        <!-- 설명 카드 -->
+        <div class="desc-card">
+          <div class="desc-head">
+            <div class="dn">책꽂이형</div>
+            <div class="dn-tag">Shelf</div>
+          </div>
+          <div class="desc-body">
+            실제 책장에 꽂아둔 것처럼, 책등을 한눈에 바라보는 기쁨이에요. 읽은 책과 읽고 있는 책이 나란히 섞여요.
+          </div>
+          <div class="desc-foot">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 2v12M2 8h12"/><circle cx="8" cy="8" r="6"/></svg>
+            <span><b>이런 분께</b> 책을 많이 사 모으는 편이라면</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="cta-bar">
+        <button class="cta-btn">
+          책꽂이형으로 시작하기
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </button>
+        <div class="cta-hint"><b>탭을 눌러</b> 다른 스타일도 미리볼 수 있어요</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════ PHONE B ══════════════════════════
+       Blackbeige 테마 · 정제된 카피 · 기본값: 큐레이터형 (부티크 큐레이터)
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="phone-col">
+    <div class="phone-label">B · 부티크 큐레이터<span class="sub">Blackbeige · 기본 = 큐레이터형</span></div>
+    <div class="phone b" data-theme="blackbeige">
+      <div class="status">
+        <span>9:41</span>
+        <div class="status-icons">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 8l2 2 3-4 3 3 5-6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+          <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="6" width="13" height="5" rx="1" fill="none" stroke="currentColor" stroke-width="1.2"/><rect x="14.5" y="7.5" width="1" height="2" fill="currentColor"/><rect x="2" y="7" width="9" height="3" fill="currentColor"/></svg>
+        </div>
+      </div>
+
+      <div class="body">
+
+        <div class="onb-top">
+          <div class="onb-mascot">
+            <img src="/mascot-idle.png" alt="완독콩이 차분하게 안내해요" />
+          </div>
+          <div class="onb-bubble">
+            당신의 서재를<br/>디자인해볼까요.
+          </div>
+        </div>
+
+        <div class="onb-title-area">
+          <div class="onb-kicker">STEP 2 · LIBRARY STYLE</div>
+          <div class="onb-headline">Your Library,<br/><em>Your Way.</em></div>
+          <div class="onb-sub">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+              <path d="M2 8a6 6 0 0 1 10.5-4M14 8a6 6 0 0 1-10.5 4"/>
+              <path d="M12.5 1.5v2.5h-2.5M3.5 14.5V12h2.5"/>
+            </svg>
+            언제든 설정에서 변경 가능합니다
+          </div>
+        </div>
+
+        <div class="style-tabs">
+          <button class="style-tab" data-style="shelf">
+            <div class="st-icon">
+              <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <rect x="5" y="5" width="3" height="16"/>
+                <rect x="10" y="4" width="3" height="17"/>
+                <rect x="15" y="6" width="3" height="15"/>
+                <rect x="20" y="3" width="3" height="18"/>
+                <line x1="3" y1="22" x2="25" y2="22" stroke-width="2.2"/>
+              </svg>
+            </div>
+            <div class="st-name">책꽂이형</div>
+          </button>
+          <button class="style-tab active" data-style="curator">
+            <div class="st-icon">
+              <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <rect x="4" y="5" width="20" height="8" rx="1.5"/>
+                <rect x="4" y="16" width="20" height="6" rx="1.5"/>
+                <line x1="8" y1="9" x2="12" y2="9"/>
+                <line x1="8" y1="19" x2="12" y2="19"/>
+              </svg>
+            </div>
+            <div class="st-name">큐레이터형</div>
+          </button>
+          <button class="style-tab" data-style="stacks">
+            <div class="st-icon">
+              <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <rect x="4" y="4" width="9" height="9" rx="1"/>
+                <rect x="15" y="4" width="9" height="9" rx="1"/>
+                <rect x="4" y="15" width="9" height="9" rx="1"/>
+                <rect x="15" y="15" width="9" height="9" rx="1"/>
+              </svg>
+            </div>
+            <div class="st-name">스택형</div>
+          </button>
+        </div>
+
+        <!-- Live Preview (Curator 활성) -->
+        <div class="preview-frame">
+          <div class="preview-label">Live</div>
+          <div class="scene-curator active">
+            <div class="cu-card">
+              <div class="cu-thumbs">
+                <div class="cu-th c1"></div>
+                <div class="cu-th c4"></div>
+                <div class="cu-th c6"></div>
+              </div>
+              <div class="cu-body">
+                <div class="tt">위로가 필요할 때</div>
+                <div class="ct">3권 · 김애란 · 한강 · 박완서</div>
+              </div>
+              <div class="cu-count">03</div>
+            </div>
+            <div class="cu-card">
+              <div class="cu-thumbs">
+                <div class="cu-th c3"></div>
+                <div class="cu-th c5"></div>
+                <div class="cu-th c2"></div>
+              </div>
+              <div class="cu-body">
+                <div class="tt">밤의 서재</div>
+                <div class="ct">5권 · 우울과 사색의 에세이</div>
+              </div>
+              <div class="cu-count">05</div>
+            </div>
+            <div class="cu-card">
+              <div class="cu-thumbs">
+                <div class="cu-th c2"></div>
+                <div class="cu-th c1"></div>
+                <div class="cu-th c3"></div>
+              </div>
+              <div class="cu-body">
+                <div class="tt">다시 읽고 싶은</div>
+                <div class="ct">7권 · 해마다 꺼내 보는 책들</div>
+              </div>
+              <div class="cu-count">07</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="desc-card">
+          <div class="desc-head">
+            <div class="dn">큐레이터형</div>
+            <div class="dn-tag">Curator</div>
+          </div>
+          <div class="desc-body">
+            테마별 컬렉션을 직접 꾸며가는 재미예요. 계절별 · 기분별 · 작가별로 자유롭게 분류하고 이유를 붙일 수 있어요.
+          </div>
+          <div class="desc-foot">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 4h10M3 8h10M3 12h6"/></svg>
+            <span><b>이런 분께</b> 테마별 독서를 즐기신다면</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-bar">
+        <button class="cta-btn">
+          Begin with Curator
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </button>
+        <div class="cta-hint"><b>Tap</b> any style to preview · Change later in settings</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════ PHONE C ══════════════════════════
+       Mint 테마 · 질문형 완독콩 · 기본값: 스택형 (깔끔한 정리 선호 독자)
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="phone-col">
+    <div class="phone-label">C · 질문형 · 심플 앵글<span class="sub">Mint · 기본 = 스택형</span></div>
+    <div class="phone c">
+      <div class="status">
+        <span>9:41</span>
+        <div class="status-icons">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 8l2 2 3-4 3 3 5-6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+          <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="6" width="13" height="5" rx="1" fill="none" stroke="currentColor" stroke-width="1.2"/><rect x="14.5" y="7.5" width="1" height="2" fill="currentColor"/><rect x="2" y="7" width="9" height="3" fill="currentColor"/></svg>
+        </div>
+      </div>
+
+      <div class="body">
+
+        <div class="onb-top">
+          <div class="onb-mascot">
+            <img src="/mascot-thinking.png" alt="완독콩이 궁금해해요" />
+          </div>
+          <div class="onb-bubble">
+            지선 님은 어떤<br/>독자세요? 🤔
+          </div>
+        </div>
+
+        <div class="onb-title-area">
+          <div class="onb-kicker">잠깐, 당신의 독서 취향</div>
+          <div class="onb-headline">당신의 서재는<br/><em>어떤 모습일까요?</em></div>
+          <div class="onb-sub">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+              <path d="M2 8a6 6 0 0 1 10.5-4M14 8a6 6 0 0 1-10.5 4"/>
+              <path d="M12.5 1.5v2.5h-2.5M3.5 14.5V12h2.5"/>
+            </svg>
+            고민 말고 골라요 · 언제든 바꿀 수 있어요
+          </div>
+        </div>
+
+        <div class="style-tabs">
+          <button class="style-tab" data-style="shelf">
+            <div class="st-icon">
+              <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <rect x="5" y="5" width="3" height="16"/>
+                <rect x="10" y="4" width="3" height="17"/>
+                <rect x="15" y="6" width="3" height="15"/>
+                <rect x="20" y="3" width="3" height="18"/>
+                <line x1="3" y1="22" x2="25" y2="22" stroke-width="2.2"/>
+              </svg>
+            </div>
+            <div class="st-name">책꽂이형</div>
+          </button>
+          <button class="style-tab" data-style="curator">
+            <div class="st-icon">
+              <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <rect x="4" y="5" width="20" height="8" rx="1.5"/>
+                <rect x="4" y="16" width="20" height="6" rx="1.5"/>
+                <line x1="8" y1="9" x2="12" y2="9"/>
+                <line x1="8" y1="19" x2="12" y2="19"/>
+              </svg>
+            </div>
+            <div class="st-name">큐레이터형</div>
+          </button>
+          <button class="style-tab active" data-style="stacks">
+            <div class="st-icon">
+              <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <rect x="4" y="4" width="9" height="9" rx="1"/>
+                <rect x="15" y="4" width="9" height="9" rx="1"/>
+                <rect x="4" y="15" width="9" height="9" rx="1"/>
+                <rect x="15" y="15" width="9" height="9" rx="1"/>
+              </svg>
+            </div>
+            <div class="st-name">스택형</div>
+          </button>
+        </div>
+
+        <!-- Live Preview (Stacks 활성) -->
+        <div class="preview-frame">
+          <div class="preview-label">Live</div>
+          <div class="scene-stacks active">
+            <div class="sk-card">
+              <div class="sn">READING</div>
+              <div class="sc">3<span class="unit">권</span></div>
+              <div class="sk-pile">
+                <div class="pc"></div>
+                <div class="pc"></div>
+                <div class="pc"></div>
+              </div>
+            </div>
+            <div class="sk-card">
+              <div class="sn">DONE · 2026</div>
+              <div class="sc">12<span class="unit">권</span></div>
+              <div class="sk-pile">
+                <div class="pc"></div>
+                <div class="pc"></div>
+                <div class="pc"></div>
+              </div>
+            </div>
+            <div class="sk-card">
+              <div class="sn">WISH</div>
+              <div class="sc">7<span class="unit">권</span></div>
+              <div class="sk-pile">
+                <div class="pc"></div>
+                <div class="pc"></div>
+              </div>
+            </div>
+            <div class="sk-card">
+              <div class="sn">LIBRARY</div>
+              <div class="sc">2<span class="unit">권</span></div>
+              <div class="sk-pile">
+                <div class="pc"></div>
+                <div class="pc"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="desc-card">
+          <div class="desc-head">
+            <div class="dn">스택형</div>
+            <div class="dn-tag">Stacks</div>
+          </div>
+          <div class="desc-body">
+            읽는 중 · 완독 · 위시 · 대여 중, 네 개의 상자에 깔끔하게. 한 화면에 전부 담기는 심플함이 장점이에요.
+          </div>
+          <div class="desc-foot">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="2" width="5" height="5"/><rect x="9" y="2" width="5" height="5"/><rect x="2" y="9" width="5" height="5"/><rect x="9" y="9" width="5" height="5"/></svg>
+            <span><b>이런 분께</b> 깔끔한 정리를 좋아하신다면</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-bar">
+        <button class="cta-btn">
+          스택형으로 시작하기
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </button>
+        <div class="cta-hint"><b>잘 모르시겠다면</b> 기본값 그대로 시작하셔도 괜찮아요</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 설명 노트 -->
+<aside class="notes">
+  <h4>드림팀 회의 결정 요약</h4>
+  <ul>
+    <li><b>등장 타이밍</b> — 첫 책 등록 완료 직후 자동. 이후엔 설정에서 변경 가능</li>
+    <li><b>화면 구조</b> — 상단 3-탭 썸네일 + 하단 Live Preview(실제 책 반영) + 설명 카드 + CTA</li>
+    <li><b>프리뷰 모션</b> — 3초 CSS 애니메이션 루프: 책꽂이는 새 책 슬라이드, 큐레이터는 카드 페이드, 스택은 책 파일 바운스</li>
+    <li><b>헤드라인</b> — "책과 어떻게 살아갈까요?" (정체성 질문) 또는 변주 앵글</li>
+    <li><b>서브헤더</b> — "나중에 설정에서 바꿀 수 있어요" (선택 스트레스 ↓)</li>
+    <li><b>기본값</b> — 변주별로 다르게: A=책꽂이형 / B=큐레이터형 / C=스택형 (어떤 기본값이 가장 안전한지 관찰하기 위해)</li>
+    <li><b>CTA</b> — "이 스타일로 시작하기" · 스킵 버튼 없음 (기본값으로 우회 가능)</li>
+    <li><b>완독콩</b> — 헤더 좌측 상단 말풍선 옆에 작게. `prefers-reduced-motion` 준수</li>
+    <li><b>접근성</b> — 모든 탭 버튼 키보드 접근 가능, ARIA selected 속성, 애니메이션 비활성 옵션 지원</li>
+  </ul>
+</aside>
+
+<script>
+  /* ── Theme toggle ──
+     Phone B는 항상 blackbeige 고정 · A, C만 토글 따라감 */
+  const themeOpts = document.querySelectorAll('.theme-opt');
+  const allPhones = document.querySelectorAll('.phone');
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    document.body.setAttribute('data-theme', theme);
+    allPhones.forEach((p) => {
+      if (p.classList.contains('b')) {
+        /* Phone B는 항상 blackbeige 고정 */
+        p.setAttribute('data-theme', 'blackbeige');
+      } else {
+        if (theme === 'blackbeige') {
+          p.setAttribute('data-theme', 'blackbeige');
+        } else {
+          p.removeAttribute('data-theme');
+        }
+      }
+    });
+    themeOpts.forEach((o) => {
+      const isActive = o.dataset.themeSet === theme;
+      o.classList.toggle('active', isActive);
+      o.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+  }
+  themeOpts.forEach((opt) => {
+    opt.addEventListener('click', () => applyTheme(opt.dataset.themeSet));
+  });
+  /* 초기 테마 */
+  applyTheme('mint');
+
+  /* ── 각 폰의 3-탭 선택 상호작용 ──
+     같은 폰 안에서 style-tab을 누르면 Live Preview 씬이 바뀌어요. */
+  const phones = document.querySelectorAll('.phone');
+  phones.forEach((phone) => {
+    const tabs = phone.querySelectorAll('.style-tab');
+    const scenes = {
+      shelf:   phone.querySelector('.scene-shelf'),
+      curator: phone.querySelector('.scene-curator'),
+      stacks:  phone.querySelector('.scene-stacks'),
+    };
+    const cta = phone.querySelector('.cta-btn');
+    const descName = phone.querySelector('.desc-head .dn');
+    const descTag = phone.querySelector('.desc-head .dn-tag');
+    const descBody = phone.querySelector('.desc-body');
+    const descFootText = phone.querySelector('.desc-foot span');
+    const styleCopy = {
+      shelf: {
+        name: '책꽂이형',
+        tag: 'Shelf',
+        body: '실제 책장에 꽂아둔 것처럼, 책등을 한눈에 바라보는 기쁨이에요. 읽은 책과 읽고 있는 책이 나란히 섞여요.',
+        foot: '<b>이런 분께</b> 책을 많이 사 모으는 편이라면',
+        ctaKR: '책꽂이형으로 시작하기',
+        ctaEN: 'Begin with Shelf',
+      },
+      curator: {
+        name: '큐레이터형',
+        tag: 'Curator',
+        body: '테마별 컬렉션을 직접 꾸며가는 재미예요. 계절별 · 기분별 · 작가별로 자유롭게 분류하고 이유를 붙일 수 있어요.',
+        foot: '<b>이런 분께</b> 테마별 독서를 즐기신다면',
+        ctaKR: '큐레이터형으로 시작하기',
+        ctaEN: 'Begin with Curator',
+      },
+      stacks: {
+        name: '스택형',
+        tag: 'Stacks',
+        body: '읽는 중 · 완독 · 위시 · 대여 중, 네 개의 상자에 깔끔하게. 한 화면에 전부 담기는 심플함이 장점이에요.',
+        foot: '<b>이런 분께</b> 깔끔한 정리를 좋아하신다면',
+        ctaKR: '스택형으로 시작하기',
+        ctaEN: 'Begin with Stacks',
+      },
+    };
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const style = tab.dataset.style;
+        tabs.forEach((t) => t.classList.toggle('active', t === tab));
+        /* 씬 전환 */
+        Object.entries(scenes).forEach(([key, el]) => {
+          if (!el) return;
+          if (key === 'shelf') {
+            el.style.display = (style === 'shelf') ? 'flex' : 'none';
+          } else {
+            el.classList.toggle('active', key === style);
+          }
+        });
+        /* 설명 카드 & CTA 텍스트 갱신 */
+        const copy = styleCopy[style];
+        if (descName) descName.textContent = copy.name;
+        if (descTag)  descTag.textContent = copy.tag;
+        if (descBody) descBody.textContent = copy.body;
+        if (descFootText) descFootText.innerHTML = copy.foot;
+        if (cta) {
+          /* Phone B(블랙베이지) 는 영문 카피 유지 */
+          const isB = phone.classList.contains('b');
+          const arrow = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>';
+          cta.innerHTML = (isB ? copy.ctaEN : copy.ctaKR) + arrow;
+        }
+      });
+    });
+  });
+</script>
+
+</body>
+</html>

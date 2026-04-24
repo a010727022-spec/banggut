@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>방긋 · 팔레트 튜닝 (Rose)</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400;1,600&display=swap" />
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { font-family: 'Pretendard Variable', -apple-system, sans-serif; background: #E8E3D8; color: #1C1815; padding: 40px 24px; min-height: 100vh; }
+
+.lab-title { max-width: 1400px; margin: 0 auto 32px; }
+.lab-title h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px; }
+.lab-title .sub { font-family: 'Crimson Pro', serif; font-style: italic; font-size: 15px; color: #5A5048; }
+
+.palette-legend { max-width: 1400px; margin: 0 auto 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.leg { background: #F8F4EA; border: 1px solid #1C1815; border-radius: 12px; padding: 14px; box-shadow: 2px 2px 0 #1C1815; }
+.leg h3 { font-size: 13px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+.leg .tag { font-family: 'Crimson Pro', serif; font-style: italic; font-size: 12px; font-weight: 400; color: #5A5048; text-transform: none; letter-spacing: 0; }
+.leg p { font-size: 12px; line-height: 1.55; color: #3A3530; margin-bottom: 8px; }
+.swatches { display: flex; gap: 4px; }
+.sw { flex: 1; height: 36px; border-radius: 8px; border: 1px solid #1C1815; display: flex; align-items: flex-end; padding: 4px 5px; font-family: 'Crimson Pro', serif; font-style: italic; font-size: 9px; color: #F8F4EA; }
+.sw.dark { color: #F8F4EA; }
+.sw.light { color: #1C1815; }
+
+.phones-row { max-width: 1400px; margin: 0 auto; display: flex; gap: 32px; justify-content: center; flex-wrap: wrap; }
+.phone-col { display: flex; flex-direction: column; gap: 14px; align-items: center; }
+.phone-label { font-family: 'Crimson Pro', serif; font-style: italic; font-size: 14px; color: #5A5048; text-align: center; }
+.phone-label strong { font-family: 'Pretendard Variable', sans-serif; font-style: normal; font-weight: 800; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: #1C1815; display: block; margin-bottom: 2px; }
+.star { color: #B84E57; }
+
+/* --- Phone frame --- */
+.phone {
+  width: 360px; height: 812px;
+  background: var(--bg);
+  border-radius: 48px;
+  border: 1.5px solid var(--tp);
+  overflow: hidden;
+  position: relative;
+  display: flex; flex-direction: column;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.12), 0 4px 0 var(--tp);
+  color: var(--tp);
+}
+
+/* Status bar */
+.status { height: 44px; padding: 14px 24px 0; display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+.status .right { display: flex; gap: 4px; align-items: center; font-size: 11px; }
+
+/* Scroll area */
+.scroll { flex: 1; overflow-y: auto; padding: 8px 18px 20px; }
+.scroll::-webkit-scrollbar { display: none; }
+
+/* Greeting strip */
+.greet { display: flex; align-items: center; justify-content: space-between; padding: 12px 4px 14px; }
+.greet .hi { display: flex; flex-direction: column; gap: 2px; }
+.greet .hi .row1 { font-family: 'Gaegu', cursive; font-size: 22px; font-weight: 700; line-height: 1; }
+.greet .hi .row2 { font-family: 'Crimson Pro', serif; font-style: italic; font-size: 13px; color: var(--graphite); }
+.streak-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 10px;
+  background: var(--sf2);
+  border: 1px solid var(--tp);
+  border-radius: 999px;
+  box-shadow: 2px 2px 0 var(--tp);
+  font-size: 11px; font-weight: 700;
+}
+.streak-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ac); }
+
+/* Hero card */
+.hero {
+  background: var(--sf2);
+  border: 1px solid var(--tp);
+  border-radius: 14px;
+  box-shadow: 2px 2px 0 var(--tp);
+  padding: 16px;
+  margin-bottom: 14px;
+  position: relative;
+}
+.hero .tag {
+  font-family: 'Crimson Pro', serif; font-style: italic;
+  font-size: 12px;
+  color: var(--ac-deep);
+  margin-bottom: 8px;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.hero .tag::before { content: ""; width: 6px; height: 6px; background: var(--ac); border-radius: 50%; border: 1px solid var(--tp); }
+.hero .book-row { display: flex; gap: 12px; margin-bottom: 12px; }
+.hero .cover {
+  width: 68px; height: 96px;
+  background: linear-gradient(180deg, var(--book1), var(--book2));
+  border: 1px solid var(--tp);
+  border-radius: 4px;
+  box-shadow: 2px 2px 0 var(--tp);
+  position: relative;
+  flex-shrink: 0;
+  display: flex; align-items: flex-end; justify-content: center;
+  padding: 6px;
+}
+.hero .cover::before { content: ""; position: absolute; top: 10px; left: 6px; right: 6px; height: 1px; background: rgba(255,255,255,0.2); }
+.hero .cover span { font-family: 'Crimson Pro', serif; font-style: italic; font-size: 10px; color: rgba(255,255,255,0.85); letter-spacing: 0.03em; text-align: center; line-height: 1.2; }
+.hero .info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.hero .info .title { font-family: 'Gaegu', cursive; font-size: 18px; font-weight: 700; line-height: 1.2; }
+.hero .info .author { font-family: 'Crimson Pro', serif; font-style: italic; font-size: 13px; color: var(--graphite); }
+.hero .info .chapter { font-size: 11px; font-weight: 600; color: var(--graphite); margin-top: auto; letter-spacing: 0.02em; }
+
+.hero .quote {
+  background: var(--bg);
+  border: 1px solid var(--tp);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--tp);
+  position: relative;
+}
+.hero .quote::before { content: "어제 멈춘 쪽"; position: absolute; top: -7px; left: 10px; background: var(--sf2); padding: 0 6px; font-size: 10px; font-style: normal; font-family: 'Pretendard Variable', sans-serif; font-weight: 700; color: var(--ac-deep); letter-spacing: 0.04em; }
+
+/* Typewriter ruler progress */
+.ruler { margin-bottom: 12px; }
+.ruler .meta { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; font-size: 11px; }
+.ruler .meta .l { font-weight: 700; color: var(--ac-deep); }
+.ruler .meta .r { font-family: 'Crimson Pro', serif; font-style: italic; color: var(--graphite); font-size: 12px; }
+.ruler .track { height: 16px; position: relative; border-bottom: 1px solid var(--tp); }
+.ruler .notches { display: flex; justify-content: space-between; position: absolute; inset: 0; }
+.ruler .notch { width: 1px; background: var(--tp); height: 6px; align-self: flex-end; }
+.ruler .notch.big { height: 10px; }
+.ruler .fill { position: absolute; bottom: 0; left: 0; height: 2px; background: var(--ac); }
+.ruler .pointer { position: absolute; bottom: -1px; width: 10px; height: 10px; background: var(--ac); border: 1px solid var(--tp); border-radius: 50%; transform: translateX(-50%); box-shadow: 1px 1px 0 var(--tp); }
+
+.cta {
+  width: 100%;
+  background: var(--ac);
+  color: #FFF9F3;
+  border: 1px solid var(--tp);
+  border-radius: 10px;
+  padding: 13px;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  box-shadow: 2px 2px 0 var(--tp);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+
+/* Weekly calendar */
+.week-card {
+  background: var(--sf2);
+  border: 1px solid var(--tp);
+  border-radius: 14px;
+  box-shadow: 2px 2px 0 var(--tp);
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.week-card .head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+.week-card .head .ttl { font-size: 13px; font-weight: 800; letter-spacing: -0.01em; }
+.week-card .head .ttl em { font-family: 'Crimson Pro', serif; font-style: italic; font-weight: 400; color: var(--graphite); font-size: 12px; margin-left: 4px; letter-spacing: 0; }
+.week-card .head .more { font-family: 'Crimson Pro', serif; font-style: italic; font-size: 11px; color: var(--graphite); }
+.days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.day { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.day .lbl { font-family: 'Crimson Pro', serif; font-style: italic; font-size: 10px; color: var(--graphite); }
+.day .sq {
+  width: 30px; height: 30px;
+  border: 1px solid var(--tp);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+  background: var(--bg);
+}
+.day.read .sq { background: var(--ac); color: #FFF9F3; box-shadow: 1px 1px 0 var(--tp); }
+.day.today .sq { background: var(--ac3); border-width: 1.5px; }
+.day.event .sq::after { content: ""; position: absolute; width: 4px; height: 4px; background: var(--pop); border-radius: 50%; border: 1px solid var(--tp); transform: translate(10px, -12px); }
+.day.event .sq { position: relative; }
+
+.events { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--tp); display: flex; flex-direction: column; gap: 6px; }
+.event-row { display: flex; align-items: center; gap: 8px; font-size: 11.5px; }
+.event-row .date-chip { font-family: 'Crimson Pro', serif; font-style: italic; font-size: 11px; color: var(--graphite); width: 42px; flex-shrink: 0; }
+.event-row .pin { width: 7px; height: 7px; border-radius: 50%; border: 1px solid var(--tp); flex-shrink: 0; }
+.event-row.meet .pin { background: var(--pop); }
+.event-row.wish .pin { background: var(--ac); }
+.event-row.lib .pin { background: var(--ac-deep); }
+.event-row .ttl { font-weight: 600; }
+.event-row .sub { color: var(--graphite); font-size: 10.5px; margin-left: auto; font-family: 'Crimson Pro', serif; font-style: italic; }
+
+/* Feed snippet */
+.feed-card {
+  background: var(--sf2);
+  border: 1px solid var(--tp);
+  border-radius: 14px;
+  box-shadow: 2px 2px 0 var(--tp);
+  padding: 14px;
+}
+.feed-card .head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+.feed-card .head .ttl { font-size: 13px; font-weight: 800; letter-spacing: -0.01em; }
+.feed-card .head .ttl em { font-family: 'Crimson Pro', serif; font-style: italic; font-weight: 400; color: var(--graphite); font-size: 12px; margin-left: 4px; letter-spacing: 0; }
+.friends { display: flex; gap: -6px; margin-bottom: 10px; }
+.friends .av {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--tp);
+  background: var(--ac3);
+  font-family: 'Gaegu', cursive; font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  margin-right: -6px;
+  box-shadow: 1px 1px 0 var(--tp);
+}
+.friends .av:nth-child(2) { background: var(--pop); }
+.friends .av:nth-child(3) { background: var(--ac); color: #FFF9F3; }
+.friends .av.more { background: var(--bg); font-family: 'Crimson Pro', serif; font-style: italic; font-size: 10px; }
+.feed-item { display: flex; gap: 8px; align-items: flex-start; padding: 8px 0; border-top: 1px solid var(--tp); }
+.feed-item .name { font-weight: 700; font-size: 12px; margin-right: 4px; }
+.feed-item .text { font-size: 11.5px; line-height: 1.5; color: var(--tp); }
+.feed-item .text .book-name { font-family: 'Crimson Pro', serif; font-style: italic; }
+
+/* Palette variants */
+.phone.opt-a {
+  --bg: #F2EDE1;
+  --sf2: #FBF6EA;
+  --tp: #241F1B;
+  --graphite: #5A5048;
+  --ac: #D65A73;
+  --ac-deep: #8A3545;
+  --ac3: #F4CCD3;
+  --pop: #D99B3E;
+  --book1: #2E2824; --book2: #0F0D0C;
+}
+
+.phone.opt-b {
+  --bg: #F3EEE0;
+  --sf2: #FBF6EA;
+  --tp: #22201D;
+  --graphite: #5A5048;
+  --ac: #CE5A6F;
+  --ac-deep: #7A3340;
+  --ac3: #F0CFD4;
+  --pop: #6BA594;
+  --book1: #2B2A28; --book2: #0D0D0C;
+}
+
+.phone.opt-c {
+  --bg: #F3EEDF;
+  --sf2: #FCF7EB;
+  --tp: #23201C;
+  --graphite: #5A5048;
+  --ac: #CE5A6E;
+  --ac-deep: #7A2E3D;
+  --ac3: #EFC9CF;
+  --pop: #CE5A6E;
+  --book1: #2D2823; --book2: #0F0D0C;
+}
+
+.notes {
+  max-width: 1400px; margin: 32px auto 0;
+  background: #F8F4EA; border: 1px solid #1C1815; border-radius: 14px; padding: 20px; box-shadow: 3px 3px 0 #1C1815;
+}
+.notes h2 { font-size: 16px; font-weight: 800; margin-bottom: 10px; }
+.notes .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.notes .col h4 { font-size: 13px; font-weight: 800; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.notes .col h4::before { content: ""; width: 10px; height: 10px; border-radius: 50%; border: 1px solid #1C1815; }
+.notes .col.a h4::before { background: #D65A73; }
+.notes .col.b h4::before { background: #CE5A6F; }
+.notes .col.c h4::before { background: #CE5A6E; }
+.notes .col p { font-size: 12px; line-height: 1.65; color: #3A3530; margin-bottom: 4px; }
+.notes .col em { font-family: 'Crimson Pro', serif; font-style: italic; color: #5A5048; font-size: 11.5px; }
+</style>
+</head>
+<body>
+
+<div class="lab-title">
+  <h1>방긋 · 팔레트 튜닝</h1>
+  <div class="sub">v2 Manuscript 레이아웃에 로즈 채도만 3가지로 실험 · 2026.04.21</div>
+</div>
+
+<div class="palette-legend">
+  <div class="leg">
+    <h3>A · 생화 로즈 <span class="tag">Fresh Rose + Honey Amber</span></h3>
+    <p>채도 65%. 비비드와 뉴트럴 중간. "꽃집 입구의 생화" 톤. 팝 컬러는 허니 앰버(버터 아님, 오커 아님).</p>
+    <div class="swatches">
+      <div class="sw dark" style="background:#D65A73">D65A73</div>
+      <div class="sw dark" style="background:#8A3545">8A3545</div>
+      <div class="sw light" style="background:#F4CCD3">F4CCD3</div>
+      <div class="sw dark" style="background:#D99B3E">D99B3E</div>
+      <div class="sw light" style="background:#F2EDE1">F2EDE1</div>
+    </div>
+  </div>
+  <div class="leg">
+    <h3>B · 로즈 &amp; 세이지 <span class="tag">Rose + Banggut Mint</span></h3>
+    <p>기존 방긋 민트(#5FA48E 계열)를 살짝 차분하게 되살린 버전. 브랜드 연속성 최강. 민트가 이제는 "포인트"만.</p>
+    <div class="swatches">
+      <div class="sw dark" style="background:#CE5A6F">CE5A6F</div>
+      <div class="sw dark" style="background:#7A3340">7A3340</div>
+      <div class="sw light" style="background:#F0CFD4">F0CFD4</div>
+      <div class="sw dark" style="background:#6BA594">6BA594</div>
+      <div class="sw light" style="background:#F3EEE0">F3EEE0</div>
+    </div>
+  </div>
+  <div class="leg">
+    <h3>C · 로즈 원컬러 <span class="tag">Rose, Paper &amp; Ink</span></h3>
+    <p>로즈 하나만 포인트. 나머지는 전부 종이/잉크/숯. 가장 "문구점" 톤. 2030/3040 모두 무난 안전.</p>
+    <div class="swatches">
+      <div class="sw dark" style="background:#CE5A6E">CE5A6E</div>
+      <div class="sw dark" style="background:#7A2E3D">7A2E3D</div>
+      <div class="sw light" style="background:#EFC9CF">EFC9CF</div>
+      <div class="sw light" style="background:#F3EEDF">F3EEDF</div>
+      <div class="sw dark" style="background:#23201C">23201C</div>
+    </div>
+  </div>
+</div>
+
+<div class="phones-row">
+
+  <!-- OPTION A -->
+  <div class="phone-col">
+    <div class="phone-label"><strong>Option A</strong><em>생화 로즈 + 허니 앰버</em></div>
+    <div class="phone opt-a">
+      <div class="status">
+        <span>9:41</span>
+        <span class="right">◉ 4G · 82%</span>
+      </div>
+      <div class="scroll">
+        <div class="greet">
+          <div class="hi">
+            <div class="row1">오늘도 한 장</div>
+            <div class="row2">four pages, or four hundred.</div>
+          </div>
+          <div class="streak-chip"><span class="dot"></span>7일 연속</div>
+        </div>
+
+        <div class="hero">
+          <div class="tag">읽는 중 · No. 03</div>
+          <div class="book-row">
+            <div class="cover"><span>달까지<br>가자</span></div>
+            <div class="info">
+              <div class="title">달까지 가자</div>
+              <div class="author">장류진 · 창비</div>
+              <div class="chapter">3장 중 3번째</div>
+            </div>
+          </div>
+          <div class="quote">&ldquo;그건 정말 꿈 같은 얘기였지만, 나는 그 꿈을 믿어보기로 했다.&rdquo;</div>
+          <div class="ruler">
+            <div class="meta"><span class="l">148 / 312 p</span><span class="r">47 percent</span></div>
+            <div class="track">
+              <div class="fill" style="width:47%;"></div>
+              <div class="pointer" style="left:47%;"></div>
+              <div class="notches">
+                <div class="notch big"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div>
+                <div class="notch big"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div>
+                <div class="notch big"></div><div class="notch"></div><div class="notch"></div><div class="notch big"></div>
+              </div>
+            </div>
+          </div>
+          <button class="cta">어제 멈춘 쪽에서 이어가기</button>
+        </div>
+
+        <div class="week-card">
+          <div class="head"><div class="ttl">이번 주 <em>— week 17</em></div><div class="more">more →</div></div>
+          <div class="days">
+            <div class="day read"><div class="lbl">mon</div><div class="sq">15</div></div>
+            <div class="day read"><div class="lbl">tue</div><div class="sq">16</div></div>
+            <div class="day read"><div class="lbl">wed</div><div class="sq">17</div></div>
+            <div class="day read"><div class="lbl">thu</div><div class="sq">18</div></div>
+            <div class="day read"><div class="lbl">fri</div><div class="sq">19</div></div>
+            <div class="day read"><div class="lbl">sat</div><div class="sq">20</div></div>
+            <div class="day today event"><div class="lbl">sun</div><div class="sq">21</div></div>
+          </div>
+          <div class="events">
+            <div class="event-row meet"><span class="pin"></span><span class="date-chip">4.23</span><span class="ttl">목요 독서모임</span><span class="sub">수요일 저녁</span></div>
+            <div class="event-row wish"><span class="pin"></span><span class="date-chip">4.25</span><span class="ttl">위시: 소설 시작</span><span class="sub">예약됨</span></div>
+            <div class="event-row lib"><span class="pin"></span><span class="date-chip">4.28</span><span class="ttl">도서관 반납</span><span class="sub">『코스모스』</span></div>
+          </div>
+        </div>
+
+        <div class="feed-card">
+          <div class="head"><div class="ttl">친구들 <em>— recently</em></div><div class="head"></div></div>
+          <div class="friends">
+            <div class="av">수</div>
+            <div class="av">지</div>
+            <div class="av">민</div>
+            <div class="av more">+4</div>
+          </div>
+          <div class="feed-item"><div><span class="name">수진</span><span class="text">님이 <span class="book-name">시선으로부터</span>를 완독했어요</span></div></div>
+          <div class="feed-item"><div><span class="name">지민</span><span class="text">님이 이번 주 모임 후기를 남겼어요</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPTION B -->
+  <div class="phone-col">
+    <div class="phone-label"><strong>Option B</strong><em>로즈 + 방긋 민트 (하이브리드)</em></div>
+    <div class="phone opt-b">
+      <div class="status">
+        <span>9:41</span>
+        <span class="right">◉ 4G · 82%</span>
+      </div>
+      <div class="scroll">
+        <div class="greet">
+          <div class="hi">
+            <div class="row1">오늘도 한 장</div>
+            <div class="row2">four pages, or four hundred.</div>
+          </div>
+          <div class="streak-chip"><span class="dot"></span>7일 연속</div>
+        </div>
+
+        <div class="hero">
+          <div class="tag">읽는 중 · No. 03</div>
+          <div class="book-row">
+            <div class="cover"><span>달까지<br>가자</span></div>
+            <div class="info">
+              <div class="title">달까지 가자</div>
+              <div class="author">장류진 · 창비</div>
+              <div class="chapter">3장 중 3번째</div>
+            </div>
+          </div>
+          <div class="quote">&ldquo;그건 정말 꿈 같은 얘기였지만, 나는 그 꿈을 믿어보기로 했다.&rdquo;</div>
+          <div class="ruler">
+            <div class="meta"><span class="l">148 / 312 p</span><span class="r">47 percent</span></div>
+            <div class="track">
+              <div class="fill" style="width:47%;"></div>
+              <div class="pointer" style="left:47%;"></div>
+              <div class="notches">
+                <div class="notch big"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div>
+                <div class="notch big"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div>
+                <div class="notch big"></div><div class="notch"></div><div class="notch"></div><div class="notch big"></div>
+              </div>
+            </div>
+          </div>
+          <button class="cta">어제 멈춘 쪽에서 이어가기</button>
+        </div>
+
+        <div class="week-card">
+          <div class="head"><div class="ttl">이번 주 <em>— week 17</em></div><div class="more">more →</div></div>
+          <div class="days">
+            <div class="day read"><div class="lbl">mon</div><div class="sq">15</div></div>
+            <div class="day read"><div class="lbl">tue</div><div class="sq">16</div></div>
+            <div class="day read"><div class="lbl">wed</div><div class="sq">17</div></div>
+            <div class="day read"><div class="lbl">thu</div><div class="sq">18</div></div>
+            <div class="day read"><div class="lbl">fri</div><div class="sq">19</div></div>
+            <div class="day read"><div class="lbl">sat</div><div class="sq">20</div></div>
+            <div class="day today event"><div class="lbl">sun</div><div class="sq">21</div></div>
+          </div>
+          <div class="events">
+            <div class="event-row meet"><span class="pin"></span><span class="date-chip">4.23</span><span class="ttl">목요 독서모임</span><span class="sub">수요일 저녁</span></div>
+            <div class="event-row wish"><span class="pin"></span><span class="date-chip">4.25</span><span class="ttl">위시: 소설 시작</span><span class="sub">예약됨</span></div>
+            <div class="event-row lib"><span class="pin"></span><span class="date-chip">4.28</span><span class="ttl">도서관 반납</span><span class="sub">『코스모스』</span></div>
+          </div>
+        </div>
+
+        <div class="feed-card">
+          <div class="head"><div class="ttl">친구들 <em>— recently</em></div></div>
+          <div class="friends">
+            <div class="av">수</div>
+            <div class="av">지</div>
+            <div class="av">민</div>
+            <div class="av more">+4</div>
+          </div>
+          <div class="feed-item"><div><span class="name">수진</span><span class="text">님이 <span class="book-name">시선으로부터</span>를 완독했어요</span></div></div>
+          <div class="feed-item"><div><span class="name">지민</span><span class="text">님이 이번 주 모임 후기를 남겼어요</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPTION C -->
+  <div class="phone-col">
+    <div class="phone-label"><strong>Option C</strong><em>로즈 원컬러 · 종이와 잉크</em></div>
+    <div class="phone opt-c">
+      <div class="status">
+        <span>9:41</span>
+        <span class="right">◉ 4G · 82%</span>
+      </div>
+      <div class="scroll">
+        <div class="greet">
+          <div class="hi">
+            <div class="row1">오늘도 한 장</div>
+            <div class="row2">four pages, or four hundred.</div>
+          </div>
+          <div class="streak-chip"><span class="dot"></span>7일 연속</div>
+        </div>
+
+        <div class="hero">
+          <div class="tag">읽는 중 · No. 03</div>
+          <div class="book-row">
+            <div class="cover"><span>달까지<br>가자</span></div>
+            <div class="info">
+              <div class="title">달까지 가자</div>
+              <div class="author">장류진 · 창비</div>
+              <div class="chapter">3장 중 3번째</div>
+            </div>
+          </div>
+          <div class="quote">&ldquo;그건 정말 꿈 같은 얘기였지만, 나는 그 꿈을 믿어보기로 했다.&rdquo;</div>
+          <div class="ruler">
+            <div class="meta"><span class="l">148 / 312 p</span><span class="r">47 percent</span></div>
+            <div class="track">
+              <div class="fill" style="width:47%;"></div>
+              <div class="pointer" style="left:47%;"></div>
+              <div class="notches">
+                <div class="notch big"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div>
+                <div class="notch big"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div>
+                <div class="notch big"></div><div class="notch"></div><div class="notch"></div><div class="notch big"></div>
+              </div>
+            </div>
+          </div>
+          <button class="cta">어제 멈춘 쪽에서 이어가기</button>
+        </div>
+
+        <div class="week-card">
+          <div class="head"><div class="ttl">이번 주 <em>— week 17</em></div><div class="more">more →</div></div>
+          <div class="days">
+            <div class="day read"><div class="lbl">mon</div><div class="sq">15</div></div>
+            <div class="day read"><div class="lbl">tue</div><div class="sq">16</div></div>
+            <div class="day read"><div class="lbl">wed</div><div class="sq">17</div></div>
+            <div class="day read"><div class="lbl">thu</div><div class="sq">18</div></div>
+            <div class="day read"><div class="lbl">fri</div><div class="sq">19</div></div>
+            <div class="day read"><div class="lbl">sat</div><div class="sq">20</div></div>
+            <div class="day today event"><div class="lbl">sun</div><div class="sq">21</div></div>
+          </div>
+          <div class="events">
+            <div class="event-row meet"><span class="pin"></span><span class="date-chip">4.23</span><span class="ttl">목요 독서모임</span><span class="sub">수요일 저녁</span></div>
+            <div class="event-row wish"><span class="pin"></span><span class="date-chip">4.25</span><span class="ttl">위시: 소설 시작</span><span class="sub">예약됨</span></div>
+            <div class="event-row lib"><span class="pin"></span><span class="date-chip">4.28</span><span class="ttl">도서관 반납</span><span class="sub">『코스모스』</span></div>
+          </div>
+        </div>
+
+        <div class="feed-card">
+          <div class="head"><div class="ttl">친구들 <em>— recently</em></div></div>
+          <div class="friends">
+            <div class="av">수</div>
+            <div class="av">지</div>
+            <div class="av">민</div>
+            <div class="av more">+4</div>
+          </div>
+          <div class="feed-item"><div><span class="name">수진</span><span class="text">님이 <span class="book-name">시선으로부터</span>를 완독했어요</span></div></div>
+          <div class="feed-item"><div><span class="name">지민</span><span class="text">님이 이번 주 모임 후기를 남겼어요</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="notes">
+  <h2>세 옵션 비교 & 추천</h2>
+  <div class="grid">
+    <div class="col a">
+      <h4>A · 생화 로즈 <em>(가장 밸런스)</em></h4>
+      <p><strong>로즈 #D65A73</strong> — v1(#E85A7A 캔디) ↔ v2(#B84E57 벽돌) 중간. 생기 살아있지만 탁하지 않음.</p>
+      <p><strong>허니 앰버 #D99B3E</strong> — v1 버터(#E8B84F 장난감)와 v2 오커(#C79538 흙) 사이. 따뜻하고 성숙.</p>
+      <p><em>누구한테: 밸런스 우선, 브랜드 색을 과감히 리뉴얼하고 싶을 때.</em></p>
+    </div>
+    <div class="col b">
+      <h4>B · 로즈 + 민트 <em>(브랜드 연속성)</em></h4>
+      <p><strong>로즈 #CE5A6F</strong> — 채도 살짝 더 낮춘 차분 톤.</p>
+      <p><strong>민트 #6BA594</strong> — 기존 방긋 민트를 살짝 성숙하게 재조정. 포인트로만 사용 (이벤트 도트, 친구 아바타).</p>
+      <p><em>누구한테: 기존 유저 재방문 때 이질감 최소. "방긋은 여전한데 어른스러워졌네" 반응 유도.</em></p>
+    </div>
+    <div class="col c">
+      <h4>C · 로즈 원컬러 <em>(가장 안전)</em></h4>
+      <p><strong>로즈 #CE5A6E 단일 포인트</strong> — 팝 컬러 없이 로즈 하나로 강약.</p>
+      <p><strong>종이 + 잉크 + 숯</strong>으로만 구성. 뮤지/미도리 문구 톤.</p>
+      <p><em>누구한테: 리스크 제로. 남녀노소 30대 후반까지 아무도 반사적으로 거부 안 함. 다만 브랜드 인상 옅음.</em></p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

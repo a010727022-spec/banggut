@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { Settings, Users, ChevronRight, Flame, LogOut, Check, MapPin, Clock, AlertTriangle, User, RefreshCw } from "lucide-react";
 import { useThemeStore } from "@/stores/useThemeStore";
 import { useHomeLayoutStore, type HomeLayout } from "@/stores/useHomeLayoutStore";
+import { useLibraryViewStore } from "@/stores/useLibraryViewStore";
 import { AVATAR_IMAGES, EMOJI_AVATARS, getAvatarSrc } from "@/lib/types";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -39,6 +40,7 @@ export default function ProfilePage() {
   const [statsWidget, setStatsWidget] = useState<"today_goal" | "yearly_ring">("today_goal");
   const homeLayout = useHomeLayoutStore((s) => s.layout);
   const setHomeLayoutStore = useHomeLayoutStore((s) => s.setLayout);
+  const libraryView = useLibraryViewStore((s) => s.view);
   const [yearlyGoal, setYearlyGoal] = useState<number | null>(null);
   const [dailyPageGoal, setDailyPageGoal] = useState<number | null>(null);
   const [goalsEditing, setGoalsEditing] = useState(false);
@@ -396,6 +398,46 @@ export default function ProfilePage() {
         </button>
       </div>
 
+      {/* ═══ 서재 뷰 (선택 스크린으로 연결) ═══ */}
+      <div style={{ fontSize: 10, fontWeight: 700, color: "var(--tm)", letterSpacing: "0.8px", textTransform: "uppercase", padding: "0 20px 8px", transition: "color 0.4s" }}>📚 서재</div>
+      <div style={{ margin: "0 20px 14px" }}>
+        <button
+          onClick={() => router.push("/settings/library-view")}
+          aria-label="서재 뷰 설정으로 이동"
+          style={{
+            width: "100%",
+            background: "var(--sf)",
+            borderRadius: 14,
+            border: "0.5px solid var(--bd)",
+            padding: "14px 16px",
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            cursor: "pointer",
+            textAlign: "left",
+            transition: "all 0.4s",
+          }}
+        >
+          <div style={{
+            width: 40, height: 40, borderRadius: 12,
+            background: "color-mix(in srgb, var(--ac) 15%, var(--bg))",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: "var(--ac)", fontSize: 20, flexShrink: 0,
+          }}>
+            📚
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "var(--tp)", lineHeight: 1.3 }}>
+              서재 뷰
+            </div>
+            <div style={{ fontSize: 11, color: "var(--tm)", marginTop: 2 }}>
+              현재: {libraryView === "A" ? "책꽂이" : libraryView === "B" ? "큐레이션 보드" : "4 스택"}
+            </div>
+          </div>
+          <ChevronRight size={16} color="var(--tm)" />
+        </button>
+      </div>
+
       {/* ═══ 독서 목표 ═══ */}
       <div style={{ fontSize: 10, fontWeight: 700, color: "var(--tm)", letterSpacing: "0.8px", textTransform: "uppercase", padding: "0 20px 8px", transition: "color 0.4s" }}>🎯 독서 목표</div>
       <div style={{ margin: "0 20px 14px", background: "var(--sf)", borderRadius: 14, border: "0.5px solid var(--bd)", padding: 16, transition: "all 0.4s" }}>
@@ -689,28 +731,87 @@ export default function ProfilePage() {
         </>
       )}
 
-      {/* ═══ 테마 피커 (HTML .th-grid) ═══ */}
+      {/* ═══ 테마 피커 — v6: 민트 / 프라다 2-카드 ═══ */}
       <div style={{ fontSize: 10, fontWeight: 700, color: "var(--tm)", letterSpacing: "0.8px", textTransform: "uppercase", padding: "0 20px 12px", transition: "color 0.4s" }}>테마</div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8, padding: "0 20px", marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, padding: "0 20px", marginBottom: 20 }}>
         {([
-          { id: "dark" as const, label: "밤숲", bg: "linear-gradient(135deg, #0c0f0d, #1a2e22)" },
-          { id: "cream" as const, label: "크림", bg: "linear-gradient(135deg, #F4EFE8, #DDD6CC)" },
-          { id: "navy" as const, label: "네이비", bg: "linear-gradient(135deg, #080c18, #162030)" },
-          { id: "sepia" as const, label: "세피아", bg: "linear-gradient(135deg, #191410, #302518)" },
-          { id: "blossom" as const, label: "블러썸", bg: "linear-gradient(135deg, #fdf0f5, #ead1e6)" },
+          {
+            id: "mint" as const,
+            name: "산뜻한 민트",
+            sub: "FRESH MINT",
+            swatches: ["#F7F3ED", "#5FA48E", "#CDE4DB"],
+          },
+          {
+            id: "prada" as const,
+            name: "시크한 프라다",
+            sub: "CHIC SAFFIANO",
+            swatches: ["#FBF5E0", "#0F0E0C", "#8A6B42"],
+          },
         ]).map((t) => {
           const sel = theme === t.id;
           return (
-            <button key={t.id} onClick={() => setTheme(t.id)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 7, cursor: "pointer", background: "none", border: "none", padding: 0 }}>
-              <div style={{
-                width: 52, height: 52, borderRadius: 14, background: t.bg,
-                border: sel ? "2.5px solid var(--ac)" : "2.5px solid transparent",
-                position: "relative", overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.25)", transition: "border-color 0.2s",
-              }}>
-                <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.15), transparent 60%)" }} />
-                {sel && <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}><Check size={18} color="rgba(255,255,255,0.9)" strokeWidth={2.5} /></div>}
+            <button
+              key={t.id}
+              onClick={() => setTheme(t.id)}
+              aria-label={`${t.name} 테마로 전환`}
+              aria-pressed={sel}
+              style={{
+                position: "relative",
+                padding: "14px 14px 12px",
+                borderRadius: 14,
+                background: sel ? "color-mix(in srgb, var(--ac) 8%, var(--sf))" : "var(--sf)",
+                border: sel ? "1.5px solid var(--ac)" : "0.5px solid var(--bd)",
+                textAlign: "left",
+                cursor: "pointer",
+                transition: "background var(--duration-normal) var(--easing-default), border-color var(--duration-normal) var(--easing-default)",
+                fontFamily: "inherit",
+              }}
+            >
+              {/* Swatches */}
+              <div style={{ display: "flex", gap: 5, marginBottom: 10 }}>
+                {t.swatches.map((c, i) => (
+                  <span key={i} style={{
+                    width: 18, height: 18, borderRadius: "50%",
+                    background: c,
+                    border: "1px solid rgba(15,14,12,0.08)",
+                    boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.15)",
+                    display: "block",
+                  }} />
+                ))}
               </div>
-              <span style={{ fontSize: 9, fontWeight: 700, color: sel ? "var(--ac)" : "var(--tm)", letterSpacing: "0.5px", transition: "color 0.4s" }}>{t.label}</span>
+              {/* Name */}
+              <div style={{
+                fontSize: 13,
+                fontWeight: 700,
+                color: "var(--tp)",
+                letterSpacing: "-0.01em",
+                marginBottom: 2,
+              }}>{t.name}</div>
+              {/* Sub */}
+              <div style={{
+                fontSize: 9,
+                fontWeight: 600,
+                color: "var(--tm)",
+                letterSpacing: "0.18em",
+                fontVariantNumeric: "tabular-nums",
+              }}>{t.sub}</div>
+              {/* Check mark when selected */}
+              {sel && (
+                <div style={{
+                  position: "absolute",
+                  top: 12,
+                  right: 12,
+                  width: 18,
+                  height: 18,
+                  borderRadius: "50%",
+                  background: "var(--ac)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }} aria-hidden>
+                  <Check size={11} color="var(--acc)" strokeWidth={3} />
+                </div>
+              )}
             </button>
           );
         })}

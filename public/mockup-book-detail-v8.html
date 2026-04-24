@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>책 상세 · 읽는 중 v8 — 25분 집중 읽기</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;word-break:keep-all}
+
+:root{
+  --bg:#F7F3ED;
+  --bg2:#F0EADF;
+  --paper:#FBF7EF;
+  --sf:#FFFFFF;
+  --sf2:#EDE7DF;
+  --sf3:#E0D9D0;
+  --ink:#1c201d;
+  --ink2:#4a5550;
+  --ink3:#7a8b7e;
+  --mint:#5FA48E;
+  --mint2:#7ABBA4;
+  --mint3:#A4D4C0;
+  --bd:rgba(95,164,142,0.14);
+  --bd2:rgba(95,164,142,0.3);
+  --acc:#f7f3ed;
+  --danger:#C55E4A;
+  --honey:#D4A056;
+  --honey2:#E8B86A;
+  --washi:#F4D9B4;
+  --font-playful:'Gaegu',cursive;
+  --ls:0.02em;
+}
+
+body{
+  font-family:'Pretendard',system-ui,-apple-system,sans-serif;
+  background:#D8D1C5;
+  padding:32px 20px 48px;
+  min-height:100vh;
+  color:var(--ink);
+}
+
+.wrap{max-width:1280px;margin:0 auto}
+
+.title{
+  font-family:var(--font-playful);
+  font-size:32px;font-weight:700;letter-spacing:var(--ls);
+  text-align:center;margin-bottom:6px;
+}
+.sub{color:var(--ink2);font-size:13px;text-align:center;margin-bottom:32px;font-weight:500;line-height:1.65}
+.sub em{font-style:normal;color:var(--mint);font-weight:700}
+.sub .c{display:inline-block;background:var(--sf);padding:2px 10px;border-radius:100px;border:0.5px solid var(--bd2);color:var(--mint);font-family:var(--font-playful);font-size:14px;letter-spacing:var(--ls);margin:0 2px}
+
+.phones{display:flex;gap:24px;justify-content:center;flex-wrap:wrap}
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;max-width:400px}
+
+.phone-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:7px 16px;border-radius:100px;
+  background:#FFFFFF;border:1px solid var(--bd2);
+  font-size:11.5px;font-weight:700;color:var(--mint);letter-spacing:0.4px;
+}
+.phone-badge b{font-family:var(--font-playful);font-size:13px;letter-spacing:var(--ls)}
+.phone-badge.active{background:var(--mint);color:#fff;border-color:var(--mint)}
+.phone-badge.done{background:color-mix(in srgb,var(--mint) 18%,var(--sf));color:var(--mint);border-color:var(--bd2)}
+
+.phone{width:380px;height:820px;border-radius:44px;box-shadow:0 0 0 3px #1a1a1a,0 0 28px rgba(0,0,0,0.12);overflow:hidden;position:relative}
+.phone-desc{font-size:11.5px;color:var(--ink2);text-align:center;line-height:1.65;max-width:380px;font-weight:500}
+.phone-desc strong{color:var(--mint);font-weight:700}
+
+.status{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;font-size:14px;font-weight:700;color:var(--ink)}
+
+/* ================ Solo root ================ */
+.p-solo{
+  --tint1:#9A6B3A;
+  height:100%;
+  background:
+    radial-gradient(ellipse 640px 360px at 50% -40px,color-mix(in srgb,var(--tint1) 14%,var(--bg)),var(--bg) 62%),
+    var(--bg);
+  position:relative;overflow:auto;
+}
+.p-solo::-webkit-scrollbar{width:0}
+
+/* ================ Nav ================ */
+.nav{display:flex;justify-content:space-between;padding:8px 20px 2px;position:relative;z-index:3}
+.nav-btn{
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(255,255,255,0.8);backdrop-filter:blur(8px);
+  border:0.5px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--ink2);cursor:pointer;
+}
+.nav-btn svg{width:15px;height:15px}
+
+/* ================ Head ================ */
+.head{padding:14px 24px 18px;display:flex;gap:18px;align-items:flex-start;position:relative}
+.head-cover{
+  width:84px;height:120px;border-radius:7px;
+  box-shadow:0 12px 28px rgba(0,0,0,0.22),0 3px 8px rgba(0,0,0,0.08);
+  flex-shrink:0;display:flex;align-items:flex-end;padding:8px;
+  font-size:10px;font-weight:800;line-height:1.15;position:relative;
+  background:linear-gradient(135deg,#9A6B3A,#C48D58);color:#f4efe8;
+}
+.head-cover::after{
+  content:"";position:absolute;top:3px;left:3px;right:3px;height:35%;
+  background:linear-gradient(135deg,rgba(255,255,255,0.18),transparent 60%);
+  border-radius:5px;pointer-events:none;
+}
+.head-body{flex:1;min-width:0;padding-top:2px}
+.head-subtitle{font-size:10.5px;font-weight:700;color:var(--mint);letter-spacing:1.4px;text-transform:uppercase;margin-bottom:6px}
+
+.position-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:var(--font-playful);font-size:11.5px;font-weight:700;
+  color:var(--ink);letter-spacing:var(--ls);
+  background:color-mix(in srgb,var(--mint) 14%,var(--sf));
+  padding:2px 9px;border-radius:100px;
+  margin-left:6px;vertical-align:middle;
+  border:0.5px solid var(--bd2);
+}
+.position-badge::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--mint)}
+
+.head-title{
+  font-size:20px;font-weight:800;color:var(--ink);
+  letter-spacing:-0.015em;line-height:1.22;margin-bottom:3px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.head-author{font-size:11.5px;color:var(--ink3);font-weight:500;margin-bottom:10px}
+.head-meta{display:flex;align-items:baseline;gap:6px;font-size:11.5px;color:var(--ink2)}
+.head-meta b{font-family:var(--font-playful);font-size:17px;color:var(--mint);letter-spacing:var(--ls);line-height:1;font-weight:700}
+.head-meta .dot{width:3px;height:3px;border-radius:50%;background:var(--bd2);margin:0 4px}
+
+/* ================ Streak ================ */
+.streak{
+  margin:14px 20px 0;padding:11px 14px;
+  background:rgba(255,255,255,0.72);backdrop-filter:blur(6px);
+  border:0.5px solid var(--bd);border-radius:14px;
+  display:flex;align-items:center;gap:10px;
+  font-size:11.5px;color:var(--ink2);line-height:1.4;
+}
+.streak svg{width:14px;height:14px;color:var(--mint);flex-shrink:0}
+.streak b{font-family:var(--font-playful);font-size:14px;color:var(--mint);letter-spacing:var(--ls);font-weight:700}
+
+.streak-edge{
+  display:flex;align-items:flex-end;gap:2px;
+  margin-left:auto;flex-shrink:0;height:18px;padding:0 4px;
+  border-bottom:1.5px solid var(--ink);
+  border-bottom-left-radius:1px;border-bottom-right-radius:1px;
+}
+.streak-mark{width:2.5px;height:12px;background:var(--sf3);border-radius:1px}
+.streak-mark.on{background:var(--mint);height:14px}
+.streak-mark.on.today{
+  background:linear-gradient(180deg,var(--mint) 0%,var(--mint2) 100%);
+  height:16px;box-shadow:0 0 0 2px color-mix(in srgb,var(--mint) 22%,transparent);
+}
+
+/* ================ ⏱ POMODORO · 3 states ================ */
+
+/* --- State 1 · 대기 (compact 1-line) --- */
+.pomo-idle{
+  margin:14px 20px 0;padding:12px 14px 12px 16px;
+  background:var(--sf);border:1px solid var(--bd);border-radius:14px;
+  display:flex;align-items:center;gap:10px;
+  position:relative;overflow:hidden;
+  cursor:pointer;transition:border-color 140ms ease,transform 140ms ease;
+}
+.pomo-idle:hover{border-color:var(--bd2);transform:translateY(-1px)}
+.pomo-idle::before{
+  content:"";position:absolute;top:0;bottom:0;left:0;width:3px;
+  background:linear-gradient(180deg,var(--mint),var(--mint2));
+}
+.pomo-idle-icon{
+  width:32px;height:32px;border-radius:10px;
+  background:color-mix(in srgb,var(--mint) 14%,var(--sf));
+  display:flex;align-items:center;justify-content:center;
+  color:var(--mint);flex-shrink:0;
+}
+.pomo-idle-icon svg{width:16px;height:16px}
+.pomo-idle-body{flex:1;min-width:0}
+.pomo-idle-t{
+  font-family:var(--font-playful);font-size:15px;font-weight:700;
+  color:var(--ink);letter-spacing:var(--ls);line-height:1.15;margin-bottom:2px;
+}
+.pomo-idle-s{font-size:11px;color:var(--ink3);line-height:1.35}
+.pomo-idle-go{
+  padding:7px 12px;border-radius:100px;
+  background:linear-gradient(135deg,var(--mint),var(--mint2));
+  color:var(--acc);
+  font-family:var(--font-playful);font-size:12px;font-weight:700;
+  letter-spacing:var(--ls);flex-shrink:0;
+  display:flex;align-items:center;gap:5px;
+  box-shadow:0 3px 10px color-mix(in srgb,var(--mint) 24%,transparent);
+  border:none;cursor:pointer;
+}
+.pomo-idle-go svg{width:11px;height:11px}
+
+/* --- State 2 · 진행중 (expanded with ring) --- */
+.pomo-run{
+  margin:14px 20px 0;padding:18px 18px 14px;
+  background:linear-gradient(155deg,color-mix(in srgb,var(--mint) 7%,var(--sf)) 0%,var(--sf) 70%);
+  border:1px solid var(--bd2);
+  border-radius:20px;
+  position:relative;overflow:hidden;
+  box-shadow:0 6px 22px color-mix(in srgb,var(--mint) 12%,transparent);
+}
+.pomo-run::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--mint),var(--mint2));
+}
+.pomo-run-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.pomo-run-label{
+  display:flex;align-items:center;gap:6px;
+  font-size:10px;font-weight:700;color:var(--mint);
+  letter-spacing:1.4px;text-transform:uppercase;
+}
+.pomo-run-label svg{width:11px;height:11px}
+.pomo-run-status{
+  font-family:var(--font-playful);font-size:12.5px;
+  color:var(--ink3);letter-spacing:var(--ls);font-weight:700;
+  display:flex;align-items:center;gap:5px;
+}
+.pomo-run-status::before{
+  content:"";width:6px;height:6px;border-radius:50%;
+  background:var(--mint);
+  animation:pomo-pulse 1.6s ease-in-out infinite;
+}
+@keyframes pomo-pulse{0%,100%{opacity:1}50%{opacity:0.35}}
+
+.pomo-run-body{display:flex;align-items:center;gap:18px;margin-bottom:14px}
+
+.pomo-ring{position:relative;width:94px;height:94px;flex-shrink:0}
+.pomo-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.pomo-ring .track{fill:none;stroke:var(--bg2);stroke-width:6}
+.pomo-ring .fill{
+  fill:none;stroke:url(#pomo-grad);stroke-width:6;stroke-linecap:round;
+  stroke-dasharray:276.46;
+  stroke-dashoffset:88.47; /* 68% progressed */
+  transition:stroke-dashoffset 1s linear;
+}
+.pomo-ring-center{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  pointer-events:none;
+}
+.pomo-ring-center b{
+  font-family:var(--font-playful);font-size:24px;
+  color:var(--ink);letter-spacing:var(--ls);
+  font-weight:700;line-height:1;
+}
+.pomo-ring-center span{
+  font-size:9px;color:var(--ink3);font-weight:600;
+  letter-spacing:0.3px;margin-top:1px;text-transform:uppercase;
+}
+
+.pomo-run-text{flex:1;min-width:0}
+.pomo-run-phase{
+  font-family:var(--font-playful);font-size:17px;font-weight:700;
+  color:var(--mint);letter-spacing:var(--ls);line-height:1.2;margin-bottom:4px;
+}
+.pomo-run-note{font-size:11px;color:var(--ink3);line-height:1.45}
+.pomo-run-note b{
+  font-family:var(--font-playful);font-size:13px;color:var(--ink);
+  letter-spacing:var(--ls);font-weight:700;
+}
+
+.pomo-run-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pomo-btn{
+  padding:11px 0;border-radius:11px;
+  background:var(--sf);border:1px solid var(--bd);
+  font-family:var(--font-playful);font-size:13.5px;font-weight:700;
+  color:var(--ink2);letter-spacing:var(--ls);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  transition:border-color 140ms ease,transform 140ms ease;
+}
+.pomo-btn:hover{border-color:var(--bd2);transform:translateY(-1px)}
+.pomo-btn.pause{
+  background:color-mix(in srgb,var(--mint) 10%,var(--sf));
+  border-color:var(--bd2);color:var(--mint);
+}
+.pomo-btn svg{width:11px;height:11px}
+
+@media (prefers-reduced-motion:reduce){
+  .pomo-run-status::before{animation:none}
+  .pomo-ring .fill{transition:none}
+}
+
+/* --- State 3 · 완료 (celebration banner) --- */
+.pomo-done{
+  margin:14px 20px 0;padding:13px 16px 13px 14px;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--mint) 18%,var(--sf)),var(--sf) 75%);
+  border:1px solid var(--mint);
+  border-radius:14px;
+  display:flex;align-items:center;gap:10px;
+  position:relative;overflow:hidden;
+  box-shadow:0 4px 16px color-mix(in srgb,var(--mint) 18%,transparent);
+  animation:pomo-pop 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+@keyframes pomo-pop{
+  0%{transform:scale(0.96);opacity:0}
+  100%{transform:scale(1);opacity:1}
+}
+.pomo-done-icon{
+  width:34px;height:34px;border-radius:50%;
+  background:linear-gradient(135deg,var(--mint),var(--mint2));
+  color:#fff;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.pomo-done-icon svg{width:17px;height:17px}
+.pomo-done-body{flex:1;min-width:0}
+.pomo-done-t{
+  font-family:var(--font-playful);font-size:16px;font-weight:700;
+  color:var(--ink);letter-spacing:var(--ls);line-height:1.2;margin-bottom:2px;
+}
+.pomo-done-s{font-size:11px;color:var(--ink3);line-height:1.35}
+.pomo-done-s em{font-style:normal;color:var(--mint);font-weight:700}
+
+@media (prefers-reduced-motion:reduce){
+  .pomo-done{animation:none}
+}
+
+/* ================ Focus Card ================ */
+.focus{
+  margin:14px 20px 0;padding:20px 20px 18px;
+  background:var(--sf);border:1px solid var(--bd);border-radius:20px;
+  position:relative;
+  box-shadow:0 6px 20px color-mix(in srgb,var(--mint) 10%,transparent);
+  overflow:visible;
+  transition:opacity 200ms ease;
+}
+.focus.dim{opacity:0.5}
+.focus.dim::after{
+  content:"";position:absolute;inset:0;border-radius:20px;
+  background:rgba(247,243,237,0.35);pointer-events:none;z-index:5;
+}
+
+.focus::before{
+  content:"";position:absolute;top:0;right:0;
+  width:54px;height:54px;
+  background:linear-gradient(225deg,var(--bg2) 0%,var(--bg2) 50%,transparent 50%,transparent 100%);
+  border-top-right-radius:20px;
+  pointer-events:none;z-index:1;
+}
+.focus-fold{
+  position:absolute;top:0;right:0;
+  width:54px;height:54px;
+  background:linear-gradient(225deg,var(--paper) 0%,#F5EFE2 48%,transparent 50%,transparent 100%);
+  border-top-right-radius:20px;
+  filter:drop-shadow(-2px 3px 2px rgba(28,32,29,0.08));
+  z-index:2;pointer-events:none;
+}
+.focus-fold-date{
+  position:absolute;top:14px;right:8px;
+  font-family:var(--font-playful);font-size:12px;color:var(--ink2);letter-spacing:var(--ls);
+  font-weight:700;line-height:1;
+  transform:rotate(-45deg);transform-origin:center;
+  text-align:center;z-index:3;width:36px;
+}
+.focus-fold-date b{display:block;font-size:16px;color:var(--mint);line-height:1;margin-top:1px}
+
+.focus-label{
+  display:flex;align-items:center;gap:6px;
+  font-size:10px;font-weight:700;color:var(--mint);
+  letter-spacing:1.4px;text-transform:uppercase;margin-bottom:8px;
+  position:relative;z-index:4;
+}
+.focus-label svg{width:11px;height:11px}
+
+.focus-q{
+  font-family:var(--font-playful);
+  font-size:21px;font-weight:700;color:var(--ink);
+  letter-spacing:var(--ls);line-height:1.3;margin-bottom:5px;
+  max-width:230px;position:relative;z-index:4;
+}
+.focus-hint{font-size:11.5px;color:var(--ink3);margin-bottom:16px;font-weight:500;position:relative;z-index:4}
+.focus-hint b{font-family:var(--font-playful);font-size:13.5px;color:var(--mint);letter-spacing:var(--ls);font-weight:700}
+
+.chips{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:7px;margin-bottom:12px;position:relative;z-index:4}
+.chip{
+  padding:10px 0;border-radius:11px;
+  background:var(--bg2);border:1px solid var(--bd);
+  font-family:var(--font-playful);font-size:14px;font-weight:700;
+  color:var(--ink);letter-spacing:var(--ls);text-align:center;cursor:pointer;
+  transition:all 140ms cubic-bezier(0.16,1,0.3,1);
+}
+.chip:hover{border-color:var(--bd2)}
+.chip.on{
+  background:color-mix(in srgb,var(--mint) 14%,var(--sf));
+  border-color:var(--mint);color:var(--mint);
+  box-shadow:0 2px 8px color-mix(in srgb,var(--mint) 20%,transparent);
+}
+.chip.ed{font-family:'Pretendard',system-ui,sans-serif;font-size:11.5px;font-weight:600;color:var(--ink2);display:flex;align-items:center;justify-content:center;gap:3px}
+.chip.ed svg{width:11px;height:11px;opacity:0.7}
+
+.cta{
+  width:100%;padding:13px;border-radius:12px;
+  background:linear-gradient(135deg,var(--mint),var(--mint2));
+  color:var(--acc);font-size:13.5px;font-weight:700;
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  box-shadow:0 4px 14px color-mix(in srgb,var(--mint) 26%,transparent);
+  transition:transform 140ms cubic-bezier(0.16,1,0.3,1);
+  position:relative;z-index:4;
+}
+.cta:hover{transform:translateY(-1px)}
+.cta svg{width:13px;height:13px}
+
+/* ================ Cameo ================ */
+.cameo{
+  margin:-4px 32px 0;
+  padding:14px 16px 13px;
+  background:var(--paper);
+  border:0.5px solid rgba(28,32,29,0.06);
+  border-radius:4px;
+  position:relative;
+  transform:rotate(-1.2deg);
+  box-shadow:0 6px 14px rgba(28,32,29,0.08);
+  font-family:var(--font-playful);
+  font-size:14px;line-height:1.45;letter-spacing:var(--ls);color:var(--ink);
+}
+.cameo::before{
+  content:"";position:absolute;
+  top:-8px;left:50%;transform:translateX(-50%) rotate(-2deg);
+  width:72px;height:18px;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--washi) 80%,#ffffff) 0%,var(--washi) 50%,color-mix(in srgb,var(--washi) 80%,#ffffff) 100%);
+  opacity:0.85;
+  box-shadow:0 1px 2px rgba(28,32,29,0.06);border-radius:1px;
+}
+.cameo-label{
+  display:block;font-family:'Pretendard',system-ui,sans-serif;
+  font-size:9.5px;font-weight:700;color:var(--ink3);
+  letter-spacing:1.2px;text-transform:uppercase;margin-bottom:3px;padding-top:4px;
+}
+.cameo em{font-style:normal;color:var(--mint);font-weight:700}
+
+/* ================ Entry · AI 토론 ================ */
+.entry{
+  margin:12px 20px 0;padding:14px 16px;
+  background:var(--sf);border:1px solid var(--bd);border-radius:16px;
+  display:flex;align-items:center;gap:12px;cursor:pointer;
+  transition:border-color 140ms ease;position:relative;overflow:hidden;
+}
+.entry:hover{border-color:var(--bd2)}
+.entry-avatar{
+  width:42px;height:42px;border-radius:12px;
+  background:color-mix(in srgb,var(--mint) 14%,var(--sf));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-playful);font-size:12px;font-weight:700;
+  color:var(--mint);letter-spacing:var(--ls);flex-shrink:0;
+}
+.entry-body{flex:1;min-width:0}
+.entry-t{font-size:13.5px;font-weight:700;color:var(--ink);letter-spacing:-0.01em;line-height:1.25;margin-bottom:2px}
+.entry-s{font-size:11px;color:var(--ink3);line-height:1.4}
+.entry-s em{font-style:normal;color:var(--mint);font-weight:700}
+.entry-arr{color:var(--ink3);flex-shrink:0}
+.entry-arr svg{width:14px;height:14px}
+
+/* ================ Subs · 문장 긋기 + 서평 ================ */
+.subs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 20px 0}
+.sub{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:14px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:border-color 140ms ease,transform 140ms ease}
+.sub:hover{border-color:var(--bd2);transform:translateY(-1px)}
+.sub-icon{width:34px;height:34px;border-radius:10px;background:color-mix(in srgb,var(--mint) 14%,var(--sf));display:flex;align-items:center;justify-content:center;color:var(--mint);flex-shrink:0}
+.sub-icon svg{width:15px;height:15px}
+.sub-body{flex:1;min-width:0}
+.sub-t{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.2;margin-bottom:2px}
+.sub-s{font-size:10.5px;color:var(--ink3);line-height:1.3}
+.sub-count{font-family:var(--font-playful);font-size:13px;font-weight:700;color:var(--mint);letter-spacing:var(--ls);line-height:1}
+
+/* ================ Past · 지난 기록 ================ */
+.past-label{margin:18px 20px 8px;font-family:var(--font-playful);font-size:12px;font-weight:700;color:var(--ink3);letter-spacing:var(--ls);display:flex;align-items:center;gap:8px}
+.past-label::after{content:"";flex:1;height:1px;background:var(--bd)}
+
+.past{margin:0 20px 8px;padding:12px 14px;background:rgba(255,255,255,0.6);border:1px solid var(--bd);border-radius:14px;display:flex;gap:12px;align-items:center}
+.past-date{font-family:var(--font-playful);font-size:11.5px;color:var(--ink3);letter-spacing:var(--ls);min-width:34px;text-align:center;line-height:1.1;font-weight:700}
+.past-date b{display:block;font-size:17px;color:var(--mint);line-height:1}
+.past-body{flex:1;min-width:0}
+.past-body b{font-family:var(--font-playful);font-size:13px;color:var(--ink);letter-spacing:var(--ls);font-weight:700}
+.past-body span{display:block;font-size:11px;color:var(--ink3);margin-top:2px;line-height:1.35}
+.past-body em{font-style:normal;color:var(--mint);font-weight:700;font-family:var(--font-playful);font-size:12.5px;letter-spacing:var(--ls)}
+
+/* ================ 🔒 Locked state (완독 전) ================ */
+.entry.locked, .sub.locked{
+  opacity:0.62;
+  background:var(--bg2);
+  cursor:default;
+  pointer-events:none;
+}
+.entry.locked .entry-avatar, .sub.locked .sub-icon{
+  background:var(--sf2);color:var(--ink3);
+}
+.entry.locked .entry-s, .sub.locked .sub-s{color:var(--ink3)}
+.entry.locked .entry-arr{color:var(--ink3)}
+.lk-ic{width:10px;height:10px;margin-right:3px;color:var(--ink3);vertical-align:-1px}
+.lk-big{width:16px;height:16px;color:var(--ink3)}
+
+/* ================ Bottom tabs & pad ================ */
+.btmtabs{position:absolute;bottom:0;left:0;right:0;height:60px;background:rgba(247,243,237,0.92);backdrop-filter:blur(10px);border-top:0.5px solid var(--bd);display:grid;grid-template-columns:repeat(4,1fr);padding:4px 12px 8px;z-index:4}
+.btmtab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--ink3);font-size:9.5px;font-weight:600;cursor:pointer}
+.btmtab.on{color:var(--mint)}
+.btmtab svg{width:16px;height:16px}
+.bottom-pad{height:76px}
+
+/* ================ Note ================ */
+.note{margin:40px auto 0;padding:26px 30px;background:#FFFFFF;border:1px solid var(--bd2);border-radius:20px;color:var(--ink);font-size:12.5px;line-height:1.8;max-width:1200px}
+.note-title{font-family:var(--font-playful);font-size:20px;font-weight:700;color:var(--mint);margin-bottom:10px;letter-spacing:var(--ls)}
+.note h4{font-family:var(--font-playful);font-size:15px;color:var(--ink);letter-spacing:var(--ls);margin:14px 0 6px;font-weight:700}
+.note ol{margin-left:22px}
+.note li{margin-bottom:6px;color:var(--ink2)}
+.note strong{color:var(--mint);font-weight:700}
+.note code{background:var(--bg2);padding:1px 6px;border-radius:4px;font-size:11px;font-family:ui-monospace,monospace;color:var(--ink)}
+</style>
+</head>
+<body>
+
+<!-- shared SVG gradient -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="pomo-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#5FA48E"/>
+      <stop offset="100%" stop-color="#7ABBA4"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <div class="title">책 상세 · 읽는 중 v8</div>
+  <div class="sub">기능은 <em>딱 하나</em> — 25분 집중 읽기 타이머<br>
+    <span class="c">대기</span> → <span class="c">진행중</span> → <span class="c">완료</span> 3-state · Focus Card ↔ cameo 사이 고정
+  </div>
+
+  <div class="phones">
+
+    <!-- ======== Phone 1 · 대기 ======== -->
+    <div class="phone-wrap">
+      <div class="phone-badge"><b>Solo · 대기</b> · 1-line 카드</div>
+      <div class="phone">
+        <div class="p-solo">
+          <div class="status">
+            <span>9:41</span>
+            <svg width="14" height="11" viewBox="0 0 14 11" fill="currentColor"><path d="M1 4h1v5H1zM4 2.5h1V9H4zM7 1h1v8H7zM10 2.5h1V9h-1zM13 4h1v5h-1z"/></svg>
+          </div>
+
+          <div class="nav">
+            <div class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+            <div class="nav-btn"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></div>
+          </div>
+
+          <div class="head">
+            <div class="head-cover">캐릭터<br>심리<br>사전</div>
+            <div class="head-body">
+              <div class="head-subtitle">READING · 12일차</div>
+              <div class="head-title">캐릭터 심리 사전<span class="position-badge">후반부 진입</span></div>
+              <div class="head-author">린다 N. 에델스타인</div>
+              <div class="head-meta"><b>245</b><span>/ 340쪽</span><span class="dot"></span><b>72%</b></div>
+            </div>
+          </div>
+
+          <div class="streak">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+            <div>이 책 <b>5일 연속</b> 읽고 있어요</div>
+            <div class="streak-edge">
+              <div class="streak-mark on"></div>
+              <div class="streak-mark on"></div>
+              <div class="streak-mark on"></div>
+              <div class="streak-mark on"></div>
+              <div class="streak-mark on today"></div>
+            </div>
+          </div>
+
+          <!-- Focus Card -->
+          <div class="focus">
+            <div class="focus-fold"></div>
+            <div class="focus-fold-date">4.<b>23</b></div>
+            <div class="focus-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+              오늘의 기록
+            </div>
+            <div class="focus-q">오늘 몇 쪽까지 읽었어요?</div>
+            <div class="focus-hint">어제 <b>245쪽</b>에서 멈췄어요</div>
+            <div class="chips">
+              <div class="chip">+10</div>
+              <div class="chip">+20</div>
+              <div class="chip">+30</div>
+              <div class="chip ed">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                직접
+              </div>
+            </div>
+            <button class="cta" style="background:var(--sf2);color:var(--ink3);box-shadow:none;cursor:not-allowed">쪽수를 골라주세요</button>
+          </div>
+
+          <!-- ⏱ POMODORO · 대기 -->
+          <div class="pomo-idle">
+            <div class="pomo-idle-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5"/><path d="M9 2h6"/></svg>
+            </div>
+            <div class="pomo-idle-body">
+              <div class="pomo-idle-t">25분 집중 읽기</div>
+              <div class="pomo-idle-s">끝나면 몇 쪽 읽었는지 물어볼게요</div>
+            </div>
+            <button class="pomo-idle-go">
+              시작
+              <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </button>
+          </div>
+
+          <!-- Cameo -->
+          <div class="cameo">
+            <span class="cameo-label">어제 그은 한 줄</span>
+            "<em>가장 고요한 사람이</em> 가장 깊은 물이다"
+          </div>
+
+          <!-- Entry · 방긋 AI 토론 (🔒 완독 후 해금) -->
+          <div class="entry locked" aria-disabled="true">
+            <div class="entry-avatar">방긋</div>
+            <div class="entry-body">
+              <div class="entry-t">방긋이랑 얘기해요</div>
+              <div class="entry-s">
+                <svg class="lk-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>책을 다 읽고 만나요
+              </div>
+            </div>
+            <div class="entry-arr">
+              <svg class="lk-big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+          </div>
+
+          <!-- Subs · 문장 긋기 + 서평 쓰기 -->
+          <div class="subs">
+            <div class="sub">
+              <div class="sub-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+              </div>
+              <div class="sub-body">
+                <div class="sub-t">문장 긋기</div>
+                <div class="sub-s"><span class="sub-count">4</span>개 모았어요</div>
+              </div>
+            </div>
+            <div class="sub locked" aria-disabled="true">
+              <div class="sub-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              </div>
+              <div class="sub-body">
+                <div class="sub-t">서평 쓰기</div>
+                <div class="sub-s">
+                  <svg class="lk-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>완독 후 열려요
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Past · 지난 기록 -->
+          <div class="past-label">지난 기록</div>
+          <div class="past">
+            <div class="past-date">4.<b>22</b></div>
+            <div class="past-body">
+              <b>어제 · 15쪽 읽었어요</b>
+              <span>문장 <em>1개</em> 긋고 '<em>주인공이 왜 이렇게 행동하는지…</em>'</span>
+            </div>
+          </div>
+          <div class="past">
+            <div class="past-date">4.<b>21</b></div>
+            <div class="past-body">
+              <b>22쪽 읽었어요</b>
+              <span>문장 <em>2개</em> · 서평 메모 <em>1건</em></span>
+            </div>
+          </div>
+
+          <div class="bottom-pad"></div>
+
+          <div class="btmtabs">
+            <div class="btmtab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>홈</div>
+            <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>서재</div>
+            <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>캘린더</div>
+            <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>나</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-desc">Focus Card 바로 아래 <strong>1-line 카드</strong> · 왼쪽 mint accent 바 · "시작" 버튼 하나 · 흐름을 방해 안 함</div>
+    </div>
+
+    <!-- ======== Phone 2 · 진행중 (핵심) ======== -->
+    <div class="phone-wrap">
+      <div class="phone-badge active"><b>Solo · 진행중</b> · 원형 링 + 카운트다운</div>
+      <div class="phone">
+        <div class="p-solo">
+          <div class="status">
+            <span>9:41</span>
+            <svg width="14" height="11" viewBox="0 0 14 11" fill="currentColor"><path d="M1 4h1v5H1zM4 2.5h1V9H4zM7 1h1v8H7zM10 2.5h1V9h-1zM13 4h1v5h-1z"/></svg>
+          </div>
+
+          <div class="nav">
+            <div class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+            <div class="nav-btn"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></div>
+          </div>
+
+          <div class="head">
+            <div class="head-cover">캐릭터<br>심리<br>사전</div>
+            <div class="head-body">
+              <div class="head-subtitle">READING · 12일차</div>
+              <div class="head-title">캐릭터 심리 사전<span class="position-badge">후반부 진입</span></div>
+              <div class="head-author">린다 N. 에델스타인</div>
+              <div class="head-meta"><b>245</b><span>/ 340쪽</span><span class="dot"></span><b>72%</b></div>
+            </div>
+          </div>
+
+          <!-- ⏱ POMODORO · 진행중 (핵심 showcase) -->
+          <div class="pomo-run">
+            <div class="pomo-run-head">
+              <div class="pomo-run-label">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5"/><path d="M9 2h6"/></svg>
+                집중 읽기
+              </div>
+              <div class="pomo-run-status">9:41 시작</div>
+            </div>
+
+            <div class="pomo-run-body">
+              <div class="pomo-ring">
+                <svg viewBox="0 0 100 100">
+                  <circle class="track" cx="50" cy="50" r="44"/>
+                  <circle class="fill" cx="50" cy="50" r="44"/>
+                </svg>
+                <div class="pomo-ring-center">
+                  <b>17:24</b>
+                  <span>남음</span>
+                </div>
+              </div>
+              <div class="pomo-run-text">
+                <div class="pomo-run-phase">25분 집중 중</div>
+                <div class="pomo-run-note">끝나면 <b>몇 쪽</b> 읽었는지<br>방긋이가 물어볼게요</div>
+              </div>
+            </div>
+
+            <div class="pomo-run-actions">
+              <button class="pomo-btn pause">
+                <svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                일시정지
+              </button>
+              <button class="pomo-btn">
+                <svg viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="1"/></svg>
+                중단
+              </button>
+            </div>
+          </div>
+
+          <!-- Focus Card dimmed (타이머 중 입력 비활성) -->
+          <div class="focus dim">
+            <div class="focus-fold"></div>
+            <div class="focus-fold-date">4.<b>23</b></div>
+            <div class="focus-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+              오늘의 기록 · 타이머 종료 후
+            </div>
+            <div class="focus-q" style="font-size:16px;color:var(--ink2);max-width:none">집중 끝나면 자동으로 열어드릴게요</div>
+          </div>
+
+          <!-- Entry · 방긋 AI 토론 (🔒 완독 후 해금) -->
+          <div class="entry locked" aria-disabled="true">
+            <div class="entry-avatar">방긋</div>
+            <div class="entry-body">
+              <div class="entry-t">방긋이랑 얘기해요</div>
+              <div class="entry-s">
+                <svg class="lk-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>책을 다 읽고 만나요
+              </div>
+            </div>
+            <div class="entry-arr">
+              <svg class="lk-big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+          </div>
+
+          <!-- Subs · 문장 긋기 + 서평 쓰기 -->
+          <div class="subs">
+            <div class="sub">
+              <div class="sub-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+              </div>
+              <div class="sub-body">
+                <div class="sub-t">문장 긋기</div>
+                <div class="sub-s"><span class="sub-count">4</span>개 모았어요</div>
+              </div>
+            </div>
+            <div class="sub locked" aria-disabled="true">
+              <div class="sub-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              </div>
+              <div class="sub-body">
+                <div class="sub-t">서평 쓰기</div>
+                <div class="sub-s">
+                  <svg class="lk-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>완독 후 열려요
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Past · 지난 기록 -->
+          <div class="past-label">지난 기록</div>
+          <div class="past">
+            <div class="past-date">4.<b>22</b></div>
+            <div class="past-body">
+              <b>어제 · 15쪽 읽었어요</b>
+              <span>문장 <em>1개</em> 긋고 '<em>주인공이 왜 이렇게 행동하는지…</em>'</span>
+            </div>
+          </div>
+          <div class="past">
+            <div class="past-date">4.<b>21</b></div>
+            <div class="past-body">
+              <b>22쪽 읽었어요</b>
+              <span>문장 <em>2개</em> · 서평 메모 <em>1건</em></span>
+            </div>
+          </div>
+
+          <div class="bottom-pad"></div>
+
+          <div class="btmtabs">
+            <div class="btmtab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>홈</div>
+            <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>서재</div>
+            <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>캘린더</div>
+            <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>나</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-desc">원형 링 94×94 · mint→mint2 그라디언트 · 왼쪽 위 pulse 도트 · <strong>Focus Card는 dim</strong> (중복 입력 방지) · 종료 시 자동 Focus로 전환</div>
+    </div>
+
+    <!-- ======== Phone 3 · 완료 ======== -->
+    <div class="phone-wrap">
+      <div class="phone-badge done"><b>Solo · 완료</b> · 축하 + 쪽수 프롬프트</div>
+      <div class="phone">
+        <div class="p-solo">
+          <div class="status">
+            <span>10:06</span>
+            <svg width="14" height="11" viewBox="0 0 14 11" fill="currentColor"><path d="M1 4h1v5H1zM4 2.5h1V9H4zM7 1h1v8H7zM10 2.5h1V9h-1zM13 4h1v5h-1z"/></svg>
+          </div>
+
+          <div class="nav">
+            <div class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+            <div class="nav-btn"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></div>
+          </div>
+
+          <div class="head">
+            <div class="head-cover">캐릭터<br>심리<br>사전</div>
+            <div class="head-body">
+              <div class="head-subtitle">READING · 12일차</div>
+              <div class="head-title">캐릭터 심리 사전<span class="position-badge">후반부 진입</span></div>
+              <div class="head-author">린다 N. 에델스타인</div>
+              <div class="head-meta"><b>245</b><span>/ 340쪽</span><span class="dot"></span><b>72%</b></div>
+            </div>
+          </div>
+
+          <!-- ⏱ POMODORO · 완료 축하 배너 -->
+          <div class="pomo-done">
+            <div class="pomo-done-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="pomo-done-body">
+              <div class="pomo-done-t">25분 집중 완료</div>
+              <div class="pomo-done-s"><em>9:41~10:06</em> · 이 책에 <em>37분째</em> 머물렀어요</div>
+            </div>
+          </div>
+
+          <!-- Focus Card 활성화 + chips on -->
+          <div class="focus">
+            <div class="focus-fold"></div>
+            <div class="focus-fold-date">4.<b>23</b></div>
+            <div class="focus-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+              얼마나 읽었어요?
+            </div>
+            <div class="focus-q">방금 25분 동안<br>몇 쪽 읽으셨나요?</div>
+            <div class="focus-hint">어제 <b>245쪽</b>에서 시작했어요</div>
+            <div class="chips">
+              <div class="chip">+10</div>
+              <div class="chip on">+20</div>
+              <div class="chip">+30</div>
+              <div class="chip ed">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                직접
+              </div>
+            </div>
+            <button class="cta">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              265쪽까지 읽었어요
+            </button>
+          </div>
+
+          <!-- Cameo -->
+          <div class="cameo">
+            <span class="cameo-label">어제 그은 한 줄</span>
+            "<em>가장 고요한 사람이</em> 가장 깊은 물이다"
+          </div>
+
+          <!-- Entry · 방긋 AI 토론 (🔒 완독 후 해금) -->
+          <div class="entry locked" aria-disabled="true">
+            <div class="entry-avatar">방긋</div>
+            <div class="entry-body">
+              <div class="entry-t">방긋이랑 얘기해요</div>
+              <div class="entry-s">
+                <svg class="lk-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>책을 다 읽고 만나요
+              </div>
+            </div>
+            <div class="entry-arr">
+              <svg class="lk-big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+          </div>
+
+          <!-- Subs · 문장 긋기 + 서평 쓰기 -->
+          <div class="subs">
+            <div class="sub">
+              <div class="sub-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+              </div>
+              <div class="sub-body">
+                <div class="sub-t">문장 긋기</div>
+                <div class="sub-s"><span class="sub-count">4</span>개 모았어요</div>
+              </div>
+            </div>
+            <div class="sub locked" aria-disabled="true">
+              <div class="sub-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              </div>
+              <div class="sub-body">
+                <div class="sub-t">서평 쓰기</div>
+                <div class="sub-s">
+                  <svg class="lk-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>완독 후 열려요
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Past · 지난 기록 -->
+          <div class="past-label">지난 기록</div>
+          <div class="past">
+            <div class="past-date">4.<b>22</b></div>
+            <div class="past-body">
+              <b>어제 · 15쪽 읽었어요</b>
+              <span>문장 <em>1개</em> 긋고 '<em>주인공이 왜 이렇게 행동하는지…</em>'</span>
+            </div>
+          </div>
+          <div class="past">
+            <div class="past-date">4.<b>21</b></div>
+            <div class="past-body">
+              <b>22쪽 읽었어요</b>
+              <span>문장 <em>2개</em> · 서평 메모 <em>1건</em></span>
+            </div>
+          </div>
+
+          <div class="bottom-pad"></div>
+
+          <div class="btmtabs">
+            <div class="btmtab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>홈</div>
+            <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>서재</div>
+            <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>캘린더</div>
+            <div class="btmtab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>나</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-desc">축하 배너(세션 시간 표시) → Focus Card 자동 활성화 + <strong>+20 pre-selected</strong> → 사용자는 CTA 한 번만 누르면 끝</div>
+    </div>
+
+  </div>
+
+  <div class="note">
+    <div class="note-title">v8 · 25분 집중 읽기 · 기능 하나로 Solo 정체성 완성</div>
+
+    <h4>기능 범위</h4>
+    <ul style="list-style:disc;margin-left:22px">
+      <li>카드 하나 · 상태 3단계 (대기 → 진행중 → 완료) · Focus Card와 Cameo 사이 고정 위치</li>
+      <li>v7에서 추가했던 narrative greeting · pace pill · Reading Well 전부 <strong>롤백</strong></li>
+      <li>Group 상태(v6)는 건드리지 않음 — 이번 라운드는 Solo만</li>
+    </ul>
+
+    <h4>3-state 전환 로직</h4>
+    <ol>
+      <li><strong>대기</strong>: 1-line 카드 · "25분 집중 읽기" · "시작" 버튼 · Focus Card는 정상 활성 (사용자 선택)</li>
+      <li><strong>진행중</strong>: 큰 카드로 확장 · 원형 링 94×94 + 카운트다운 · Focus Card는 <code>.dim</code> 으로 비활성 (중복 입력 방지) · 일시정지/중단 2-버튼</li>
+      <li><strong>완료</strong>: 축하 배너 (시작~종료 시각 · 누적 시간 표시) · Focus Card 자동 활성 + chips <code>+20</code> pre-selected · 사용자는 CTA 한 번만 탭하면 쪽수 저장 + 세션 로그 완성</li>
+    </ol>
+
+    <h4>구현 메모 (Dan)</h4>
+    <ul style="list-style:disc;margin-left:22px">
+      <li>타이머: <code>performance.now()</code> 기준 <code>startedAt</code> ref + <code>setInterval(1000)</code>. 백그라운드 탭 복귀 시 <code>elapsed = now - startedAt</code>으로 재계산 (drift 0)</li>
+      <li>상태: <code>useReducer</code> — <code>{status:'idle'|'running'|'paused'|'done', startedAt, elapsed, pausedAt}</code></li>
+      <li>localStorage: <code>reading_session_&lt;bookId&gt;</code> — 앱 재진입 시 active session 복원. 25분 초과로 지난 세션은 폐기</li>
+      <li>DB: 신규 테이블 <code>reading_sessions</code> — <code>(id, user_id, book_id, started_at, ended_at, duration_seconds, pages_read_delta)</code>. 완료 시점에 INSERT</li>
+      <li>알림: 25분 만료 시 (a) 탭 포커스 시: <code>pomo-done</code> 배너 pop-in + Focus Card 자동 활성 (b) 탭 미포커스: <code>Notification API</code> (권한 있으면)</li>
+      <li>일시정지: <code>status:'paused'</code> 저장 · 링은 멈춘 각도 유지 · 재개 시 <code>pausedAt</code> 기준 delta 빼고 계산</li>
+      <li>중단: 세션을 <code>reading_sessions</code>에 <code>ended_at = now, pages_read_delta = 0</code>로 저장 (데이터는 남기되 기록 없음으로)</li>
+    </ul>
+
+    <h4>시각 언어</h4>
+    <ul style="list-style:disc;margin-left:22px">
+      <li>대기 카드: Focus Card처럼 sf 배경 + 좌측 mint 바 (streak과 비슷한 가로 리듬)</li>
+      <li>진행중 카드: 민트 틴트 배경 그라디언트 + 상단 민트 bar + pulse 도트로 "살아 있음" 표시</li>
+      <li>원형 링: stroke-width 6, r=44 (2πr=276.46) — 25분 동안 <code>stroke-dashoffset</code> 0 → 276.46 선형 보간 (CSS transition 1s step)</li>
+      <li>완료 카드: mint 강한 accent + pop-in (scale 0.96→1, 0.4s) · <code>prefers-reduced-motion</code> 시 skip</li>
+      <li>Focus Card dim: opacity 0.5 + 반투명 overlay (Pretendard 앱 가이드와 일치 — 비활성은 흐림으로만)</li>
+    </ul>
+
+    <h4>엣지 케이스</h4>
+    <ul style="list-style:disc;margin-left:22px">
+      <li><strong>세션 중 앱 종료 후 재진입</strong>: localStorage에서 복원, 만료 지났으면 '완료' state로 바로 진입</li>
+      <li><strong>25분 중 사용자가 직접 쪽수 저장</strong>: Focus Card에 수동 입력 가능 (dim이지만 tap으로 깨우기). 세션은 계속 진행 또는 자동 종료 옵션 — <strong>자동 종료 + 즉시 완료 state</strong>로 결정</li>
+      <li><strong>Group 책에서 누를 경우</strong>: 이번 범위 제외 — Group UI 그대로 · 추후 판단</li>
+      <li><strong>여러 책 동시 세션 방지</strong>: localStorage에 <code>reading_session_active</code>(book_id) 저장. 다른 책에서 시작하려고 하면 "현재 책에서 진행 중이에요" 토스트</li>
+    </ul>
+
+    <h4>🔒 완독 후 해금 패턴 (v8 신규)</h4>
+    <ul style="list-style:disc;margin-left:22px">
+      <li><strong>철학</strong>: 읽는 중에는 "책과 나" 둘만의 시간 — 방긋 AI 토론과 서평은 <strong>책을 다 읽은 뒤</strong>에 열려요. 성급한 평가 대신 감상을 기다려 주는 UX</li>
+      <li><strong>잠금 대상</strong>: (a) 방긋 AI 토론 entry — "책을 다 읽고 만나요" (b) 서평 쓰기 sub — "완독 후 열려요"</li>
+      <li><strong>활성 유지</strong>: 문장 긋기 sub는 <strong>읽는 중 핵심 도구</strong>라서 잠그지 않음. 모든 state(대기·진행중·완료)에서 상시 활성</li>
+      <li><strong>시각 언어</strong>: <code>opacity:0.62</code> + <code>background:var(--bg2)</code> + 아이콘 tint를 <code>var(--sf2)</code>로 중화 · 서브카피 앞에 12px 자물쇠 아이콘 · <code>pointer-events:none</code> + <code>aria-disabled="true"</code>로 접근성 대응</li>
+      <li><strong>해금 조건</strong>: <code>book.status === 'finished'</code> 되는 순간 자물쇠 해제 + 같은 자리에서 active 상태로 전환 (레이아웃 점프 없음)</li>
+      <li><strong>첫 해금 축하</strong>: 완독 직후 상세 재진입 시 AI 토론 entry에 pop-in 애니메이션 + "드디어 얘기할 시간이에요" 한 번만 노출 (localStorage 플래그로 중복 방지)</li>
+      <li><strong>구현</strong>: <code>resolveBookDetailVariant(book)</code>에서 <code>review_unlocked = book.status === 'finished'</code> 플래그 반환 → 각 컴포넌트가 <code>locked</code> 클래스 토글</li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>

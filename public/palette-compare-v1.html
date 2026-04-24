@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>방긋 — 팔레트 비교 (현재 vs Evergreen&Apricot vs Bright)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<style>
+  :root {
+    --font-body: "Pretendard Variable", Pretendard, -apple-system, system-ui, sans-serif;
+    --font-playful: "Gaegu", "Pretendard Variable", cursive;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { font-family: var(--font-body); -webkit-font-smoothing: antialiased; }
+
+  body {
+    background: #2A2620;
+    padding: 40px 24px 60px;
+    min-height: 100vh;
+    color: #E8E3D8;
+  }
+
+  .page-hdr { max-width: 1280px; margin: 0 auto 28px; text-align: center; }
+  .page-hdr h1 {
+    font-family: var(--font-playful);
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+  .page-hdr p { font-size: 13px; color: #A8A29A; line-height: 1.6; }
+
+  /* ───────── 팔레트 스와치 섹션 ───────── */
+  .palette-row {
+    max-width: 1280px;
+    margin: 0 auto 32px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .palette-card {
+    background: #1A1712;
+    border-radius: 14px;
+    padding: 16px 18px;
+    border: 1px solid #3A342B;
+  }
+  .palette-card h3 {
+    font-family: var(--font-playful);
+    font-size: 17px;
+    color: #E8E3D8;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .palette-card .tag {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #8A8378;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .palette-card p {
+    font-size: 11.5px;
+    color: #C9BFB0;
+    line-height: 1.55;
+    margin-bottom: 12px;
+  }
+  .swatch-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+  .swatch {
+    flex: 1;
+    height: 44px;
+    border-radius: 8px;
+    position: relative;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .swatch-lbl {
+    position: absolute;
+    bottom: 4px;
+    left: 4px;
+    right: 4px;
+    font-size: 9px;
+    font-weight: 700;
+    text-align: center;
+    font-family: monospace;
+    letter-spacing: 0.3px;
+  }
+  .swatch-lbl.d { color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.4); }
+  .swatch-lbl.l { color: rgba(0,0,0,0.7); }
+
+  /* ───────── 3 폰 가로 배치 ───────── */
+  .phones {
+    display: flex;
+    gap: 28px;
+    justify-content: center;
+    flex-wrap: wrap;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  .phone-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* ───────── 공통 폰 컴포넌트 ───────── */
+  .phone {
+    width: 360px;
+    height: 720px;
+    background: var(--bg);
+    border-radius: 38px;
+    border: 10px solid #1A1712;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 20px 50px rgba(0,0,0,0.5),
+      0 6px 18px rgba(0,0,0,0.35);
+  }
+  .statusbar {
+    height: 40px;
+    padding: 0 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--tp);
+    position: relative;
+  }
+  .statusbar .notch {
+    position: absolute;
+    left: 50%;
+    top: 6px;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 22px;
+    background: #1A1712;
+    border-radius: 100px;
+    z-index: 5;
+  }
+  .screen {
+    height: calc(720px - 40px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+  }
+  .screen::-webkit-scrollbar { display: none; }
+
+  .app-hdr {
+    padding: 8px 20px 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-family: var(--font-playful);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--tp);
+  }
+  .icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--sf);
+    border: 0.5px solid var(--bd);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ts);
+    position: relative;
+  }
+  .icon-btn svg { width: 16px; height: 16px; }
+  .icon-btn.dot::after {
+    content: "";
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    background: var(--signal);
+    border-radius: 50%;
+    top: 6px;
+    right: 6px;
+    border: 1.5px solid var(--bg);
+  }
+
+  .greet {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px 6px;
+  }
+  .greet-mascot {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--ac3), var(--ac2));
+    flex-shrink: 0;
+    box-shadow: 0 3px 8px var(--ac-shadow);
+  }
+  .greet-name {
+    font-family: var(--font-playful);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--tp);
+  }
+  .greet-hello { font-size: 11px; color: var(--tm); }
+
+  /* 이어읽기 히어로 */
+  .hero-read {
+    margin: 12px 20px 0;
+    border-radius: 18px;
+    padding: 14px;
+    background:
+      linear-gradient(135deg,
+        color-mix(in srgb, var(--ac) 14%, var(--sf2)) 0%,
+        var(--sf2) 50%,
+        color-mix(in srgb, var(--signal) 18%, var(--sf2)) 100%);
+    border: 0.5px solid var(--bd);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-read::before {
+    content: "";
+    position: absolute;
+    top: -20px; right: -20px;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--ac) 36%, transparent), transparent 70%);
+    filter: blur(14px);
+  }
+  .hero-read-row { display: flex; gap: 12px; position: relative; z-index: 1; }
+  .book-cover {
+    width: 64px;
+    height: 92px;
+    border-radius: 5px;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, var(--book1), var(--book2));
+    position: relative;
+    box-shadow:
+      0 5px 12px rgba(30,25,18,0.22),
+      inset 3px 0 0 rgba(255,255,255,0.08);
+    overflow: hidden;
+  }
+  .book-cover::before {
+    content: "";
+    position: absolute;
+    left: 3px; top: 0; bottom: 0;
+    width: 1px;
+    background: rgba(0,0,0,0.25);
+  }
+  .book-cover-title {
+    position: absolute;
+    top: 12px; left: 8px; right: 6px;
+    font-family: var(--font-playful);
+    font-size: 10px;
+    color: rgba(255,255,255,0.92);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .hero-info { flex: 1; min-width: 0; padding-top: 2px; }
+  .hero-kicker {
+    font-size: 10px;
+    color: var(--ac-deep);
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+  .hero-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--tp);
+    line-height: 1.25;
+  }
+  .hero-author { font-size: 10.5px; color: var(--tm); margin-bottom: 8px; }
+  .progress-bar {
+    height: 5px;
+    background: color-mix(in srgb, var(--ac) 12%, transparent);
+    border-radius: 100px;
+    overflow: hidden;
+    margin-bottom: 3px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--ac), var(--ac-deep));
+    border-radius: 100px;
+  }
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--ts);
+  }
+  .progress-meta b { color: var(--tp); }
+
+  .hero-context {
+    margin-top: 9px;
+    padding: 7px 10px;
+    background: color-mix(in srgb, var(--signal) 16%, transparent);
+    border-radius: 7px;
+    border-left: 2px solid var(--signal);
+    font-size: 11px;
+    color: var(--ts);
+    line-height: 1.4;
+  }
+  .hero-context b { color: var(--signal-deep); font-weight: 700; }
+
+  .hero-cta {
+    margin-top: 10px;
+    width: 100%;
+    padding: 11px 14px;
+    border: none;
+    border-radius: 11px;
+    background: linear-gradient(180deg, var(--ac) 0%, var(--ac-deep) 100%);
+    color: #fff;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-shadow:
+      0 4px 10px var(--ac-shadow),
+      inset 0 1px 0 rgba(255,255,255,0.22);
+  }
+  .hero-cta svg { width: 14px; height: 14px; }
+
+  /* 주간 캘린더 */
+  .cal-card {
+    margin: 12px 20px 0;
+    background: var(--sf2);
+    border: 0.5px solid var(--bd);
+    border-radius: 14px;
+    padding: 12px 14px;
+  }
+  .cal-hdr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .cal-ttl-row { display: flex; align-items: center; gap: 6px; }
+  .cal-ttl {
+    font-family: var(--font-playful);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--tp);
+  }
+  .cal-streak-badge {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--signal-deep);
+    background: color-mix(in srgb, var(--signal) 20%, transparent);
+    padding: 2px 7px;
+    border-radius: 100px;
+  }
+  .cal-days {
+    display: flex;
+    justify-content: space-between;
+    gap: 3px;
+  }
+  .cal-day { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .cal-day-label { font-size: 9.5px; color: var(--tm); font-weight: 600; }
+  .cal-day-dot {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .cal-day-dot.read {
+    background: var(--ac);
+    color: #fff;
+    box-shadow: 0 2px 4px var(--ac-shadow);
+  }
+  .cal-day-dot.today {
+    background: color-mix(in srgb, var(--signal) 24%, transparent);
+    color: var(--signal-deep);
+    border: 1.5px solid var(--signal);
+  }
+  .cal-day-dot.future {
+    background: transparent;
+    color: var(--tm);
+    border: 1px solid var(--bd2);
+  }
+
+  /* 이벤트 한 줄 */
+  .evt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    background: var(--sf);
+    border-radius: 10px;
+    margin-top: 10px;
+  }
+  .evt-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; background: var(--signal); }
+  .evt-info { flex: 1; min-width: 0; }
+  .evt-ttl { font-size: 12px; font-weight: 600; color: var(--tp); }
+  .evt-meta { font-size: 10px; color: var(--tm); margin-top: 1px; }
+  .evt-dday {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--signal-deep);
+    background: color-mix(in srgb, var(--signal) 18%, transparent);
+    padding: 3px 7px;
+    border-radius: 100px;
+  }
+
+  /* 커뮤니티 짧은 */
+  .friends-strip {
+    margin: 12px 20px 0;
+    padding: 11px 12px;
+    background: var(--sf2);
+    border: 0.5px solid var(--bd);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .avatar-stack { display: flex; }
+  .avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid var(--sf2);
+    margin-right: -8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .avatar:nth-child(1) { background: linear-gradient(135deg, #D7C5E0, #B098C7); }
+  .avatar:nth-child(2) { background: linear-gradient(135deg, var(--signal), var(--signal-deep)); }
+  .avatar:nth-child(3) { background: linear-gradient(135deg, #A6D3D9, #6A9BA8); margin-right: 0; }
+  .friends-text {
+    flex: 1;
+    font-size: 11.5px;
+    color: var(--ts);
+    line-height: 1.4;
+  }
+  .friends-text b { color: var(--tp); }
+
+  /* palette caption */
+  .palette-name {
+    font-family: var(--font-playful);
+    font-size: 15px;
+    font-weight: 700;
+    color: #E8E3D8;
+    text-align: center;
+  }
+  .palette-sub {
+    font-size: 11px;
+    color: #8A8378;
+    text-align: center;
+    margin-top: -4px;
+  }
+
+  /* ═══════════════════════════════════════════════════ */
+  /* Palette 1: 현재 (Sage Cream)                        */
+  /* ═══════════════════════════════════════════════════ */
+  .p-current {
+    --bg: #F7F3ED;
+    --sf: #EDE7DF;
+    --sf2: #FBF7EF;
+    --tp: #1c201d;
+    --ts: #4a5550;
+    --tm: #7a8b7e;
+    --bd: rgba(58,107,86,0.14);
+    --bd2: rgba(58,107,86,0.08);
+    --ac: #5FA48E;
+    --ac2: #7ABBA4;
+    --ac3: #A4D4C0;
+    --ac-deep: #3A6B56;
+    --ac-shadow: rgba(58,107,86,0.30);
+    --signal: #B5802A;         /* copper */
+    --signal-deep: #7A4E22;
+    --book1: #6B8D6A;
+    --book2: #3E5C3F;
+  }
+  .s-current .s1 { background: #5FA48E; }
+  .s-current .s2 { background: #3A6B56; }
+  .s-current .s3 { background: #B5802A; }
+  .s-current .s4 { background: #C97A5B; }
+  .s-current .s5 { background: #F7F3ED; }
+
+  /* ═══════════════════════════════════════════════════ */
+  /* Palette 2: Evergreen & Apricot (Refined Vivid)      */
+  /* ═══════════════════════════════════════════════════ */
+  .p-refined {
+    --bg: #F8F4EA;             /* 더 중립적 크림 (노란기 down) */
+    --sf: #F2EDE0;             /* 살짝 더 진한 서피스 */
+    --sf2: #FCF9F1;            /* 페이퍼 카드 */
+    --tp: #17201B;             /* 딥 잉크 (녹색빛 최소) */
+    --ts: #3D4A40;
+    --tm: #7E8679;
+    --bd: rgba(36,106,83,0.15);
+    --bd2: rgba(36,106,83,0.08);
+    --ac: #3FA580;             /* 크리스프 제이드 민트 */
+    --ac2: #5FBF9D;
+    --ac3: #9FDCBF;
+    --ac-deep: #246A53;        /* 딥 이끼 */
+    --ac-shadow: rgba(36,106,83,0.32);
+    --signal: #F2936B;         /* 시그니처 애프리콧 */
+    --signal-deep: #C25C3A;
+    --book1: #5E3E6B;          /* 플럼 북커버 */
+    --book2: #3A2541;
+  }
+  .s-refined .s1 { background: #3FA580; }
+  .s-refined .s2 { background: #246A53; }
+  .s-refined .s3 { background: #F2936B; }
+  .s-refined .s4 { background: #5E3E6B; }
+  .s-refined .s5 { background: #F8F4EA; }
+
+  /* ═══════════════════════════════════════════════════ */
+  /* Palette 3: Bright Banggut (Bold Vivid)              */
+  /* ═══════════════════════════════════════════════════ */
+  .p-bright {
+    --bg: #FAF6EA;             /* 선명 크림 */
+    --sf: #F0EBDB;
+    --sf2: #FEFAF0;
+    --tp: #111815;
+    --ts: #334037;
+    --tm: #7A8278;
+    --bd: rgba(26,138,96,0.16);
+    --bd2: rgba(26,138,96,0.09);
+    --ac: #2FBC89;             /* 비비드 에메랄드 민트 */
+    --ac2: #4ED4A4;
+    --ac3: #9FE8CA;
+    --ac-deep: #1A8A60;        /* 딥 에메랄드 */
+    --ac-shadow: rgba(26,138,96,0.36);
+    --signal: #FF9A6C;         /* 밝은 애프리콧 */
+    --signal-deep: #E5573D;
+    --book1: #4A2E5F;          /* 딥 플럼 */
+    --book2: #2C1938;
+  }
+  .s-bright .s1 { background: #2FBC89; }
+  .s-bright .s2 { background: #1A8A60; }
+  .s-bright .s3 { background: #FF9A6C; }
+  .s-bright .s4 { background: #4A2E5F; }
+  .s-bright .s5 { background: #FAF6EA; }
+
+  /* 표식 */
+  .verdict-row {
+    max-width: 1280px;
+    margin: 40px auto 0;
+    background: #1A1712;
+    border-radius: 14px;
+    padding: 22px 26px;
+    color: #C9BFB0;
+    font-size: 12.5px;
+    line-height: 1.7;
+  }
+  .verdict-row h4 {
+    font-family: var(--font-playful);
+    font-size: 16px;
+    color: #E8E3D8;
+    margin-bottom: 10px;
+  }
+  .verdict-row table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  .verdict-row td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #3A342B;
+    vertical-align: top;
+  }
+  .verdict-row td:first-child {
+    color: #8A8378;
+    font-weight: 700;
+    width: 110px;
+  }
+  .verdict-row td b { color: #E8E3D8; }
+</style>
+</head>
+<body>
+
+<div class="page-hdr">
+  <h1>방긋 · 브랜드 팔레트 비교</h1>
+  <p>A 변형(이어읽기 중심) 화면을 3개 팔레트로 동일하게 렌더 · 어떤 방향이 방긋스러운가?</p>
+</div>
+
+<!-- 팔레트 스와치 행 -->
+<div class="palette-row">
+  <!-- 현재 -->
+  <div class="palette-card">
+    <div class="tag">Option 0 · 현재</div>
+    <h3>Sage Cream</h3>
+    <p>세이지 민트 + 구리 악센트. 차분하지만 평범. 다른 독서 앱과 거의 동일한 기본 조합.</p>
+    <div class="swatch-row s-current">
+      <div class="swatch s1"><div class="swatch-lbl d">5FA48E</div></div>
+      <div class="swatch s2"><div class="swatch-lbl d">3A6B56</div></div>
+      <div class="swatch s3"><div class="swatch-lbl d">B5802A</div></div>
+      <div class="swatch s4"><div class="swatch-lbl d">C97A5B</div></div>
+      <div class="swatch s5"><div class="swatch-lbl l">F7F3ED</div></div>
+    </div>
+  </div>
+
+  <!-- Refined -->
+  <div class="palette-card" style="border-color: #3FA580;">
+    <div class="tag" style="color:#5FBF9D;">Option 1 · 정제된 비비드 ★추천</div>
+    <h3>Evergreen & Apricot</h3>
+    <p>크리스프한 제이드 민트 + 시그니처 애프리콧 + 희귀한 딥플럼 북커버. 방긋이 캐릭터의 따뜻한 홍조를 브랜드 코어로.</p>
+    <div class="swatch-row s-refined">
+      <div class="swatch s1"><div class="swatch-lbl d">3FA580</div></div>
+      <div class="swatch s2"><div class="swatch-lbl d">246A53</div></div>
+      <div class="swatch s3"><div class="swatch-lbl d">F2936B</div></div>
+      <div class="swatch s4"><div class="swatch-lbl d">5E3E6B</div></div>
+      <div class="swatch s5"><div class="swatch-lbl l">F8F4EA</div></div>
+    </div>
+  </div>
+
+  <!-- Bright -->
+  <div class="palette-card" style="border-color: #FF9A6C;">
+    <div class="tag" style="color:#FF9A6C;">Option 2 · 과감한 비비드</div>
+    <h3>Bright Banggut</h3>
+    <p>쨍한 에메랄드 민트 + 밝은 애프리콧. 더 젊고 에너지 넘치는 톤. 듀오링고 계열 방향.</p>
+    <div class="swatch-row s-bright">
+      <div class="swatch s1"><div class="swatch-lbl d">2FBC89</div></div>
+      <div class="swatch s2"><div class="swatch-lbl d">1A8A60</div></div>
+      <div class="swatch s3"><div class="swatch-lbl d">FF9A6C</div></div>
+      <div class="swatch s4"><div class="swatch-lbl d">4A2E5F</div></div>
+      <div class="swatch s5"><div class="swatch-lbl l">FAF6EA</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ───────── 3 폰 실제 렌더 ───────── -->
+<div class="phones">
+
+  <!-- Phone 1: 현재 팔레트 -->
+  <div class="phone-wrap">
+    <div class="palette-name">Option 0 · 현재</div>
+    <div class="palette-sub">Sage Cream</div>
+    <div class="phone p-current">
+      <div class="statusbar">
+        <div class="notch"></div>
+        <div>9:41</div>
+        <div>●●●</div>
+      </div>
+      <div class="screen">
+        <div class="app-hdr">
+          <div class="logo">방긋</div>
+          <div class="icon-btn dot">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>
+          </div>
+        </div>
+        <div class="greet">
+          <div class="greet-mascot"></div>
+          <div>
+            <div class="greet-hello">좋은 아침이에요</div>
+            <div class="greet-name">민지님, 오늘도 한 쪽</div>
+          </div>
+        </div>
+        <div class="hero-read">
+          <div class="hero-read-row">
+            <div class="book-cover"><div class="book-cover-title">작별하지<br/>않는다</div></div>
+            <div class="hero-info">
+              <div class="hero-kicker">이어 읽기</div>
+              <div class="hero-title">작별하지 않는다</div>
+              <div class="hero-author">한강</div>
+              <div class="progress-bar"><div class="progress-fill" style="width:58%"></div></div>
+              <div class="progress-meta"><span><b>152</b> / 264쪽</span><span>58%</span></div>
+            </div>
+          </div>
+          <div class="hero-context">어제는 <b>눈 덮인 제주 집 앞</b>에서 멈추셨어요</div>
+          <button class="hero-cta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-14 9V3z"/></svg>
+            152쪽부터 이어 읽기
+          </button>
+        </div>
+        <div class="cal-card">
+          <div class="cal-hdr">
+            <div class="cal-ttl-row">
+              <div class="cal-ttl">이번 주</div>
+              <div class="cal-streak-badge">7일 연속</div>
+            </div>
+          </div>
+          <div class="cal-days">
+            <div class="cal-day"><div class="cal-day-label">월</div><div class="cal-day-dot read">15</div></div>
+            <div class="cal-day"><div class="cal-day-label">화</div><div class="cal-day-dot read">16</div></div>
+            <div class="cal-day"><div class="cal-day-label">수</div><div class="cal-day-dot read">17</div></div>
+            <div class="cal-day"><div class="cal-day-label">목</div><div class="cal-day-dot read">18</div></div>
+            <div class="cal-day"><div class="cal-day-label">금</div><div class="cal-day-dot read">19</div></div>
+            <div class="cal-day"><div class="cal-day-label">토</div><div class="cal-day-dot read">20</div></div>
+            <div class="cal-day"><div class="cal-day-label">일</div><div class="cal-day-dot today">21</div></div>
+          </div>
+          <div class="evt">
+            <div class="evt-dot"></div>
+            <div class="evt-info">
+              <div class="evt-ttl">독서모임 · 작별하지 않는다</div>
+              <div class="evt-meta">4월 24일 오후 7시</div>
+            </div>
+            <div class="evt-dday">D-3</div>
+          </div>
+        </div>
+        <div class="friends-strip">
+          <div class="avatar-stack">
+            <div class="avatar">수</div>
+            <div class="avatar">준</div>
+            <div class="avatar">지</div>
+          </div>
+          <div class="friends-text"><b>3명</b>이 오늘 책을 읽었어요</div>
+        </div>
+        <div style="height: 20px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phone 2: Refined (Evergreen & Apricot) -->
+  <div class="phone-wrap">
+    <div class="palette-name" style="color:#5FBF9D;">Option 1 · 정제 비비드 ★</div>
+    <div class="palette-sub">Evergreen & Apricot</div>
+    <div class="phone p-refined">
+      <div class="statusbar">
+        <div class="notch"></div>
+        <div>9:41</div>
+        <div>●●●</div>
+      </div>
+      <div class="screen">
+        <div class="app-hdr">
+          <div class="logo">방긋</div>
+          <div class="icon-btn dot">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>
+          </div>
+        </div>
+        <div class="greet">
+          <div class="greet-mascot"></div>
+          <div>
+            <div class="greet-hello">좋은 아침이에요</div>
+            <div class="greet-name">민지님, 오늘도 한 쪽</div>
+          </div>
+        </div>
+        <div class="hero-read">
+          <div class="hero-read-row">
+            <div class="book-cover"><div class="book-cover-title">작별하지<br/>않는다</div></div>
+            <div class="hero-info">
+              <div class="hero-kicker">이어 읽기</div>
+              <div class="hero-title">작별하지 않는다</div>
+              <div class="hero-author">한강</div>
+              <div class="progress-bar"><div class="progress-fill" style="width:58%"></div></div>
+              <div class="progress-meta"><span><b>152</b> / 264쪽</span><span>58%</span></div>
+            </div>
+          </div>
+          <div class="hero-context">어제는 <b>눈 덮인 제주 집 앞</b>에서 멈추셨어요</div>
+          <button class="hero-cta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-14 9V3z"/></svg>
+            152쪽부터 이어 읽기
+          </button>
+        </div>
+        <div class="cal-card">
+          <div class="cal-hdr">
+            <div class="cal-ttl-row">
+              <div class="cal-ttl">이번 주</div>
+              <div class="cal-streak-badge">7일 연속</div>
+            </div>
+          </div>
+          <div class="cal-days">
+            <div class="cal-day"><div class="cal-day-label">월</div><div class="cal-day-dot read">15</div></div>
+            <div class="cal-day"><div class="cal-day-label">화</div><div class="cal-day-dot read">16</div></div>
+            <div class="cal-day"><div class="cal-day-label">수</div><div class="cal-day-dot read">17</div></div>
+            <div class="cal-day"><div class="cal-day-label">목</div><div class="cal-day-dot read">18</div></div>
+            <div class="cal-day"><div class="cal-day-label">금</div><div class="cal-day-dot read">19</div></div>
+            <div class="cal-day"><div class="cal-day-label">토</div><div class="cal-day-dot read">20</div></div>
+            <div class="cal-day"><div class="cal-day-label">일</div><div class="cal-day-dot today">21</div></div>
+          </div>
+          <div class="evt">
+            <div class="evt-dot"></div>
+            <div class="evt-info">
+              <div class="evt-ttl">독서모임 · 작별하지 않는다</div>
+              <div class="evt-meta">4월 24일 오후 7시</div>
+            </div>
+            <div class="evt-dday">D-3</div>
+          </div>
+        </div>
+        <div class="friends-strip">
+          <div class="avatar-stack">
+            <div class="avatar">수</div>
+            <div class="avatar">준</div>
+            <div class="avatar">지</div>
+          </div>
+          <div class="friends-text"><b>3명</b>이 오늘 책을 읽었어요</div>
+        </div>
+        <div style="height: 20px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phone 3: Bright Banggut -->
+  <div class="phone-wrap">
+    <div class="palette-name" style="color:#FF9A6C;">Option 2 · 과감 비비드</div>
+    <div class="palette-sub">Bright Banggut</div>
+    <div class="phone p-bright">
+      <div class="statusbar">
+        <div class="notch"></div>
+        <div>9:41</div>
+        <div>●●●</div>
+      </div>
+      <div class="screen">
+        <div class="app-hdr">
+          <div class="logo">방긋</div>
+          <div class="icon-btn dot">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>
+          </div>
+        </div>
+        <div class="greet">
+          <div class="greet-mascot"></div>
+          <div>
+            <div class="greet-hello">좋은 아침이에요</div>
+            <div class="greet-name">민지님, 오늘도 한 쪽</div>
+          </div>
+        </div>
+        <div class="hero-read">
+          <div class="hero-read-row">
+            <div class="book-cover"><div class="book-cover-title">작별하지<br/>않는다</div></div>
+            <div class="hero-info">
+              <div class="hero-kicker">이어 읽기</div>
+              <div class="hero-title">작별하지 않는다</div>
+              <div class="hero-author">한강</div>
+              <div class="progress-bar"><div class="progress-fill" style="width:58%"></div></div>
+              <div class="progress-meta"><span><b>152</b> / 264쪽</span><span>58%</span></div>
+            </div>
+          </div>
+          <div class="hero-context">어제는 <b>눈 덮인 제주 집 앞</b>에서 멈추셨어요</div>
+          <button class="hero-cta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-14 9V3z"/></svg>
+            152쪽부터 이어 읽기
+          </button>
+        </div>
+        <div class="cal-card">
+          <div class="cal-hdr">
+            <div class="cal-ttl-row">
+              <div class="cal-ttl">이번 주</div>
+              <div class="cal-streak-badge">7일 연속</div>
+            </div>
+          </div>
+          <div class="cal-days">
+            <div class="cal-day"><div class="cal-day-label">월</div><div class="cal-day-dot read">15</div></div>
+            <div class="cal-day"><div class="cal-day-label">화</div><div class="cal-day-dot read">16</div></div>
+            <div class="cal-day"><div class="cal-day-label">수</div><div class="cal-day-dot read">17</div></div>
+            <div class="cal-day"><div class="cal-day-label">목</div><div class="cal-day-dot read">18</div></div>
+            <div class="cal-day"><div class="cal-day-label">금</div><div class="cal-day-dot read">19</div></div>
+            <div class="cal-day"><div class="cal-day-label">토</div><div class="cal-day-dot read">20</div></div>
+            <div class="cal-day"><div class="cal-day-label">일</div><div class="cal-day-dot today">21</div></div>
+          </div>
+          <div class="evt">
+            <div class="evt-dot"></div>
+            <div class="evt-info">
+              <div class="evt-ttl">독서모임 · 작별하지 않는다</div>
+              <div class="evt-meta">4월 24일 오후 7시</div>
+            </div>
+            <div class="evt-dday">D-3</div>
+          </div>
+        </div>
+        <div class="friends-strip">
+          <div class="avatar-stack">
+            <div class="avatar">수</div>
+            <div class="avatar">준</div>
+            <div class="avatar">지</div>
+          </div>
+          <div class="friends-text"><b>3명</b>이 오늘 책을 읽었어요</div>
+        </div>
+        <div style="height: 20px;"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 평가 & 권장 -->
+<div class="verdict-row">
+  <h4>팔레트 비교 · 평가</h4>
+  <table>
+    <tr>
+      <td>브랜드 차별성</td>
+      <td>
+        <b>현재:</b> 낮음 — 다른 독서앱(Literal, Storygraph)과 구분 불가.<br/>
+        <b>Option 1:</b> <span style="color:#5FBF9D;">높음</span> — 애프리콧 시그니처로 즉시 식별.<br/>
+        <b>Option 2:</b> <span style="color:#FF9A6C;">높음</span> — 밝은 에메랄드+밝은 애프리콧. 에너지 강함.
+      </td>
+    </tr>
+    <tr>
+      <td>방긋이와 궁합</td>
+      <td>
+        <b>현재:</b> 중 — 캐릭터의 민트 그린은 살지만 얼굴 홍조와 공명 없음.<br/>
+        <b>Option 1:</b> <span style="color:#5FBF9D;">상</span> — 애프리콧이 방긋이 뺨 홍조와 정확히 맞음.<br/>
+        <b>Option 2:</b> 상 — 발랄하지만 방긋이의 <i>차분한 3D 렌더</i>와 살짝 톤 차이.
+      </td>
+    </tr>
+    <tr>
+      <td>책장 · 독서 느낌</td>
+      <td>
+        <b>현재:</b> 구리색이 책장 분위기 냄. 약간 올드함.<br/>
+        <b>Option 1:</b> <span style="color:#5FBF9D;">상</span> — 딥플럼 북커버가 문학적 깊이 부여.<br/>
+        <b>Option 2:</b> 중 — 쨍한 색감이 어린이 도서앱 느낌에 가까워질 위험.
+      </td>
+    </tr>
+    <tr>
+      <td>오래 보기</td>
+      <td>
+        <b>현재:</b> 편안함 (눈 피로 적음).<br/>
+        <b>Option 1:</b> <span style="color:#5FBF9D;">편안 + 설렘</span> — 민트는 여전히 차분, 애프리콧은 포인트만.<br/>
+        <b>Option 2:</b> 활기 강함 — 조용한 독서 세션에는 과할 수 있음.
+      </td>
+    </tr>
+  </table>
+  <div style="margin-top: 18px; padding: 14px 16px; background: color-mix(in srgb, #3FA580 12%, #1A1712); border-left: 3px solid #3FA580; border-radius: 8px;">
+    <div style="color:#E8E3D8; font-weight:700; margin-bottom:4px;">드림팀 권장: Option 1 · Evergreen &amp; Apricot</div>
+    독서앱의 <i>차분함</i>과 방긋이의 <i>따뜻함</i>을 모두 가져가면서 시그니처가 있어 브랜드가 기억됨. Option 2는 과감하지만 책을 <b>오래</b> 읽는 행위와 톤이 살짝 어긋남.
+  </div>
+</div>
+
+</body>
+</html>

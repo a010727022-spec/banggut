@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Users, PenLine, User } from "lucide-react";
+import { Home, Library, Users, PenLine, User } from "lucide-react";
 
 const NAV_ITEMS = [
-  { id: "library", label: "서재",  icon: BookOpen, route: "/",        ariaLabel: "내 서재로 이동" },
-  { id: "groups",  label: "모임",  icon: Users,    route: "/groups",  ariaLabel: "독서 모임으로 이동" },
-  { id: "reviews", label: "서평",  icon: PenLine,  route: "/scrap",   ariaLabel: "스크랩 서평으로 이동" },
-  { id: "profile", label: "MY",    icon: User,     route: "/profile", ariaLabel: "내 프로필로 이동" },
+  { id: "home",    label: "홈",     icon: Home,     route: "/",        ariaLabel: "홈 대시보드로 이동" },
+  { id: "library", label: "서재",   icon: Library,  route: "/library", ariaLabel: "내 서재로 이동" },
+  { id: "groups",  label: "모임",   icon: Users,    route: "/groups",  ariaLabel: "독서 모임으로 이동" },
+  { id: "reviews", label: "서평",   icon: PenLine,  route: "/scrap",   ariaLabel: "스크랩 서평으로 이동" },
+  { id: "profile", label: "내정보", icon: User,     route: "/profile", ariaLabel: "내 정보로 이동" },
 ];
 
 export function BottomNav() {

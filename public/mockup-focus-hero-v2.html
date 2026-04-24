@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>방긋 · 뽀모도로 Hero v2</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,700;9..144,900&family=Gaegu:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#F7F3ED; --sf:#FFFDF9; --sf2:#F1EBE0; --sf3:#E8E1D4;
+    --tp:#2B2420; --ts:#6B5E52; --tm:#8C7D6F;
+    --ac:#5FA48E; --ac2:#4E8A77; --acc:#FFFDF9;
+    --bd:rgba(43,36,32,0.08); --bd2:rgba(43,36,32,0.16);
+    --honey:#D4A056; --honey2:#B5803E; --honey-soft:#EFD7A6;
+    --danger:#C26B4B;
+    --ritual-bg:#FCF5E6;
+    --shadow-card:0 1px 2px rgba(40,25,10,0.08);
+    --shadow-hero:0 20px 40px -20px rgba(40,25,10,0.22),0 6px 14px -6px rgba(40,25,10,0.14);
+    --font-serif:"Fraunces",Georgia,serif;
+    --font-sans:"Pretendard Variable",Pretendard,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--tp);font-family:var(--font-sans);letter-spacing:-0.01em;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1320px;margin:0 auto;padding:36px 24px 80px}
+  .hdr{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:28px;gap:16px;flex-wrap:wrap}
+  .hdr h1{margin:0;font-family:var(--font-serif);font-size:30px;font-weight:700;letter-spacing:-0.5px}
+  .hdr p{margin:4px 0 0;font-size:13px;color:var(--tm);line-height:1.55;max-width:620px}
+  .concept{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:100px;background:var(--honey-soft);color:var(--honey2);font-size:11px;font-weight:700;letter-spacing:0.3px}
+  .concept::before{content:"•";color:var(--honey)}
+
+  .phones{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+  @media (max-width:1100px){.phones{grid-template-columns:1fr;max-width:420px;margin:0 auto}}
+  .phone{background:var(--bg);border:1px solid var(--bd);border-radius:36px;padding:14px 12px;box-shadow:var(--shadow-hero);position:relative;overflow:hidden}
+  .phone-label{position:absolute;top:14px;left:0;right:0;text-align:center;font-size:10px;font-weight:800;color:var(--tm);letter-spacing:2.5px;text-transform:uppercase;pointer-events:none;z-index:0}
+  .phone-state{position:absolute;top:44px;left:14px;padding:4px 10px;border-radius:100px;font-size:9px;font-weight:800;letter-spacing:0.5px;z-index:2;text-transform:uppercase}
+  .s-idle{background:var(--honey);color:#fff}
+  .s-run{background:var(--ac);color:var(--acc)}
+  .s-done{background:#C7B697;color:#5D4829}
+  .screen{margin-top:60px;position:relative;z-index:1}
+
+  /* ── Hero (book) ── */
+  .hero{position:relative;height:112px;border-radius:0 0 18px 18px;overflow:hidden;margin-bottom:14px;background:linear-gradient(135deg,#3a4e46,#5a766a);}
+  .hero::before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle at 30% 40%,rgba(255,255,255,0.16),transparent 50%),radial-gradient(circle at 75% 70%,rgba(0,0,0,0.25),transparent 60%)}
+  .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,0.58))}
+  .hero-cover{position:absolute;left:14px;bottom:-18px;width:66px;height:92px;border-radius:4px;background:#1c1a17;box-shadow:0 10px 16px -6px rgba(0,0,0,0.5),inset 2px 0 0 rgba(0,0,0,0.35);z-index:3;overflow:hidden}
+  .hero-cover::before{content:"심리학자가";position:absolute;top:12px;left:0;right:0;text-align:center;font-family:var(--font-serif);font-size:7px;font-weight:700;color:#f3e4c7;letter-spacing:0.5px}
+  .hero-cover::after{content:"";position:absolute;top:30px;left:14px;right:14px;height:34px;background:radial-gradient(circle,#8d6a3a 20%,transparent 60%);border:0.5px solid rgba(255,255,255,0.15);border-radius:50%;opacity:0.6}
+  .hero-meta{position:absolute;left:92px;right:14px;bottom:12px;z-index:3;color:#fff}
+  .hero-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:100px;background:rgba(95,164,142,0.85);font-size:8px;font-weight:800;margin-bottom:4px;backdrop-filter:blur(8px)}
+  .hero-badge::before{content:"●";font-size:7px}
+  .hero-title{font-family:var(--font-serif);font-size:14px;font-weight:700;letter-spacing:-0.2px;line-height:1.2;text-shadow:0 2px 10px rgba(0,0,0,0.5);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .hero-author{font-size:9px;color:rgba(255,255,255,0.68);margin-top:3px}
+
+  /* ── Tiny progress strip (아래로 밀려남) ── */
+  .strip{display:flex;align-items:center;gap:8px;margin:0 16px 12px;padding:7px 10px;background:var(--sf);border-radius:10px;border:0.5px solid var(--bd)}
+  .strip-bar{flex:1;height:3px;background:var(--sf3);border-radius:2px;overflow:hidden}
+  .strip-bar > div{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));width:23%}
+  .strip-pct{font-size:10px;font-weight:800;color:var(--ac);letter-spacing:-0.3px}
+  .strip-num{font-size:9px;color:var(--tm);font-weight:700;letter-spacing:0.2px}
+  .strip-fmt{display:inline-flex;gap:1px;background:var(--sf2);padding:1px;border-radius:100px}
+  .strip-fmt button{padding:2px 7px;border:none;border-radius:100px;background:transparent;font-size:8.5px;font-weight:700;color:var(--tm);font-family:inherit;cursor:pointer}
+  .strip-fmt button.on{background:var(--tp);color:var(--bg)}
+
+  /* ═══════════════════════════ FOCUS HERO CARD ═══════════════════════════ */
+  .focus{position:relative;margin:0 16px 14px;padding:22px 18px 18px;border-radius:22px;background:linear-gradient(165deg,var(--ritual-bg) 0%,#FFF7E5 55%,#F7EFD8 100%);overflow:hidden;border:0.5px solid rgba(212,160,86,0.25);box-shadow:0 10px 24px -12px rgba(180,120,40,0.2),inset 0 1px 0 rgba(255,255,255,0.5)}
+  .focus::before{content:"";position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(212,160,86,0.22) 0%,transparent 65%);pointer-events:none}
+  .focus::after{content:"";position:absolute;bottom:-50px;left:-20px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(95,164,142,0.12) 0%,transparent 65%);pointer-events:none}
+
+  .focus-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;position:relative;z-index:2}
+  .focus-mode{display:inline-flex;background:rgba(255,253,249,0.8);padding:3px;border-radius:100px;border:0.5px solid rgba(43,36,32,0.1);backdrop-filter:blur(6px)}
+  .focus-mode button{padding:5px 11px;border:none;border-radius:100px;background:transparent;font-size:10px;font-weight:700;color:var(--tm);font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:4px}
+  .focus-mode button.on{background:linear-gradient(180deg,var(--honey),var(--honey2));color:#fff;box-shadow:0 2px 6px -1px rgba(181,128,62,0.5)}
+  .focus-mode button.on.mint{background:linear-gradient(180deg,var(--ac),var(--ac2));box-shadow:0 2px 6px -1px rgba(78,138,119,0.5)}
+  .streak-chip{display:inline-flex;align-items:center;gap:5px;font-size:9.5px;font-weight:800;color:var(--honey2);padding:4px 9px;border-radius:100px;background:rgba(255,255,255,0.6);border:0.5px solid rgba(212,160,86,0.25)}
+  .streak-chip span{font-family:var(--font-serif);font-size:11px;font-weight:700}
+
+  .ring-wrap{position:relative;width:190px;height:190px;margin:10px auto 4px;filter:drop-shadow(0 8px 16px rgba(181,128,62,0.22))}
+  .ring{position:absolute;inset:0}
+  .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .ring-time{font-family:var(--font-serif);font-size:46px;font-weight:500;color:var(--tp);letter-spacing:-2px;line-height:1;font-variant-numeric:tabular-nums}
+  .ring-sub{font-size:10px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:2.5px;margin-top:8px}
+  .ring-pulse{position:absolute;inset:-6px;border-radius:50%;border:1.5px solid rgba(212,160,86,0.35);animation:pulse 2.6s ease-out infinite}
+  @keyframes pulse{0%{transform:scale(0.95);opacity:0.7}100%{transform:scale(1.08);opacity:0}}
+
+  .focus-label{text-align:center;margin:4px 0 12px;position:relative;z-index:2}
+  .focus-label .w1{font-family:var(--font-serif);font-size:15px;font-weight:500;color:var(--tp);letter-spacing:-0.2px;font-style:italic}
+  .focus-label .w2{font-size:10.5px;color:var(--ts);margin-top:4px;line-height:1.4}
+
+  .focus-cta{width:calc(100% - 8px);margin:2px 4px 0;padding:14px;border-radius:16px;background:linear-gradient(180deg,var(--honey) 0%,var(--honey2) 100%);color:#fff;font-size:14px;font-weight:800;border:none;letter-spacing:-0.3px;cursor:pointer;box-shadow:0 8px 16px -6px rgba(181,128,62,0.45),inset 0 1px 0 rgba(255,255,255,0.25);position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:7px}
+  .focus-cta.mint{background:linear-gradient(180deg,var(--ac) 0%,var(--ac2) 100%);box-shadow:0 8px 16px -6px rgba(78,138,119,0.45),inset 0 1px 0 rgba(255,255,255,0.25)}
+  .focus-cta.ghost{background:transparent;color:var(--honey2);border:1.5px solid rgba(181,128,62,0.35);box-shadow:none}
+
+  .focus-cta-row{display:flex;gap:8px;margin:2px 4px 0;position:relative;z-index:2}
+  .focus-cta-row > button{flex:1}
+  .focus-cta-row .focus-cta{margin:0}
+
+  /* Running state: ring thicker & with breathing */
+  .ring-running{animation:breathe 4s ease-in-out infinite}
+  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+
+  .tiny-link{display:block;text-align:center;margin-top:10px;font-size:10px;color:var(--tm);text-decoration:underline;text-underline-offset:3px;background:transparent;border:none;font-family:inherit;width:100%;cursor:pointer;position:relative;z-index:2}
+
+  /* ═══════════════ After Focus area ═══════════════ */
+  .qa-row{display:flex;gap:7px;padding:0 16px 10px}
+  .qa-btn{flex:1;padding:10px 0;border-radius:12px;font-size:11px;font-weight:700;border:0.5px solid var(--bd2);background:var(--sf);color:var(--ac2);display:flex;align-items:center;justify-content:center;gap:5px;font-family:inherit;cursor:pointer}
+  .qa-btn svg{width:13px;height:13px}
+
+  .completion{margin:0 16px 10px;padding:12px 14px;border-radius:14px;background:transparent;border:1.5px dashed rgba(43,76,63,0.35);color:#2B4C3F;font-size:13px;font-weight:800;text-align:center;letter-spacing:-0.3px;font-family:inherit;cursor:pointer}
+  .detail-accordion{margin:0 16px 14px;background:var(--sf);border-radius:12px;border:0.5px solid var(--bd);overflow:hidden}
+  .detail-head{padding:9px 12px;display:flex;align-items:center;justify-content:space-between;font-size:10.5px;font-weight:700;color:var(--tm)}
+  .detail-head .chev{color:var(--tm)}
+
+  /* Done state input */
+  .recap-fields{margin-top:12px;padding:14px;background:rgba(255,253,249,0.7);border-radius:14px;border:0.5px solid var(--bd);position:relative;z-index:2;backdrop-filter:blur(4px)}
+  .recap-fields h5{margin:0 0 10px;font-size:11px;font-weight:800;color:var(--tp);letter-spacing:-0.2px}
+  .recap-row{display:flex;gap:8px;align-items:center}
+  .recap-row input{flex:1;padding:9px 10px;border:0.5px solid var(--bd2);border-radius:10px;background:#fff;font-size:13px;color:var(--tp);font-weight:700;text-align:center;font-family:var(--font-serif);outline:none}
+  .recap-row .arrow{font-size:15px;color:var(--tm)}
+  .recap-row .unit{font-size:11px;color:var(--tm);font-weight:700}
+  .recap-save{margin-top:10px;width:100%;padding:11px;border-radius:12px;background:var(--tp);color:var(--bg);font-size:12px;font-weight:800;border:none;letter-spacing:-0.2px}
+
+  /* running sub stats */
+  .run-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 4px 0;position:relative;z-index:2}
+  .run-stats > div{padding:10px 12px;background:rgba(255,253,249,0.7);border-radius:12px;border:0.5px solid var(--bd);text-align:center;backdrop-filter:blur(4px)}
+  .run-stats b{display:block;font-family:var(--font-serif);font-size:18px;font-weight:500;color:var(--tp);letter-spacing:-0.5px;line-height:1}
+  .run-stats p{margin:4px 0 0;font-size:9px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:0.8px}
+
+  /* NOTES */
+  .notes{margin-top:40px;background:var(--sf);border:1px solid var(--bd);border-radius:20px;padding:26px 28px}
+  .notes h2{margin:0 0 8px;font-family:var(--font-serif);font-size:18px;font-weight:700;letter-spacing:-0.3px}
+  .notes h3{margin:18px 0 6px;font-size:11px;font-weight:800;color:var(--honey2);letter-spacing:1px;text-transform:uppercase}
+  .notes p,.notes li{font-size:13px;color:var(--ts);line-height:1.65;margin:0 0 6px}
+  .notes ul{padding-left:18px;margin:4px 0 10px}
+  .notes code{background:var(--sf2);padding:1px 7px;border-radius:5px;font-size:12px;color:var(--ac2);font-family:ui-monospace,"SF Mono",Menlo,monospace}
+
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:14px}
+  @media (max-width:720px){.pair{grid-template-columns:1fr}}
+  .pair .box{padding:16px 18px;background:var(--ritual-bg);border:0.5px solid rgba(212,160,86,0.25);border-radius:14px}
+  .pair .box h4{margin:0 0 6px;font-family:var(--font-serif);font-size:15px;font-weight:700;color:var(--honey2)}
+  .pair .box p{font-size:12.5px;margin:0}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hdr">
+    <div>
+      <span class="concept">새 컨셉 · 독서 세션이 주인공</span>
+      <h1>책 상세 · 뽀모도로 Hero</h1>
+      <p>페이지를 채우는 게 아니라 <b>책과 보낸 시간</b>이 화면의 중심이에요. 진행률·포맷 토글·페이지 입력은 모두 세션 플로우에 흡수돼요.</p>
+    </div>
+  </header>
+
+  <div class="phones">
+
+    <!-- ══════════════════════ PHONE A · Idle ══════════════════════ -->
+    <div class="phone">
+      <div class="phone-label">PHONE A</div>
+      <div class="phone-state s-idle">Idle · 시작 전</div>
+      <div class="screen">
+        <div class="hero">
+          <div class="hero-cover"></div>
+          <div class="hero-meta">
+            <div class="hero-badge">읽는 중</div>
+            <div class="hero-title">시 심리학자가 종이책을 읽는다</div>
+            <div class="hero-author">린다 N. 애셔스타인</div>
+          </div>
+        </div>
+
+        <!-- 얇은 progress strip (수치는 살아 있되 부수적) -->
+        <div class="strip">
+          <div class="strip-fmt"><button class="on">📘</button><button>📱</button></div>
+          <div class="strip-bar"><div></div></div>
+          <span class="strip-pct">23%</span>
+          <span class="strip-num">124/520p</span>
+        </div>
+
+        <!-- FOCUS HERO -->
+        <div class="focus">
+          <div class="focus-head">
+            <div class="focus-mode">
+              <button class="on">⏳ 25분 집중</button>
+              <button>⌁ 읽는 만큼</button>
+            </div>
+            <div class="streak-chip">🔥 <span>8</span>일째</div>
+          </div>
+
+          <div class="ring-wrap">
+            <svg class="ring" viewBox="0 0 200 200" width="190" height="190">
+              <defs>
+                <linearGradient id="honey-grad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#D4A056" />
+                  <stop offset="100%" stop-color="#B5803E" />
+                </linearGradient>
+              </defs>
+              <circle cx="100" cy="100" r="88" fill="none" stroke="rgba(181,128,62,0.14)" stroke-width="8" />
+              <circle cx="100" cy="100" r="88" fill="none" stroke="url(#honey-grad)" stroke-width="8" stroke-linecap="round" stroke-dasharray="553" stroke-dashoffset="0" transform="rotate(-90 100 100)" />
+              <circle cx="100" cy="12" r="4" fill="#D4A056" />
+            </svg>
+            <div class="ring-center">
+              <div class="ring-time">25:00</div>
+              <div class="ring-sub">Focus</div>
+            </div>
+          </div>
+
+          <div class="focus-label">
+            <div class="w1">"오늘도 한 꼭지만."</div>
+            <div class="w2">방해 없이 책과 둘만 보낼 25분이에요</div>
+          </div>
+
+          <button class="focus-cta">▶ 집중 시작하기</button>
+          <button class="tiny-link">· 바로 페이지만 적을래요</button>
+        </div>
+
+        <div class="qa-row">
+          <button class="qa-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 17l6-6 4 4 8-8"/></svg>문장 긋기</button>
+          <button class="qa-btn" style="opacity:0.6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 11l3 3 5-6"/></svg>서평 쓰기</button>
+        </div>
+
+        <button class="completion">꾹 눌러서 · 다 읽었어요</button>
+
+        <div class="detail-accordion">
+          <div class="detail-head">
+            <span>· 책 정보 수정 (전체 페이지, 시작/완독일)</span>
+            <span class="chev">›</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════ PHONE B · Running ══════════════════════ -->
+    <div class="phone">
+      <div class="phone-label">PHONE B</div>
+      <div class="phone-state s-run">Running · 집중 중</div>
+      <div class="screen">
+        <div class="hero" style="opacity:0.78">
+          <div class="hero-cover"></div>
+          <div class="hero-meta">
+            <div class="hero-badge">읽는 중</div>
+            <div class="hero-title">시 심리학자가 종이책을 읽는다</div>
+            <div class="hero-author">린다 N. 애셔스타인</div>
+          </div>
+        </div>
+
+        <!-- strip은 running 상태에도 얇게 유지 -->
+        <div class="strip" style="opacity:0.55">
+          <div class="strip-fmt"><button class="on">📘</button><button>📱</button></div>
+          <div class="strip-bar"><div></div></div>
+          <span class="strip-pct">23%</span>
+          <span class="strip-num">124/520p</span>
+        </div>
+
+        <div class="focus">
+          <div class="focus-head">
+            <div class="focus-mode">
+              <button class="on">⏳ 25분 집중</button>
+              <button style="opacity:0.35;pointer-events:none">⌁ 읽는 만큼</button>
+            </div>
+            <div class="streak-chip" style="background:var(--ac);color:#fff;border-color:transparent">● 진행 중</div>
+          </div>
+
+          <div class="ring-wrap ring-running">
+            <svg class="ring" viewBox="0 0 200 200" width="190" height="190">
+              <defs>
+                <linearGradient id="mint-grad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#7EC2AB" />
+                  <stop offset="100%" stop-color="#4E8A77" />
+                </linearGradient>
+              </defs>
+              <circle cx="100" cy="100" r="88" fill="none" stroke="rgba(78,138,119,0.16)" stroke-width="10" />
+              <!-- progress ~ 42% of 25min = passed ~ 42% → dashoffset -->
+              <circle cx="100" cy="100" r="88" fill="none" stroke="url(#mint-grad)" stroke-width="10" stroke-linecap="round" stroke-dasharray="553" stroke-dashoffset="321" transform="rotate(-90 100 100)" />
+              <circle cx="177.5" cy="136" r="5" fill="#4E8A77" />
+            </svg>
+            <div class="ring-pulse"></div>
+            <div class="ring-center">
+              <div class="ring-time">14:32</div>
+              <div class="ring-sub" style="color:var(--ac2)">Reading</div>
+            </div>
+          </div>
+
+          <div class="focus-label">
+            <div class="w1">조용히, 고요하게.</div>
+            <div class="w2">10분 28초 지나갔어요. 한 챕터씩 가봐요.</div>
+          </div>
+
+          <div class="focus-cta-row">
+            <button class="focus-cta mint">❚❚ 일시정지</button>
+            <button class="focus-cta ghost">중단</button>
+          </div>
+
+          <div class="run-stats">
+            <div><b>10:28</b><p>지난 시간</p></div>
+            <div><b>14:32</b><p>남은 시간</p></div>
+          </div>
+        </div>
+
+        <!-- running 상태에선 퀵 액션 감춤 (집중 유지) -->
+        <div class="detail-accordion" style="opacity:0.45">
+          <div class="detail-head">
+            <span>· 집중 중에는 알림을 줄여요</span>
+            <span class="chev">·</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════ PHONE C · Done ══════════════════════ -->
+    <div class="phone">
+      <div class="phone-label">PHONE C</div>
+      <div class="phone-state s-done">Done · 리캡</div>
+      <div class="screen">
+        <div class="hero">
+          <div class="hero-cover"></div>
+          <div class="hero-meta">
+            <div class="hero-badge">읽는 중</div>
+            <div class="hero-title">시 심리학자가 종이책을 읽는다</div>
+            <div class="hero-author">린다 N. 애셔스타인</div>
+          </div>
+        </div>
+
+        <div class="strip">
+          <div class="strip-fmt"><button class="on">📘</button><button>📱</button></div>
+          <div class="strip-bar"><div style="width:31%"></div></div>
+          <span class="strip-pct">31%</span>
+          <span class="strip-num">160/520p</span>
+        </div>
+
+        <div class="focus" style="background:linear-gradient(165deg,#FDF0D0 0%,#FCE6B8 55%,#F7DBA0 100%)">
+          <div class="focus-head">
+            <div class="streak-chip" style="background:#fff;border-color:rgba(212,160,86,0.4)">🔥 <span>9</span>일째 · 오늘 2번째</div>
+            <div style="font-size:9px;color:var(--honey2);font-weight:700;letter-spacing:1px;text-transform:uppercase">방금 완료</div>
+          </div>
+
+          <div class="ring-wrap" style="width:150px;height:150px;margin:16px auto 6px">
+            <svg class="ring" viewBox="0 0 200 200" width="150" height="150">
+              <circle cx="100" cy="100" r="88" fill="none" stroke="rgba(181,128,62,0.18)" stroke-width="8" />
+              <circle cx="100" cy="100" r="88" fill="none" stroke="#D4A056" stroke-width="8" stroke-linecap="round" stroke-dasharray="553" stroke-dashoffset="0" transform="rotate(-90 100 100)" />
+            </svg>
+            <div class="ring-center">
+              <div style="font-size:32px;line-height:1">🌿</div>
+              <div class="ring-sub" style="margin-top:6px;color:var(--honey2)">Done</div>
+            </div>
+          </div>
+
+          <div class="focus-label">
+            <div class="w1">25분 잘 다녀오셨어요.</div>
+            <div class="w2">오늘 누적 50분 · 이번 주 3일째 꾸준함</div>
+          </div>
+
+          <div class="recap-fields">
+            <h5>어디까지 읽으셨나요?</h5>
+            <div class="recap-row">
+              <input type="text" value="124" />
+              <span class="arrow">→</span>
+              <input type="text" value="160" />
+              <span class="unit">p</span>
+            </div>
+            <button class="recap-save">기록하고 덮기</button>
+          </div>
+
+          <button class="tiny-link">· 페이지 기록은 건너뛸게요</button>
+        </div>
+
+        <div class="qa-row">
+          <button class="qa-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 17l6-6 4 4 8-8"/></svg>방금 문장 긋기</button>
+          <button class="qa-btn" style="opacity:0.6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 11l3 3 5-6"/></svg>서평 쓰기</button>
+        </div>
+
+        <button class="completion">꾹 눌러서 · 다 읽었어요</button>
+      </div>
+    </div>
+
+  </div>
+
+  <section class="notes">
+    <h2>🌿 컨셉 · 세션이 주인공, 페이지는 따라붙어요</h2>
+    <p>방긋에서 독서의 증거가 '몇 페이지 읽었나'에서 '얼마나 함께 있었나'로 이동해요. 뽀모도로 링을 책의 맥박으로 삼고, 진행률 · 포맷 토글 · 페이지 입력은 세션 플로우에 흡수돼요.</p>
+
+    <h3>상태별 할 일</h3>
+    <ul>
+      <li><b>Idle</b>: honey 그라데이션 링 + <code>집중 시작하기</code> · 아래 <code>· 바로 페이지만 적을래요</code> 안전망 링크 · 진행률은 얇은 strip(상단)</li>
+      <li><b>Running</b>: mint 링이 진행 + 호흡 애니메이션 · 일시정지/중단 · 퀵액션/접기 희미하게 · 방해 최소화</li>
+      <li><b>Done</b>: honey glow + 🌿 리캡 · 세션에서 읽은 페이지를 인라인으로 묻기 (<code>124 → 160</code>) · 건너뛰기 링크 · "오늘 2번째 · 누적 50분" 서사</li>
+    </ul>
+
+    <h3>이렇게 정리돼요</h3>
+    <div class="pair">
+      <div class="box">
+        <h4>사라지는 것</h4>
+        <ul style="padding-left:16px;margin:4px 0 0">
+          <li>퀵액션 <code>진행률 업데이트</code> 버튼 ①</li>
+          <li>큰 CTA <code>오늘 읽었어요</code> ③</li>
+          <li><code>showTodayModal</code> 바텀시트</li>
+          <li><code>showProgress</code> 상세 카드 ④</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h4>남는 것 · 이동</h4>
+        <ul style="padding-left:16px;margin:4px 0 0">
+          <li>뽀모도로 카드 (Hero로 승격)</li>
+          <li>얇은 진행률 strip (포맷 토글 포함) ② 압축</li>
+          <li>책 정보 수정 — 접기 섹션으로</li>
+          <li>꾹 누르기 완독 — 유지</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>🎨 디자인 토큰 · 메모</h3>
+    <ul>
+      <li><b>Primary</b>: <code>--honey #D4A056 → --honey2 #B5803E</code> 그라데이션 (뽀모도로 idle/done)</li>
+      <li><b>Secondary</b>: <code>--ac #5FA48E</code> mint (running 중에만)</li>
+      <li><b>카드 배경</b>: <code>#FCF5E6 → #FFF7E5 → #F7EFD8</code> 세로 그라데이션 + 코너 radial glow</li>
+      <li><b>타이포</b>: 숫자 · 카피 세리프는 <code>Fraunces</code> (무료 · Pretendard 보완), 본문은 Pretendard</li>
+      <li><b>링</b>: 두께 8px(idle)→10px(running), stroke-linecap round, honey/mint gradient + drop-shadow</li>
+      <li><b>Motion</b>: running 링에 <code>breathe 4s</code> 소폭 pulse · 1개 ring-pulse wave (반복) · <code>prefers-reduced-motion</code> 존중</li>
+    </ul>
+
+    <h3>🧪 구현 메모 (Dan)</h3>
+    <ul>
+      <li><code>FocusSessionCard</code> 를 idle/running/done 3-state hero로 확장 (이미 state 분리됨 — 스타일만 승격)</li>
+      <li>세션 Done 시 페이지 인라인 input 추가 → <code>saveField({current_page})</code>로 직접 저장. 그 자리가 유일한 페이지 업데이트 entry.</li>
+      <li>진행률 카드는 strip 한 줄로 축소 (≈36px 높이). 포맷 토글 내장.</li>
+      <li><code>showProgress</code> 카드 → <code>&lt;details&gt;</code> 접기로 이동 (전체 페이지·시작일·완독일만).</li>
+      <li>퀵액션: <code>진행률 업데이트</code> 버튼 삭제, 문장 긋기 + 서평 2열.</li>
+      <li>큰 CTA <code>오늘 읽었어요</code> 삭제. 꾹 누르기 완독은 하단에 유지.</li>
+      <li>스트릭 판정: 오늘 FocusSession 1건 이상 완료 시 스트릭 칠.</li>
+    </ul>
+  </section>
+</div>
+</body>
+</html>

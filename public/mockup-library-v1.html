@@ -1,0 +1,2819 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>완독콩 · Library v1 — 가상 서재 큐레이션</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet" />
+
+<style>
+  :root,
+  :root[data-theme="mint"] {
+    /* ── 산뜻한 민트 (Fresh Mint) ────────────── */
+    --cream: #F7F3ED;
+    --cream-sub: #EFE8DB;
+    --paper: #FFFFFF;
+    --mint: #5FA48E;
+    --mint-deep: #3F7A66;
+    --mint-soft: #CDE4DB;
+    --peach: #F4C8A8;
+    --peach-deep: #C78A5B;
+    --ink: #1E1B16;
+    --ink-sub: #5A5348;
+    --ink-mute: #8E8778;
+    --line: rgba(30, 27, 22, 0.08);
+    --line-strong: rgba(30, 27, 22, 0.16);
+    --shadow: 0 2px 12px rgba(30, 27, 22, 0.06), 0 8px 28px rgba(30, 27, 22, 0.04);
+    --radius: 18px;
+
+    /* 페이지 배경 (민트 테마일 땐 다크 레더) */
+    --page-bg: #1C1814;
+    --page-text: #EDE5D4;
+    --page-kicker: #B5A989;
+    --page-body: #9E9478;
+
+    /* 히어로 글로우 + 마스코트 그림자 */
+    --hero-glow: rgba(95, 164, 142, 0.12);
+    --mascot-shadow-sm: 0 3px 6px rgba(95, 164, 142, 0.22);
+    --mascot-shadow-lg: 0 10px 16px rgba(63, 122, 102, 0.28);
+  }
+
+  :root[data-theme="blackbeige"] {
+    /* ── 시크한 블랙베이지 (Chic Black Beige) ──
+       프라다 사피아노 재해석: 밝은 린넨 비스킷 + 딥 잉크 + 실버 플라크
+       v5.3 — 베이지 확 밝게 (아이보리 비스킷 톤으로) */
+    --cream: #FBF5E0;        /* 주 배경 (밝은 아이보리 비스킷) */
+    --cream-sub: #F3E8CA;    /* 카드 (살짝 가라앉은 크림으로 깊이감) */
+    --paper: #FEFBEE;        /* 페이퍼 (거의 흰색에 가까운 밝은 크림) */
+    --mint: #0F0E0C;         /* 프라이머리 = 잉크 블랙 */
+    --mint-deep: #8A6B42;    /* 세컨더리 = 브라스 골드 */
+    --mint-soft: #E1D4B2;    /* 소프트 액센트 밴드 */
+    --peach: #D6B58A;        /* 뮤티드 카멜 (위시 태그) */
+    --peach-deep: #6E5231;
+    --ink: #0F0E0C;
+    --ink-sub: #2D2820;
+    --ink-mute: #7A7164;
+    --line: rgba(15, 14, 12, 0.10);
+    --line-strong: rgba(15, 14, 12, 0.22);
+    --shadow: 0 2px 12px rgba(15, 14, 12, 0.08), 0 8px 28px rgba(15, 14, 12, 0.05);
+    --radius: 18px;
+
+    /* 페이지 배경 (블랙베이지 테마일 땐 잉크 블랙 — 부티크 쇼윈도) */
+    --page-bg: #0A0906;
+    --page-text: #EDE5CE;
+    --page-kicker: #A89C7E;
+    --page-body: #8F8569;
+
+    /* 히어로 글로우 + 마스코트 그림자 */
+    --hero-glow: rgba(138, 107, 66, 0.10);
+    --mascot-shadow-sm: 0 3px 6px rgba(15, 14, 12, 0.18);
+    --mascot-shadow-lg: 0 10px 18px rgba(15, 14, 12, 0.26);
+
+    /* 사피아노 크로스해치 (프라다 레더 캐스트 텍스처)
+       v5.3 — 배경이 밝아진 만큼 패턴 opacity 약간 올림 */
+    --saff-pattern:
+      repeating-linear-gradient(45deg,
+        transparent 0, transparent 3px,
+        rgba(85, 62, 22, 0.11) 3px, rgba(85, 62, 22, 0.11) 3.6px),
+      repeating-linear-gradient(-45deg,
+        transparent 0, transparent 3px,
+        rgba(85, 62, 22, 0.11) 3px, rgba(85, 62, 22, 0.11) 3.6px);
+
+    /* 실버 플라크 그라디언트 (프라다 메탈 트라이앵글) */
+    --silver:
+      linear-gradient(140deg,
+        #F4EEE0 0%,
+        #C5BDA9 34%,
+        #7A7464 52%,
+        #E0D9C4 74%,
+        #524D42 100%);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    font-family: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
+    background: var(--page-bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    transition: background .4s ease;
+  }
+
+  body {
+    min-height: 100vh;
+    padding: 48px 32px 96px;
+  }
+
+  /* ─── Page header ─────────────────────────── */
+  .page-hero {
+    max-width: 1280px;
+    margin: 0 auto 32px;
+    color: var(--page-text);
+  }
+  .page-hero .kicker {
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    color: var(--page-kicker);
+    margin-bottom: 10px;
+  }
+  .page-hero h1 {
+    font-weight: 700;
+    font-size: 32px;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+  .page-hero p {
+    color: var(--page-body);
+    font-size: 14px;
+    max-width: 720px;
+    line-height: 1.6;
+  }
+
+  /* ─── Theme Picker ──────────────────────── */
+  .theme-picker {
+    max-width: 1280px;
+    margin: 0 auto 36px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .theme-opt {
+    flex: 1 1 240px;
+    min-width: 240px;
+    position: relative;
+    padding: 16px 18px 14px;
+    border-radius: 14px;
+    background: rgba(237, 229, 212, 0.04);
+    border: 1px solid rgba(237, 229, 212, 0.12);
+    color: var(--page-text);
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background .25s ease, border-color .25s ease, transform .15s ease;
+  }
+  .theme-opt:hover {
+    background: rgba(237, 229, 212, 0.08);
+    border-color: rgba(237, 229, 212, 0.3);
+  }
+  .theme-opt.active {
+    background: rgba(237, 229, 212, 0.12);
+    border-color: var(--page-text);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  }
+  .theme-opt.active::after {
+    content: "";
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--page-text);
+  }
+  .theme-swatches {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .theme-swatches span {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: block;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+  }
+  .theme-name {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 3px;
+    color: var(--page-text);
+  }
+  .theme-sub {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--page-kicker);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ─── Grid ─────────────────────────────────── */
+  .phones-grid {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    justify-items: center;
+  }
+  @media (max-width: 1100px) {
+    .phones-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 760px) {
+    .phones-grid { grid-template-columns: 1fr; }
+  }
+
+  .phone-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .phone-label {
+    color: var(--page-text);
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .phone-label .sub {
+    display: block;
+    color: var(--page-body);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: none;
+    margin-top: 4px;
+  }
+
+  /* ─── Phone frame ──────────────────────────── */
+  .phone {
+    width: 360px;
+    height: 812px;
+    border-radius: 40px;
+    background: var(--cream);
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 8px #0F0C09,
+      0 0 0 9px #2A241D,
+      0 30px 60px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* status bar */
+  .status {
+    height: 40px;
+    padding: 12px 26px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    flex-shrink: 0;
+  }
+  .status-icons {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+  .status-icons svg { width: 14px; height: 14px; }
+
+  /* scroll body */
+  .body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 20px 28px;
+  }
+  .body::-webkit-scrollbar { display: none; }
+
+  /* ─── Common components ───────────────────── */
+  .greet {
+    padding: 14px 4px 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  /* 완독콩 캐릭터 — 작은 버전 (감정별 PNG) */
+  .mascot {
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+    position: relative;
+    filter: drop-shadow(var(--mascot-shadow-sm));
+  }
+  .mascot img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+  }
+
+  .greet-text {
+    flex: 1;
+    padding-top: 2px;
+  }
+  .greet-text .small {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+  }
+  .greet-text .big {
+    font-family: "Gaegu", "Pretendard Variable", sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--ink);
+    margin-top: 3px;
+    line-height: 1.25;
+  }
+  .greet-text .big em {
+    color: var(--mint-deep);
+    font-style: normal;
+  }
+
+  .streak-pill {
+    align-self: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--peach);
+    color: #6B3D1F;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 10px;
+    border-radius: 999px;
+    flex-shrink: 0;
+  }
+  .streak-pill svg { width: 12px; height: 12px; }
+
+  /* section header */
+  .sec-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 18px 4px 10px;
+  }
+  .sec-head h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .sec-head .more {
+    font-size: 11px;
+    color: var(--ink-mute);
+    letter-spacing: 0.04em;
+  }
+
+  /* buttons */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--mint);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+  }
+  .btn-primary svg { width: 12px; height: 12px; }
+
+  /* community row */
+  .com-row {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    background: var(--paper);
+    border-radius: 14px;
+    border: 1px solid var(--line);
+  }
+  .com-row + .com-row { margin-top: 8px; }
+  .com-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--mint-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--mint-deep);
+  }
+  .com-text {
+    flex: 1;
+    font-size: 12px;
+    color: var(--ink-sub);
+    line-height: 1.45;
+  }
+  .com-text .name {
+    color: var(--ink);
+    font-weight: 700;
+    margin-right: 4px;
+  }
+  .com-meta {
+    font-size: 10px;
+    color: var(--ink-mute);
+    margin-top: 3px;
+    letter-spacing: 0.02em;
+  }
+
+  /* bottom nav */
+  .tabbar {
+    height: 64px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-around;
+    padding: 10px 18px 0;
+    background: var(--cream);
+    border-top: 1px solid var(--line);
+    flex-shrink: 0;
+  }
+  .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    color: var(--ink-mute);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+  }
+  .tab.active { color: var(--mint-deep); }
+  .tab svg { width: 22px; height: 22px; }
+
+
+  /* ═══════════════════════════════════════════════════
+     A. 캘린더 중심
+     ═══════════════════════════════════════════════════ */
+  .phone.a .greet { padding-top: 10px; padding-bottom: 10px; }
+
+  .cal-card {
+    background: var(--paper);
+    border-radius: var(--radius);
+    padding: 16px 16px 18px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--line);
+  }
+  .cal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .cal-head .month {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .cal-head .nav {
+    display: flex;
+    gap: 10px;
+    color: var(--ink-mute);
+  }
+  .cal-head .nav svg { width: 14px; height: 14px; cursor: pointer; }
+
+  .cal-dow {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--ink-mute);
+    text-align: center;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--line);
+  }
+  .cal-dow span:first-child { color: #C25B5B; }
+
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    padding-top: 8px;
+  }
+  .cal-cell {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink-sub);
+    border-radius: 8px;
+  }
+  .cal-cell.muted { color: var(--ink-mute); opacity: 0.4; }
+  .cal-cell.read {
+    background: var(--mint-soft);
+    color: var(--mint-deep);
+  }
+  .cal-cell.today {
+    background: var(--mint);
+    color: #fff;
+  }
+  .cal-cell .dot {
+    position: absolute;
+    bottom: 3px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+  }
+  .cal-cell .dot.meet { background: var(--peach-deep); }
+  .cal-cell .dot.wish { background: var(--mint); }
+  .cal-cell .dot.lib { background: #C25B5B; }
+  .cal-cell.today .dot.meet { background: #fff; }
+
+  .cal-legend {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--line-strong);
+    flex-wrap: wrap;
+  }
+  .leg {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: var(--ink-sub);
+  }
+  .leg .ldot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .ev-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ev {
+    display: flex;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--paper);
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    align-items: center;
+  }
+  .ev-date {
+    width: 42px;
+    flex-shrink: 0;
+    text-align: center;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+  .ev-date .d { font-size: 22px; letter-spacing: -0.02em; }
+  .ev-date .m { font-size: 10px; color: var(--ink-mute); margin-top: 2px; letter-spacing: 0.06em; }
+  .ev-body {
+    flex: 1;
+    min-width: 0;
+  }
+  .ev-body .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+  }
+  .ev-body .tag.meet { background: #FBE5D3; color: var(--peach-deep); }
+  .ev-body .tag.wish { background: var(--mint-soft); color: var(--mint-deep); }
+  .ev-body .tag.lib  { background: #F6D7D7; color: #A63D3D; }
+  .ev-body .title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .ev-body .sub {
+    font-size: 11px;
+    color: var(--ink-mute);
+    margin-top: 2px;
+  }
+  .ev-days {
+    flex-shrink: 0;
+    font-size: 11px;
+    color: var(--ink-mute);
+    font-weight: 600;
+    text-align: right;
+  }
+
+  .cont-mini {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    background: var(--mint);
+    color: #fff;
+    border-radius: 14px;
+    align-items: center;
+    cursor: pointer;
+  }
+  .cont-mini-cover {
+    width: 40px;
+    height: 56px;
+    background: linear-gradient(135deg, #F5E0C7, #D9A675);
+    border-radius: 4px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  .cont-mini-body { flex: 1; min-width: 0; }
+  .cont-mini-body .l1 {
+    font-size: 10px;
+    opacity: 0.85;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .cont-mini-body .l2 {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .cont-mini-body .l3 {
+    font-size: 11px;
+    opacity: 0.88;
+    margin-top: 3px;
+  }
+  .cont-mini-arrow {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .cont-mini-arrow svg { width: 14px; height: 14px; color: #fff; }
+
+
+  /* ═══════════════════════════════════════════════════
+     B. 이어읽기 중심
+     ═══════════════════════════════════════════════════ */
+  .hero-card {
+    background: linear-gradient(160deg, #FFFFFF 0%, #EFE8DB 100%);
+    border-radius: 24px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--line);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-card::before {
+    content: "";
+    position: absolute;
+    top: -40px;
+    right: -30px;
+    width: 140px;
+    height: 140px;
+    background: radial-gradient(circle, var(--hero-glow), transparent 70%);
+    border-radius: 50%;
+  }
+  .hero-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--mint-deep);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    background: var(--mint-soft);
+    border-radius: 999px;
+    margin-bottom: 14px;
+  }
+  .hero-label svg { width: 11px; height: 11px; }
+
+  .hero-body {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .hero-cover {
+    width: 96px;
+    height: 138px;
+    background: linear-gradient(140deg, #1E2E3A, #47647A 55%, #8AB0C2 100%);
+    border-radius: 6px;
+    flex-shrink: 0;
+    box-shadow: 0 6px 16px rgba(30, 27, 22, 0.2), inset 2px 0 0 rgba(0,0,0,0.12);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-cover::before {
+    content: "채식주의자";
+    position: absolute;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #F7F3ED;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  .hero-cover .author {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #F7F3ED;
+    opacity: 0.7;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+  }
+  .hero-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .hero-info .bk-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.015em;
+    line-height: 1.3;
+  }
+  .hero-info .bk-author {
+    font-size: 11px;
+    color: var(--ink-mute);
+    margin-top: 3px;
+    margin-bottom: 14px;
+  }
+  .hero-info .recall {
+    font-family: "Gaegu", sans-serif;
+    font-weight: 400;
+    font-size: 13px;
+    color: var(--ink-sub);
+    line-height: 1.5;
+    padding: 10px 12px;
+    background: var(--cream-sub);
+    border-radius: 10px;
+    border-left: 3px solid var(--mint);
+  }
+  .hero-info .recall strong {
+    color: var(--ink);
+    font-weight: 700;
+    font-family: "Pretendard Variable", sans-serif;
+    font-size: 12px;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .hero-progress {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .prog-track {
+    flex: 1;
+    height: 6px;
+    background: var(--cream-sub);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .prog-fill {
+    height: 100%;
+    width: 62%;
+    background: linear-gradient(90deg, var(--mint), var(--mint-deep));
+    border-radius: 999px;
+  }
+  .prog-text {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink-sub);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .hero-actions .btn-primary { flex: 1; justify-content: center; }
+  .btn-ghost {
+    background: var(--paper);
+    border: 1px solid var(--line-strong);
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 10px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+
+  /* 7-day strip */
+  .week-strip {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    padding: 10px 0;
+  }
+  .day-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 2px;
+    border-radius: 10px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+  }
+  .day-cell .dlabel {
+    font-size: 9px;
+    color: var(--ink-mute);
+    font-weight: 600;
+  }
+  .day-cell .dnum {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .day-cell .ddot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--cream-sub);
+  }
+  .day-cell.done .ddot { background: var(--mint); }
+  .day-cell.today {
+    background: var(--mint);
+    border-color: var(--mint);
+  }
+  .day-cell.today .dlabel,
+  .day-cell.today .dnum { color: #fff; }
+  .day-cell.today .ddot { background: rgba(255,255,255,0.7); }
+
+  /* compact event chips */
+  .ev-chips {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .ev-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    font-size: 12px;
+  }
+  .ev-chip .ic {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .ev-chip .ic.meet { background: #FBE5D3; }
+  .ev-chip .ic.wish { background: var(--mint-soft); }
+  .ev-chip .ic.lib  { background: #F6D7D7; }
+  .ev-chip .ic svg { width: 12px; height: 12px; }
+  .ev-chip .label { flex: 1; color: var(--ink); font-weight: 600; }
+  .ev-chip .d-left {
+    font-size: 11px;
+    color: var(--ink-mute);
+    font-weight: 600;
+  }
+
+
+  /* ═══════════════════════════════════════════════════
+     C. 마스코트 + 커뮤니티
+     ═══════════════════════════════════════════════════ */
+  .mascot-hero {
+    background: linear-gradient(160deg, var(--mint-soft) 0%, var(--cream-sub) 100%);
+    border-radius: 24px;
+    padding: 20px 20px 18px;
+    position: relative;
+    overflow: hidden;
+    margin-top: 6px;
+  }
+  .mascot-hero::after {
+    content: "";
+    position: absolute;
+    right: -10px;
+    top: -10px;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, rgba(255,255,255,0.5), transparent 70%);
+    border-radius: 50%;
+  }
+  /* 완독콩 캐릭터 — 큰 버전 (감정별 PNG) */
+  .mascot-big {
+    width: 118px;
+    height: 118px;
+    position: relative;
+    margin-top: 18px;
+    margin-bottom: 10px;
+    filter: drop-shadow(var(--mascot-shadow-lg));
+  }
+  .mascot-big img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    animation: kkongBob 4.6s ease-in-out infinite;
+    transform-origin: 50% 90%;
+  }
+  @keyframes kkongBob {
+    0%, 100% { transform: translateY(0) rotate(-1.4deg); }
+    50%      { transform: translateY(-4px) rotate(1.4deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .mascot-big img { animation: none; }
+  }
+
+  .bubble {
+    font-family: "Gaegu", sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--ink);
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+  }
+  .bubble em {
+    color: var(--mint-deep);
+    font-style: normal;
+  }
+  .bubble-sub {
+    font-family: "Pretendard Variable", sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--ink-sub);
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+  .bubble-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    background: var(--mint);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 9px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    border: none;
+  }
+  .bubble-cta svg { width: 12px; height: 12px; }
+
+  /* community full */
+  .com-full {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .com-post {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px;
+  }
+  .com-post-head {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .com-post-head .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--mint-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--mint-deep);
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .com-post-head .info { flex: 1; }
+  .com-post-head .name {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .com-post-head .meta {
+    font-size: 10px;
+    color: var(--ink-mute);
+    margin-top: 2px;
+    letter-spacing: 0.02em;
+  }
+  .com-post-body {
+    font-size: 13px;
+    color: var(--ink);
+    line-height: 1.55;
+    margin-bottom: 10px;
+  }
+  .com-post-body .quote {
+    font-family: "Gaegu", sans-serif;
+    font-weight: 400;
+    font-size: 13px;
+    color: var(--ink-sub);
+    padding: 10px 12px;
+    background: var(--cream-sub);
+    border-radius: 10px;
+    margin-top: 8px;
+    border-left: 2px solid var(--mint);
+  }
+  .com-post-actions {
+    display: flex;
+    gap: 14px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--line);
+  }
+  .com-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--ink-mute);
+    font-weight: 600;
+  }
+  .com-action svg { width: 12px; height: 12px; }
+
+  /* float continue CTA */
+  .float-cta {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 76px;
+    background: var(--ink);
+    color: #fff;
+    border-radius: 16px;
+    padding: 11px 13px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    box-shadow: 0 8px 24px rgba(30, 27, 22, 0.4);
+    z-index: 5;
+  }
+  .float-cta-cover {
+    width: 32px;
+    height: 44px;
+    background: linear-gradient(140deg, #C7A571, #8A6B42);
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .float-cta-body { flex: 1; min-width: 0; }
+  .float-cta-body .t1 {
+    font-size: 9px;
+    opacity: 0.65;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .float-cta-body .t2 {
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+  }
+  .float-cta-body .t3 {
+    font-size: 10px;
+    opacity: 0.75;
+    margin-top: 1px;
+  }
+  .float-cta-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--mint);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .float-cta-btn svg { width: 14px; height: 14px; color: #fff; }
+
+  /* mini calendar chip */
+  .mini-cal {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+  }
+  .mini-cal-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--mint-soft);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .mini-cal-icon svg { width: 16px; height: 16px; color: var(--mint-deep); }
+  .mini-cal-body { flex: 1; min-width: 0; }
+  .mini-cal-body .l1 {
+    font-size: 11px;
+    color: var(--ink-mute);
+    letter-spacing: 0.04em;
+  }
+  .mini-cal-body .l2 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-top: 2px;
+  }
+  .mini-cal-arrow {
+    color: var(--ink-mute);
+    flex-shrink: 0;
+  }
+  .mini-cal-arrow svg { width: 14px; height: 14px; }
+
+  /* ─── Notes below ─────────────────────────── */
+  .notes {
+    max-width: 1280px;
+    margin: 56px auto 0;
+    color: var(--page-body);
+    padding-top: 32px;
+    border-top: 1px solid rgba(237, 229, 212, 0.16);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  @media (max-width: 1100px) {
+    .notes { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 760px) {
+    .notes { grid-template-columns: 1fr; }
+  }
+  .note h4 {
+    color: var(--page-text);
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .note p {
+    font-size: 12px;
+    line-height: 1.7;
+    margin-bottom: 8px;
+  }
+  .note ul {
+    list-style: none;
+    font-size: 12px;
+    line-height: 1.7;
+  }
+  .note ul li::before {
+    content: "·";
+    color: var(--mint);
+    margin-right: 8px;
+    font-weight: 700;
+  }
+
+  /* ═════════════════════════════════════════════
+     LIBRARY 컴포넌트 (서재 전용 · 민트 베이스)
+     ═════════════════════════════════════════════ */
+
+  /* ── 서재 헤더: 제목 + 권수 + 전시 토글 ── */
+  .lib-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 18px 2px 12px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid var(--line);
+  }
+  .lib-head .lh-title h2 {
+    font-family: "Gaegu", "Pretendard Variable", sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+  }
+  .lib-head .lh-title h2 em {
+    font-style: normal;
+    color: var(--mint-deep);
+  }
+  .lib-head .lh-title .sub {
+    display: block;
+    font-family: "Pretendard Variable", Pretendard, sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: var(--ink-mute);
+    margin-top: 5px;
+    text-transform: uppercase;
+  }
+  .exhibit-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    color: var(--ink-sub);
+    white-space: nowrap;
+    padding-bottom: 2px;
+  }
+  .exhibit-toggle .tog {
+    width: 30px;
+    height: 16px;
+    border-radius: 10px;
+    background: var(--mint);
+    position: relative;
+    flex-shrink: 0;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+  }
+  .exhibit-toggle .tog::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 16px;
+    width: 12px;
+    height: 12px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  }
+  .exhibit-toggle .tog.off {
+    background: var(--line-strong);
+  }
+  .exhibit-toggle .tog.off::after { left: 2px; }
+
+  /* ── 섹션 헤더 ── */
+  .shelf-section {
+    margin: 18px 0 4px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 0 2px;
+  }
+  .shelf-section h3 {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .shelf-section h3 .count {
+    font-weight: 500;
+    font-size: 11px;
+    color: var(--ink-mute);
+    margin-left: 5px;
+    font-variant-numeric: tabular-nums;
+  }
+  .shelf-section .more {
+    font-size: 10px;
+    color: var(--mint-deep);
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* ── 쉘프 (가로 스크롤 책등 + 나무 바) ── */
+  .shelf {
+    position: relative;
+    margin: 0 -20px 0 -4px;
+    padding-left: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .shelf::-webkit-scrollbar { display: none; }
+  .shelf-row {
+    display: flex;
+    gap: 3px;
+    align-items: flex-end;
+    padding: 4px 20px 0 2px;
+    min-height: 130px;
+  }
+  .shelf-wood {
+    height: 5px;
+    margin: 0 18px 0 -2px;
+    background:
+      linear-gradient(180deg,
+        rgba(130, 96, 54, 0.55) 0%,
+        rgba(80, 55, 25, 0.7) 45%,
+        rgba(55, 38, 15, 0.55) 100%);
+    border-radius: 1px;
+    box-shadow:
+      0 2px 5px rgba(30, 20, 10, 0.22),
+      inset 0 1px 0 rgba(255, 230, 180, 0.25);
+  }
+
+  /* ── 책등 (세로) ── */
+  .spine {
+    width: 26px;
+    min-width: 26px;
+    height: 118px;
+    position: relative;
+    cursor: pointer;
+    border-radius: 1.5px 1.5px 0 0;
+    background: var(--mint);
+    color: rgba(255, 255, 255, 0.9);
+    box-shadow:
+      inset 0 -2px 3px rgba(0, 0, 0, 0.2),
+      inset 1.5px 0 0 rgba(255, 255, 255, 0.15),
+      inset -1px 0 0 rgba(0, 0, 0, 0.22),
+      0 2px 0 rgba(0, 0, 0, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: transform .15s ease;
+  }
+  .spine:hover { transform: translateY(-3px); }
+  .spine .t {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    padding: 8px 0;
+    max-height: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .spine.tall { height: 128px; }
+  .spine.short { height: 100px; }
+  .spine.mid { height: 112px; }
+  .spine.wide { width: 30px; min-width: 30px; }
+  .spine.slim { width: 22px; min-width: 22px; }
+
+  /* 책등 컬러 변형 */
+  .spine.v-sage   { background: #84A98C; }
+  .spine.v-cream  { background: #EFE3C8; color: #3a3320; box-shadow:
+      inset 0 -2px 3px rgba(120,90,40,0.3),
+      inset 1.5px 0 0 rgba(255,255,255,0.5),
+      inset -1px 0 0 rgba(120,90,40,0.3),
+      0 2px 0 rgba(120,90,40,0.25); }
+  .spine.v-oak    { background: #A07B55; }
+  .spine.v-ink    { background: #1E2A33; }
+  .spine.v-berry  { background: #8B3A4E; }
+  .spine.v-mint   { background: var(--mint); }
+  .spine.v-peach  { background: #D98D62; }
+  .spine.v-rose   { background: #C97C84; }
+  .spine.v-forest { background: #2E4D3F; }
+  .spine.v-dusk   { background: #6B5B93; }
+  .spine.v-clay   { background: #B7664F; }
+
+  /* ── 표지 (정면) ── */
+  .cover {
+    width: 82px;
+    min-width: 82px;
+    height: 118px;
+    border-radius: 2px 5px 5px 2px;
+    position: relative;
+    cursor: pointer;
+    background: linear-gradient(135deg, #E9C4A0 0%, #C98868 100%);
+    color: #2B1A10;
+    box-shadow:
+      0 2px 6px rgba(30, 20, 10, 0.22),
+      inset 2px 0 0 rgba(0,0,0,0.22),
+      inset -1px 0 0 rgba(255,255,255,0.15);
+    padding: 10px 9px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-shrink: 0;
+    transition: transform .15s ease;
+    overflow: hidden;
+  }
+  .cover:hover { transform: translateY(-3px); }
+  .cover .k {
+    font-size: 7.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    font-weight: 700;
+  }
+  .cover .tt {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    margin-top: 4px;
+  }
+  .cover .au {
+    font-size: 8.5px;
+    opacity: 0.8;
+    margin-top: auto;
+  }
+  .cover.featured {
+    height: 128px;
+    width: 90px;
+    min-width: 90px;
+  }
+  .cover.v-sage  { background: linear-gradient(135deg, #A4C3A8, #5B8968); color: #F5F8F0; }
+  .cover.v-ink   { background: linear-gradient(135deg, #3C4A54, #1E2A33); color: #EDE5D4; }
+  .cover.v-berry { background: linear-gradient(135deg, #B25A70, #7A2D42); color: #F7EAE9; }
+  .cover.v-rose  { background: linear-gradient(135deg, #E6A8A8, #C97C84); color: #4A2A2E; }
+  .cover.v-oak   { background: linear-gradient(135deg, #C79868, #8B6640); color: #FBF2E0; }
+  .cover.v-dusk  { background: linear-gradient(135deg, #8679B2, #4C4074); color: #F0ECF7; }
+
+  /* ── 큐레이션 쉘프 카드 (Phone A) ── */
+  .curated {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px 14px 14px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 4px rgba(30, 20, 10, 0.04);
+    cursor: pointer;
+    transition: transform .15s ease;
+  }
+  .curated:hover { transform: translateY(-2px); }
+  .curated-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .curated-head h4 {
+    font-family: "Gaegu", "Pretendard Variable", sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .curated-head .cnt {
+    font-size: 10px;
+    color: var(--ink-mute);
+    letter-spacing: 0.08em;
+    font-variant-numeric: tabular-nums;
+  }
+  .curated-reason {
+    font-size: 11px;
+    color: var(--ink-sub);
+    line-height: 1.55;
+    margin-bottom: 10px;
+    padding-left: 9px;
+    border-left: 2px solid var(--mint-soft);
+  }
+  .curated-mini {
+    display: flex;
+    gap: 2px;
+    align-items: flex-end;
+  }
+  .curated-mini .spine {
+    width: 20px;
+    min-width: 20px;
+    height: 74px;
+  }
+  .curated-mini .spine .t { font-size: 7.5px; padding: 4px 0; }
+  .curated-mini .spine.short { height: 62px; }
+  .curated-mini .spine.mid { height: 70px; }
+
+  /* ── Stack Card (Phone C) ── */
+  .stacks-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 8px 0 12px;
+  }
+  .stack-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 13px 13px 12px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(30,20,10,0.04);
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .stack-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(30,20,10,0.08);
+  }
+  .stack-card .sk {
+    font-size: 9.5px;
+    letter-spacing: 0.2em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+  .stack-card .sn {
+    font-family: "Gaegu", "Pretendard Variable", sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.1;
+    margin-bottom: 8px;
+    letter-spacing: -0.005em;
+  }
+  .stack-card .sc {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--mint-deep);
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .stack-card .sc .unit {
+    font-size: 11px;
+    color: var(--ink-mute);
+    font-weight: 600;
+    margin-left: 3px;
+  }
+  .stack-pile {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: flex-end;
+    gap: 2px;
+    margin-top: 10px;
+    padding-right: 2px;
+  }
+  .stack-pile .pc {
+    height: 7px;
+    border-radius: 1px;
+    box-shadow:
+      inset 0 -1px 1px rgba(0,0,0,0.18),
+      inset 1px 0 0 rgba(255,255,255,0.15);
+  }
+  .stack-pile .pc.w1 { width: 38px; }
+  .stack-pile .pc.w2 { width: 32px; }
+  .stack-pile .pc.w3 { width: 44px; }
+  .stack-pile .pc.w4 { width: 28px; }
+  .stack-pile .pc.v-sage   { background: #84A98C; }
+  .stack-pile .pc.v-cream  { background: #EFE3C8; }
+  .stack-pile .pc.v-oak    { background: #A07B55; }
+  .stack-pile .pc.v-ink    { background: #1E2A33; }
+  .stack-pile .pc.v-berry  { background: #8B3A4E; }
+  .stack-pile .pc.v-peach  { background: #D98D62; }
+  .stack-pile .pc.v-mint   { background: var(--mint); }
+  .stack-pile .pc.v-rose   { background: #C97C84; }
+
+  /* ── 주간 하이라이트 (Phone C) ── */
+  .weekly-hl {
+    margin-top: 14px;
+    padding: 14px 15px 13px;
+    background: var(--mint-soft);
+    border-radius: 14px;
+    border: 1px solid var(--mint);
+    position: relative;
+  }
+  .weekly-hl .wk-k {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    color: var(--mint-deep);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+  .weekly-hl .wk-t {
+    font-size: 12.5px;
+    color: var(--ink);
+    line-height: 1.55;
+    letter-spacing: -0.005em;
+  }
+  .weekly-hl .wk-t em {
+    font-style: normal;
+    font-weight: 800;
+    color: var(--mint-deep);
+  }
+
+  /* ── Curator grid (Phone B) ── */
+  .curator-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 4px 0 10px;
+  }
+  .curator-cell {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px 10px 12px;
+    cursor: pointer;
+    transition: transform .15s ease;
+    box-shadow: 0 1px 3px rgba(30,20,10,0.04);
+  }
+  .curator-cell:hover { transform: translateY(-2px); }
+  .curator-cell .cv {
+    width: 100%;
+    height: 88px;
+    border-radius: 3px 5px 5px 3px;
+    margin-bottom: 8px;
+    padding: 10px 10px 9px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: rgba(255,255,255,0.95);
+    box-shadow:
+      0 2px 4px rgba(30,20,10,0.18),
+      inset 3px 0 0 rgba(0,0,0,0.2),
+      inset -1px 0 0 rgba(255,255,255,0.12);
+  }
+  .curator-cell .cv.v-sage  { background: linear-gradient(135deg, #A4C3A8, #4F7A62); }
+  .curator-cell .cv.v-ink   { background: linear-gradient(135deg, #4C5D68, #1E2A33); }
+  .curator-cell .cv.v-berry { background: linear-gradient(135deg, #B25A70, #6B2437); }
+  .curator-cell .cv.v-oak   { background: linear-gradient(135deg, #C79868, #7C5A36); color: #FBF2E0; }
+  .curator-cell .cv.v-rose  { background: linear-gradient(135deg, #E6A8A8, #A45F69); }
+  .curator-cell .cv.v-dusk  { background: linear-gradient(135deg, #8679B2, #3F356A); }
+  .curator-cell .cv .cv-k {
+    font-size: 8px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    opacity: 0.75;
+    font-weight: 700;
+  }
+  .curator-cell .cv .cv-t {
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+  .curator-cell .cn {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    margin-bottom: 3px;
+  }
+  .curator-cell .cd {
+    font-size: 10.5px;
+    color: var(--ink-mute);
+    line-height: 1.45;
+  }
+
+  /* ── 이달의 한 문장 (Phone B) ── */
+  .quote-of-month {
+    background: var(--cream-sub);
+    border-radius: 12px;
+    padding: 14px 16px 15px;
+    border-left: 3px solid var(--mint);
+    margin: 8px 0 10px;
+  }
+  .quote-of-month .qk {
+    font-size: 9.5px;
+    letter-spacing: 0.24em;
+    color: var(--mint-deep);
+    text-transform: uppercase;
+    margin-bottom: 7px;
+    font-weight: 700;
+  }
+  .quote-of-month .qt {
+    font-family: "Gaegu", "Pretendard Variable", sans-serif;
+    font-size: 15.5px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.45;
+    letter-spacing: -0.005em;
+  }
+  .quote-of-month .qs {
+    font-size: 10.5px;
+    color: var(--ink-mute);
+    margin-top: 8px;
+    letter-spacing: 0.02em;
+  }
+
+  /* ── Phone A 지금 읽는 중 (featured pair) ── */
+  .reading-now {
+    display: flex;
+    gap: 10px;
+    padding: 6px 2px 2px;
+    align-items: flex-end;
+  }
+  .reading-now .rn-cover-wrap {
+    flex-shrink: 0;
+  }
+  .reading-now .rn-meta {
+    flex: 1;
+    padding-bottom: 6px;
+  }
+  .reading-now .rn-meta .rn-k {
+    font-size: 9.5px;
+    letter-spacing: 0.22em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    margin-bottom: 3px;
+    font-weight: 700;
+  }
+  .reading-now .rn-meta .rn-t {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.35;
+    margin-bottom: 4px;
+    letter-spacing: -0.01em;
+  }
+  .reading-now .rn-meta .rn-p {
+    font-size: 11px;
+    color: var(--ink-sub);
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 6px;
+  }
+  .reading-now .rn-bar {
+    height: 4px;
+    background: var(--mint-soft);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .reading-now .rn-bar > span {
+    display: block;
+    height: 100%;
+    background: var(--mint);
+  }
+
+  /* ── mini 쉘프 (위시·대여) ── */
+  .mini-shelf-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .mini-shelf {
+    background: var(--cream-sub);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px 12px 10px;
+  }
+  .mini-shelf .mk {
+    font-size: 9.5px;
+    letter-spacing: 0.2em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .mini-shelf .mv {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .mini-shelf .mv .u {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--ink-mute);
+    margin-left: 3px;
+  }
+  .mini-shelf .mb {
+    font-size: 10px;
+    color: var(--ink-sub);
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+  .mini-shelf .mb em {
+    font-style: normal;
+    font-weight: 700;
+    color: var(--mint-deep);
+  }
+
+  /* ═════════════════════════════════════════════
+     BLACKBEIGE 서재 오버라이드 (프라다 부티크 쇼윈도)
+     ═════════════════════════════════════════════ */
+  :root[data-theme="blackbeige"] .lib-head {
+    border-bottom: 1px solid var(--ink);
+  }
+  :root[data-theme="blackbeige"] .lib-head .lh-title h2 {
+    font-family: "Pretendard Variable", Pretendard, sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    font-size: 19px;
+  }
+  :root[data-theme="blackbeige"] .lib-head .lh-title h2 em {
+    color: var(--ink);
+    position: relative;
+    padding: 0 2px;
+  }
+  :root[data-theme="blackbeige"] .lib-head .lh-title .sub {
+    letter-spacing: 0.26em;
+  }
+  :root[data-theme="blackbeige"] .exhibit-toggle {
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-size: 9px;
+    color: var(--ink);
+  }
+  :root[data-theme="blackbeige"] .exhibit-toggle .tog {
+    background: var(--ink);
+    border-radius: 2px;
+    width: 32px;
+    height: 14px;
+  }
+  :root[data-theme="blackbeige"] .exhibit-toggle .tog::after {
+    background: var(--cream);
+    border-radius: 1px;
+    top: 1px;
+    left: 18px;
+    width: 12px;
+    height: 12px;
+  }
+  :root[data-theme="blackbeige"] .exhibit-toggle .tog.off {
+    background: var(--line-strong);
+  }
+
+  :root[data-theme="blackbeige"] .shelf-section h3 {
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-size: 11px;
+  }
+  :root[data-theme="blackbeige"] .shelf-section .more {
+    color: var(--ink);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 9px;
+  }
+
+  :root[data-theme="blackbeige"] .shelf-wood {
+    background: linear-gradient(180deg,
+      #1A140E 0%, #0A0806 50%, #2B2217 100%);
+    box-shadow:
+      0 2px 5px rgba(0,0,0,0.35),
+      inset 0 1px 0 rgba(190, 155, 105, 0.35);
+  }
+
+  :root[data-theme="blackbeige"] .spine {
+    background: var(--ink);
+    color: var(--cream);
+    box-shadow:
+      inset 0 -2px 3px rgba(0,0,0,0.4),
+      inset 1.5px 0 0 rgba(255,255,255,0.06),
+      inset -1px 0 0 rgba(0,0,0,0.5),
+      0 2px 0 rgba(0,0,0,0.4);
+  }
+  :root[data-theme="blackbeige"] .spine .t {
+    letter-spacing: 0.1em;
+    font-weight: 600;
+  }
+  :root[data-theme="blackbeige"] .spine.v-sage   { background: #3F3628; color: #D6C5A0; }
+  :root[data-theme="blackbeige"] .spine.v-cream  { background: #D6C5A0; color: #2B2014; box-shadow:
+      inset 0 -2px 3px rgba(80,60,30,0.3),
+      inset 1.5px 0 0 rgba(255,255,255,0.4),
+      inset -1px 0 0 rgba(80,60,30,0.3),
+      0 2px 0 rgba(80,60,30,0.25); }
+  :root[data-theme="blackbeige"] .spine.v-oak    { background: #5C4226; color: #E4D4B4; }
+  :root[data-theme="blackbeige"] .spine.v-ink    { background: #0A0806; color: #D6C5A0; }
+  :root[data-theme="blackbeige"] .spine.v-berry  { background: #4C2D1E; color: #E4D4B4; }
+  :root[data-theme="blackbeige"] .spine.v-mint   { background: var(--ink); color: var(--cream); }
+  :root[data-theme="blackbeige"] .spine.v-peach  { background: #8A6B42; color: #FBF4DF; }
+  :root[data-theme="blackbeige"] .spine.v-rose   { background: #5E3F3A; color: #E4D4B4; }
+  :root[data-theme="blackbeige"] .spine.v-forest { background: #2A2218; color: #D6C5A0; }
+  :root[data-theme="blackbeige"] .spine.v-dusk   { background: #3C3045; color: #D6C5A0; }
+  :root[data-theme="blackbeige"] .spine.v-clay   { background: #4A2D22; color: #E4D4B4; }
+
+  :root[data-theme="blackbeige"] .cover {
+    background: linear-gradient(135deg, #D6C5A0 0%, #8A6B42 100%);
+    color: #1A1410;
+    box-shadow:
+      0 2px 6px rgba(0,0,0,0.3),
+      inset 2px 0 0 rgba(0,0,0,0.28),
+      inset -1px 0 0 rgba(255,255,255,0.1);
+    border-radius: 1px 3px 3px 1px;
+  }
+  :root[data-theme="blackbeige"] .cover .tt {
+    font-family: "Pretendard Variable", sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+  }
+  :root[data-theme="blackbeige"] .cover.v-sage  { background: linear-gradient(135deg, #5A5140, #2A2418); color: #E4D4B4; }
+  :root[data-theme="blackbeige"] .cover.v-ink   { background: linear-gradient(135deg, #2D2820, #0A0806); color: #D6C5A0; }
+  :root[data-theme="blackbeige"] .cover.v-berry { background: linear-gradient(135deg, #6B3A2A, #2D160E); color: #E4D4B4; }
+  :root[data-theme="blackbeige"] .cover.v-oak   { background: linear-gradient(135deg, #8A6B42, #3F2D1A); color: #FBF2E0; }
+  :root[data-theme="blackbeige"] .cover.v-rose  { background: linear-gradient(135deg, #7A4D4A, #3F2420); color: #E4D4B4; }
+  :root[data-theme="blackbeige"] .cover.v-dusk  { background: linear-gradient(135deg, #3C3045, #1A1424); color: #D6C5A0; }
+
+  :root[data-theme="blackbeige"] .curated {
+    background: var(--cream-sub);
+    background-image:
+      repeating-linear-gradient(45deg,
+        transparent 0, transparent 3px,
+        rgba(80, 58, 20, 0.04) 3px, rgba(80, 58, 20, 0.04) 3.6px);
+    border-color: rgba(15,14,12,0.14);
+    border-radius: 4px;
+  }
+  :root[data-theme="blackbeige"] .curated-head h4 {
+    font-family: "Pretendard Variable", sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-size: 12.5px;
+  }
+  :root[data-theme="blackbeige"] .curated-head .cnt {
+    letter-spacing: 0.18em;
+    color: var(--ink);
+    font-weight: 600;
+  }
+  :root[data-theme="blackbeige"] .curated-reason {
+    border-left-color: var(--ink);
+    font-style: italic;
+    color: var(--ink-sub);
+  }
+
+  :root[data-theme="blackbeige"] .stack-card {
+    background: var(--cream-sub);
+    background-image:
+      repeating-linear-gradient(45deg,
+        transparent 0, transparent 3px,
+        rgba(80, 58, 20, 0.04) 3px, rgba(80, 58, 20, 0.04) 3.6px);
+    border-color: rgba(15,14,12,0.14);
+    border-radius: 4px;
+  }
+  :root[data-theme="blackbeige"] .stack-card .sn {
+    font-family: "Pretendard Variable", sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    font-size: 14px;
+  }
+  :root[data-theme="blackbeige"] .stack-card .sc { color: var(--ink); }
+  :root[data-theme="blackbeige"] .stack-card .sc .unit { color: var(--ink-mute); }
+  :root[data-theme="blackbeige"] .stack-pile .pc.v-sage   { background: #3F3628; }
+  :root[data-theme="blackbeige"] .stack-pile .pc.v-cream  { background: #D6C5A0; }
+  :root[data-theme="blackbeige"] .stack-pile .pc.v-oak    { background: #5C4226; }
+  :root[data-theme="blackbeige"] .stack-pile .pc.v-ink    { background: #0A0806; }
+  :root[data-theme="blackbeige"] .stack-pile .pc.v-berry  { background: #4C2D1E; }
+  :root[data-theme="blackbeige"] .stack-pile .pc.v-peach  { background: #8A6B42; }
+  :root[data-theme="blackbeige"] .stack-pile .pc.v-mint   { background: var(--ink); }
+  :root[data-theme="blackbeige"] .stack-pile .pc.v-rose   { background: #5E3F3A; }
+
+  :root[data-theme="blackbeige"] .weekly-hl {
+    background: rgba(15,14,12,0.06);
+    border: 1px solid var(--ink);
+    border-radius: 2px;
+  }
+  :root[data-theme="blackbeige"] .weekly-hl .wk-k {
+    color: var(--ink);
+    letter-spacing: 0.32em;
+  }
+  :root[data-theme="blackbeige"] .weekly-hl .wk-t em {
+    color: var(--ink);
+    background: linear-gradient(transparent 55%, rgba(138,107,66,0.35) 55%);
+  }
+
+  :root[data-theme="blackbeige"] .curator-cell {
+    background: var(--cream-sub);
+    border-color: rgba(15,14,12,0.14);
+    border-radius: 2px;
+  }
+  :root[data-theme="blackbeige"] .curator-cell .cv {
+    border-radius: 1px 3px 3px 1px;
+  }
+  :root[data-theme="blackbeige"] .curator-cell .cv.v-sage  { background: linear-gradient(135deg, #5A5140, #1E1A10); }
+  :root[data-theme="blackbeige"] .curator-cell .cv.v-ink   { background: linear-gradient(135deg, #2D2820, #0A0806); }
+  :root[data-theme="blackbeige"] .curator-cell .cv.v-berry { background: linear-gradient(135deg, #6B3A2A, #1A0E08); }
+  :root[data-theme="blackbeige"] .curator-cell .cv.v-oak   { background: linear-gradient(135deg, #8A6B42, #2A1E10); }
+  :root[data-theme="blackbeige"] .curator-cell .cv.v-rose  { background: linear-gradient(135deg, #7A4D4A, #2A1814); }
+  :root[data-theme="blackbeige"] .curator-cell .cv.v-dusk  { background: linear-gradient(135deg, #3C3045, #100A1A); }
+  :root[data-theme="blackbeige"] .curator-cell .cn {
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    font-size: 12px;
+  }
+
+  :root[data-theme="blackbeige"] .quote-of-month {
+    background: rgba(15,14,12,0.05);
+    border-left-color: var(--ink);
+    border-radius: 2px;
+  }
+  :root[data-theme="blackbeige"] .quote-of-month .qk {
+    color: var(--ink);
+    letter-spacing: 0.3em;
+  }
+  :root[data-theme="blackbeige"] .quote-of-month .qt {
+    font-family: "Pretendard Variable", sans-serif;
+    font-weight: 600;
+    font-style: italic;
+    font-size: 13.5px;
+  }
+
+  :root[data-theme="blackbeige"] .reading-now .rn-meta .rn-t {
+    font-weight: 800;
+    letter-spacing: -0.015em;
+  }
+  :root[data-theme="blackbeige"] .reading-now .rn-bar {
+    background: var(--mint-soft);
+  }
+  :root[data-theme="blackbeige"] .reading-now .rn-bar > span {
+    background: var(--ink);
+  }
+
+  :root[data-theme="blackbeige"] .mini-shelf {
+    background: var(--cream-sub);
+    border-radius: 2px;
+    border-color: rgba(15,14,12,0.14);
+  }
+  :root[data-theme="blackbeige"] .mini-shelf .mk {
+    letter-spacing: 0.26em;
+    color: var(--ink);
+  }
+  :root[data-theme="blackbeige"] .mini-shelf .mb em { color: var(--ink); }
+
+  /* ═════════════════════════════════════════════
+     BLACKBEIGE 전용 레이어 (프라다 사피아노 무드)
+     ═════════════════════════════════════════════ */
+
+  /* ── 1. 폰 본체: 사피아노 크로스해치 + 블랙 엣지 ── */
+  :root[data-theme="blackbeige"] .phone {
+    background-color: var(--cream);
+    background-image: var(--saff-pattern);
+    box-shadow:
+      0 0 0 8px #0A0906,
+      0 0 0 9px #2A2419,
+      0 30px 60px rgba(0, 0, 0, 0.5);
+  }
+  :root[data-theme="blackbeige"] .hero-card,
+  :root[data-theme="blackbeige"] .mascot-hero {
+    background-color: var(--cream-sub);
+    background-image:
+      repeating-linear-gradient(45deg,
+        transparent 0, transparent 3px,
+        rgba(80, 58, 20, 0.05) 3px, rgba(80, 58, 20, 0.05) 3.6px),
+      repeating-linear-gradient(-45deg,
+        transparent 0, transparent 3px,
+        rgba(80, 58, 20, 0.05) 3px, rgba(80, 58, 20, 0.05) 3.6px);
+    border: 1px solid rgba(15, 14, 12, 0.08);
+  }
+
+  /* ── 2. 모든 완독콩 PNG 숨기기 ── */
+  :root[data-theme="blackbeige"] .mascot img,
+  :root[data-theme="blackbeige"] .mascot-big img,
+  :root[data-theme="blackbeige"] .hero-label img,
+  :root[data-theme="blackbeige"] .ev-days img,
+  :root[data-theme="blackbeige"] .mini-cal-icon img {
+    display: none !important;
+  }
+
+  /* ── 3. 작은 .mascot 아바타 → 실버 메탈 코인 (프라다 플라크) ── */
+  :root[data-theme="blackbeige"] .mascot {
+    background: var(--silver);
+    border: 1px solid rgba(15, 14, 12, 0.18);
+    border-radius: 50%;
+    box-shadow:
+      inset 0 -2px 3px rgba(15, 14, 12, 0.22),
+      inset 0 1px 2px rgba(255, 255, 255, 0.4),
+      0 2px 5px rgba(15, 14, 12, 0.18);
+    filter: none;
+    overflow: hidden;
+  }
+  :root[data-theme="blackbeige"] .mascot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 20px;
+    height: 16px;
+    clip-path: polygon(50% 100%, 0 0, 100% 0);
+    background: linear-gradient(140deg, #F4EEE0 0%, #8E8676 55%, #524D42 100%);
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+  }
+
+  /* ── 4. Phone C 히어로: 큰 실버 플라크 + 매거진 스탯 ── */
+  :root[data-theme="blackbeige"] .mascot-big {
+    width: 80px;
+    height: 72px;
+    margin: 8px auto 14px;
+    animation: none;
+  }
+  :root[data-theme="blackbeige"] .mascot-big::before {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 100%;
+    clip-path: polygon(50% 94%, 6% 10%, 94% 10%);
+    background: var(--silver);
+    filter: drop-shadow(0 3px 8px rgba(15, 14, 12, 0.35));
+  }
+
+  /* ── 5. Mint/Chic 컨텐츠 스왑 ── */
+  .chi-chic { display: none; }
+  :root[data-theme="blackbeige"] .chi-mint { display: none; }
+  :root[data-theme="blackbeige"] .chi-chic { display: block; }
+
+  /* ── 6. Chic stat card ── */
+  .chic-plate {
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .chic-kicker {
+    font-size: 10px;
+    letter-spacing: 0.36em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    position: relative;
+    display: inline-block;
+    padding: 0 18px;
+  }
+  .chic-kicker::before,
+  .chic-kicker::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 14px;
+    height: 1px;
+    background: var(--ink-mute);
+  }
+  .chic-kicker::before { left: 0; }
+  .chic-kicker::after  { right: 0; }
+  .chic-num {
+    font-size: 64px;
+    font-weight: 900;
+    letter-spacing: -0.05em;
+    color: var(--ink);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .chic-unit {
+    font-size: 11px;
+    letter-spacing: 0.36em;
+    color: var(--ink-sub);
+    margin-top: 4px;
+    text-transform: uppercase;
+  }
+  .chic-caption {
+    text-align: center;
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--ink-sub);
+    margin-bottom: 18px;
+    padding: 0 12px;
+    letter-spacing: -0.005em;
+  }
+  .chic-caption em {
+    font-style: normal;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .chic-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    background: var(--ink);
+    color: #F4EEE0;
+    border: none;
+    padding: 13px 18px;
+    border-radius: 2px;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    cursor: pointer;
+    font-family: inherit;
+    text-transform: uppercase;
+    transition: background .2s ease;
+  }
+  :root[data-theme="blackbeige"] .chic-cta:hover {
+    background: #24201A;
+  }
+  .chic-cta svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* ── 7. 이벤트 D-X 정리 (flex-column 해제) ── */
+  :root[data-theme="blackbeige"] .ev-days {
+    display: block !important;
+    flex-direction: unset !important;
+  }
+
+  /* ── 8. hero-label 카피 스왑 ── */
+  .lbl-chic { display: none; }
+  :root[data-theme="blackbeige"] .lbl-mint { display: none; }
+  :root[data-theme="blackbeige"] .lbl-chic { display: inline; }
+  :root[data-theme="blackbeige"] .hero-label {
+    font-style: normal;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-size: 10px;
+    background: var(--ink);
+    color: var(--cream);
+    padding: 5px 12px;
+    border-radius: 0;
+  }
+
+  /* ── 9. mini-cal-icon: PNG 담겨 있던 것만 실버 플라크로 ── */
+  :root[data-theme="blackbeige"] .mini-cal-icon[style] {
+    background: var(--silver) !important;
+    padding: 0 !important;
+    position: relative;
+    border: 1px solid rgba(15, 14, 12, 0.15);
+  }
+  :root[data-theme="blackbeige"] .mini-cal-icon[style]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 14px;
+    height: 11px;
+    clip-path: polygon(50% 100%, 0 0, 100% 0);
+    background: linear-gradient(140deg, #F4EEE0 0%, #6F6A5E 70%);
+  }
+  /* SVG만 있는 순수 mini-cal-icon은 베이지 bg + 골드 아이콘으로 */
+  :root[data-theme="blackbeige"] .mini-cal-icon:not([style]) {
+    background: var(--mint-soft);
+    border: 1px solid rgba(15, 14, 12, 0.08);
+  }
+
+  /* ── 10. bubble(손글씨) → 블랙베이지에선 사용 안 함.
+     streak-pill / hero-label 타입 정돈 ── */
+  :root[data-theme="blackbeige"] .streak-pill {
+    background: var(--ink);
+    color: var(--mint-soft);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-size: 10px;
+  }
+
+  /* ── 11. 포커스 링 (접근성 유지) ── */
+  :root[data-theme="blackbeige"] .chic-cta:focus-visible,
+  :root[data-theme="blackbeige"] .theme-opt:focus-visible {
+    outline: 2px solid var(--mint-deep);
+    outline-offset: 2px;
+  }
+
+  /* ── 11.5 캘린더 이벤트 도트 재조정 (블랙베이지에서 위시 도트
+     가 mint=black 으로 뭉치는 문제 해결 → 브라스 골드) ── */
+  :root[data-theme="blackbeige"] .cal-cell .dot.wish,
+  :root[data-theme="blackbeige"] .cal-legend .leg .ldot[style*="--mint"] {
+    background: var(--mint-deep) !important;
+  }
+
+  /* ── 12. 타입 전환: 블랙베이지에선 Gaegu 손글씨 전체 봉인,
+     Pretendard 매거진 톤으로 ── */
+  :root[data-theme="blackbeige"] .bubble,
+  :root[data-theme="blackbeige"] .bubble em,
+  :root[data-theme="blackbeige"] .greet-text .big,
+  :root[data-theme="blackbeige"] .greet-text .big em,
+  :root[data-theme="blackbeige"] .hero-info .recall,
+  :root[data-theme="blackbeige"] .com-post-body .quote {
+    font-family: "Pretendard Variable", Pretendard, sans-serif;
+  }
+  :root[data-theme="blackbeige"] .greet-text .big {
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: -0.02em;
+    line-height: 1.35;
+  }
+  :root[data-theme="blackbeige"] .greet-text .big em {
+    color: var(--ink);
+    font-weight: 700;
+  }
+  :root[data-theme="blackbeige"] .greet-text .small {
+    letter-spacing: 0.22em;
+    color: var(--ink-mute);
+  }
+  :root[data-theme="blackbeige"] .hero-info .recall {
+    font-size: 12px;
+    line-height: 1.6;
+    border-left: 2px solid var(--ink);
+    background: rgba(15, 14, 12, 0.04);
+    font-style: italic;
+    letter-spacing: -0.005em;
+  }
+  :root[data-theme="blackbeige"] .com-post-body .quote {
+    font-size: 12px;
+    line-height: 1.6;
+    font-style: italic;
+    background: rgba(15, 14, 12, 0.04);
+    border-left: 2px solid var(--ink);
+  }
+</style>
+</head>
+<body>
+
+<header class="page-hero">
+  <div class="kicker">WANDOKKONG · LIBRARY V1 · 2026.04.22</div>
+  <h1>가상 서재, 세 가지 큐레이션</h1>
+  <p>하단 내비 2번째 "서재" 탭 — 독자가 자기 책을 "꽂고 · 꺼내고 · 전시하는" 공간. <em style="color:var(--page-text);font-style:normal;font-weight:600">A 책꽂이 은유</em> · <em style="color:var(--page-text);font-style:normal;font-weight:600">B 큐레이터 보드</em> · <em style="color:var(--page-text);font-style:normal;font-weight:600">C 4 스택</em> 세 방향을 비교. 책등과 표지의 리듬, 사용자 쉘프 생성, 전시 토글 — 이 세 장치가 공통 뼈대예요.</p>
+</header>
+
+<!-- Theme Picker -->
+<div class="theme-picker" role="tablist" aria-label="테마 선택">
+  <button class="theme-opt active" data-theme-btn="mint" role="tab" aria-selected="true">
+    <div class="theme-swatches" aria-hidden="true">
+      <span style="background:#F7F3ED"></span>
+      <span style="background:#5FA48E"></span>
+      <span style="background:#3F7A66"></span>
+      <span style="background:#1E1B16"></span>
+    </div>
+    <div class="theme-name">산뜻한 민트</div>
+    <div class="theme-sub">FRESH MINT · F7F3ED × 5FA48E</div>
+  </button>
+  <button class="theme-opt" data-theme-btn="blackbeige" role="tab" aria-selected="false">
+    <div class="theme-swatches" aria-hidden="true">
+      <span style="background:#FBF5E0"></span>
+      <span style="background:#0F0E0C"></span>
+      <span style="background:#8A6B42"></span>
+      <span style="background:#E1D4B2"></span>
+    </div>
+    <div class="theme-name">시크한 블랙베이지</div>
+    <div class="theme-sub">CHIC BLACK BEIGE · FBF5E0 × 0F0E0C</div>
+  </button>
+</div>
+
+<div class="phones-grid">
+
+  <!-- ═══════════════ A. 캘린더 중심 ═══════════════ -->
+  <div class="phone-col">
+    <div class="phone a">
+      <div class="status">
+        <span>9:41</span>
+        <div class="status-icons">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21a9 9 0 100-18 9 9 0 000 18zm-1-4.41l4.3-4.3-1.42-1.42L11 13.76l-1.88-1.88-1.42 1.42L11 16.59z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 22h20V10H2v12zM6 4h12v4H6V4z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 8H4v8h16V8zm-2 6H6v-4h12v4z"/></svg>
+        </div>
+      </div>
+
+      <div class="body">
+        <div class="lib-head">
+          <div class="lh-title">
+            <h2>지선의 <em>서재</em></h2>
+            <div class="sub">MY LIBRARY · 72 BOOKS</div>
+          </div>
+          <div class="exhibit-toggle" role="switch" aria-checked="true">
+            <span>전시 중</span>
+            <span class="tog" aria-hidden="true"></span>
+          </div>
+        </div>
+
+        <div class="shelf-section">
+          <h3>지금 읽는 중<span class="count">2</span></h3>
+          <span class="more">전체</span>
+        </div>
+        <div class="reading-now">
+          <div class="rn-cover-wrap">
+            <div class="cover featured v-sage">
+              <div class="k">Novel</div>
+              <div class="tt">채식<br>주의자</div>
+              <div class="au">한강</div>
+            </div>
+          </div>
+          <div class="rn-meta">
+            <div class="rn-k">p.137 · 어제</div>
+            <div class="rn-t">오늘은 나무처럼 뿌리내리는 장면부터</div>
+            <div class="rn-p">62% · 남은 95쪽</div>
+            <div class="rn-bar"><span style="width:62%"></span></div>
+          </div>
+        </div>
+
+        <div class="shelf-section">
+          <h3>올해의 완독<span class="count">14</span></h3>
+          <span class="more">연도별</span>
+        </div>
+        <div class="shelf">
+          <div class="shelf-row">
+            <div class="spine v-sage tall"><span class="t">소년이 온다</span></div>
+            <div class="spine v-cream mid"><span class="t">아주 사적인 독서</span></div>
+            <div class="spine v-berry"><span class="t">불편한 편의점</span></div>
+            <div class="spine v-oak short"><span class="t">파친코 1</span></div>
+            <div class="spine v-ink tall"><span class="t">파친코 2</span></div>
+            <div class="spine v-mint mid wide"><span class="t">시대예보: 핵개인</span></div>
+            <div class="spine v-peach"><span class="t">꿀벌과 천둥</span></div>
+            <div class="spine v-rose short"><span class="t">나의 눈부신 친구</span></div>
+            <div class="spine v-forest tall slim"><span class="t">작별 인사</span></div>
+            <div class="spine v-cream"><span class="t">여자 둘이 살고 있습니다</span></div>
+            <div class="spine v-dusk mid"><span class="t">달러구트 꿈 백화점</span></div>
+            <div class="spine v-clay tall"><span class="t">물고기는 존재하지 않는다</span></div>
+            <div class="spine v-mint short"><span class="t">구의 증명</span></div>
+            <div class="spine v-ink"><span class="t">죽이고 싶은 아이</span></div>
+          </div>
+          <div class="shelf-wood" aria-hidden="true"></div>
+        </div>
+
+        <div class="shelf-section">
+          <h3>큐레이션 쉘프<span class="count">5</span></h3>
+          <span class="more">+ 새 쉘프</span>
+        </div>
+
+        <div class="curated">
+          <div class="curated-head">
+            <h4>봄에 어울리는 에세이</h4>
+            <span class="cnt">5권</span>
+          </div>
+          <div class="curated-reason">햇볕 기울기가 부드러워지는 계절에 곁에 두고 싶은 문장들</div>
+          <div class="curated-mini">
+            <div class="spine v-sage"><span class="t">여름이 버린 것</span></div>
+            <div class="spine v-cream short"><span class="t">시간의 향</span></div>
+            <div class="spine v-peach mid"><span class="t">소란</span></div>
+            <div class="spine v-rose"><span class="t">나의 해방</span></div>
+            <div class="spine v-mint short"><span class="t">봄의 정원</span></div>
+          </div>
+        </div>
+
+        <div class="curated">
+          <div class="curated-head">
+            <h4>위로가 필요할 때</h4>
+            <span class="cnt">8권</span>
+          </div>
+          <div class="curated-reason">지친 날 펼치는 문장. 책 읽는 밤 모임에서 자주 추천한 리스트</div>
+          <div class="curated-mini">
+            <div class="spine v-dusk"><span class="t">죽고 싶지만 떡볶이</span></div>
+            <div class="spine v-oak mid"><span class="t">인생의 역사</span></div>
+            <div class="spine v-cream short"><span class="t">슈퍼 노말</span></div>
+            <div class="spine v-berry"><span class="t">아무튼, 잠</span></div>
+            <div class="spine v-forest mid"><span class="t">작은 것들의 신</span></div>
+            <div class="spine v-clay short"><span class="t">나의 다정함</span></div>
+          </div>
+        </div>
+
+        <div class="curated">
+          <div class="curated-head">
+            <h4>2026 상반기 목표</h4>
+            <span class="cnt">12권</span>
+          </div>
+          <div class="curated-reason">연말에 "다 읽었다"고 말하고 싶은 책들. 반드시 완독할 리스트</div>
+          <div class="curated-mini">
+            <div class="spine v-ink mid"><span class="t">카라마조프</span></div>
+            <div class="spine v-oak"><span class="t">잃어버린 시간</span></div>
+            <div class="spine v-sage short"><span class="t">안나 카레니나</span></div>
+            <div class="spine v-berry mid"><span class="t">벨 자</span></div>
+            <div class="spine v-cream"><span class="t">데미안</span></div>
+            <div class="spine v-dusk short"><span class="t">자기 앞의 생</span></div>
+          </div>
+        </div>
+
+        <div class="mini-shelf-grid">
+          <div class="mini-shelf">
+            <div class="mk">위시 리스트</div>
+            <div class="mv">23<span class="u">권</span></div>
+            <div class="mb"><em>작별하지 않는다</em> D-0 시작</div>
+          </div>
+          <div class="mini-shelf">
+            <div class="mk">대여 중</div>
+            <div class="mv">3<span class="u">권</span></div>
+            <div class="mb">가장 가까운 반납 <em>4월 25일</em></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabbar">
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/></svg>
+          홈
+        </div>
+        <div class="tab active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+          서재
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          캘린더
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          모임
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg>
+          내정보
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">A · 책꽂이 은유<span class="sub">책등이 만드는 리듬 · 쉘프 나무 바</span></div>
+  </div>
+
+
+  <!-- ═══════════════ B. 큐레이터 보드 ═══════════════ -->
+  <div class="phone-col">
+    <div class="phone b">
+      <div class="status">
+        <span>9:41</span>
+        <div class="status-icons">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21a9 9 0 100-18 9 9 0 000 18zm-1-4.41l4.3-4.3-1.42-1.42L11 13.76l-1.88-1.88-1.42 1.42L11 16.59z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 22h20V10H2v12zM6 4h12v4H6V4z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 8H4v8h16V8zm-2 6H6v-4h12v4z"/></svg>
+        </div>
+      </div>
+
+      <div class="body">
+        <div class="lib-head">
+          <div class="lh-title">
+            <h2>2026 지선의 <em>큐레이션</em></h2>
+            <div class="sub">CURATED · APRIL 2026</div>
+          </div>
+          <div class="exhibit-toggle" role="switch" aria-checked="true">
+            <span>전시</span>
+            <span class="tog" aria-hidden="true"></span>
+          </div>
+        </div>
+
+        <div class="quote-of-month">
+          <div class="qk">이달의 한 문장</div>
+          <div class="qt">"말로 할 수 없는 마음은 결국<br>문장을 읽는 일로 되돌아왔다."</div>
+          <div class="qs">— 『소년이 온다』, 한강 · 지선의 필사 노트</div>
+        </div>
+
+        <div class="shelf-section">
+          <h3>나의 쉘프<span class="count">6</span></h3>
+          <span class="more">+ 새 쉘프</span>
+        </div>
+
+        <div class="curator-grid">
+          <div class="curator-cell">
+            <div class="cv v-sage">
+              <div class="cv-k">Shelf 01</div>
+              <div class="cv-t">봄의 독서<br>2026</div>
+            </div>
+            <div class="cn">봄의 독서</div>
+            <div class="cd">5권 · 햇살 기울기가 바뀔 때</div>
+          </div>
+          <div class="curator-cell">
+            <div class="cv v-ink">
+              <div class="cv-k">Shelf 02</div>
+              <div class="cv-t">30대 첫 달</div>
+            </div>
+            <div class="cn">30대의 첫 페이지</div>
+            <div class="cd">7권 · 삶의 방향을 찾고 싶을 때</div>
+          </div>
+          <div class="curator-cell">
+            <div class="cv v-rose">
+              <div class="cv-k">Shelf 03</div>
+              <div class="cv-t">위로<br>에세이</div>
+            </div>
+            <div class="cn">위로의 에세이</div>
+            <div class="cd">8권 · 혼자 있는 저녁 옆에</div>
+          </div>
+          <div class="curator-cell">
+            <div class="cv v-oak">
+              <div class="cv-k">Shelf 04</div>
+              <div class="cv-t">다시 읽고<br>싶은</div>
+            </div>
+            <div class="cn">다시 읽고 싶은</div>
+            <div class="cd">4권 · 나이 들며 달라 보이는 문장</div>
+          </div>
+          <div class="curator-cell">
+            <div class="cv v-dusk">
+              <div class="cv-k">Shelf 05</div>
+              <div class="cv-t">밤의 서재</div>
+            </div>
+            <div class="cn">밤의 서재</div>
+            <div class="cd">12권 · 잠 못 드는 날의 동반자</div>
+          </div>
+          <div class="curator-cell">
+            <div class="cv v-berry">
+              <div class="cv-k">Shelf 06</div>
+              <div class="cv-t">선물받은<br>책</div>
+            </div>
+            <div class="cn">선물받은 책</div>
+            <div class="cd">3권 · 누군가의 마음이 담긴 페이지</div>
+          </div>
+        </div>
+
+        <div class="shelf-section">
+          <h3>지금 읽는 중<span class="count">2</span></h3>
+          <span class="more">이어읽기</span>
+        </div>
+        <div class="curated" style="margin-bottom:6px">
+          <div class="curated-head">
+            <h4>채식주의자 · 한강</h4>
+            <span class="cnt">p.137 · 62%</span>
+          </div>
+          <div class="curated-reason">어제 덮은 문장: "꿈을 꾸었어. 어떤 얼굴이 내 안으로 천천히…"</div>
+          <div class="curated-mini">
+            <div class="spine v-sage mid"><span class="t">1부 · 채식주의자</span></div>
+            <div class="spine v-cream short"><span class="t">2부 · 몽고반점</span></div>
+            <div class="spine v-berry tall"><span class="t">3부 · 나무 불꽃</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabbar">
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/></svg>
+          홈
+        </div>
+        <div class="tab active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+          서재
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          캘린더
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          모임
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg>
+          내정보
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">B · 큐레이터 보드<span class="sub">표지 썸네일 · 이달의 한 문장 · 쉘프 사유</span></div>
+  </div>
+
+
+  <!-- ═══════════════ C. 4 스택 (4개의 무더기) ═══════════════ -->
+  <div class="phone-col">
+    <div class="phone c">
+      <div class="status">
+        <span>9:41</span>
+        <div class="status-icons">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21a9 9 0 100-18 9 9 0 000 18zm-1-4.41l4.3-4.3-1.42-1.42L11 13.76l-1.88-1.88-1.42 1.42L11 16.59z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 22h20V10H2v12zM6 4h12v4H6V4z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 8H4v8h16V8zm-2 6H6v-4h12v4z"/></svg>
+        </div>
+      </div>
+
+      <div class="body">
+        <div class="lib-head">
+          <div class="lh-title">
+            <h2>네 개의 <em>무더기</em></h2>
+            <div class="sub">FOUR STACKS · 42 BOOKS</div>
+          </div>
+          <div class="exhibit-toggle" role="switch" aria-checked="false">
+            <span>비공개</span>
+            <span class="tog off" aria-hidden="true"></span>
+          </div>
+        </div>
+
+        <div class="stacks-grid">
+          <div class="stack-card">
+            <div class="sk">Stack 01</div>
+            <div class="sn">읽는 중</div>
+            <div class="sc">2<span class="unit">권</span></div>
+            <div class="stack-pile" aria-hidden="true">
+              <div class="pc v-sage w2"></div>
+              <div class="pc v-cream w3"></div>
+            </div>
+          </div>
+          <div class="stack-card">
+            <div class="sk">Stack 02</div>
+            <div class="sn">올해 완독</div>
+            <div class="sc">14<span class="unit">권</span></div>
+            <div class="stack-pile" aria-hidden="true">
+              <div class="pc v-oak w1"></div>
+              <div class="pc v-berry w2"></div>
+              <div class="pc v-ink w3"></div>
+              <div class="pc v-mint w2"></div>
+              <div class="pc v-rose w1"></div>
+              <div class="pc v-sage w4"></div>
+              <div class="pc v-cream w3"></div>
+            </div>
+          </div>
+          <div class="stack-card">
+            <div class="sk">Stack 03</div>
+            <div class="sn">위시 · 대기</div>
+            <div class="sc">23<span class="unit">권</span></div>
+            <div class="stack-pile" aria-hidden="true">
+              <div class="pc v-peach w3"></div>
+              <div class="pc v-sage w2"></div>
+              <div class="pc v-oak w1"></div>
+              <div class="pc v-berry w4"></div>
+              <div class="pc v-cream w3"></div>
+              <div class="pc v-mint w2"></div>
+            </div>
+          </div>
+          <div class="stack-card">
+            <div class="sk">Stack 04</div>
+            <div class="sn">대여 중</div>
+            <div class="sc">3<span class="unit">권</span></div>
+            <div class="stack-pile" aria-hidden="true">
+              <div class="pc v-ink w3"></div>
+              <div class="pc v-sage w2"></div>
+              <div class="pc v-berry w4"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="weekly-hl">
+          <div class="wk-k">This Week · 이번 주 한 권</div>
+          <div class="wk-t">
+            다음 주엔 <em>작별하지 않는다</em>가<br>
+            "읽는 중" 스택으로 합류해요. D-0.
+          </div>
+        </div>
+
+        <div class="shelf-section">
+          <h3>올해의 완독<span class="count">14</span></h3>
+          <span class="more">연도별</span>
+        </div>
+        <div class="shelf">
+          <div class="shelf-row">
+            <div class="spine v-sage tall"><span class="t">소년이 온다</span></div>
+            <div class="spine v-cream mid"><span class="t">아주 사적인 독서</span></div>
+            <div class="spine v-berry"><span class="t">불편한 편의점</span></div>
+            <div class="spine v-oak short"><span class="t">파친코 1</span></div>
+            <div class="spine v-ink tall"><span class="t">파친코 2</span></div>
+            <div class="spine v-mint mid wide"><span class="t">시대예보: 핵개인</span></div>
+            <div class="spine v-peach"><span class="t">꿀벌과 천둥</span></div>
+            <div class="spine v-rose short"><span class="t">나의 눈부신 친구</span></div>
+            <div class="spine v-forest tall slim"><span class="t">작별 인사</span></div>
+            <div class="spine v-dusk"><span class="t">달러구트 꿈 백화점</span></div>
+          </div>
+          <div class="shelf-wood" aria-hidden="true"></div>
+        </div>
+
+        <div class="mini-shelf-grid">
+          <div class="mini-shelf">
+            <div class="mk">이번 달 페이스</div>
+            <div class="mv">38<span class="u">쪽/일</span></div>
+            <div class="mb">작년 대비 <em>+12쪽</em></div>
+          </div>
+          <div class="mini-shelf">
+            <div class="mk">완독 예정</div>
+            <div class="mv">4월 26<span class="u">일</span></div>
+            <div class="mb"><em>채식주의자</em> · 95쪽 남음</div>
+          </div>
+        </div>
+
+        <div style="height: 24px"></div>
+      </div>
+
+      <div class="tabbar">
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/></svg>
+          홈
+        </div>
+        <div class="tab active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+          서재
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
+          캘린더
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          모임
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg>
+          내정보
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">C · 4 스택<span class="sub">2×2 무더기 · 주간 하이라이트 · 비공개 모드</span></div>
+  </div>
+
+</div>
+
+<section class="notes">
+  <div class="note">
+    <h4>A · 책꽂이 은유</h4>
+    <p>쉘프 나무 바 아래 세로 책등이 정렬되는 익숙한 은유. "지금 읽는 중"만 정면 표지, 나머지는 책등으로 리듬을 만들어요.</p>
+    <ul>
+      <li>책등 높이·컬러 랜덤으로 실제 책꽂이의 불규칙한 리듬 재현</li>
+      <li>큐레이션 쉘프는 카드로 분리 — 사용자가 직접 만든 모음</li>
+      <li>하단 위시·대여 mini 쉘프로 수량만 빠르게 확인</li>
+    </ul>
+  </div>
+  <div class="note">
+    <h4>B · 큐레이터 보드</h4>
+    <p>전시 공간처럼. 표지 썸네일 + 쉘프 이름 + 큐레이션 사유(왜 모았는가)가 함께. "이달의 한 문장"으로 책 읽기의 감정을 헤더로 끌어올려요.</p>
+    <ul>
+      <li>6개의 쉘프 카드 — 각자 사유와 권수가 한 셀에</li>
+      <li>Gaegu 필기 인용구로 사용자 자신의 목소리 강조</li>
+      <li>"+ 새 쉘프" CTA로 큐레이터 행위 자체를 장려</li>
+    </ul>
+  </div>
+  <div class="note">
+    <h4>C · 4 스택</h4>
+    <p>정리벽이 강한 독자를 위한 2×2 카드. 각 스택은 책 무더기 미니어처와 숫자로 상태를 직시. 숫자가 곧 서재의 형태가 돼요.</p>
+    <ul>
+      <li>읽는 중 / 올해 완독 / 위시 / 대여 — 4개 축이 전부</li>
+      <li>주간 하이라이트로 "다음 주엔 이 책이 합류" 같은 흐름 보여주기</li>
+      <li>비공개 토글(off) — 서재는 열어두지 않는 사용자도 배려</li>
+    </ul>
+  </div>
+</section>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    var buttons = document.querySelectorAll('[data-theme-btn]');
+
+    // 초기 상태: mint
+    if (!root.getAttribute('data-theme')) {
+      root.setAttribute('data-theme', 'mint');
+    }
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var theme = btn.getAttribute('data-theme-btn');
+        root.setAttribute('data-theme', theme);
+        buttons.forEach(function (b) {
+          var isActive = (b === btn);
+          b.classList.toggle('active', isActive);
+          b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>

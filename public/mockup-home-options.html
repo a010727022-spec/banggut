@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>방긋 홈 — 4가지 방향 비교</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;word-break:keep-all}
+:root{
+  --bg: #F7F3ED; --sf: #EDE7DF; --sf2: #E0D9D0; --sf3: #D0C8BC;
+  --bd: rgba(95,164,142,0.14); --bd2: rgba(95,164,142,0.28);
+  --tp: #1c201d; --ts: #4a5550; --tm: #7a8b7e;
+  --ac: #5FA48E; --ac2: #7ABBA4; --ac3: #A4D4C0; --acc: #f7f3ed;
+  --milestone: #B79556;
+}
+body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:#DCD5CA;padding:40px 20px;min-height:100vh;color:var(--tp)}
+.wrap{max-width:1600px;margin:0 auto}
+.title{font-family:'Gaegu',cursive;font-size:30px;font-weight:700;letter-spacing:0.02em;text-align:center;margin-bottom:6px}
+.sub{color:var(--ts);font-size:13px;text-align:center;margin-bottom:40px;font-weight:500}
+.phones{display:flex;gap:24px;justify-content:center;flex-wrap:wrap}
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;max-width:360px}
+.phone-badge{display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:100px;background:#FFFFFF;border:1px solid var(--bd2);font-size:11px;font-weight:700;color:var(--ac);letter-spacing:0.5px}
+.phone{width:340px;height:780px;background:var(--bg);border-radius:44px;display:flex;flex-direction:column;box-shadow:0 0 0 3px #1a1a1a,0 0 26px rgba(0,0,0,0.1);overflow:auto;position:relative;padding-bottom:68px}
+.phone::-webkit-scrollbar{width:0}
+.phone-desc{font-size:11px;color:var(--ts);text-align:center;line-height:1.6;max-width:340px}
+.phone-desc strong{color:var(--ac);font-weight:700}
+.phone-desc em{color:var(--tp);font-style:normal;font-weight:600}
+
+/* ═══ 공통 ═══ */
+.header{padding:44px 18px 10px;display:flex;align-items:center;gap:10px}
+.header-mascot{width:36px;height:36px;flex-shrink:0}
+.header-text{flex:1}
+.header-nick{font-family:'Gaegu',cursive;font-size:17px;font-weight:700;color:var(--tp);letter-spacing:0.02em;line-height:1.2}
+.header-greeting{font-size:11px;color:var(--tm);margin-top:2px}
+.header-greeting em{font-style:normal;color:var(--ac);font-weight:700}
+.header-btn{width:34px;height:34px;border-radius:50%;background:var(--sf);border:0.5px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px}
+
+.bnav{position:absolute;bottom:0;left:0;right:0;background:rgba(247,243,237,0.95);backdrop-filter:blur(14px);border-top:0.5px solid var(--bd);padding:8px 4px 22px;display:flex;justify-content:space-around;z-index:50}
+.bnav-item{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;color:var(--tm);padding:4px 6px;border-radius:10px;min-width:42px;font-weight:600}
+.bnav-item.on{background:color-mix(in srgb,var(--ac) 10%,transparent);color:var(--ac)}
+.bnav-icon{font-size:15px}
+
+.section-label{font-size:10px;font-weight:700;color:var(--tm);letter-spacing:1.1px;text-transform:uppercase;padding:0 18px 8px}
+
+/* ═══ 1. 이어읽기 허브 ═══ */
+.streak-bar{margin:0 18px 14px;padding:10px 12px;background:linear-gradient(135deg,color-mix(in srgb,var(--milestone) 10%,var(--sf)),var(--sf));border:0.5px solid var(--bd);border-radius:12px;display:flex;align-items:center;gap:10px}
+.streak-icon{width:30px;height:30px;border-radius:9px;background:color-mix(in srgb,var(--milestone) 20%,var(--sf));display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.streak-title{font-size:11.5px;font-weight:700;color:var(--tp);line-height:1.3}
+.streak-title em{font-style:normal;color:var(--milestone)}
+.streak-sub{font-size:10px;color:var(--tm);margin-top:1px}
+.streak-temp{background:color-mix(in srgb,var(--ac) 12%,var(--bg));color:var(--ac);padding:3px 9px;border-radius:100px;font-size:10px;font-weight:700;margin-left:auto;flex-shrink:0}
+
+.hero{margin:0 18px 18px;background:linear-gradient(135deg,var(--sf),color-mix(in srgb,var(--ac) 5%,var(--sf)));border:0.5px solid var(--bd);border-radius:18px;padding:16px;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;top:-30px;right:-30px;width:150px;height:150px;background:radial-gradient(circle,color-mix(in srgb,var(--ac) 18%,transparent),transparent 70%)}
+.hero-row{display:flex;gap:12px;position:relative;z-index:2;margin-bottom:14px}
+.hero-cover{width:74px;height:108px;border-radius:7px;overflow:hidden;flex-shrink:0;box-shadow:0 6px 16px color-mix(in srgb,var(--ac) 12%,rgba(0,0,0,0.08));background:linear-gradient(135deg,#2d5a3f,#1a3a2a);color:#f4efe8;display:flex;align-items:flex-end;padding:5px;font-size:10px;font-weight:700;line-height:1.2}
+.hero-info{flex:1;min-width:0}
+.hero-nudge{font-family:'Gaegu',cursive;font-size:12px;font-weight:700;color:var(--ac);letter-spacing:0.02em;margin-bottom:4px;line-height:1.3}
+.hero-title{font-size:15px;font-weight:800;color:var(--tp);line-height:1.3;letter-spacing:-0.3px;margin-bottom:2px}
+.hero-author{font-size:10.5px;color:var(--tm);margin-bottom:8px}
+.hero-bar{height:3.5px;background:color-mix(in srgb,var(--ac) 10%,var(--sf2));border-radius:2px;margin-bottom:4px;overflow:hidden}
+.hero-fill{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:2px;width:72%}
+.hero-stat{font-size:10px;color:var(--tm);font-weight:500}
+.hero-stat em{font-style:normal;color:var(--ac);font-weight:700}
+.hero-cta{width:100%;padding:11px;border-radius:100px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:var(--acc);font-family:'Gaegu',cursive;font-size:15px;font-weight:700;letter-spacing:0.04em;border:none;cursor:pointer;box-shadow:0 5px 14px color-mix(in srgb,var(--ac) 22%,transparent);position:relative;z-index:2}
+
+.nudge-card{margin:0 18px 8px;display:flex;gap:10px;padding:11px 12px;background:var(--sf);border:0.5px solid var(--bd);border-radius:14px;align-items:center}
+.nudge-emoji{width:28px;height:28px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:color-mix(in srgb,var(--ac) 12%,var(--bg))}
+.nudge-text{flex:1;font-size:11px;color:var(--tp);line-height:1.4;font-weight:500}
+.nudge-text em{font-style:normal;font-weight:700;color:var(--ac)}
+
+/* ═══ 2. 하이브리드 ═══ */
+.tabs{display:flex;gap:6px;padding:2px 18px 12px;overflow-x:auto}
+.tab{padding:6px 13px;border-radius:100px;font-size:11px;font-weight:700;white-space:nowrap;border:0.5px solid var(--bd2);background:transparent;color:var(--tm)}
+.tab.on{background:var(--ac);color:var(--acc);border-color:var(--ac)}
+
+.shelf-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;padding:0 18px 14px}
+.shelf-cover{aspect-ratio:7/10;border-radius:5px;overflow:hidden;box-shadow:0 3px 10px rgba(0,0,0,0.1);background:linear-gradient(135deg,#2d5a3f,#1a3a2a);color:#f4efe8;display:flex;align-items:flex-end;padding:6px;font-size:9px;font-weight:700;line-height:1.2;position:relative}
+.shelf-cover.c2{background:linear-gradient(135deg,#8a6030,#4a3020)}
+.shelf-cover.c3{background:linear-gradient(135deg,#7a4090,#3a1a5a)}
+.shelf-cover.c4{background:linear-gradient(135deg,#4a80b8,#2a4a80)}
+.shelf-cover.c5{background:linear-gradient(135deg,#b8606a,#804050)}
+.shelf-cover.c6{background:linear-gradient(135deg,#c89060,#806040)}
+.shelf-cover.c7{background:linear-gradient(135deg,#6aa890,#4a8070)}
+.shelf-cover.c8{background:linear-gradient(135deg,#d0904a,#a06020)}
+.shelf-cover.c9{background:linear-gradient(135deg,#5a5a8a,#2a2a5a)}
+.shelf-cover .dot{position:absolute;top:6px;right:6px;width:14px;height:14px;border-radius:50%;background:var(--ac);display:flex;align-items:center;justify-content:center;font-size:7px;color:#fff;font-weight:700}
+
+.shelf-stats{margin:0 18px 12px;padding:12px 14px;background:var(--sf);border:0.5px solid var(--bd);border-radius:14px;display:flex;justify-content:space-around;text-align:center}
+.shelf-stat{flex:1}
+.shelf-stat-v{font-size:18px;font-weight:800;color:var(--tp);letter-spacing:-0.5px}
+.shelf-stat-l{font-size:9px;font-weight:700;color:var(--tm);margin-top:2px;letter-spacing:0.5px}
+
+/* ═══ 3. 인스타 스타일 ═══ */
+.insta-header{padding:44px 18px 14px;display:flex;align-items:center;gap:14px}
+.insta-avatar{width:68px;height:68px;border-radius:50%;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,#A4D4C0,#5FA48E);border:3px solid var(--bg);box-shadow:0 0 0 2px var(--ac2)}
+.insta-avatar img{width:100%;height:100%;object-fit:cover}
+.insta-profile{flex:1}
+.insta-nick{font-size:16px;font-weight:800;color:var(--tp);letter-spacing:-0.3px;margin-bottom:6px}
+.insta-stats{display:flex;gap:16px}
+.insta-stat-v{font-size:15px;font-weight:800;color:var(--tp)}
+.insta-stat-l{font-size:10px;color:var(--tm);margin-top:0}
+.insta-bio{padding:0 18px 12px;font-family:'Gaegu',cursive;font-size:13px;color:var(--tp);letter-spacing:0.02em;line-height:1.5}
+.insta-bio em{font-style:normal;color:var(--ac);font-weight:700}
+
+.stories{display:flex;gap:10px;padding:0 18px 14px;overflow-x:auto}
+.story{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;cursor:pointer}
+.story-circle{width:54px;height:54px;border-radius:50%;padding:2px;background:linear-gradient(135deg,var(--ac),var(--ac3));display:flex;align-items:center;justify-content:center;position:relative}
+.story-circle.done{background:linear-gradient(135deg,var(--milestone),#E8C088)}
+.story-inner{width:100%;height:100%;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.story-inner .cover{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#2d5a3f,#1a3a2a);display:flex;align-items:center;justify-content:center;color:#f4efe8;font-size:14px;font-weight:700}
+.story-label{font-size:9.5px;color:var(--ts);font-weight:600;max-width:64px;text-align:center;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.shelf-tabs{display:flex;border-top:0.5px solid var(--bd);border-bottom:0.5px solid var(--bd);margin:4px 0 0}
+.shelf-tab{flex:1;padding:11px 0;font-size:11px;font-weight:700;color:var(--tm);letter-spacing:0.3px;text-align:center;cursor:pointer;position:relative}
+.shelf-tab.on{color:var(--tp)}
+.shelf-tab.on::after{content:"";position:absolute;bottom:-0.5px;left:30%;right:30%;height:1.5px;background:var(--ac)}
+
+.insta-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;padding:2px}
+.insta-cell{aspect-ratio:7/10;background:linear-gradient(135deg,#2d5a3f,#1a3a2a);display:flex;align-items:flex-end;padding:8px;color:#f4efe8;font-size:10.5px;font-weight:700;line-height:1.25;letter-spacing:-0.01em;position:relative;cursor:pointer}
+.insta-cell .badge{position:absolute;top:6px;right:6px;background:rgba(255,255,255,0.94);color:var(--ac);font-size:8px;font-weight:800;padding:2px 6px;border-radius:100px}
+
+/* ═══ 4. 시각적 섞기 ═══ */
+.mix-hero{margin:0 18px 18px;padding:0;background:none;border:none}
+.mix-big-cover{width:100%;aspect-ratio:1.2/1;border-radius:20px;overflow:hidden;background:linear-gradient(135deg,#2d5a3f,#1a3a2a);position:relative;margin-bottom:12px;box-shadow:0 12px 30px color-mix(in srgb,var(--ac) 14%,rgba(0,0,0,0.1))}
+.mix-big-cover .gradient{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.7),transparent 50%)}
+.mix-big-cover .cover-img{position:absolute;inset:20px;border-radius:10px;background:linear-gradient(135deg,#c89060,#806040);box-shadow:0 16px 30px rgba(0,0,0,0.4);display:flex;align-items:flex-end;padding:16px;color:#f4efe8;font-size:16px;font-weight:800;line-height:1.2}
+.mix-big-cover .content{position:absolute;bottom:16px;left:16px;right:16px;color:#fff;z-index:2}
+.mix-big-cover .nudge{font-family:'Gaegu',cursive;font-size:12px;font-weight:700;color:rgba(255,255,255,0.85);margin-bottom:3px;letter-spacing:0.02em}
+.mix-big-cover .title{font-size:17px;font-weight:800;letter-spacing:-0.3px;margin-bottom:6px;text-shadow:0 2px 8px rgba(0,0,0,0.5)}
+.mix-big-cover .stat{font-size:11px;color:rgba(255,255,255,0.8);font-weight:600}
+.mix-big-cover .stat em{font-style:normal;color:#A4D4C0;font-weight:800}
+.mix-cta{width:calc(100% - 36px);margin:0 18px;padding:13px;border-radius:100px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:var(--acc);font-family:'Gaegu',cursive;font-size:16px;font-weight:700;letter-spacing:0.04em;border:none;cursor:pointer;box-shadow:0 6px 16px color-mix(in srgb,var(--ac) 22%,transparent);display:block;margin-bottom:16px}
+
+.mix-shelf{padding:0 18px 14px}
+.mix-shelf-title{font-family:'Gaegu',cursive;font-size:14px;font-weight:700;color:var(--tp);letter-spacing:0.02em;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.mix-shelf-title a{font-size:10px;color:var(--ac);text-decoration:none;font-weight:600;font-family:'Pretendard',sans-serif}
+.mix-shelf-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.mix-shelf-cover{aspect-ratio:7/10;border-radius:8px;overflow:hidden;background:linear-gradient(135deg,#2d5a3f,#1a3a2a);color:#f4efe8;display:flex;align-items:flex-end;padding:7px;font-size:9.5px;font-weight:700;line-height:1.2;box-shadow:0 4px 10px rgba(0,0,0,0.1)}
+
+.note{margin-top:40px;padding:24px 28px;background:#FFFFFF;border:1px solid rgba(90,110,95,0.13);border-radius:20px;color:var(--tp);font-size:12px;line-height:1.9;max-width:860px;margin-left:auto;margin-right:auto}
+.note-title{font-family:'Gaegu',cursive;font-size:18px;font-weight:700;color:var(--ac);margin-bottom:14px}
+.note h4{font-family:'Gaegu',cursive;font-size:15px;font-weight:700;color:var(--tp);letter-spacing:0.02em;margin-top:14px;margin-bottom:6px}
+.note strong{color:var(--ac);font-weight:700}
+.note em{font-style:normal;color:#8B9A3A;font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title">방긋 홈 · 4가지 방향 비교</div>
+  <div class="sub">실제 구동시 각각 어떤 느낌인지 — 원하는 방향 골라주세요</div>
+
+  <div class="phones">
+
+    <!-- 1. 이어읽기 허브 (현재 리디자인) -->
+    <div class="phone-wrap">
+      <div class="phone-badge">① 이어읽기 허브 · 현재</div>
+      <div class="phone">
+        <div class="header">
+          <img src="/logo-banggut.svg" class="header-mascot" alt="">
+          <div class="header-text">
+            <div class="header-nick">지선님</div>
+            <div class="header-greeting"><em>어제 245쪽에서 멈췄어요</em></div>
+          </div>
+          <div class="header-btn">🔔</div>
+        </div>
+        <div class="streak-bar">
+          <div class="streak-icon">🔥</div>
+          <div>
+            <div class="streak-title"><em>7일째</em> 스트릭</div>
+            <div class="streak-sub">오늘도 한 장만 읽어요</div>
+          </div>
+          <div class="streak-temp">52°</div>
+        </div>
+        <div class="section-label">오늘 이어서</div>
+        <div class="hero">
+          <div class="hero-row">
+            <div class="hero-cover">작별하지<br>않는다</div>
+            <div class="hero-info">
+              <div class="hero-nudge">오늘도 한 장만</div>
+              <div class="hero-title">작별하지 않는다</div>
+              <div class="hero-author">한강</div>
+              <div class="hero-bar"><div class="hero-fill"></div></div>
+              <div class="hero-stat"><em>245</em> / 340쪽 · <em>72%</em></div>
+            </div>
+          </div>
+          <button class="hero-cta">지금 이어 읽기 →</button>
+        </div>
+        <div class="section-label">오늘의 넛지</div>
+        <div class="nudge-card">
+          <div class="nudge-emoji">📅</div>
+          <div class="nudge-text"><em>프로젝트 헤일메리</em> 내일 시작 예정</div>
+        </div>
+        <div class="nudge-card">
+          <div class="nudge-emoji">💬</div>
+          <div class="nudge-text"><em>민지</em>가 새 질문을 던졌어요</div>
+        </div>
+        <div class="bnav">
+          <div class="bnav-item on"><span class="bnav-icon">🏠</span>홈</div>
+          <div class="bnav-item"><span class="bnav-icon">👥</span>모임</div>
+          <div class="bnav-item"><span class="bnav-icon">🔖</span>스크랩</div>
+          <div class="bnav-item"><span class="bnav-icon">👤</span>MY</div>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>행동 중심</strong> · 이어읽기 CTA가 히어로. 정보 밀도 높음, 텍스트 많음. <em>실제 독서 유도</em>에 가장 강함.</div>
+    </div>
+
+    <!-- 2. 하이브리드 (홈 + 서재 탭) -->
+    <div class="phone-wrap">
+      <div class="phone-badge">② 하이브리드 · 추천</div>
+      <div class="phone">
+        <div class="header">
+          <img src="/logo-banggut.svg" class="header-mascot" alt="">
+          <div class="header-text">
+            <div class="header-nick">지선님</div>
+            <div class="header-greeting"><em>어제 245쪽에서 멈췄어요</em></div>
+          </div>
+          <div class="header-btn">🔔</div>
+        </div>
+        <div class="streak-bar">
+          <div class="streak-icon">🔥</div>
+          <div>
+            <div class="streak-title"><em>7일째</em> 스트릭</div>
+            <div class="streak-sub">오늘도 한 장만 읽어요</div>
+          </div>
+          <div class="streak-temp">52°</div>
+        </div>
+        <div class="section-label">오늘 이어서</div>
+        <div class="hero">
+          <div class="hero-row">
+            <div class="hero-cover">작별하지<br>않는다</div>
+            <div class="hero-info">
+              <div class="hero-nudge">오늘도 한 장만</div>
+              <div class="hero-title">작별하지 않는다</div>
+              <div class="hero-author">한강</div>
+              <div class="hero-bar"><div class="hero-fill"></div></div>
+              <div class="hero-stat"><em>245</em> / 340쪽 · <em>72%</em></div>
+            </div>
+          </div>
+          <button class="hero-cta">지금 이어 읽기 →</button>
+        </div>
+        <div class="section-label">다른 읽는 책</div>
+        <div class="shelf-grid">
+          <div class="shelf-cover c2">이기적<br>유전자</div>
+          <div class="shelf-cover c3">달러구트<br>꿈백화점</div>
+          <div class="shelf-cover c4">사피엔스</div>
+        </div>
+        <div class="nudge-card">
+          <div class="nudge-emoji">💬</div>
+          <div class="nudge-text"><em>민지</em>가 새 질문을 던졌어요</div>
+        </div>
+        <div class="bnav">
+          <div class="bnav-item on"><span class="bnav-icon">🏠</span>홈</div>
+          <div class="bnav-item"><span class="bnav-icon">📚</span>서재</div>
+          <div class="bnav-item"><span class="bnav-icon">👥</span>모임</div>
+          <div class="bnav-item"><span class="bnav-icon">👤</span>MY</div>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>홈 = 행동 중심</strong> + <strong>서재 탭 = 인스타 피드 별도</strong>. 두 세계 장점 모두. <em>탭 아이콘에 서재 추가</em>.</div>
+    </div>
+
+    <!-- 3. 인스타 스타일 (Full) -->
+    <div class="phone-wrap">
+      <div class="phone-badge">③ 인스타 스타일 · 자랑감성</div>
+      <div class="phone">
+        <div class="insta-header">
+          <div class="insta-avatar">
+            <img src="/logo-banggut.svg" alt="">
+          </div>
+          <div class="insta-profile">
+            <div class="insta-nick">지선 · @taasha</div>
+            <div class="insta-stats">
+              <div><span class="insta-stat-v">12</span><span class="insta-stat-l"> 완독</span></div>
+              <div><span class="insta-stat-v">2</span><span class="insta-stat-l"> 읽는 중</span></div>
+              <div><span class="insta-stat-v">5</span><span class="insta-stat-l"> 위시</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="insta-bio">📖 2026년 24권 째 · <em>읽고, 긋고, 방긋</em> · 오늘 체온 52°</div>
+
+        <!-- 하이라이트 스토리 (완독한 책들) -->
+        <div class="stories">
+          <div class="story">
+            <div class="story-circle done">
+              <div class="story-inner"><div class="cover">✨</div></div>
+            </div>
+            <div class="story-label">인생책</div>
+          </div>
+          <div class="story">
+            <div class="story-circle">
+              <div class="story-inner"><div class="cover">🔥</div></div>
+            </div>
+            <div class="story-label">읽는 중</div>
+          </div>
+          <div class="story">
+            <div class="story-circle">
+              <div class="story-inner"><div class="cover" style="background:linear-gradient(135deg,#c89060,#806040)">📚</div></div>
+            </div>
+            <div class="story-label">2025년</div>
+          </div>
+          <div class="story">
+            <div class="story-circle">
+              <div class="story-inner"><div class="cover" style="background:linear-gradient(135deg,#7a4090,#3a1a5a)">🌙</div></div>
+            </div>
+            <div class="story-label">소설</div>
+          </div>
+          <div class="story">
+            <div class="story-circle">
+              <div class="story-inner"><div class="cover" style="background:linear-gradient(135deg,#4a80b8,#2a4a80)">💬</div></div>
+            </div>
+            <div class="story-label">모임</div>
+          </div>
+        </div>
+
+        <!-- 탭 -->
+        <div class="shelf-tabs">
+          <div class="shelf-tab on">완독</div>
+          <div class="shelf-tab">읽는 중</div>
+          <div class="shelf-tab">위시</div>
+        </div>
+
+        <!-- 그리드 -->
+        <div class="insta-grid">
+          <div class="insta-cell" style="background:linear-gradient(135deg,#2d5a3f,#1a3a2a)"><span class="badge">★ 5.0</span>작별하지<br>않는다</div>
+          <div class="insta-cell" style="background:linear-gradient(135deg,#8a6030,#4a3020)"><span class="badge">★ 4.5</span>이기적<br>유전자</div>
+          <div class="insta-cell" style="background:linear-gradient(135deg,#7a4090,#3a1a5a)"><span class="badge">★ 5.0</span>달러구트<br>꿈 백화점</div>
+          <div class="insta-cell" style="background:linear-gradient(135deg,#4a80b8,#2a4a80)"><span class="badge">★ 4.0</span>사피엔스</div>
+          <div class="insta-cell" style="background:linear-gradient(135deg,#b8606a,#804050)"><span class="badge">★ 4.5</span>아몬드</div>
+          <div class="insta-cell" style="background:linear-gradient(135deg,#c89060,#806040)"><span class="badge">★ 5.0</span>보건교사<br>안은영</div>
+          <div class="insta-cell" style="background:linear-gradient(135deg,#6aa890,#4a8070)"><span class="badge">★ 4.0</span>연금술사</div>
+          <div class="insta-cell" style="background:linear-gradient(135deg,#d0904a,#a06020)"><span class="badge">★ 5.0</span>나미야<br>잡화점</div>
+          <div class="insta-cell" style="background:linear-gradient(135deg,#5a5a8a,#2a2a5a)"><span class="badge">★ 4.5</span>미드나잇<br>라이브러리</div>
+        </div>
+
+        <div class="bnav">
+          <div class="bnav-item on"><span class="bnav-icon">🏠</span>서재</div>
+          <div class="bnav-item"><span class="bnav-icon">👥</span>모임</div>
+          <div class="bnav-item"><span class="bnav-icon">🔖</span>스크랩</div>
+          <div class="bnav-item"><span class="bnav-icon">👤</span>MY</div>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>전시·자랑 중심</strong>. 프로필 + 하이라이트 스토리 + 3칸 그리드 + 별점 뱃지. <em>"내 책장"</em> 감성 극대화. 이어읽기는 없음.</div>
+    </div>
+
+    <!-- 4. 시각적 섞기 -->
+    <div class="phone-wrap">
+      <div class="phone-badge">④ 시각적 섞기 · 밸런스</div>
+      <div class="phone">
+        <div class="header">
+          <img src="/logo-banggut.svg" class="header-mascot" alt="">
+          <div class="header-text">
+            <div class="header-nick">지선님 · 52°</div>
+            <div class="header-greeting"><em>어제 245쪽에서 멈췄어요</em></div>
+          </div>
+          <div class="header-btn">🔔</div>
+        </div>
+
+        <!-- 큰 영화 포스터 스타일 히어로 -->
+        <div class="mix-hero">
+          <div class="mix-big-cover">
+            <div class="cover-img" style="background:linear-gradient(135deg,#2d5a3f,#1a3a2a);color:rgba(255,255,255,0.3);font-size:14px">작별하지<br>않는다<br>· 한강</div>
+            <div class="gradient"></div>
+            <div class="content">
+              <div class="nudge">오늘도 한 장만</div>
+              <div class="title">작별하지 않는다</div>
+              <div class="stat"><em>72%</em> · 245 / 340쪽</div>
+            </div>
+          </div>
+        </div>
+        <button class="mix-cta">지금 이어 읽기 →</button>
+
+        <!-- 나의 서재 미리보기 -->
+        <div class="mix-shelf">
+          <div class="mix-shelf-title">
+            <span>📚 나의 서재</span>
+            <a href="#">모두 보기 →</a>
+          </div>
+          <div class="mix-shelf-grid">
+            <div class="mix-shelf-cover">이기적<br>유전자</div>
+            <div class="mix-shelf-cover" style="background:linear-gradient(135deg,#7a4090,#3a1a5a)">달러구트<br>꿈백화점</div>
+            <div class="mix-shelf-cover" style="background:linear-gradient(135deg,#4a80b8,#2a4a80)">사피엔스</div>
+            <div class="mix-shelf-cover" style="background:linear-gradient(135deg,#c89060,#806040)">보건교사</div>
+            <div class="mix-shelf-cover" style="background:linear-gradient(135deg,#b8606a,#804050)">아몬드</div>
+            <div class="mix-shelf-cover" style="background:linear-gradient(135deg,#6aa890,#4a8070)">연금술사</div>
+          </div>
+        </div>
+
+        <div class="nudge-card">
+          <div class="nudge-emoji">💬</div>
+          <div class="nudge-text"><em>민지</em>가 새 질문을 던졌어요</div>
+        </div>
+
+        <div class="bnav">
+          <div class="bnav-item on"><span class="bnav-icon">🏠</span>홈</div>
+          <div class="bnav-item"><span class="bnav-icon">👥</span>모임</div>
+          <div class="bnav-item"><span class="bnav-icon">🔖</span>스크랩</div>
+          <div class="bnav-item"><span class="bnav-icon">👤</span>MY</div>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>큰 영화포스터 히어로</strong> + <strong>서재 6권 미리보기</strong> + 모임 소식. 비주얼 + 행동 균형. <em>한 화면에 모든 것</em>.</div>
+    </div>
+
+  </div>
+
+  <div class="note">
+    <div class="note-title">🎯 장단점 요약</div>
+
+    <h4>① 이어읽기 허브 (현재)</h4>
+    <strong>강점</strong>: 오늘 뭐 읽을지 즉시 답. 행동 유도 최강. 독서토론 킥 연결 강함<br>
+    <strong>약점</strong>: 텍스트 많음. '내 책장' 자랑 감성 없음. 시각적 즐거움 부족
+
+    <h4>② 하이브리드 (추천)</h4>
+    <strong>강점</strong>: 홈에서 행동 + 서재 탭에서 전시. 용도별 분리. 두 세계 모두<br>
+    <strong>약점</strong>: 탭이 하나 늘어남. 서재 탭 별도 디자인 필요
+
+    <h4>③ 인스타 스타일</h4>
+    <strong>강점</strong>: 자랑 감성 최강. 하이라이트 스토리로 북클럽 느낌. 완독 별점이 시각적 자산<br>
+    <strong>약점</strong>: <em>이어읽기 CTA 없음</em>. 책 많아야 재미. 행동 유도 약함. 방긋 킥(토론)과 거리 있음
+
+    <h4>④ 시각적 섞기</h4>
+    <strong>강점</strong>: 큰 영화포스터 히어로 + 6권 서재. 비주얼·행동 밸런스. 한 화면에 다 보임<br>
+    <strong>약점</strong>: 히어로가 크면 스트릭·넛지가 스크롤 아래로. 밀도 낮음
+
+    <h4 style="color:var(--ac)">💚 제 추천: ② 하이브리드</h4>
+    이유: 유저 두 가지 욕구(오늘 읽자 / 내 책장 자랑) 각각 최적의 공간에서 충족. 홈은 행동, 서재는 감상. 방긋의 모든 기능(독서토론·스트릭·인생책)도 자연스럽게 담김.
+  </div>
+</div>
+</body>
+</html>

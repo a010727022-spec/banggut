@@ -1,0 +1,1337 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>완독콩 · 포커스 히어로 v6 — 디자이너 리파인</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;0,900;1,600&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<style>
+  :root {
+    /* ——— Canvas ——— */
+    --bg:          #F5EEDE;
+    --paper:       #FFFDF6;
+    --paper-warm:  #FBF4DF;
+    --ink:         #2B2420;
+    --ink-soft:    #5A4A3C;
+    --ink-mute:    #8A7862;
+    --ink-faint:   #BDAE94;
+    --bd:          #E7D9B6;
+    --bd-soft:     #EFE4C7;
+    --hairline:    #E8DCBD;
+
+    /* ——— Primary accent (brand sage) ——— */
+    --sage:        #5FA48E;
+    --sage-deep:   #3E7E6A;
+    --sage-ink:    #264E42;
+    --sage-soft:   #D8EAE1;
+    --sage-bg:     #EDF4F0;
+
+    /* ——— Celebration only (Phone C) ——— */
+    --honey:       #E8A93F;
+    --honey-soft:  #FFE6A8;
+    --honey-bg:    #FFF3CC;
+
+    /* ——— Mascot tonal support ——— */
+    --kong:        #B07A4B;
+    --kong-deep:   #5A3F28;
+
+    /* ——— Elevation ——— */
+    --shadow-card: 0 1px 0 rgba(43,36,32,.04), 2px 3px 0 rgba(43,36,32,.08);
+    --shadow-cta:  0 1px 0 rgba(43,36,32,.06), 2px 4px 0 rgba(62,126,106,.28);
+    --shadow-stamp: 2px 3px 0 rgba(43,36,32,.14);
+    --shadow-soft: 0 10px 28px rgba(43,36,32,.08);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, system-ui, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(#E1D3B0 1px, transparent 1px) 0 0 / 22px 22px,
+      linear-gradient(180deg, #F8F1DF 0%, #F2E8CE 100%);
+    min-height: 100vh;
+    padding: 56px 24px 96px;
+    letter-spacing: -0.01em;
+  }
+
+  .page { max-width: 1280px; margin: 0 auto; }
+
+  /* ═══════════════════════════════════════ */
+  /*  Header                                 */
+  /* ═══════════════════════════════════════ */
+  .page-hd { text-align: center; margin-bottom: 32px; }
+
+  .page-hd .kicker {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 5px 13px;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 100px;
+    font-family: 'Gaegu', cursive;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 18px;
+    box-shadow: var(--shadow-card);
+  }
+  .page-hd .kicker .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--sage);
+  }
+  .page-hd h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 44px;
+    letter-spacing: -0.025em;
+    margin: 0 0 10px;
+    line-height: 1.08;
+  }
+  .page-hd h1 em {
+    font-style: italic;
+    font-weight: 700;
+    color: var(--sage-ink);
+  }
+  .page-hd p {
+    color: var(--ink-soft);
+    font-size: 15px;
+    margin: 0 auto;
+    line-height: 1.6;
+    max-width: 520px;
+  }
+
+  .team-note {
+    max-width: 780px;
+    margin: 22px auto 0;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 14px;
+    padding: 14px 20px;
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    box-shadow: var(--shadow-card);
+  }
+  .team-note b { color: var(--ink); font-weight: 700; }
+  .team-note .arrow { color: var(--sage-deep); font-weight: 700; }
+
+  /* ═══════════════════════════════════════ */
+  /*  Phones                                 */
+  /* ═══════════════════════════════════════ */
+  .phones {
+    display: flex;
+    gap: 44px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 48px;
+  }
+
+  .phone-wrap { width: 360px; position: relative; }
+
+  .phone-tag {
+    position: absolute;
+    top: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Gaegu', cursive;
+    font-size: 13px;
+    padding: 4px 14px;
+    border-radius: 100px;
+    font-weight: 700;
+    white-space: nowrap;
+    z-index: 3;
+    letter-spacing: 0.02em;
+  }
+  .phone-tag .num { color: var(--sage-soft); margin-right: 6px; }
+
+  .phone {
+    width: 360px;
+    height: 812px;
+    background: #FAF4E4;
+    border-radius: 44px;
+    border: 10px solid #2B2420;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 22px 48px rgba(43,36,32,.16), 0 4px 12px rgba(43,36,32,.06);
+  }
+
+  .phone::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(#E5D6B1 1px, transparent 1px);
+    background-size: 20px 20px;
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .phone::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 110px;
+    height: 24px;
+    background: #2B2420;
+    border-radius: 100px;
+    z-index: 10;
+  }
+
+  .screen {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    padding: 44px 18px 18px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ═══════════════════════════════════════ */
+  /*  Status bar                             */
+  /* ═══════════════════════════════════════ */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink);
+    padding: 0 14px;
+    margin-bottom: 12px;
+  }
+  .status-bar .time { font-family: 'Fraunces', serif; font-size: 13px; font-weight: 600; }
+  .status-bar .icons { display: flex; gap: 5px; align-items: center; opacity: 0.8; }
+
+  /* ═══════════════════════════════════════ */
+  /*  Top bar                                */
+  /* ═══════════════════════════════════════ */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2px 16px;
+  }
+  .topbar .back,
+  .topbar .more {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ink);
+    font-size: 18px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  .topbar .back:hover,
+  .topbar .more:hover { background: var(--paper); }
+  .topbar .title {
+    font-size: 13px;
+    color: var(--ink-mute);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  /* ═══════════════════════════════════════ */
+  /*  Book rail (slim, no rotation)          */
+  /* ═══════════════════════════════════════ */
+  .book-rail {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--paper);
+    border: 1.5px solid var(--hairline);
+    border-radius: 14px;
+    margin: 0 2px 18px;
+  }
+  .book-rail .cover {
+    width: 40px; height: 56px;
+    background: linear-gradient(152deg, var(--sage) 0%, var(--sage-deep) 100%);
+    border-radius: 4px;
+    flex-shrink: 0;
+    position: relative;
+    box-shadow: inset -2px 0 0 rgba(0,0,0,0.06);
+  }
+  .book-rail .cover::after {
+    content: '';
+    position: absolute;
+    left: 4px; top: 6px; bottom: 6px;
+    width: 1.5px;
+    background: rgba(255,255,255,0.22);
+  }
+  .book-rail .cover .cover-title {
+    position: absolute;
+    inset: 0;
+    padding: 6px 4px;
+    color: #fff;
+    font-family: 'Fraunces', serif;
+    font-size: 7px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: 0.02em;
+    text-align: center;
+    opacity: 0.85;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .book-rail .meta { flex: 1; min-width: 0; }
+  .book-rail .meta .t {
+    font-size: 14.5px; font-weight: 700; color: var(--ink);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    letter-spacing: -0.01em;
+  }
+  .book-rail .meta .s {
+    font-size: 11.5px; color: var(--ink-mute);
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+  .book-rail .pct {
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--sage-deep);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ═══════════════════════════════════════ */
+  /*  Greeting                               */
+  /* ═══════════════════════════════════════ */
+  .greet {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 4px 4px 20px;
+  }
+  .greet .mascot-wrap {
+    width: 68px; height: 68px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .greet .mascot-wrap img {
+    width: 100%; height: 100%; object-fit: contain;
+    filter: drop-shadow(2px 3px 0 rgba(43,36,32,.1));
+  }
+  .greet .mascot-wrap.bob img   { animation: bob 3.2s ease-in-out infinite; }
+  .greet .txt { flex: 1; min-width: 0; }
+  .greet .greet-line {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+  .greet .greet-h {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.015em;
+    line-height: 1.25;
+  }
+
+  /* ═══════════════════════════════════════ */
+  /*  Stat card (one card, hairline rows)    */
+  /* ═══════════════════════════════════════ */
+  .stat-card {
+    background: var(--paper);
+    border: 1.5px solid var(--hairline);
+    border-radius: 14px;
+    margin: 0 2px 16px;
+    overflow: hidden;
+  }
+  .stat-card .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+  }
+  .stat-card .row + .row {
+    border-top: 1px dashed var(--hairline);
+  }
+  .stat-card .row .label {
+    font-size: 12.5px;
+    color: var(--ink-mute);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+  .stat-card .row .value {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+  .stat-card .row .value .u {
+    font-family: 'Pretendard Variable', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-mute);
+    margin-left: 2px;
+  }
+  .stat-card .row.primary .value { color: var(--sage-deep); }
+  .stat-card .row.muted  .value  { color: var(--ink-soft); }
+
+  /* ═══════════════════════════════════════ */
+  /*  Calendar strip (7 days)                */
+  /* ═══════════════════════════════════════ */
+  .cal-strip {
+    background: var(--paper);
+    border: 1.5px solid var(--hairline);
+    border-radius: 14px;
+    padding: 14px 12px 12px;
+    margin: 0 2px 16px;
+  }
+  .cal-strip .hd {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 0 4px 10px;
+  }
+  .cal-strip .hd .t {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.005em;
+  }
+  .cal-strip .hd .sub {
+    font-size: 11px;
+    color: var(--ink-mute);
+    font-variant-numeric: tabular-nums;
+  }
+  .cal-strip .hd .sub b { color: var(--sage-deep); font-weight: 700; }
+
+  .cal-strip .days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+  .day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 2px 8px;
+    border-radius: 10px;
+    position: relative;
+  }
+  .day .wd {
+    font-size: 10px;
+    color: var(--ink-mute);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .day .dn {
+    font-family: 'Fraunces', serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+  }
+  .day .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--bd);
+    margin-top: 2px;
+  }
+  .day.read .dot { background: var(--sage); }
+  .day.read .dn  { color: var(--ink); }
+  .day.today {
+    background: var(--sage-bg);
+  }
+  .day.today .dn { color: var(--sage-ink); font-weight: 700; }
+
+  /* Today fresh stamp (only Phone C) */
+  .day.today.fresh .dot {
+    width: 0; height: 0;
+    background: transparent;
+    position: relative;
+  }
+  .day.today.fresh .dot::before {
+    content: '';
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 22px; height: 22px;
+    transform: translate(-50%, -50%) rotate(-8deg);
+    background-image: url('/mascot-happy.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    filter: drop-shadow(1px 2px 0 rgba(43,36,32,.18));
+    animation: stamp 1.2s cubic-bezier(.3,1.5,.4,1) 0.2s both;
+  }
+
+  /* Regular read day stamp on Phone C */
+  .day.read.stamped .dot {
+    width: 0; height: 0;
+    background: transparent;
+    position: relative;
+  }
+  .day.read.stamped .dot::before {
+    content: '';
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 14px; height: 14px;
+    transform: translate(-50%, -50%) rotate(6deg);
+    background-image: url('/mascot-happy.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0.85;
+  }
+
+  /* ═══════════════════════════════════════ */
+  /*  ETA row                                */
+  /* ═══════════════════════════════════════ */
+  .eta-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: var(--paper);
+    border: 1.5px solid var(--hairline);
+    border-radius: 14px;
+    margin: 0 2px 18px;
+  }
+  .eta-row .icon {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--sage-bg);
+    border: 1px solid var(--sage-soft);
+    color: var(--sage-deep);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .eta-row .body { flex: 1; min-width: 0; }
+  .eta-row .body .line1 {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    font-weight: 500;
+    margin-bottom: 1px;
+  }
+  .eta-row .body .line2 {
+    font-size: 13px;
+    color: var(--ink);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .eta-row .body .line2 em {
+    font-style: normal;
+    color: var(--sage-deep);
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+  }
+
+  /* ═══════════════════════════════════════ */
+  /*  CTA button                             */
+  /* ═══════════════════════════════════════ */
+  .cta {
+    margin-top: auto;
+    padding: 16px 20px;
+    background: var(--sage);
+    color: var(--paper);
+    border: 1.5px solid var(--sage-deep);
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: var(--shadow-cta);
+    transition: transform 0.15s ease;
+  }
+  .cta:hover { transform: translateY(-1px); }
+  .cta:active { transform: translateY(1px); box-shadow: 0 1px 0 rgba(62,126,106,.2); }
+  .cta .ico { font-size: 15px; }
+  .cta .sub {
+    font-weight: 500;
+    font-size: 12.5px;
+    opacity: 0.85;
+    margin-left: 4px;
+  }
+
+  .cta-sub {
+    margin-top: 8px;
+    text-align: center;
+    font-size: 11.5px;
+    color: var(--ink-mute);
+  }
+  .cta-sub b { color: var(--ink-soft); font-weight: 700; }
+
+  /* ═══════════════════════════════════════ */
+  /*  Phone B · running                      */
+  /* ═══════════════════════════════════════ */
+  .running-stage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 0 4px;
+    gap: 18px;
+  }
+  .running-stage .mascot-lg {
+    width: 128px; height: 128px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .running-stage .mascot-lg img {
+    width: 100%; height: 100%; object-fit: contain;
+    filter: drop-shadow(2px 4px 0 rgba(43,36,32,.1));
+    animation: breath 4.2s ease-in-out infinite;
+  }
+  .running-stage .mascot-lg .zz {
+    position: absolute;
+    top: 8px; right: 2px;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 700;
+    color: var(--sage-deep);
+    font-size: 15px;
+    opacity: 0;
+    animation: zzz 4s ease-in-out infinite;
+  }
+  .running-stage .mascot-lg .zz.l2 {
+    right: 14px; top: 22px;
+    font-size: 12px;
+    animation-delay: 1.2s;
+  }
+
+  .countdown {
+    text-align: center;
+  }
+  .countdown .time {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 78px;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .countdown .meta {
+    font-size: 12.5px;
+    color: var(--ink-mute);
+    margin-top: 10px;
+    font-variant-numeric: tabular-nums;
+  }
+  .countdown .meta b {
+    color: var(--sage-deep);
+    font-weight: 700;
+  }
+
+  .progress-ring {
+    width: 220px; height: 6px;
+    background: var(--hairline);
+    border-radius: 100px;
+    overflow: hidden;
+    position: relative;
+  }
+  .progress-ring .fill {
+    position: absolute;
+    inset: 0;
+    width: 26%;
+    background: linear-gradient(90deg, var(--sage) 0%, var(--sage-deep) 100%);
+    border-radius: 100px;
+  }
+
+  .dnd-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11.5px;
+    color: var(--ink-mute);
+    font-weight: 500;
+  }
+  .dnd-line .d {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--sage);
+  }
+
+  .run-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: auto;
+  }
+  .run-actions button {
+    padding: 14px 16px;
+    border-radius: 14px;
+    font-size: 14.5px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: -0.005em;
+  }
+  .run-actions .pause {
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    color: var(--ink);
+    box-shadow: var(--shadow-card);
+  }
+  .run-actions .stop {
+    background: var(--sage);
+    border: 1.5px solid var(--sage-deep);
+    color: var(--paper);
+    box-shadow: var(--shadow-cta);
+  }
+
+  /* ═══════════════════════════════════════ */
+  /*  Phone C · done                         */
+  /* ═══════════════════════════════════════ */
+  .done-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px 0 16px;
+  }
+  .done-hero .mascot-lg {
+    width: 120px; height: 120px;
+  }
+  .done-hero .mascot-lg img {
+    width: 100%; height: 100%; object-fit: contain;
+    filter: drop-shadow(2px 4px 0 rgba(43,36,32,.12));
+    animation: cheer 2.4s ease-in-out infinite;
+  }
+  .done-hero .num {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 56px;
+    line-height: 1;
+    color: var(--sage-deep);
+    letter-spacing: -0.03em;
+    margin: 8px 0 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .done-hero .num-sub {
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-weight: 600;
+  }
+  .done-hero .num-sub b {
+    color: var(--sage-deep);
+    font-weight: 700;
+    font-family: 'Fraunces', serif;
+  }
+
+  /* Reward — the single honey moment */
+  .reward {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    background: var(--honey-bg);
+    border: 1.5px solid var(--honey);
+    border-radius: 14px;
+    margin: 14px 2px 16px;
+    transform: rotate(-0.8deg);
+    box-shadow: var(--shadow-stamp);
+  }
+  .reward .bean {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    transform: rotate(6deg);
+  }
+  .reward .txt { flex: 1; min-width: 0; }
+  .reward .txt .k {
+    font-family: 'Gaegu', cursive;
+    font-size: 12px;
+    color: var(--kong-deep);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    margin-bottom: 2px;
+  }
+  .reward .txt .v {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.005em;
+  }
+  .reward .txt .v em {
+    font-style: normal;
+    font-family: 'Fraunces', serif;
+    color: var(--sage-deep);
+  }
+  .reward .plus {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 22px;
+    color: var(--sage-deep);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .delta-inline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin: 6px 2px 16px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+  .delta-inline .group {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .delta-inline b {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    color: var(--sage-deep);
+  }
+  .delta-inline .dot-sep {
+    width: 3px; height: 3px;
+    border-radius: 50%;
+    background: var(--ink-faint);
+  }
+
+  .done-cta {
+    margin-top: auto;
+    display: grid;
+    grid-template-columns: 1fr 1.7fr;
+    gap: 10px;
+  }
+  .done-cta .ghost {
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    color: var(--ink);
+    padding: 14px 12px;
+    border-radius: 14px;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--shadow-card);
+  }
+  .done-cta .primary {
+    background: var(--ink);
+    color: var(--paper);
+    border: 1.5px solid var(--ink);
+    padding: 14px 16px;
+    border-radius: 14px;
+    font-size: 14.5px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: -0.005em;
+    box-shadow: 2px 3px 0 rgba(43,36,32,.18);
+  }
+
+  /* ═══════════════════════════════════════ */
+  /*  Animations                             */
+  /* ═══════════════════════════════════════ */
+  @keyframes bob {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50%      { transform: translateY(-5px) rotate(-2deg); }
+  }
+  @keyframes breath {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.035); }
+  }
+  @keyframes cheer {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    30%      { transform: translateY(-8px) rotate(4deg); }
+    60%      { transform: translateY(-4px) rotate(-3deg); }
+  }
+  @keyframes zzz {
+    0%   { opacity: 0; transform: translateY(0) scale(0.7); }
+    25%  { opacity: 1; transform: translateY(-4px) scale(1); }
+    60%  { opacity: 1; transform: translateY(-14px) scale(1.08); }
+    100% { opacity: 0; transform: translateY(-22px) scale(0.9); }
+  }
+  @keyframes stamp {
+    0%   { transform: translate(-50%, -50%) rotate(45deg) scale(0); opacity: 0; }
+    55%  { transform: translate(-50%, -50%) rotate(-14deg) scale(1.35); opacity: 1; }
+    100% { transform: translate(-50%, -50%) rotate(-8deg) scale(1); opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+
+  /* ═══════════════════════════════════════ */
+  /*  Implementation notes                   */
+  /* ═══════════════════════════════════════ */
+  .impl {
+    max-width: 920px;
+    margin: 72px auto 0;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 18px;
+    padding: 28px 32px;
+    box-shadow: var(--shadow-soft);
+  }
+  .impl h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 24px;
+    margin: 0 0 6px;
+    letter-spacing: -0.02em;
+  }
+  .impl h2 em { font-style: italic; color: var(--sage-deep); }
+  .impl .lede {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    line-height: 1.65;
+    margin: 0 0 20px;
+  }
+  .impl h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 16.5px;
+    font-weight: 700;
+    margin: 22px 0 8px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .impl ul {
+    margin: 0 0 12px;
+    padding-left: 22px;
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--ink-soft);
+  }
+  .impl ul li { margin-bottom: 4px; }
+  .impl code {
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 12px;
+    background: var(--paper-warm);
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: var(--ink);
+  }
+  .impl table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    margin: 8px 0 16px;
+  }
+  .impl table th, .impl table td {
+    padding: 8px 10px;
+    border-bottom: 1px dashed var(--hairline);
+    text-align: left;
+    vertical-align: top;
+  }
+  .impl table th {
+    color: var(--ink-mute);
+    font-weight: 700;
+    font-size: 11.5px;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+  .impl table td .swatch {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border-radius: 4px;
+    border: 1px solid var(--ink);
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  .impl .sage-sw { background: var(--sage); }
+  .impl .honey-sw { background: var(--honey); }
+  .impl .ink-sw { background: var(--ink); }
+  .impl .bg-sw { background: var(--bg); }
+
+  .impl .edits {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-top: 16px;
+  }
+  .impl .edits .col {
+    background: var(--paper-warm);
+    border: 1px dashed var(--bd);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .impl .edits h4 {
+    margin: 0 0 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .impl .edits p {
+    margin: 0;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    line-height: 1.6;
+  }
+  .impl .edits del { color: var(--ink-faint); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ═══ Page header ═══ -->
+  <header class="page-hd">
+    <span class="kicker"><span class="dot"></span> v6 · designer refined</span>
+    <h1>방긋이 · <em>고요한 몰입</em></h1>
+    <p>컬러 3개 대신 한 개. 스티커 3겹 대신 한 장. 귀여움은 마스코트가 맡고, 나머지는 타이포가 합니다.</p>
+
+    <div class="team-note">
+      <b>v5 → v6 변경</b> · 팔레트 잠금 (sage 1 + 허니는 완료 모멘트 1회) <span class="arrow">·</span>
+      로테이션 해제 (도장·리워드만 ±4°) <span class="arrow">·</span>
+      회색 그림자 1톤 통일 <span class="arrow">·</span>
+      3 스티커 → 1 스탯 카드 (hairline 구분)
+    </div>
+  </header>
+
+  <!-- ═══ Phones ═══ -->
+  <div class="phones">
+
+    <!-- ╔═══════════════════════════════════════╗ -->
+    <!-- ║  PHONE A · idle (시작 전)            ║ -->
+    <!-- ╚═══════════════════════════════════════╝ -->
+    <div class="phone-wrap">
+      <div class="phone-tag"><span class="num">A</span>시작 전</div>
+      <div class="phone">
+        <div class="screen">
+
+          <div class="status-bar">
+            <span class="time">9:41</span>
+            <span class="icons">◉ 5G ▮▮▮▮▯</span>
+          </div>
+
+          <div class="topbar">
+            <button class="back" aria-label="뒤로">←</button>
+            <span class="title">나미야 잡화점의 기적</span>
+            <button class="more" aria-label="더보기">⋯</button>
+          </div>
+
+          <div class="book-rail">
+            <div class="cover">
+              <div class="cover-title">나미야<br>잡화점의<br>기적</div>
+            </div>
+            <div class="meta">
+              <div class="t">나미야 잡화점의 기적</div>
+              <div class="s">142 / 452쪽 · 31%</div>
+            </div>
+            <div class="pct">31%</div>
+          </div>
+
+          <div class="greet">
+            <div class="mascot-wrap bob">
+              <img src="/mascot-morning.png" alt="방긋이 아침 인사" />
+            </div>
+            <div class="txt">
+              <div class="greet-line">좋은 아침이에요, 지선님</div>
+              <div class="greet-h">오늘도 한 모금,<br>읽어볼까요?</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="row">
+              <span class="label">오늘</span>
+              <span class="value">0<span class="u">분</span></span>
+            </div>
+            <div class="row primary">
+              <span class="label">이번 주</span>
+              <span class="value">128<span class="u">분</span></span>
+            </div>
+            <div class="row muted">
+              <span class="label">전체 몰입</span>
+              <span class="value">6시간 32<span class="u">분</span></span>
+            </div>
+          </div>
+
+          <div class="cal-strip">
+            <div class="hd">
+              <span class="t">이번 주 독서</span>
+              <span class="sub"><b>4</b>일 / 7일</span>
+            </div>
+            <div class="days">
+              <div class="day read"><span class="wd">월</span><span class="dn">21</span><span class="dot"></span></div>
+              <div class="day read"><span class="wd">화</span><span class="dn">22</span><span class="dot"></span></div>
+              <div class="day"     ><span class="wd">수</span><span class="dn">23</span><span class="dot"></span></div>
+              <div class="day read"><span class="wd">목</span><span class="dn">24</span><span class="dot"></span></div>
+              <div class="day read"><span class="wd">금</span><span class="dn">25</span><span class="dot"></span></div>
+              <div class="day today"><span class="wd">토</span><span class="dn">26</span><span class="dot"></span></div>
+              <div class="day"     ><span class="wd">일</span><span class="dn">27</span><span class="dot"></span></div>
+            </div>
+          </div>
+
+          <div class="eta-row">
+            <div class="icon">✦</div>
+            <div class="body">
+              <div class="line1">이 속도로 읽으면</div>
+              <div class="line2"><em>5월 11일</em>쯤 완독 · 약 <em>18일</em> 남음</div>
+            </div>
+          </div>
+
+          <button class="cta">
+            <span class="ico">▸</span>
+            25분 집중 시작
+            <span class="sub">· 뽀모도로</span>
+          </button>
+          <div class="cta-sub">
+            멈춘 쪽: <b>142쪽</b> · 기록은 자동 저장돼요
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔═══════════════════════════════════════╗ -->
+    <!-- ║  PHONE B · running (진행 중)         ║ -->
+    <!-- ╚═══════════════════════════════════════╝ -->
+    <div class="phone-wrap">
+      <div class="phone-tag"><span class="num">B</span>진행 중</div>
+      <div class="phone">
+        <div class="screen">
+
+          <div class="status-bar">
+            <span class="time">9:48</span>
+            <span class="icons">◉ 5G ▮▮▮▮▯</span>
+          </div>
+
+          <div class="topbar">
+            <button class="back" aria-label="뒤로">←</button>
+            <span class="title">집중 중</span>
+            <button class="more" aria-label="더보기">⋯</button>
+          </div>
+
+          <div class="book-rail">
+            <div class="cover">
+              <div class="cover-title">나미야<br>잡화점의<br>기적</div>
+            </div>
+            <div class="meta">
+              <div class="t">나미야 잡화점의 기적</div>
+              <div class="s">현재 145쪽 · 방금 3쪽</div>
+            </div>
+            <div class="pct">32%</div>
+          </div>
+
+          <div class="running-stage">
+            <div class="mascot-lg">
+              <img src="/mascot-read.png" alt="방긋이 독서 중" />
+              <span class="zz">z</span>
+              <span class="zz l2">z</span>
+            </div>
+
+            <div class="countdown">
+              <div class="time">18:42</div>
+              <div class="meta">오늘 <b>2번째</b> · 진행 <b>00:07:18</b></div>
+            </div>
+
+            <div class="progress-ring">
+              <div class="fill"></div>
+            </div>
+
+            <div class="dnd-line">
+              <span class="d"></span> 방해 금지 · 알림 잠시 꺼뒀어요
+            </div>
+          </div>
+
+          <div class="run-actions">
+            <button class="pause">일시정지</button>
+            <button class="stop">지금 저장하고 끝</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔═══════════════════════════════════════╗ -->
+    <!-- ║  PHONE C · done (완료)               ║ -->
+    <!-- ╚═══════════════════════════════════════╝ -->
+    <div class="phone-wrap">
+      <div class="phone-tag"><span class="num">C</span>완료</div>
+      <div class="phone">
+        <div class="screen">
+
+          <div class="status-bar">
+            <span class="time">10:13</span>
+            <span class="icons">◉ 5G ▮▮▮▮▯</span>
+          </div>
+
+          <div class="topbar">
+            <button class="back" aria-label="뒤로">←</button>
+            <span class="title">집중 완료</span>
+            <button class="more" aria-label="더보기">⋯</button>
+          </div>
+
+          <div class="book-rail">
+            <div class="cover">
+              <div class="cover-title">나미야<br>잡화점의<br>기적</div>
+            </div>
+            <div class="meta">
+              <div class="t">나미야 잡화점의 기적</div>
+              <div class="s">145 → 167쪽 · +22쪽</div>
+            </div>
+            <div class="pct">37%</div>
+          </div>
+
+          <div class="done-hero">
+            <div class="mascot-lg">
+              <img src="/mascot-happy.png" alt="방긋이 완료 축하" />
+            </div>
+            <div class="num">+25<span style="font-size:28px;">분</span></div>
+            <div class="num-sub">이번 주 몰입 <b>153</b>분으로 올라왔어요</div>
+          </div>
+
+          <div class="reward">
+            <div class="bean">🫘</div>
+            <div class="txt">
+              <div class="k">오늘의 콩</div>
+              <div class="v">연속 <em>5</em>일째 · 방긋이가 도장을 찍었어요</div>
+            </div>
+            <div class="plus">+1</div>
+          </div>
+
+          <div class="cal-strip">
+            <div class="hd">
+              <span class="t">이번 주 독서</span>
+              <span class="sub"><b>5</b>일 / 7일</span>
+            </div>
+            <div class="days">
+              <div class="day read stamped"><span class="wd">월</span><span class="dn">21</span><span class="dot"></span></div>
+              <div class="day read stamped"><span class="wd">화</span><span class="dn">22</span><span class="dot"></span></div>
+              <div class="day"     ><span class="wd">수</span><span class="dn">23</span><span class="dot"></span></div>
+              <div class="day read stamped"><span class="wd">목</span><span class="dn">24</span><span class="dot"></span></div>
+              <div class="day read stamped"><span class="wd">금</span><span class="dn">25</span><span class="dot"></span></div>
+              <div class="day today fresh"><span class="wd">토</span><span class="dn">26</span><span class="dot"></span></div>
+              <div class="day"     ><span class="wd">일</span><span class="dn">27</span><span class="dot"></span></div>
+            </div>
+          </div>
+
+          <div class="delta-inline">
+            <span class="group">완독 예정 <b>5/9</b></span>
+            <span class="dot-sep"></span>
+            <span class="group"><b>−2</b>일 빨라졌어요</span>
+          </div>
+
+          <div class="done-cta">
+            <button class="ghost">한 번 더</button>
+            <button class="primary">저장하고 닫기</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ Implementation notes ═══ -->
+  <section class="impl">
+    <h2>v6 <em>refined</em> — 무엇이 바뀌었나</h2>
+    <p class="lede">
+      v5가 스티커 4가지 컬러를 병렬로 쓰며 "귀여움"을 컬러로 증명했다면,
+      v6는 <b>브랜드 sage 한 톤 + 허니 한 번</b>으로 팔레트를 묶고, 귀여움은 마스코트·도장·Gaegu 카피에만 위임했어요.
+      정보량·기능은 동일하게 유지됩니다.
+    </p>
+
+    <h3>팔레트 잠금</h3>
+    <table>
+      <thead>
+        <tr><th>역할</th><th>토큰</th><th>용례</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="swatch bg-sw"></span>Canvas</td><td><code>--bg</code> #F5EEDE</td><td>dot paper 배경, 카드 밖 전부</td></tr>
+        <tr><td><span class="swatch ink-sw"></span>Ink</td><td><code>--ink</code> #2B2420</td><td>본문 텍스트, 1.5px 테두리, 그림자 오프셋</td></tr>
+        <tr><td><span class="swatch sage-sw"></span>Sage (brand)</td><td><code>--sage</code> #5FA48E</td><td>CTA, 진행 막대, 도장 점, 수치 강조</td></tr>
+        <tr><td><span class="swatch honey-sw"></span>Honey (축하)</td><td><code>--honey</code> #E8A93F</td><td>Phone C 리워드 카드 <b>딱 한 군데</b></td></tr>
+      </tbody>
+    </table>
+    <p class="lede" style="margin-bottom: 12px;">
+      v5에 있던 mint / peach / rose / lavender / kong-pink 파생 토큰은 모두 드롭.
+      민트 대신 sage를 쓰고, 허니는 Phone C 외엔 등장 금지.
+    </p>
+
+    <h3>디자이너가 조정한 포인트</h3>
+    <div class="edits">
+      <div class="col">
+        <h4>회전각 규칙</h4>
+        <p>
+          <del>모든 카드 ±3°</del><br>
+          → 카드 0° 고정. <b>리워드·캘린더 도장</b> 같은 감정 모멘트에만 ±4° 허용.
+        </p>
+      </div>
+      <div class="col">
+        <h4>그림자 1톤</h4>
+        <p>
+          <del>honey / mint / peach 컬러 오프셋 3종</del><br>
+          → <code>2px 3px 0 rgba(43,36,32,.08)</code> 단일 ink 톤.
+        </p>
+      </div>
+      <div class="col">
+        <h4>스탯 카드 통합</h4>
+        <p>
+          <del>3색 스티커 3개 나란히</del><br>
+          → 1 카드 · hairline dashed 구분. 숫자는 Fraunces 18px, 단위는 12px Pretendard.
+        </p>
+      </div>
+      <div class="col">
+        <h4>타이포 위계</h4>
+        <p>
+          모든 수치는 <b>Fraunces</b>, 라벨은 <b>Pretendard 600</b>, 감정 카피만 <b>Gaegu</b>.
+          색 대신 서체로 계층을 분리.
+        </p>
+      </div>
+      <div class="col">
+        <h4>Legend 제거</h4>
+        <p>
+          <del>상단 3-마스코트 범례 카드</del><br>
+          → Phone A/B/C 태그와 마스코트 포즈가 이미 설명을 함. 중복 해소.
+        </p>
+      </div>
+      <div class="col">
+        <h4>CTA 버튼</h4>
+        <p>
+          sage 솔리드 + sage-deep 테두리 · 그림자는 sage 62% 오프셋.
+          "시작 버튼은 브랜드 컬러로" 원칙 명확히.
+        </p>
+      </div>
+    </div>
+
+    <h3>마스코트 매핑 (v5와 동일)</h3>
+    <table>
+      <thead>
+        <tr><th>상태</th><th>마스코트</th><th>애니메이션</th><th>크기</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Phone A · 시작 전</td><td><code>mascot-morning.png</code></td><td><code>bob</code> 3.2s</td><td>68px (greet)</td></tr>
+        <tr><td>Phone B · 진행 중</td><td><code>mascot-read.png</code></td><td><code>breath</code> 4.2s + <code>zzz</code></td><td>128px (stage)</td></tr>
+        <tr><td>Phone C · 완료</td><td><code>mascot-happy.png</code></td><td><code>cheer</code> 2.4s</td><td>120px (hero)</td></tr>
+        <tr><td>캘린더 도장</td><td><code>mascot-happy.png</code> (CSS bg)</td><td>today만 <code>stamp</code> 1.2s</td><td>14px / today 22px</td></tr>
+      </tbody>
+    </table>
+
+    <h3>구현 체크리스트</h3>
+    <ul>
+      <li><code>components/book-detail/FocusMascot.tsx</code> — <code>state: "idle" | "running" | "done"</code> 로 <code>&lt;Image&gt;</code> 교체, 애니메이션 클래스 부여</li>
+      <li><code>components/book-detail/FocusStatsRow.tsx</code> — 단일 카드 + <code>rows: [{label, value, unit, tone}]</code> 배열 prop</li>
+      <li><code>components/book-detail/BookFocusCalendar.tsx</code> — 7일 스트립 + 상태별 클래스 (<code>read</code>, <code>stamped</code>, <code>today</code>, <code>fresh</code>)</li>
+      <li><code>lib/reading-pace.ts</code> — <code>computeETA(book, sessions)</code> · 최근 7일 분당 평균 × 남은 쪽으로 완독일 계산</li>
+      <li><code>FocusSessionCard.tsx</code> 리팩터 — 위 4개로 구성, 기존 <code>book/[bookId]/page.tsx</code>의 중복 진행 UI 4종 정리</li>
+      <li><code>next/image</code> 로 마스코트 PNG 로드 (WebP 자동 변환, priority on idle/done)</li>
+      <li><code>prefers-reduced-motion</code> — 이미 CSS 에서 처리. React 쪽은 이미지 정지 상태로 기본 노출</li>
+    </ul>
+
+    <h3>접근성</h3>
+    <ul>
+      <li>CTA 44px+ 터치 타겟 — 실측 56px (패딩 16px 양방향 + 24px 내부)</li>
+      <li>sage/ink 본문 대비비: 7.1:1 (AAA)</li>
+      <li>honey 리워드 카드는 <code>aria-live="polite"</code> 로 완료 순간 토스트 낭독</li>
+      <li>마스코트 이미지는 <code>alt</code> 한글 제공 (상태 설명)</li>
+      <li>도장·zzz 애니메이션은 <code>prefers-reduced-motion</code> 에서 즉시 정지</li>
+    </ul>
+  </section>
+
+</div>
+</body>
+</html>

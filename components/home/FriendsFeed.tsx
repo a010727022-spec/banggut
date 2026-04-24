@@ -63,6 +63,8 @@ export default function FriendsFeed({
   currentUserId,
   limit = 3,
   onMoreTap,
+  showEmpty = false,
+  onAddScrap,
 }: {
   myScraps: Scrap[];
   groupScraps: GroupScrapShape[];
@@ -72,6 +74,10 @@ export default function FriendsFeed({
   currentUserId?: string | null;
   limit?: number;
   onMoreTap?: () => void;
+  /** true면 items가 비어도 컴포넌트를 렌더하고 빈 상태 UI를 보여줍니다. */
+  showEmpty?: boolean;
+  /** 빈 상태 CTA에서 호출 — 스크랩 추가 플로우로 이동하는 용도 */
+  onAddScrap?: () => void;
 }) {
   const router = useRouter();
 
@@ -123,7 +129,85 @@ export default function FriendsFeed({
       .slice(0, limit);
   }, [myScraps, groupScraps, bookMap, currentUserNickname, currentUserEmoji, currentUserId, limit]);
 
-  if (items.length === 0) return null;
+  if (items.length === 0 && !showEmpty) return null;
+
+  // 빈 상태: 세그먼트 탭 등에서 "보여는 주되 비어있다"고 알려야 할 때
+  if (items.length === 0 && showEmpty) {
+    return (
+      <div
+        style={{
+          background: "var(--sf)",
+          borderRadius: 18,
+          border: "0.5px solid var(--bd)",
+          padding: "28px 20px",
+          textAlign: "center",
+          marginBottom: 12,
+          transition:
+            "background var(--duration-slow) var(--easing-default), border-color var(--duration-slow) var(--easing-default)",
+        }}
+      >
+        <div
+          style={{
+            width: 44,
+            height: 44,
+            margin: "0 auto 12px",
+            borderRadius: "50%",
+            background: "color-mix(in srgb, var(--ac) 10%, var(--sf2))",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 20,
+          }}
+          aria-hidden
+        >
+          ✍️
+        </div>
+        <div
+          style={{
+            fontSize: 13,
+            fontWeight: 700,
+            color: "var(--tp)",
+            marginBottom: 4,
+            letterSpacing: "-0.01em",
+          }}
+        >
+          아직 오늘 그은 문장이 없어요
+        </div>
+        <div
+          style={{
+            fontSize: 11,
+            color: "var(--tm)",
+            lineHeight: 1.5,
+            marginBottom: onAddScrap ? 14 : 0,
+          }}
+        >
+          책에서 마음에 든 문장을 그으면
+          <br />
+          여기에 나의 오늘이 기록돼요
+        </div>
+        {onAddScrap && (
+          <button
+            type="button"
+            onClick={onAddScrap}
+            style={{
+              padding: "9px 18px",
+              borderRadius: 100,
+              border: "none",
+              background: "var(--ac)",
+              color: "var(--acc)",
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: "pointer",
+              letterSpacing: "-0.01em",
+              transition: "opacity var(--duration-fast) var(--easing-default)",
+            }}
+          >
+            문장 긋기 시작
+          </button>
+        )}
+      </div>
+    );
+  }
 
   return (
     <>

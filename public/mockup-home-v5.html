@@ -1,0 +1,2080 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>완독콩 · Home v5 — 3 variations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet" />
+
+<style>
+  :root,
+  :root[data-theme="mint"] {
+    /* ── 산뜻한 민트 (Fresh Mint) ────────────── */
+    --cream: #F7F3ED;
+    --cream-sub: #EFE8DB;
+    --paper: #FFFFFF;
+    --mint: #5FA48E;
+    --mint-deep: #3F7A66;
+    --mint-soft: #CDE4DB;
+    --peach: #F4C8A8;
+    --peach-deep: #C78A5B;
+    --ink: #1E1B16;
+    --ink-sub: #5A5348;
+    --ink-mute: #8E8778;
+    --line: rgba(30, 27, 22, 0.08);
+    --line-strong: rgba(30, 27, 22, 0.16);
+    --shadow: 0 2px 12px rgba(30, 27, 22, 0.06), 0 8px 28px rgba(30, 27, 22, 0.04);
+    --radius: 18px;
+
+    /* 페이지 배경 (민트 테마일 땐 다크 레더) */
+    --page-bg: #1C1814;
+    --page-text: #EDE5D4;
+    --page-kicker: #B5A989;
+    --page-body: #9E9478;
+
+    /* 히어로 글로우 + 마스코트 그림자 */
+    --hero-glow: rgba(95, 164, 142, 0.12);
+    --mascot-shadow-sm: 0 3px 6px rgba(95, 164, 142, 0.22);
+    --mascot-shadow-lg: 0 10px 16px rgba(63, 122, 102, 0.28);
+  }
+
+  :root[data-theme="blackbeige"] {
+    /* ── 시크한 블랙베이지 (Chic Black Beige) ──
+       프라다 사피아노 재해석: 밝은 린넨 비스킷 + 딥 잉크 + 실버 플라크
+       v5.3 — 베이지 확 밝게 (아이보리 비스킷 톤으로) */
+    --cream: #FBF5E0;        /* 주 배경 (밝은 아이보리 비스킷) */
+    --cream-sub: #F3E8CA;    /* 카드 (살짝 가라앉은 크림으로 깊이감) */
+    --paper: #FEFBEE;        /* 페이퍼 (거의 흰색에 가까운 밝은 크림) */
+    --mint: #0F0E0C;         /* 프라이머리 = 잉크 블랙 */
+    --mint-deep: #8A6B42;    /* 세컨더리 = 브라스 골드 */
+    --mint-soft: #E1D4B2;    /* 소프트 액센트 밴드 */
+    --peach: #D6B58A;        /* 뮤티드 카멜 (위시 태그) */
+    --peach-deep: #6E5231;
+    --ink: #0F0E0C;
+    --ink-sub: #2D2820;
+    --ink-mute: #7A7164;
+    --line: rgba(15, 14, 12, 0.10);
+    --line-strong: rgba(15, 14, 12, 0.22);
+    --shadow: 0 2px 12px rgba(15, 14, 12, 0.08), 0 8px 28px rgba(15, 14, 12, 0.05);
+    --radius: 18px;
+
+    /* 페이지 배경 (블랙베이지 테마일 땐 잉크 블랙 — 부티크 쇼윈도) */
+    --page-bg: #0A0906;
+    --page-text: #EDE5CE;
+    --page-kicker: #A89C7E;
+    --page-body: #8F8569;
+
+    /* 히어로 글로우 + 마스코트 그림자 */
+    --hero-glow: rgba(138, 107, 66, 0.10);
+    --mascot-shadow-sm: 0 3px 6px rgba(15, 14, 12, 0.18);
+    --mascot-shadow-lg: 0 10px 18px rgba(15, 14, 12, 0.26);
+
+    /* 사피아노 크로스해치 (프라다 레더 캐스트 텍스처)
+       v5.3 — 배경이 밝아진 만큼 패턴 opacity 약간 올림 */
+    --saff-pattern:
+      repeating-linear-gradient(45deg,
+        transparent 0, transparent 3px,
+        rgba(85, 62, 22, 0.11) 3px, rgba(85, 62, 22, 0.11) 3.6px),
+      repeating-linear-gradient(-45deg,
+        transparent 0, transparent 3px,
+        rgba(85, 62, 22, 0.11) 3px, rgba(85, 62, 22, 0.11) 3.6px);
+
+    /* 실버 플라크 그라디언트 (프라다 메탈 트라이앵글) */
+    --silver:
+      linear-gradient(140deg,
+        #F4EEE0 0%,
+        #C5BDA9 34%,
+        #7A7464 52%,
+        #E0D9C4 74%,
+        #524D42 100%);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    font-family: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
+    background: var(--page-bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    transition: background .4s ease;
+  }
+
+  body {
+    min-height: 100vh;
+    padding: 48px 32px 96px;
+  }
+
+  /* ─── Page header ─────────────────────────── */
+  .page-hero {
+    max-width: 1280px;
+    margin: 0 auto 32px;
+    color: var(--page-text);
+  }
+  .page-hero .kicker {
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    color: var(--page-kicker);
+    margin-bottom: 10px;
+  }
+  .page-hero h1 {
+    font-weight: 700;
+    font-size: 32px;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+  .page-hero p {
+    color: var(--page-body);
+    font-size: 14px;
+    max-width: 720px;
+    line-height: 1.6;
+  }
+
+  /* ─── Theme Picker ──────────────────────── */
+  .theme-picker {
+    max-width: 1280px;
+    margin: 0 auto 36px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .theme-opt {
+    flex: 1 1 240px;
+    min-width: 240px;
+    position: relative;
+    padding: 16px 18px 14px;
+    border-radius: 14px;
+    background: rgba(237, 229, 212, 0.04);
+    border: 1px solid rgba(237, 229, 212, 0.12);
+    color: var(--page-text);
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background .25s ease, border-color .25s ease, transform .15s ease;
+  }
+  .theme-opt:hover {
+    background: rgba(237, 229, 212, 0.08);
+    border-color: rgba(237, 229, 212, 0.3);
+  }
+  .theme-opt.active {
+    background: rgba(237, 229, 212, 0.12);
+    border-color: var(--page-text);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  }
+  .theme-opt.active::after {
+    content: "";
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--page-text);
+  }
+  .theme-swatches {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .theme-swatches span {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: block;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+  }
+  .theme-name {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 3px;
+    color: var(--page-text);
+  }
+  .theme-sub {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--page-kicker);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ─── Grid ─────────────────────────────────── */
+  .phones-grid {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    justify-items: center;
+  }
+  @media (max-width: 1100px) {
+    .phones-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 760px) {
+    .phones-grid { grid-template-columns: 1fr; }
+  }
+
+  .phone-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .phone-label {
+    color: var(--page-text);
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .phone-label .sub {
+    display: block;
+    color: var(--page-body);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: none;
+    margin-top: 4px;
+  }
+
+  /* ─── Phone frame ──────────────────────────── */
+  .phone {
+    width: 360px;
+    height: 812px;
+    border-radius: 40px;
+    background: var(--cream);
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 8px #0F0C09,
+      0 0 0 9px #2A241D,
+      0 30px 60px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* status bar */
+  .status {
+    height: 40px;
+    padding: 12px 26px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    flex-shrink: 0;
+  }
+  .status-icons {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+  .status-icons svg { width: 14px; height: 14px; }
+
+  /* scroll body */
+  .body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 20px 28px;
+  }
+  .body::-webkit-scrollbar { display: none; }
+
+  /* ─── Common components ───────────────────── */
+  .greet {
+    padding: 14px 4px 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  /* 완독콩 캐릭터 — 작은 버전 (감정별 PNG) */
+  .mascot {
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+    position: relative;
+    filter: drop-shadow(var(--mascot-shadow-sm));
+  }
+  .mascot img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+  }
+
+  .greet-text {
+    flex: 1;
+    padding-top: 2px;
+  }
+  .greet-text .small {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+  }
+  .greet-text .big {
+    font-family: "Gaegu", "Pretendard Variable", sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--ink);
+    margin-top: 3px;
+    line-height: 1.25;
+  }
+  .greet-text .big em {
+    color: var(--mint-deep);
+    font-style: normal;
+  }
+
+  .streak-pill {
+    align-self: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--peach);
+    color: #6B3D1F;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 10px;
+    border-radius: 999px;
+    flex-shrink: 0;
+  }
+  .streak-pill svg { width: 12px; height: 12px; }
+
+  /* section header */
+  .sec-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 18px 4px 10px;
+  }
+  .sec-head h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .sec-head .more {
+    font-size: 11px;
+    color: var(--ink-mute);
+    letter-spacing: 0.04em;
+  }
+
+  /* buttons */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--mint);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+  }
+  .btn-primary svg { width: 12px; height: 12px; }
+
+  /* community row */
+  .com-row {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    background: var(--paper);
+    border-radius: 14px;
+    border: 1px solid var(--line);
+  }
+  .com-row + .com-row { margin-top: 8px; }
+  .com-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--mint-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--mint-deep);
+  }
+  .com-text {
+    flex: 1;
+    font-size: 12px;
+    color: var(--ink-sub);
+    line-height: 1.45;
+  }
+  .com-text .name {
+    color: var(--ink);
+    font-weight: 700;
+    margin-right: 4px;
+  }
+  .com-meta {
+    font-size: 10px;
+    color: var(--ink-mute);
+    margin-top: 3px;
+    letter-spacing: 0.02em;
+  }
+
+  /* bottom nav */
+  .tabbar {
+    height: 64px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-around;
+    padding: 10px 18px 0;
+    background: var(--cream);
+    border-top: 1px solid var(--line);
+    flex-shrink: 0;
+  }
+  .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    color: var(--ink-mute);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+  }
+  .tab.active { color: var(--mint-deep); }
+  .tab svg { width: 22px; height: 22px; }
+
+
+  /* ═══════════════════════════════════════════════════
+     A. 캘린더 중심
+     ═══════════════════════════════════════════════════ */
+  .phone.a .greet { padding-top: 10px; padding-bottom: 10px; }
+
+  .cal-card {
+    background: var(--paper);
+    border-radius: var(--radius);
+    padding: 16px 16px 18px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--line);
+  }
+  .cal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .cal-head .month {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .cal-head .nav {
+    display: flex;
+    gap: 10px;
+    color: var(--ink-mute);
+  }
+  .cal-head .nav svg { width: 14px; height: 14px; cursor: pointer; }
+
+  .cal-dow {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--ink-mute);
+    text-align: center;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--line);
+  }
+  .cal-dow span:first-child { color: #C25B5B; }
+
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    padding-top: 8px;
+  }
+  .cal-cell {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink-sub);
+    border-radius: 8px;
+  }
+  .cal-cell.muted { color: var(--ink-mute); opacity: 0.4; }
+  .cal-cell.read {
+    background: var(--mint-soft);
+    color: var(--mint-deep);
+  }
+  .cal-cell.today {
+    background: var(--mint);
+    color: #fff;
+  }
+  .cal-cell .dot {
+    position: absolute;
+    bottom: 3px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+  }
+  .cal-cell .dot.meet { background: var(--peach-deep); }
+  .cal-cell .dot.wish { background: var(--mint); }
+  .cal-cell .dot.lib { background: #C25B5B; }
+  .cal-cell.today .dot.meet { background: #fff; }
+
+  .cal-legend {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--line-strong);
+    flex-wrap: wrap;
+  }
+  .leg {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: var(--ink-sub);
+  }
+  .leg .ldot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .ev-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ev {
+    display: flex;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--paper);
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    align-items: center;
+  }
+  .ev-date {
+    width: 42px;
+    flex-shrink: 0;
+    text-align: center;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+  .ev-date .d { font-size: 22px; letter-spacing: -0.02em; }
+  .ev-date .m { font-size: 10px; color: var(--ink-mute); margin-top: 2px; letter-spacing: 0.06em; }
+  .ev-body {
+    flex: 1;
+    min-width: 0;
+  }
+  .ev-body .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+  }
+  .ev-body .tag.meet { background: #FBE5D3; color: var(--peach-deep); }
+  .ev-body .tag.wish { background: var(--mint-soft); color: var(--mint-deep); }
+  .ev-body .tag.lib  { background: #F6D7D7; color: #A63D3D; }
+  .ev-body .title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .ev-body .sub {
+    font-size: 11px;
+    color: var(--ink-mute);
+    margin-top: 2px;
+  }
+  .ev-days {
+    flex-shrink: 0;
+    font-size: 11px;
+    color: var(--ink-mute);
+    font-weight: 600;
+    text-align: right;
+  }
+
+  .cont-mini {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    background: var(--mint);
+    color: #fff;
+    border-radius: 14px;
+    align-items: center;
+    cursor: pointer;
+  }
+  .cont-mini-cover {
+    width: 40px;
+    height: 56px;
+    background: linear-gradient(135deg, #F5E0C7, #D9A675);
+    border-radius: 4px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  .cont-mini-body { flex: 1; min-width: 0; }
+  .cont-mini-body .l1 {
+    font-size: 10px;
+    opacity: 0.85;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .cont-mini-body .l2 {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .cont-mini-body .l3 {
+    font-size: 11px;
+    opacity: 0.88;
+    margin-top: 3px;
+  }
+  .cont-mini-arrow {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .cont-mini-arrow svg { width: 14px; height: 14px; color: #fff; }
+
+
+  /* ═══════════════════════════════════════════════════
+     B. 이어읽기 중심
+     ═══════════════════════════════════════════════════ */
+  .hero-card {
+    background: linear-gradient(160deg, #FFFFFF 0%, #EFE8DB 100%);
+    border-radius: 24px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--line);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-card::before {
+    content: "";
+    position: absolute;
+    top: -40px;
+    right: -30px;
+    width: 140px;
+    height: 140px;
+    background: radial-gradient(circle, var(--hero-glow), transparent 70%);
+    border-radius: 50%;
+  }
+  .hero-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--mint-deep);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    background: var(--mint-soft);
+    border-radius: 999px;
+    margin-bottom: 14px;
+  }
+  .hero-label svg { width: 11px; height: 11px; }
+
+  .hero-body {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .hero-cover {
+    width: 96px;
+    height: 138px;
+    background: linear-gradient(140deg, #1E2E3A, #47647A 55%, #8AB0C2 100%);
+    border-radius: 6px;
+    flex-shrink: 0;
+    box-shadow: 0 6px 16px rgba(30, 27, 22, 0.2), inset 2px 0 0 rgba(0,0,0,0.12);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-cover::before {
+    content: "채식주의자";
+    position: absolute;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #F7F3ED;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  .hero-cover .author {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #F7F3ED;
+    opacity: 0.7;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+  }
+  .hero-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .hero-info .bk-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.015em;
+    line-height: 1.3;
+  }
+  .hero-info .bk-author {
+    font-size: 11px;
+    color: var(--ink-mute);
+    margin-top: 3px;
+    margin-bottom: 14px;
+  }
+  .hero-info .recall {
+    font-family: "Gaegu", sans-serif;
+    font-weight: 400;
+    font-size: 13px;
+    color: var(--ink-sub);
+    line-height: 1.5;
+    padding: 10px 12px;
+    background: var(--cream-sub);
+    border-radius: 10px;
+    border-left: 3px solid var(--mint);
+  }
+  .hero-info .recall strong {
+    color: var(--ink);
+    font-weight: 700;
+    font-family: "Pretendard Variable", sans-serif;
+    font-size: 12px;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .hero-progress {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .prog-track {
+    flex: 1;
+    height: 6px;
+    background: var(--cream-sub);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .prog-fill {
+    height: 100%;
+    width: 62%;
+    background: linear-gradient(90deg, var(--mint), var(--mint-deep));
+    border-radius: 999px;
+  }
+  .prog-text {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink-sub);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .hero-actions .btn-primary { flex: 1; justify-content: center; }
+  .btn-ghost {
+    background: var(--paper);
+    border: 1px solid var(--line-strong);
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 10px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+
+  /* 7-day strip */
+  .week-strip {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    padding: 10px 0;
+  }
+  .day-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 2px;
+    border-radius: 10px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+  }
+  .day-cell .dlabel {
+    font-size: 9px;
+    color: var(--ink-mute);
+    font-weight: 600;
+  }
+  .day-cell .dnum {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .day-cell .ddot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--cream-sub);
+  }
+  .day-cell.done .ddot { background: var(--mint); }
+  .day-cell.today {
+    background: var(--mint);
+    border-color: var(--mint);
+  }
+  .day-cell.today .dlabel,
+  .day-cell.today .dnum { color: #fff; }
+  .day-cell.today .ddot { background: rgba(255,255,255,0.7); }
+
+  /* compact event chips */
+  .ev-chips {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .ev-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    font-size: 12px;
+  }
+  .ev-chip .ic {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .ev-chip .ic.meet { background: #FBE5D3; }
+  .ev-chip .ic.wish { background: var(--mint-soft); }
+  .ev-chip .ic.lib  { background: #F6D7D7; }
+  .ev-chip .ic svg { width: 12px; height: 12px; }
+  .ev-chip .label { flex: 1; color: var(--ink); font-weight: 600; }
+  .ev-chip .d-left {
+    font-size: 11px;
+    color: var(--ink-mute);
+    font-weight: 600;
+  }
+
+
+  /* ═══════════════════════════════════════════════════
+     C. 마스코트 + 커뮤니티
+     ═══════════════════════════════════════════════════ */
+  .mascot-hero {
+    background: linear-gradient(160deg, var(--mint-soft) 0%, var(--cream-sub) 100%);
+    border-radius: 24px;
+    padding: 20px 20px 18px;
+    position: relative;
+    overflow: hidden;
+    margin-top: 6px;
+  }
+  .mascot-hero::after {
+    content: "";
+    position: absolute;
+    right: -10px;
+    top: -10px;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, rgba(255,255,255,0.5), transparent 70%);
+    border-radius: 50%;
+  }
+  /* 완독콩 캐릭터 — 큰 버전 (감정별 PNG) */
+  .mascot-big {
+    width: 118px;
+    height: 118px;
+    position: relative;
+    margin-top: 18px;
+    margin-bottom: 10px;
+    filter: drop-shadow(var(--mascot-shadow-lg));
+  }
+  .mascot-big img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    animation: kkongBob 4.6s ease-in-out infinite;
+    transform-origin: 50% 90%;
+  }
+  @keyframes kkongBob {
+    0%, 100% { transform: translateY(0) rotate(-1.4deg); }
+    50%      { transform: translateY(-4px) rotate(1.4deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .mascot-big img { animation: none; }
+  }
+
+  .bubble {
+    font-family: "Gaegu", sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--ink);
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+  }
+  .bubble em {
+    color: var(--mint-deep);
+    font-style: normal;
+  }
+  .bubble-sub {
+    font-family: "Pretendard Variable", sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--ink-sub);
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+  .bubble-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    background: var(--mint);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 9px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    border: none;
+  }
+  .bubble-cta svg { width: 12px; height: 12px; }
+
+  /* community full */
+  .com-full {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .com-post {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px;
+  }
+  .com-post-head {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .com-post-head .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--mint-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--mint-deep);
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .com-post-head .info { flex: 1; }
+  .com-post-head .name {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .com-post-head .meta {
+    font-size: 10px;
+    color: var(--ink-mute);
+    margin-top: 2px;
+    letter-spacing: 0.02em;
+  }
+  .com-post-body {
+    font-size: 13px;
+    color: var(--ink);
+    line-height: 1.55;
+    margin-bottom: 10px;
+  }
+  .com-post-body .quote {
+    font-family: "Gaegu", sans-serif;
+    font-weight: 400;
+    font-size: 13px;
+    color: var(--ink-sub);
+    padding: 10px 12px;
+    background: var(--cream-sub);
+    border-radius: 10px;
+    margin-top: 8px;
+    border-left: 2px solid var(--mint);
+  }
+  .com-post-actions {
+    display: flex;
+    gap: 14px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--line);
+  }
+  .com-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--ink-mute);
+    font-weight: 600;
+  }
+  .com-action svg { width: 12px; height: 12px; }
+
+  /* float continue CTA */
+  .float-cta {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 76px;
+    background: var(--ink);
+    color: #fff;
+    border-radius: 16px;
+    padding: 11px 13px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    box-shadow: 0 8px 24px rgba(30, 27, 22, 0.4);
+    z-index: 5;
+  }
+  .float-cta-cover {
+    width: 32px;
+    height: 44px;
+    background: linear-gradient(140deg, #C7A571, #8A6B42);
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .float-cta-body { flex: 1; min-width: 0; }
+  .float-cta-body .t1 {
+    font-size: 9px;
+    opacity: 0.65;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .float-cta-body .t2 {
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+  }
+  .float-cta-body .t3 {
+    font-size: 10px;
+    opacity: 0.75;
+    margin-top: 1px;
+  }
+  .float-cta-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--mint);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .float-cta-btn svg { width: 14px; height: 14px; color: #fff; }
+
+  /* mini calendar chip */
+  .mini-cal {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+  }
+  .mini-cal-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--mint-soft);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .mini-cal-icon svg { width: 16px; height: 16px; color: var(--mint-deep); }
+  .mini-cal-body { flex: 1; min-width: 0; }
+  .mini-cal-body .l1 {
+    font-size: 11px;
+    color: var(--ink-mute);
+    letter-spacing: 0.04em;
+  }
+  .mini-cal-body .l2 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-top: 2px;
+  }
+  .mini-cal-arrow {
+    color: var(--ink-mute);
+    flex-shrink: 0;
+  }
+  .mini-cal-arrow svg { width: 14px; height: 14px; }
+
+  /* ─── Notes below ─────────────────────────── */
+  .notes {
+    max-width: 1280px;
+    margin: 56px auto 0;
+    color: var(--page-body);
+    padding-top: 32px;
+    border-top: 1px solid rgba(237, 229, 212, 0.16);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  @media (max-width: 1100px) {
+    .notes { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 760px) {
+    .notes { grid-template-columns: 1fr; }
+  }
+  .note h4 {
+    color: var(--page-text);
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .note p {
+    font-size: 12px;
+    line-height: 1.7;
+    margin-bottom: 8px;
+  }
+  .note ul {
+    list-style: none;
+    font-size: 12px;
+    line-height: 1.7;
+  }
+  .note ul li::before {
+    content: "·";
+    color: var(--mint);
+    margin-right: 8px;
+    font-weight: 700;
+  }
+
+  /* ═════════════════════════════════════════════
+     BLACKBEIGE 전용 레이어 (프라다 사피아노 무드)
+     ═════════════════════════════════════════════ */
+
+  /* ── 1. 폰 본체: 사피아노 크로스해치 + 블랙 엣지 ── */
+  :root[data-theme="blackbeige"] .phone {
+    background-color: var(--cream);
+    background-image: var(--saff-pattern);
+    box-shadow:
+      0 0 0 8px #0A0906,
+      0 0 0 9px #2A2419,
+      0 30px 60px rgba(0, 0, 0, 0.5);
+  }
+  :root[data-theme="blackbeige"] .hero-card,
+  :root[data-theme="blackbeige"] .mascot-hero {
+    background-color: var(--cream-sub);
+    background-image:
+      repeating-linear-gradient(45deg,
+        transparent 0, transparent 3px,
+        rgba(80, 58, 20, 0.05) 3px, rgba(80, 58, 20, 0.05) 3.6px),
+      repeating-linear-gradient(-45deg,
+        transparent 0, transparent 3px,
+        rgba(80, 58, 20, 0.05) 3px, rgba(80, 58, 20, 0.05) 3.6px);
+    border: 1px solid rgba(15, 14, 12, 0.08);
+  }
+
+  /* ── 2. 모든 완독콩 PNG 숨기기 ── */
+  :root[data-theme="blackbeige"] .mascot img,
+  :root[data-theme="blackbeige"] .mascot-big img,
+  :root[data-theme="blackbeige"] .hero-label img,
+  :root[data-theme="blackbeige"] .ev-days img,
+  :root[data-theme="blackbeige"] .mini-cal-icon img {
+    display: none !important;
+  }
+
+  /* ── 3. 작은 .mascot 아바타 → 실버 메탈 코인 (프라다 플라크) ── */
+  :root[data-theme="blackbeige"] .mascot {
+    background: var(--silver);
+    border: 1px solid rgba(15, 14, 12, 0.18);
+    border-radius: 50%;
+    box-shadow:
+      inset 0 -2px 3px rgba(15, 14, 12, 0.22),
+      inset 0 1px 2px rgba(255, 255, 255, 0.4),
+      0 2px 5px rgba(15, 14, 12, 0.18);
+    filter: none;
+    overflow: hidden;
+  }
+  :root[data-theme="blackbeige"] .mascot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 20px;
+    height: 16px;
+    clip-path: polygon(50% 100%, 0 0, 100% 0);
+    background: linear-gradient(140deg, #F4EEE0 0%, #8E8676 55%, #524D42 100%);
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+  }
+
+  /* ── 4. Phone C 히어로: 큰 실버 플라크 + 매거진 스탯 ── */
+  :root[data-theme="blackbeige"] .mascot-big {
+    width: 80px;
+    height: 72px;
+    margin: 8px auto 14px;
+    animation: none;
+  }
+  :root[data-theme="blackbeige"] .mascot-big::before {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 100%;
+    clip-path: polygon(50% 94%, 6% 10%, 94% 10%);
+    background: var(--silver);
+    filter: drop-shadow(0 3px 8px rgba(15, 14, 12, 0.35));
+  }
+
+  /* ── 5. Mint/Chic 컨텐츠 스왑 ── */
+  .chi-chic { display: none; }
+  :root[data-theme="blackbeige"] .chi-mint { display: none; }
+  :root[data-theme="blackbeige"] .chi-chic { display: block; }
+
+  /* ── 6. Chic stat card ── */
+  .chic-plate {
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .chic-kicker {
+    font-size: 10px;
+    letter-spacing: 0.36em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    position: relative;
+    display: inline-block;
+    padding: 0 18px;
+  }
+  .chic-kicker::before,
+  .chic-kicker::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 14px;
+    height: 1px;
+    background: var(--ink-mute);
+  }
+  .chic-kicker::before { left: 0; }
+  .chic-kicker::after  { right: 0; }
+  .chic-num {
+    font-size: 64px;
+    font-weight: 900;
+    letter-spacing: -0.05em;
+    color: var(--ink);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .chic-unit {
+    font-size: 11px;
+    letter-spacing: 0.36em;
+    color: var(--ink-sub);
+    margin-top: 4px;
+    text-transform: uppercase;
+  }
+  .chic-caption {
+    text-align: center;
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--ink-sub);
+    margin-bottom: 18px;
+    padding: 0 12px;
+    letter-spacing: -0.005em;
+  }
+  .chic-caption em {
+    font-style: normal;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .chic-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    background: var(--ink);
+    color: #F4EEE0;
+    border: none;
+    padding: 13px 18px;
+    border-radius: 2px;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    cursor: pointer;
+    font-family: inherit;
+    text-transform: uppercase;
+    transition: background .2s ease;
+  }
+  :root[data-theme="blackbeige"] .chic-cta:hover {
+    background: #24201A;
+  }
+  .chic-cta svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* ── 7. 이벤트 D-X 정리 (flex-column 해제) ── */
+  :root[data-theme="blackbeige"] .ev-days {
+    display: block !important;
+    flex-direction: unset !important;
+  }
+
+  /* ── 8. hero-label 카피 스왑 ── */
+  .lbl-chic { display: none; }
+  :root[data-theme="blackbeige"] .lbl-mint { display: none; }
+  :root[data-theme="blackbeige"] .lbl-chic { display: inline; }
+  :root[data-theme="blackbeige"] .hero-label {
+    font-style: normal;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-size: 10px;
+    background: var(--ink);
+    color: var(--cream);
+    padding: 5px 12px;
+    border-radius: 0;
+  }
+
+  /* ── 9. mini-cal-icon: PNG 담겨 있던 것만 실버 플라크로 ── */
+  :root[data-theme="blackbeige"] .mini-cal-icon[style] {
+    background: var(--silver) !important;
+    padding: 0 !important;
+    position: relative;
+    border: 1px solid rgba(15, 14, 12, 0.15);
+  }
+  :root[data-theme="blackbeige"] .mini-cal-icon[style]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 14px;
+    height: 11px;
+    clip-path: polygon(50% 100%, 0 0, 100% 0);
+    background: linear-gradient(140deg, #F4EEE0 0%, #6F6A5E 70%);
+  }
+  /* SVG만 있는 순수 mini-cal-icon은 베이지 bg + 골드 아이콘으로 */
+  :root[data-theme="blackbeige"] .mini-cal-icon:not([style]) {
+    background: var(--mint-soft);
+    border: 1px solid rgba(15, 14, 12, 0.08);
+  }
+
+  /* ── 10. bubble(손글씨) → 블랙베이지에선 사용 안 함.
+     streak-pill / hero-label 타입 정돈 ── */
+  :root[data-theme="blackbeige"] .streak-pill {
+    background: var(--ink);
+    color: var(--mint-soft);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-size: 10px;
+  }
+
+  /* ── 11. 포커스 링 (접근성 유지) ── */
+  :root[data-theme="blackbeige"] .chic-cta:focus-visible,
+  :root[data-theme="blackbeige"] .theme-opt:focus-visible {
+    outline: 2px solid var(--mint-deep);
+    outline-offset: 2px;
+  }
+
+  /* ── 11.5 캘린더 이벤트 도트 재조정 (블랙베이지에서 위시 도트
+     가 mint=black 으로 뭉치는 문제 해결 → 브라스 골드) ── */
+  :root[data-theme="blackbeige"] .cal-cell .dot.wish,
+  :root[data-theme="blackbeige"] .cal-legend .leg .ldot[style*="--mint"] {
+    background: var(--mint-deep) !important;
+  }
+
+  /* ── 12. 타입 전환: 블랙베이지에선 Gaegu 손글씨 전체 봉인,
+     Pretendard 매거진 톤으로 ── */
+  :root[data-theme="blackbeige"] .bubble,
+  :root[data-theme="blackbeige"] .bubble em,
+  :root[data-theme="blackbeige"] .greet-text .big,
+  :root[data-theme="blackbeige"] .greet-text .big em,
+  :root[data-theme="blackbeige"] .hero-info .recall,
+  :root[data-theme="blackbeige"] .com-post-body .quote {
+    font-family: "Pretendard Variable", Pretendard, sans-serif;
+  }
+  :root[data-theme="blackbeige"] .greet-text .big {
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: -0.02em;
+    line-height: 1.35;
+  }
+  :root[data-theme="blackbeige"] .greet-text .big em {
+    color: var(--ink);
+    font-weight: 700;
+  }
+  :root[data-theme="blackbeige"] .greet-text .small {
+    letter-spacing: 0.22em;
+    color: var(--ink-mute);
+  }
+  :root[data-theme="blackbeige"] .hero-info .recall {
+    font-size: 12px;
+    line-height: 1.6;
+    border-left: 2px solid var(--ink);
+    background: rgba(15, 14, 12, 0.04);
+    font-style: italic;
+    letter-spacing: -0.005em;
+  }
+  :root[data-theme="blackbeige"] .com-post-body .quote {
+    font-size: 12px;
+    line-height: 1.6;
+    font-style: italic;
+    background: rgba(15, 14, 12, 0.04);
+    border-left: 2px solid var(--ink);
+  }
+</style>
+</head>
+<body>
+
+<header class="page-hero">
+  <div class="kicker">WANDOKKONG · HOME V5 · 2026.04.22</div>
+  <h1>완독콩이 사는 홈, 세 가지 위계 · 두 가지 테마</h1>
+  <p>캘린더 위젯 · 이어읽기 · 완독콩 인사 · 커뮤니티 피드 — 네 개 요소를 그대로 두고 "홈 진입 후 제일 먼저 눈이 가는 곳"만 바꿨어요. 캐릭터는 '완독 + 콩' 메타포. 테마는 <em style="color:var(--page-text);font-style:normal;font-weight:600">산뜻한 민트</em>와 <em style="color:var(--page-text);font-style:normal;font-weight:600">시크한 블랙베이지</em> 두 선택지 — 아래에서 눌러 바꿔볼 수 있어요.</p>
+</header>
+
+<!-- Theme Picker -->
+<div class="theme-picker" role="tablist" aria-label="테마 선택">
+  <button class="theme-opt active" data-theme-btn="mint" role="tab" aria-selected="true">
+    <div class="theme-swatches" aria-hidden="true">
+      <span style="background:#F7F3ED"></span>
+      <span style="background:#5FA48E"></span>
+      <span style="background:#3F7A66"></span>
+      <span style="background:#1E1B16"></span>
+    </div>
+    <div class="theme-name">산뜻한 민트</div>
+    <div class="theme-sub">FRESH MINT · F7F3ED × 5FA48E</div>
+  </button>
+  <button class="theme-opt" data-theme-btn="blackbeige" role="tab" aria-selected="false">
+    <div class="theme-swatches" aria-hidden="true">
+      <span style="background:#FBF5E0"></span>
+      <span style="background:#0F0E0C"></span>
+      <span style="background:#8A6B42"></span>
+      <span style="background:#E1D4B2"></span>
+    </div>
+    <div class="theme-name">시크한 블랙베이지</div>
+    <div class="theme-sub">CHIC BLACK BEIGE · FBF5E0 × 0F0E0C</div>
+  </button>
+</div>
+
+<div class="phones-grid">
+
+  <!-- ═══════════════ A. 캘린더 중심 ═══════════════ -->
+  <div class="phone-col">
+    <div class="phone a">
+      <div class="status">
+        <span>9:41</span>
+        <div class="status-icons">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21a9 9 0 100-18 9 9 0 000 18zm-1-4.41l4.3-4.3-1.42-1.42L11 13.76l-1.88-1.88-1.42 1.42L11 16.59z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 22h20V10H2v12zM6 4h12v4H6V4z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 8H4v8h16V8zm-2 6H6v-4h12v4z"/></svg>
+        </div>
+      </div>
+
+      <div class="body">
+        <div class="greet">
+          <div class="mascot">
+            <img src="/mascot-morning.png" alt="완독콩 (아침 인사)" />
+          </div>
+          <div class="greet-text">
+            <div class="small">좋은 아침이에요, 지선 님</div>
+            <div class="big">이번 주 <em>3일째</em><br>읽고 계세요</div>
+          </div>
+          <span class="streak-pill">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 0c3 6-3 9-3 12a3 3 0 006 0c0-2-1.5-3-1.5-5 2 1 4 3 4 7a7 7 0 11-14 0C5 8 10 7 13.5 0z"/></svg>
+            12일
+          </span>
+        </div>
+
+        <div class="cal-card">
+          <div class="cal-head">
+            <div class="month">4월 · April 2026</div>
+            <div class="nav">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-label="이전 달"><polyline points="15 18 9 12 15 6"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-label="다음 달"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+          <div class="cal-dow">
+            <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+          </div>
+          <div class="cal-grid">
+            <div class="cal-cell muted">29</div>
+            <div class="cal-cell muted">30</div>
+            <div class="cal-cell muted">31</div>
+            <div class="cal-cell read">1</div>
+            <div class="cal-cell read">2</div>
+            <div class="cal-cell">3</div>
+            <div class="cal-cell read">4</div>
+
+            <div class="cal-cell read">5</div>
+            <div class="cal-cell read">6</div>
+            <div class="cal-cell">7</div>
+            <div class="cal-cell read">8<span class="dot meet"></span></div>
+            <div class="cal-cell read">9</div>
+            <div class="cal-cell read">10</div>
+            <div class="cal-cell">11</div>
+
+            <div class="cal-cell read">12</div>
+            <div class="cal-cell read">13</div>
+            <div class="cal-cell read">14</div>
+            <div class="cal-cell">15</div>
+            <div class="cal-cell read">16</div>
+            <div class="cal-cell read">17</div>
+            <div class="cal-cell read">18</div>
+
+            <div class="cal-cell read">19</div>
+            <div class="cal-cell read">20</div>
+            <div class="cal-cell today">21<span class="dot meet"></span></div>
+            <div class="cal-cell">22<span class="dot wish"></span></div>
+            <div class="cal-cell">23</div>
+            <div class="cal-cell">24</div>
+            <div class="cal-cell">25<span class="dot lib"></span></div>
+
+            <div class="cal-cell">26</div>
+            <div class="cal-cell">27</div>
+            <div class="cal-cell">28</div>
+            <div class="cal-cell">29</div>
+            <div class="cal-cell">30</div>
+            <div class="cal-cell muted">1</div>
+            <div class="cal-cell muted">2</div>
+          </div>
+          <div class="cal-legend">
+            <span class="leg"><span class="ldot" style="background: var(--mint-soft)"></span>읽은 날</span>
+            <span class="leg"><span class="ldot" style="background: var(--peach-deep)"></span>모임</span>
+            <span class="leg"><span class="ldot" style="background: var(--mint)"></span>위시책</span>
+            <span class="leg"><span class="ldot" style="background: #C25B5B"></span>반납</span>
+          </div>
+        </div>
+
+        <div class="sec-head">
+          <h3>다가오는 일정</h3>
+          <span class="more">전체 보기</span>
+        </div>
+        <div class="ev-list">
+          <div class="ev">
+            <div class="ev-date"><div class="d">21</div><div class="m">오늘</div></div>
+            <div class="ev-body">
+              <span class="tag meet">독서모임</span>
+              <div class="title">책 읽는 밤 · 4월 정기모임</div>
+              <div class="sub">20:00 · 성수동 책방 소담</div>
+            </div>
+            <div class="ev-days" style="display:flex;flex-direction:column;align-items:center;gap:2px">
+              <img src="/mascot-welcome.png" alt="" style="width:30px;height:30px;object-fit:contain;display:block"/>
+              <span>D-0</span>
+            </div>
+          </div>
+          <div class="ev">
+            <div class="ev-date"><div class="d">22</div><div class="m">수</div></div>
+            <div class="ev-body">
+              <span class="tag wish">위시책</span>
+              <div class="title">작별하지 않는다 · 한강</div>
+              <div class="sub">예약한 날에 맞춰 시작해요</div>
+            </div>
+            <div class="ev-days">내일</div>
+          </div>
+          <div class="ev">
+            <div class="ev-date"><div class="d">25</div><div class="m">토</div></div>
+            <div class="ev-body">
+              <span class="tag lib">도서관</span>
+              <div class="title">채식주의자 반납</div>
+              <div class="sub">중구립도서관 · 연장 1회 남음</div>
+            </div>
+            <div class="ev-days" style="display:flex;flex-direction:column;align-items:center;gap:2px">
+              <img src="/mascot-worried.png" alt="" style="width:30px;height:30px;object-fit:contain;display:block"/>
+              <span>D-4</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sec-head">
+          <h3>이어읽기</h3>
+          <span class="more">내 서재</span>
+        </div>
+        <div class="cont-mini">
+          <div class="cont-mini-cover"></div>
+          <div class="cont-mini-body">
+            <div class="l1">어제 · p.137</div>
+            <div class="l2">채식주의자 · 한강</div>
+            <div class="l3">62% · 오늘 10쪽만 더 읽어볼까요?</div>
+          </div>
+          <div class="cont-mini-arrow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+
+        <div class="sec-head">
+          <h3>모임 소식</h3>
+          <span class="more">더 보기</span>
+        </div>
+        <div class="com-row">
+          <div class="com-avatar">유</div>
+          <div>
+            <div class="com-text"><span class="name">유진</span>채식주의자 3부 끝나고 진짜 멍해졌어요…</div>
+            <div class="com-meta">책 읽는 밤 · 2시간 전</div>
+          </div>
+        </div>
+        <div class="com-row">
+          <div class="com-avatar" style="background:#FBE5D3; color: var(--peach-deep)">S</div>
+          <div>
+            <div class="com-text"><span class="name">soop</span>내일 모임 전에 170쪽까지는 꼭 읽어가야지…</div>
+            <div class="com-meta">책 읽는 밤 · 5시간 전</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabbar">
+        <div class="tab active">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/></svg>
+          홈
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          캘린더
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+          서재
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          모임
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg>
+          내정보
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">A · 캘린더 중심<span class="sub">일정·모임이 많은 사용자</span></div>
+  </div>
+
+
+  <!-- ═══════════════ B. 이어읽기 중심 ═══════════════ -->
+  <div class="phone-col">
+    <div class="phone b">
+      <div class="status">
+        <span>9:41</span>
+        <div class="status-icons">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21a9 9 0 100-18 9 9 0 000 18zm-1-4.41l4.3-4.3-1.42-1.42L11 13.76l-1.88-1.88-1.42 1.42L11 16.59z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 22h20V10H2v12zM6 4h12v4H6V4z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 8H4v8h16V8zm-2 6H6v-4h12v4z"/></svg>
+        </div>
+      </div>
+
+      <div class="body">
+        <div class="greet">
+          <div class="mascot">
+            <img src="/mascot-read.png" alt="완독콩 (책 읽는 모습)" />
+          </div>
+          <div class="greet-text">
+            <div class="small">화 · 4월 21일 · 맑음</div>
+            <div class="big">어제 멈춘 <em>137쪽</em>부터<br>이어볼까요?</div>
+          </div>
+        </div>
+
+        <div class="hero-card">
+          <div class="hero-label">
+            <img src="/mascot-read.png" alt="" style="width:20px;height:20px;object-fit:contain;margin-right:-2px"/>
+            <span class="lbl-mint">이어읽기 · 완독콩도 기다려요</span>
+            <span class="lbl-chic">Continue · p.137</span>
+          </div>
+          <div class="hero-body">
+            <div class="hero-cover">
+              <span class="author">한강 장편소설</span>
+            </div>
+            <div class="hero-info">
+              <div class="bk-title">채식주의자</div>
+              <div class="bk-author">한강 · 창비</div>
+              <div class="recall">
+                <strong>어제 이 대목에서 멈췄어요</strong>
+                "꿈을 꾸었어. 어떤 얼굴이 내 안으로 천천히…" (p.137)
+              </div>
+            </div>
+          </div>
+          <div class="hero-progress">
+            <div class="prog-track"><div class="prog-fill"></div></div>
+            <div class="prog-text">62%</div>
+          </div>
+          <div class="hero-actions">
+            <button class="btn-primary">
+              이어읽기
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            <button class="btn-ghost">메모</button>
+          </div>
+        </div>
+
+        <div class="sec-head">
+          <h3>이번 주 · 4일 읽었어요</h3>
+          <span class="more">12일 연속</span>
+        </div>
+        <div class="week-strip">
+          <div class="day-cell done"><span class="dlabel">일</span><span class="dnum">19</span><span class="ddot"></span></div>
+          <div class="day-cell done"><span class="dlabel">월</span><span class="dnum">20</span><span class="ddot"></span></div>
+          <div class="day-cell today"><span class="dlabel">화</span><span class="dnum">21</span><span class="ddot"></span></div>
+          <div class="day-cell"><span class="dlabel">수</span><span class="dnum">22</span><span class="ddot"></span></div>
+          <div class="day-cell"><span class="dlabel">목</span><span class="dnum">23</span><span class="ddot"></span></div>
+          <div class="day-cell"><span class="dlabel">금</span><span class="dnum">24</span><span class="ddot"></span></div>
+          <div class="day-cell"><span class="dlabel">토</span><span class="dnum">25</span><span class="ddot"></span></div>
+        </div>
+
+        <div class="sec-head">
+          <h3>다가오는 일정</h3>
+          <span class="more">캘린더</span>
+        </div>
+        <div class="ev-chips">
+          <div class="ev-chip">
+            <div class="ic meet">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color: var(--peach-deep)"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            </div>
+            <div class="label">오늘 20시 · 책 읽는 밤 모임</div>
+            <div class="d-left">D-0</div>
+          </div>
+          <div class="ev-chip">
+            <div class="ic wish">
+              <svg viewBox="0 0 24 24" fill="currentColor" style="color: var(--mint-deep)"><path d="M12 21s-7-4.35-7-10a4 4 0 017-2.65A4 4 0 0119 11c0 5.65-7 10-7 10z"/></svg>
+            </div>
+            <div class="label">작별하지 않는다 · 시작일</div>
+            <div class="d-left">내일</div>
+          </div>
+          <div class="ev-chip">
+            <div class="ic lib">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#A63D3D"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+            </div>
+            <div class="label">채식주의자 반납 · 중구립</div>
+            <div class="d-left">D-4</div>
+          </div>
+        </div>
+
+        <div class="sec-head">
+          <h3>친구들 소식</h3>
+          <span class="more">전체</span>
+        </div>
+        <div class="com-row">
+          <div class="com-avatar">유</div>
+          <div>
+            <div class="com-text"><span class="name">유진</span>3부 숨이 막혀요… 오늘 모임에서 얘기하고 싶은 게 많아요</div>
+            <div class="com-meta">2시간 전 · 공감 4</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabbar">
+        <div class="tab active">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/></svg>
+          홈
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          캘린더
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+          서재
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          모임
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg>
+          내정보
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">B · 이어읽기 중심<span class="sub">매일 꾸준히 읽는 사용자</span></div>
+  </div>
+
+
+  <!-- ═══════════════ C. 마스코트 + 커뮤니티 ═══════════════ -->
+  <div class="phone-col">
+    <div class="phone c">
+      <div class="status">
+        <span>9:41</span>
+        <div class="status-icons">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21a9 9 0 100-18 9 9 0 000 18zm-1-4.41l4.3-4.3-1.42-1.42L11 13.76l-1.88-1.88-1.42 1.42L11 16.59z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 22h20V10H2v12zM6 4h12v4H6V4z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 8H4v8h16V8zm-2 6H6v-4h12v4z"/></svg>
+        </div>
+      </div>
+
+      <div class="body">
+        <div class="mascot-hero">
+          <!-- 민트 테마: 완독콩 친근한 인사 -->
+          <div class="chi-mint">
+            <div class="mascot-big">
+              <img src="/mascot-happy.png" alt="완독콩 (12일 연속 축하)" />
+            </div>
+            <div class="bubble">
+              우리 <em>12일째</em><br>같이 읽고 있어요!
+            </div>
+            <div class="bubble-sub">
+              지선 님, 어제 채식주의자 137쪽에서 멈췄어요.<br>
+              오늘은 10쪽만 더 읽어볼까요?
+            </div>
+            <button class="bubble-cta">
+              오늘 10쪽 목표로 잡기
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+
+          <!-- 블랙베이지 테마: 매거진 스탯 카드 -->
+          <div class="chi-chic">
+            <div class="mascot-big" aria-hidden="true"></div>
+            <div class="chic-plate">
+              <div class="chic-kicker">Reading Streak</div>
+              <div class="chic-num">12</div>
+              <div class="chic-unit">Days in April</div>
+            </div>
+            <p class="chic-caption">
+              <em>채식주의자</em> · p.137에서 멈춘<br>
+              4월의 열두 번째 밤. 오늘 10쪽이면 완독.
+            </p>
+            <button class="chic-cta">
+              Continue Reading
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="sec-head">
+          <h3>곧 있어요</h3>
+          <span class="more">전체 일정</span>
+        </div>
+        <div class="mini-cal">
+          <div class="mini-cal-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
+          </div>
+          <div class="mini-cal-body">
+            <div class="l1">오늘 · 20:00</div>
+            <div class="l2">책 읽는 밤 · 4월 모임</div>
+          </div>
+          <div class="mini-cal-arrow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+        <div class="mini-cal" style="margin-top: 8px">
+          <div class="mini-cal-icon" style="background:#E6DEF2;padding:2px">
+            <img src="/mascot-sleep.png" alt="" style="width:100%;height:100%;object-fit:contain"/>
+          </div>
+          <div class="mini-cal-body">
+            <div class="l1">내일 시작 · 완독콩이 기다려요</div>
+            <div class="l2">작별하지 않는다 · 한강</div>
+          </div>
+          <div class="mini-cal-arrow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+        <div class="mini-cal" style="margin-top: 8px">
+          <div class="mini-cal-icon" style="background:#F6D7D7;padding:2px">
+            <img src="/mascot-worried.png" alt="" style="width:100%;height:100%;object-fit:contain"/>
+          </div>
+          <div class="mini-cal-body">
+            <div class="l1">D-4 · 25일 토</div>
+            <div class="l2">채식주의자 반납 · 중구립</div>
+          </div>
+          <div class="mini-cal-arrow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+
+        <div class="sec-head">
+          <h3>모임 친구들</h3>
+          <span class="more">전체 보기</span>
+        </div>
+
+        <div class="com-full">
+          <div class="com-post">
+            <div class="com-post-head">
+              <div class="avatar">유</div>
+              <div class="info">
+                <div class="name">유진 · 책 읽는 밤</div>
+                <div class="meta">2시간 전 · 채식주의자 p.189</div>
+              </div>
+            </div>
+            <div class="com-post-body">
+              3부 끝나고 한참 멍하게 앉아있었어요.
+              <div class="quote">"누구도 그녀를 도울 수 없다는 것을 그는 알고 있었다."</div>
+            </div>
+            <div class="com-post-actions">
+              <div class="com-action">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                공감 4
+              </div>
+              <div class="com-action">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                댓글 2
+              </div>
+            </div>
+          </div>
+
+          <div class="com-post">
+            <div class="com-post-head">
+              <div class="avatar" style="background:#FBE5D3; color: var(--peach-deep)">S</div>
+              <div class="info">
+                <div class="name">soop · 책 읽는 밤</div>
+                <div class="meta">5시간 전 · 모임 공지</div>
+              </div>
+            </div>
+            <div class="com-post-body">
+              오늘 모임 전에 170쪽까지는 꼭 읽어가야지… 읽고 오시는 분 댓글로 표시해주세요.
+            </div>
+            <div class="com-post-actions">
+              <div class="com-action">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                공감 7
+              </div>
+              <div class="com-action">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                댓글 5
+              </div>
+            </div>
+          </div>
+
+          <div class="com-post">
+            <div class="com-post-head">
+              <div class="avatar" style="background:#E6DEF2; color:#6B52A3">민</div>
+              <div class="info">
+                <div class="name">민서 · 조용한 독서</div>
+                <div class="meta">어제 · 작별하지 않는다 p.42</div>
+              </div>
+            </div>
+            <div class="com-post-body">
+              한강 작가님 문장은 몇 번이고 돌아가서 다시 읽게 돼요. 이번 달 꼭 끝내고 싶어요.
+            </div>
+          </div>
+        </div>
+
+        <div style="height: 72px"></div>
+      </div>
+
+      <div class="float-cta">
+        <div class="float-cta-cover"></div>
+        <div class="float-cta-body">
+          <div class="t1">이어읽기 · p.137</div>
+          <div class="t2">채식주의자</div>
+          <div class="t3">62% · 10쪽만 더</div>
+        </div>
+        <div class="float-cta-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+
+      <div class="tabbar">
+        <div class="tab active">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/></svg>
+          홈
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
+          캘린더
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+          서재
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          모임
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg>
+          내정보
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">C · 완독콩 + 커뮤니티<span class="sub">느슨하게 연결되고 싶은 사용자</span></div>
+  </div>
+
+</div>
+
+<section class="notes">
+  <div class="note">
+    <h4>A · 캘린더 중심</h4>
+    <p>홈 진입 직후 월 캘린더가 가장 크게. 읽은 날(민트) · 모임(피치) · 위시책(민트 닷) · 반납(레드) 4종 도트로 일정을 한눈에 코딩했어요.</p>
+    <ul>
+      <li>다가오는 일정 카드 3장: D-day와 태그 색이 바로 읽혀요</li>
+      <li>이어읽기는 민트 mini 카드로 축소 (CTA는 유지)</li>
+      <li>모임·약속이 많은 2030 대상</li>
+    </ul>
+  </div>
+  <div class="note">
+    <h4>B · 이어읽기 중심</h4>
+    <p>홈에 들어오면 어제 덮었던 문장이 그대로 펼쳐져요. Gaegu 서체 인용구가 "방금 덮은 책을 다시 여는" 감각을 살려요.</p>
+    <ul>
+      <li>7일 스트릭 스트립으로 가벼운 리듬 확인</li>
+      <li>일정은 chip으로 축소, 이어읽기 방해 ×</li>
+      <li>매일 조금씩 꾸준히 읽는 3040</li>
+    </ul>
+  </div>
+  <div class="note">
+    <h4>C · 완독콩 + 커뮤니티</h4>
+    <p>완독콩이 먼저 말을 걸고, 바로 아래에 친구들 피드. 이어읽기는 하단 플로팅 CTA로 언제나 손 닿는 곳에.</p>
+    <ul>
+      <li>혼자보다 같이 읽고 싶을 때 효과적</li>
+      <li>공감·댓글 수 노출로 대화 유도</li>
+      <li>느슨한 커뮤니티 지향 20·30</li>
+    </ul>
+  </div>
+</section>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    var buttons = document.querySelectorAll('[data-theme-btn]');
+
+    // 초기 상태: mint
+    if (!root.getAttribute('data-theme')) {
+      root.setAttribute('data-theme', 'mint');
+    }
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var theme = btn.getAttribute('data-theme-btn');
+        root.setAttribute('data-theme', theme);
+        buttons.forEach(function (b) {
+          var isActive = (b === btn);
+          b.classList.toggle('active', isActive);
+          b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>

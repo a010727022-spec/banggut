@@ -1,0 +1,1064 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>방긋 · 포커스 히어로 v7.2 — Dial · Rose & Record</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;0,900;1,600&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<style>
+  :root {
+    /* ——— Canvas ——— */
+    --bg:          #F5EEDE;
+    --paper:       #FFFDF6;
+    --paper-warm:  #FBF4DF;
+    --ink:         #2B2420;
+    --ink-soft:    #5A4A3C;
+    --ink-mute:    #8A7862;
+    --ink-faint:   #BDAE94;
+    --bd:          #E7D9B6;
+    --bd-soft:     #EFE4C7;
+    --hairline:    #E8DCBD;
+
+    /* ——— Primary accent (brand sage · 자유 모드) ——— */
+    --sage:        #5FA48E;
+    --sage-deep:   #3E7E6A;
+    --sage-ink:    #264E42;
+    --sage-soft:   #D8EAE1;
+    --sage-bg:     #EDF4F0;
+
+    /* ——— Pomodoro accent (민트와 어울리는 블러시 로즈) ——— */
+    --rose:        #D99CAB;
+    --rose-deep:   #B77485;
+    --rose-ink:    #8F4D5E;
+    --rose-soft:   #F5D6DE;
+    --rose-bg:     #FBEEF2;
+
+    /* ——— Dial specific ——— */
+    --dial-track:  #EADCBF;
+    --dial-face:   #FBF5E4;
+
+    /* ——— Elevation ——— */
+    --shadow-card: 0 1px 0 rgba(43,36,32,.04), 2px 3px 0 rgba(43,36,32,.08);
+    --shadow-cta:  0 1px 0 rgba(43,36,32,.06), 2px 4px 0 rgba(62,126,106,.28);
+    --shadow-cta-rose: 0 1px 0 rgba(43,36,32,.06), 2px 4px 0 rgba(183,116,133,.32);
+    --shadow-soft: 0 10px 28px rgba(43,36,32,.08);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, system-ui, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(#E1D3B0 1px, transparent 1px) 0 0 / 22px 22px,
+      linear-gradient(180deg, #F8F1DF 0%, #F2E8CE 100%);
+    min-height: 100vh;
+    padding: 56px 24px 96px;
+    letter-spacing: -0.01em;
+  }
+
+  .page { max-width: 1280px; margin: 0 auto; }
+
+  /* ═══ Header ═══ */
+  .page-hd { text-align: center; margin-bottom: 32px; }
+  .page-hd .kicker {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 5px 13px;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 100px;
+    font-family: 'Gaegu', cursive;
+    font-size: 13.5px; font-weight: 700; color: var(--ink);
+    margin-bottom: 18px;
+    box-shadow: var(--shadow-card);
+  }
+  .page-hd .kicker .sage-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--sage); }
+  .page-hd .kicker .rose-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--rose); }
+  .page-hd h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 44px;
+    letter-spacing: -0.025em;
+    margin: 0 0 10px;
+    line-height: 1.08;
+  }
+  .page-hd h1 em.sage { font-style: italic; font-weight: 700; color: var(--sage-ink); }
+  .page-hd h1 em.rose { font-style: italic; font-weight: 700; color: var(--rose-ink); }
+  .page-hd p { color: var(--ink-soft); font-size: 15px; margin: 0 auto; line-height: 1.6; max-width: 560px; }
+
+  .team-note {
+    max-width: 820px;
+    margin: 22px auto 0;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 14px;
+    padding: 14px 22px;
+    font-size: 12.5px; line-height: 1.65; color: var(--ink-soft);
+    box-shadow: var(--shadow-card);
+  }
+  .team-note b { color: var(--ink); font-weight: 700; }
+  .team-note b.sage { color: var(--sage-deep); }
+  .team-note b.rose { color: var(--rose-deep); }
+  .team-note .arrow { color: var(--ink-mute); font-weight: 700; }
+
+  /* ═══ Phones ═══ */
+  .phones { display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; margin-top: 48px; }
+  .phone-wrap { width: 360px; position: relative; }
+  .phone-tag {
+    position: absolute; top: -28px; left: 50%; transform: translateX(-50%);
+    background: var(--ink); color: var(--paper);
+    font-family: 'Gaegu', cursive; font-size: 13px;
+    padding: 4px 14px; border-radius: 100px; font-weight: 700;
+    white-space: nowrap; z-index: 3; letter-spacing: 0.02em;
+  }
+  .phone-tag .num { color: var(--sage-soft); margin-right: 6px; }
+  .phone-tag.rose .num { color: var(--rose-soft); }
+
+  .phone {
+    width: 360px; height: 812px;
+    background: #FAF4E4;
+    border-radius: 44px;
+    border: 10px solid #2B2420;
+    position: relative; overflow: hidden;
+    box-shadow: 0 22px 48px rgba(43,36,32,.16), 0 4px 12px rgba(43,36,32,.06);
+  }
+  .phone::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: radial-gradient(#E5D6B1 1px, transparent 1px);
+    background-size: 20px 20px; opacity: 0.4; pointer-events: none; z-index: 0;
+  }
+  .phone::after {
+    content: ''; position: absolute; top: 10px; left: 50%;
+    transform: translateX(-50%); width: 110px; height: 24px;
+    background: #2B2420; border-radius: 100px; z-index: 10;
+  }
+  .screen {
+    position: relative; width: 100%; height: 100%; z-index: 1;
+    padding: 44px 18px 18px;
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+
+  /* ═══ Status bar ═══ */
+  .status-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px; font-weight: 700; color: var(--ink);
+    padding: 0 14px; margin-bottom: 12px;
+  }
+  .status-bar .time { font-family: 'Fraunces', serif; font-size: 13px; font-weight: 600; }
+  .status-bar .icons { display: flex; gap: 5px; align-items: center; opacity: 0.8; }
+
+  /* ═══ Top bar ═══ */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2px 14px;
+  }
+  .topbar .back, .topbar .more {
+    width: 36px; height: 36px; border-radius: 50%; border: none;
+    background: transparent; color: var(--ink); font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .topbar .title { font-size: 13px; color: var(--ink-mute); font-weight: 600; letter-spacing: 0.02em; }
+
+  /* ═══ Book rail ═══ */
+  .book-rail {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+    background: var(--paper);
+    border: 1.5px solid var(--hairline);
+    border-radius: 14px;
+    margin: 0 2px 14px;
+  }
+  .book-rail .cover {
+    width: 40px; height: 56px;
+    background: linear-gradient(152deg, var(--sage) 0%, var(--sage-deep) 100%);
+    border-radius: 4px; flex-shrink: 0; position: relative;
+    box-shadow: inset -2px 0 0 rgba(0,0,0,0.06);
+  }
+  .book-rail .cover::after {
+    content: ''; position: absolute; left: 4px; top: 6px; bottom: 6px;
+    width: 1.5px; background: rgba(255,255,255,0.22);
+  }
+  .book-rail .cover .cover-title {
+    position: absolute; inset: 0; padding: 6px 4px;
+    color: #fff; font-family: 'Fraunces', serif;
+    font-size: 7px; font-weight: 700; line-height: 1.15;
+    text-align: center; opacity: 0.85;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .book-rail .meta { flex: 1; min-width: 0; }
+  .book-rail .meta .t {
+    font-size: 14.5px; font-weight: 700; color: var(--ink);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .book-rail .meta .s {
+    font-size: 11.5px; color: var(--ink-mute); margin-top: 2px;
+  }
+  .book-rail .pct {
+    font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700;
+    color: var(--sage-deep); font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+
+  /* ═══ Greeting row (small mascot + bubble) ═══ */
+  .greet-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 2px 4px 12px;
+  }
+  .greet-row .mascot {
+    width: 44px; height: 44px;
+    background: url('/mascot-morning.png') center / contain no-repeat;
+    filter: drop-shadow(2px 3px 0 rgba(43,36,32,.12));
+    animation: fs-bob 3.2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  @keyframes fs-bob {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    50%      { transform: translateY(-4px) rotate(-2deg); }
+  }
+  .greet-row .bubble { flex: 1; }
+  .greet-row .bubble .hi {
+    font-size: 12px; color: var(--ink-mute); font-weight: 600; letter-spacing: 0.01em;
+  }
+  .greet-row .bubble .ask {
+    font-family: 'Fraunces', serif;
+    font-size: 17px; font-weight: 700; color: var(--ink);
+    letter-spacing: -0.015em; margin-top: 1px;
+  }
+  .greet-row .bubble .ask em { font-style: normal; color: var(--rose-deep); }
+
+  /* ═══ Dial (hero) ═══ */
+  .dial-wrap {
+    position: relative;
+    width: 220px; height: 220px;
+    margin: 2px auto 0;
+  }
+  .dial-wrap svg {
+    width: 100%; height: 100%; display: block;
+    transform: rotate(-90deg);
+  }
+  .dial-wrap .face-bg { fill: var(--dial-face); stroke: var(--hairline); stroke-width: 1; }
+  .dial-wrap .track   { fill: none; stroke: var(--dial-track); stroke-width: 10; stroke-linecap: round; }
+  .dial-wrap .arc     { fill: none; stroke: var(--rose); stroke-width: 10; stroke-linecap: round;
+                        transition: stroke-dashoffset .6s cubic-bezier(0.22,1,0.36,1); }
+  .dial-wrap .ticks circle { fill: var(--ink-faint); }
+  .dial-wrap .ticks .t-major { fill: var(--ink-soft); }
+
+  .dial-center {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    pointer-events: none;
+  }
+  .dial-num {
+    font-family: 'Fraunces', serif; font-weight: 700;
+    font-size: 70px; color: var(--ink);
+    letter-spacing: -0.04em; line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .dial-unit {
+    font-size: 12px; color: var(--ink-mute);
+    font-weight: 600; margin-top: 2px; letter-spacing: 0.08em;
+  }
+  .dial-sub {
+    font-size: 10px; color: var(--ink-faint); font-weight: 600;
+    margin-top: 5px; letter-spacing: 0.02em;
+  }
+
+  /* ═══ Chips (time preset) ═══ */
+  .chips {
+    display: flex; gap: 8px; justify-content: center;
+    margin-top: 18px; padding: 0 2px;
+  }
+  .chip {
+    flex: 1;
+    padding: 9px 6px 8px;
+    border-radius: 14px;
+    background: var(--paper);
+    border: 1.5px solid var(--bd-soft);
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .chip .num {
+    font-family: 'Fraunces', serif; font-weight: 700;
+    font-size: 16px; color: var(--ink); letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .chip .sub { font-size: 10px; color: var(--ink-mute); font-weight: 600; letter-spacing: 0.02em; }
+  .chip.active {
+    background: var(--rose);
+    border-color: var(--rose);
+    box-shadow: 2px 3px 0 rgba(183,116,133,.28);
+  }
+  .chip.active .num,
+  .chip.active .sub { color: #fff; }
+  .chip.active .sub { opacity: 0.88; }
+
+  /* ═══ CTA ═══ */
+  .cta-row { margin-top: 12px; padding: 0 2px; }
+  .cta-start {
+    width: 100%; height: 52px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none; border-radius: 100px;
+    font-size: 14.5px; font-weight: 700; letter-spacing: -0.005em;
+    cursor: pointer;
+    box-shadow: var(--shadow-cta-rose);
+  }
+  .cta-start .play {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--rose);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 9px;
+  }
+  .cta-start .label-min {
+    font-family: 'Fraunces', serif; font-weight: 700;
+    color: var(--rose-soft); font-size: 12.5px; margin-left: 2px;
+  }
+
+  /* ═══ Quick record (타이머 없이 쪽수만 · NEW) ═══ */
+  .quick-record {
+    margin-top: 10px; padding: 0 2px;
+  }
+  .quick-record .qrow {
+    width: 100%;
+    display: flex; align-items: center; gap: 10px;
+    background: var(--paper);
+    border: 1.5px dashed var(--bd);
+    border-radius: 14px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .quick-record .qrow:hover {
+    border-color: var(--ink-mute);
+    background: var(--paper-warm);
+  }
+  .quick-record .qrow .qicon {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: var(--sage-bg);
+    color: var(--sage-deep);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 14px;
+  }
+  .quick-record .qrow .qtxt { flex: 1; min-width: 0; }
+  .quick-record .qrow .qt {
+    font-size: 13px; font-weight: 700; color: var(--ink);
+    letter-spacing: -0.005em;
+  }
+  .quick-record .qrow .qs {
+    font-size: 10.5px; color: var(--ink-mute); font-weight: 600;
+    margin-top: 1px;
+  }
+  .quick-record .qrow .qarr {
+    color: var(--ink-mute); font-size: 14px; flex-shrink: 0;
+  }
+
+  /* ═══ Mode toggle ═══ */
+  .mode-row {
+    margin-top: 10px;
+    display: flex; justify-content: center;
+  }
+  .seg {
+    display: inline-flex; padding: 3px;
+    background: var(--paper);
+    border: 1.5px solid var(--hairline);
+    border-radius: 100px;
+    gap: 2px;
+  }
+  .seg button {
+    padding: 6px 14px;
+    border: none; background: transparent;
+    font-size: 11.5px; font-weight: 600; color: var(--ink-mute);
+    border-radius: 100px; cursor: pointer;
+    letter-spacing: 0.01em;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .seg button.on-rose {
+    background: var(--rose-deep);
+    color: #fff;
+  }
+  .seg button.on-sage {
+    background: var(--sage-deep);
+    color: #fff;
+  }
+  .seg button .gl { font-family: 'Fraunces', serif; font-style: italic; font-weight: 600; }
+
+  /* ═══ Phone B (running) specific ═══ */
+  .run-topcard {
+    background: var(--rose-bg);
+    border: 1.5px solid var(--rose-soft);
+    border-radius: 14px;
+    padding: 10px 14px;
+    margin: 0 2px 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .run-topcard .dot-pulse {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--rose-deep);
+    animation: pulse 1.6s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50%      { opacity: 1; transform: scale(1.2); }
+  }
+  .run-topcard .t { font-size: 12px; color: var(--rose-ink); font-weight: 700; }
+  .run-topcard .s { font-size: 10.5px; color: var(--ink-mute); font-weight: 600; margin-left: auto; font-variant-numeric: tabular-nums; }
+
+  .run-dial-wrap {
+    position: relative;
+    width: 260px; height: 260px;
+    margin: 4px auto 0;
+  }
+  .run-dial-wrap svg { transform: rotate(-90deg); }
+  .run-dial-wrap .face-bg { fill: var(--dial-face); stroke: var(--hairline); stroke-width: 1; }
+  .run-dial-wrap .track   { fill: none; stroke: var(--dial-track); stroke-width: 12; stroke-linecap: round; }
+  .run-dial-wrap .arc     { fill: none; stroke: var(--rose); stroke-width: 12; stroke-linecap: round; }
+
+  .run-mascot {
+    position: absolute; top: 32px; left: 50%; transform: translateX(-50%);
+    width: 60px; height: 60px;
+    background: url('/mascot-read.png') center / contain no-repeat;
+    filter: drop-shadow(2px 3px 0 rgba(43,36,32,.1));
+    animation: fs-breath 4.2s ease-in-out infinite;
+    z-index: 2;
+  }
+  @keyframes fs-breath {
+    0%, 100% { transform: translateX(-50%) scale(1); }
+    50%      { transform: translateX(-50%) scale(1.035); }
+  }
+
+  .run-center {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding-top: 66px;
+    pointer-events: none;
+  }
+  .run-time {
+    font-family: 'Fraunces', serif; font-weight: 700;
+    font-size: 50px; color: var(--ink);
+    letter-spacing: -0.045em; line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .run-meta {
+    font-size: 11px; color: var(--ink-mute); font-weight: 600;
+    margin-top: 8px; letter-spacing: 0.01em;
+  }
+  .run-meta b { color: var(--rose-deep); font-weight: 700; font-family: 'Fraunces', serif; }
+
+  .run-hint {
+    margin-top: 14px; text-align: center;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    font-size: 10.5px; color: var(--ink-mute); font-weight: 600;
+  }
+  .run-hint .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--rose); }
+
+  .run-actions {
+    margin-top: auto; padding: 12px 2px 0;
+    display: flex; gap: 10px;
+  }
+  .run-actions .btn {
+    flex: 1; height: 48px;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    border-radius: 100px; border: none;
+    font-size: 13px; font-weight: 700;
+    cursor: pointer;
+  }
+  .btn-pause {
+    background: var(--paper);
+    border: 1.5px solid var(--bd-soft) !important;
+    color: var(--ink);
+  }
+  .btn-complete {
+    background: var(--rose-deep); color: #fff;
+    box-shadow: var(--shadow-cta-rose);
+  }
+  .btn-abort {
+    background: transparent; color: var(--ink-mute);
+    border: 1.5px solid var(--bd-soft) !important;
+    font-weight: 600 !important;
+    font-size: 11.5px !important;
+    white-space: nowrap;
+    padding: 0 22px !important;
+  }
+
+  /* ═══ Phone C (쪽수 기록 시트) ═══ */
+  .phone-dim {
+    position: absolute; inset: 0;
+    background: rgba(43,36,32,.38);
+    z-index: 5;
+    pointer-events: none;
+  }
+  .sheet {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    background: var(--paper);
+    border-radius: 24px 24px 0 0;
+    padding: 12px 18px 22px;
+    z-index: 6;
+    box-shadow: 0 -12px 40px rgba(43,36,32,.18);
+    display: flex; flex-direction: column;
+  }
+  .sheet-handle {
+    width: 44px; height: 4px; background: var(--bd);
+    border-radius: 2px; margin: 0 auto 14px;
+  }
+  .sheet-hd {
+    text-align: center; padding: 0 4px 14px;
+  }
+  .sheet-hd .mini-mascot {
+    width: 40px; height: 40px; margin: 0 auto 8px;
+    background: url('/mascot-read.png') center / contain no-repeat;
+    filter: drop-shadow(2px 3px 0 rgba(43,36,32,.1));
+  }
+  .sheet-hd .ttl {
+    font-family: 'Fraunces', serif; font-weight: 700; font-size: 19px;
+    color: var(--ink); letter-spacing: -0.02em;
+  }
+  .sheet-hd .sub {
+    font-size: 11.5px; color: var(--ink-mute); font-weight: 600;
+    margin-top: 4px;
+  }
+  .sheet-hd .sub b { color: var(--sage-deep); font-weight: 700; font-family: 'Fraunces', serif; }
+
+  .page-stepper {
+    display: flex; align-items: center; justify-content: center;
+    gap: 14px;
+    padding: 14px 8px;
+    margin: 0 2px 10px;
+    background: var(--paper-warm);
+    border: 1.5px solid var(--bd-soft);
+    border-radius: 16px;
+  }
+  .page-stepper button {
+    width: 40px; height: 40px;
+    border-radius: 50%; border: 1.5px solid var(--bd);
+    background: var(--paper);
+    font-size: 18px; font-weight: 700; color: var(--ink-soft);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .page-stepper .pg {
+    font-family: 'Fraunces', serif; font-weight: 700;
+    font-size: 54px; color: var(--ink); letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    min-width: 90px; text-align: center;
+  }
+  .page-stepper .pg-unit {
+    font-size: 13px; color: var(--ink-mute); font-weight: 600;
+    margin-top: 8px; font-family: 'Pretendard Variable', sans-serif;
+    letter-spacing: 0;
+  }
+
+  .delta-row {
+    display: flex; gap: 6px; padding: 0 2px;
+    margin-bottom: 10px;
+  }
+  .delta-chip {
+    flex: 1;
+    padding: 8px 4px;
+    background: var(--paper);
+    border: 1.5px solid var(--bd-soft);
+    border-radius: 10px;
+    font-size: 11.5px; font-weight: 700; color: var(--ink);
+    font-family: 'Fraunces', serif; letter-spacing: -0.01em;
+    text-align: center; cursor: pointer;
+  }
+  .delta-chip b { font-weight: 700; color: var(--sage-deep); }
+
+  .sheet-slider {
+    padding: 14px 4px 6px;
+    margin-bottom: 14px;
+  }
+  .sheet-slider .track-row {
+    position: relative;
+    height: 6px;
+    background: var(--bd-soft);
+    border-radius: 3px;
+  }
+  .sheet-slider .fill {
+    position: absolute; left: 0; top: 0;
+    height: 100%; width: 34.7%; /* 157 / 452 */
+    background: var(--sage);
+    border-radius: 3px;
+  }
+  .sheet-slider .knob {
+    position: absolute; left: 34.7%; top: 50%;
+    width: 18px; height: 18px;
+    transform: translate(-50%, -50%);
+    background: var(--paper); border: 2.5px solid var(--sage-deep);
+    border-radius: 50%;
+    box-shadow: 0 1px 4px rgba(43,36,32,.12);
+  }
+  .sheet-slider .ranges {
+    display: flex; justify-content: space-between;
+    margin-top: 10px;
+    font-size: 10px; color: var(--ink-mute); font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .sheet-actions {
+    display: flex; gap: 8px;
+    margin-top: auto;
+  }
+  .sheet-save {
+    flex: 1; height: 50px;
+    background: var(--sage-deep);
+    color: #fff; border: none; border-radius: 100px;
+    font-size: 14px; font-weight: 700; letter-spacing: -0.005em;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    box-shadow: var(--shadow-cta);
+  }
+  .sheet-save .check {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: rgba(255,255,255,.2); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+  }
+  .sheet-also {
+    flex: 0 0 auto; height: 50px; padding: 0 14px;
+    background: transparent; border: 1.5px solid var(--bd);
+    color: var(--ink-soft); font-size: 11.5px; font-weight: 700;
+    border-radius: 100px; cursor: pointer;
+  }
+
+  /* ═══ Notes footer ═══ */
+  .impl-notes {
+    max-width: 980px; margin: 80px auto 0;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 18px;
+    padding: 28px 32px;
+    box-shadow: var(--shadow-card);
+  }
+  .impl-notes h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 22px; font-weight: 700;
+    margin: 0 0 8px; letter-spacing: -0.02em;
+  }
+  .impl-notes h2 em.sage { font-style: italic; color: var(--sage-deep); }
+  .impl-notes h2 em.rose { font-style: italic; color: var(--rose-deep); }
+  .impl-notes p { font-size: 13.5px; line-height: 1.7; color: var(--ink-soft); margin: 0 0 12px; }
+  .impl-notes table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+  .impl-notes th, .impl-notes td {
+    padding: 10px 8px; text-align: left;
+    border-bottom: 1px dashed var(--hairline);
+    font-size: 12.5px; line-height: 1.55;
+    vertical-align: top;
+  }
+  .impl-notes th {
+    color: var(--ink-mute); font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    font-size: 10.5px; border-bottom: 1.5px solid var(--ink);
+  }
+  .impl-notes td code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11.5px; color: var(--ink);
+    background: var(--sage-bg); padding: 1px 6px; border-radius: 5px;
+  }
+  .impl-notes td code.rose { color: var(--rose-ink); background: var(--rose-bg); }
+  .impl-notes .check { color: var(--sage-deep); font-weight: 700; }
+  .impl-notes .check.rose { color: var(--rose-deep); }
+
+  .palette {
+    display: flex; gap: 10px; margin: 14px 0 6px; flex-wrap: wrap;
+  }
+  .palette .sw {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px;
+    background: var(--paper-warm);
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+    font-size: 11.5px; font-weight: 600; color: var(--ink-soft);
+    font-family: ui-monospace, monospace;
+  }
+  .palette .sw .box {
+    width: 18px; height: 18px; border-radius: 4px;
+    border: 1px solid rgba(43,36,32,.12);
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- ═══════════════════ Header ═══════════════════ -->
+    <header class="page-hd">
+      <span class="kicker">
+        <span class="sage-dot"></span>
+        <span class="rose-dot"></span>
+        v7.2 · dial · rose + 쪽수 기록
+      </span>
+      <h1>뽀모도로는 <em class="rose">로즈</em>, 자유는 <em class="sage">민트</em></h1>
+      <p>
+        두 모드가 색으로 구분돼요. 그리고 타이머 없이 <b>쪽수만 빠르게 기록</b>하는 길도 카드 안에서 열려요.<br>
+        민트와 블러시는 서로의 온도를 잡아주는 클래식 조합입니다.
+      </p>
+      <div class="team-note">
+        <b class="rose">Rose 팔레트</b> <span class="arrow">→</span>
+        #D99CAB (base) · #B77485 (deep) · #8F4D5E (ink) · #F5D6DE (soft) · #FBEEF2 (bg) —
+        <b>민트 #5FA48E</b>과 같은 채도/명도 레이어. 호·CTA·배지에만 소량 사용.
+        <b class="sage">Sage</b>는 책·진행률·"자유" 모드 쪽에 남겨둬요.
+      </div>
+    </header>
+
+    <!-- ═══════════════════ Phones ═══════════════════ -->
+    <div class="phones">
+
+      <!-- ───── Phone A · 시작 전 (dial idle · 뽀모도로) ───── -->
+      <div class="phone-wrap">
+        <div class="phone-tag rose"><span class="num">A</span>시작 전 · 뽀모도로 idle</div>
+        <div class="phone">
+          <div class="screen">
+
+            <div class="status-bar">
+              <span class="time">9:41</span>
+              <span class="icons">● 5G ▪▪▪▪▫</span>
+            </div>
+
+            <div class="topbar">
+              <button class="back">←</button>
+              <span class="title">나미야 잡화점의 기적</span>
+              <button class="more">⋯</button>
+            </div>
+
+            <div class="book-rail">
+              <div class="cover"><div class="cover-title">나미야<br>잡화점의<br>기적</div></div>
+              <div class="meta">
+                <div class="t">나미야 잡화점의 기적</div>
+                <div class="s">142 / 452쪽 · 31%</div>
+              </div>
+              <div class="pct">31%</div>
+            </div>
+
+            <div class="greet-row">
+              <div class="mascot"></div>
+              <div class="bubble">
+                <div class="hi">좋은 아침이에요, 지선님</div>
+                <div class="ask">오늘은 <em>25분</em> 어때요?</div>
+              </div>
+            </div>
+
+            <!-- dial -->
+            <div class="dial-wrap">
+              <svg viewBox="0 0 220 220">
+                <circle class="face-bg" cx="110" cy="110" r="104"></circle>
+                <g class="ticks">
+                  <circle class="t-major" cx="110" cy="14" r="2.5"></circle>
+                  <circle class="t-major" cx="206" cy="110" r="2.5"></circle>
+                  <circle class="t-major" cx="110" cy="206" r="2.5"></circle>
+                  <circle class="t-major" cx="14" cy="110" r="2.5"></circle>
+                  <circle cx="158" cy="26" r="1.5"></circle>
+                  <circle cx="194" cy="62" r="1.5"></circle>
+                  <circle cx="194" cy="158" r="1.5"></circle>
+                  <circle cx="158" cy="194" r="1.5"></circle>
+                  <circle cx="62" cy="194" r="1.5"></circle>
+                  <circle cx="26" cy="158" r="1.5"></circle>
+                  <circle cx="26" cy="62" r="1.5"></circle>
+                  <circle cx="62" cy="26" r="1.5"></circle>
+                </g>
+                <!-- track r=88 · circumference 2π·88 = 552.92 -->
+                <circle class="track" cx="110" cy="110" r="88"></circle>
+                <!-- arc for 25/60 = 41.67% → filled 230.38 -->
+                <circle class="arc" cx="110" cy="110" r="88"
+                        stroke-dasharray="230.38 552.92"
+                        stroke-dashoffset="0"></circle>
+              </svg>
+              <div class="dial-center">
+                <div class="dial-num">25</div>
+                <div class="dial-unit">분</div>
+                <div class="dial-sub">뽀모도로 한 라운드</div>
+              </div>
+            </div>
+
+            <!-- chips -->
+            <div class="chips">
+              <div class="chip"><div class="num">15</div><div class="sub">짧게</div></div>
+              <div class="chip active"><div class="num">25</div><div class="sub">집중</div></div>
+              <div class="chip"><div class="num">45</div><div class="sub">깊이</div></div>
+            </div>
+
+            <!-- CTA -->
+            <div class="cta-row">
+              <button class="cta-start">
+                <span class="play">▶</span>
+                시작하기
+                <span class="label-min">· 25분</span>
+              </button>
+            </div>
+
+            <!-- QUICK RECORD (NEW) -->
+            <div class="quick-record">
+              <div class="qrow">
+                <div class="qicon">✎</div>
+                <div class="qtxt">
+                  <div class="qt">타이머 없이 · 쪽수만 기록</div>
+                  <div class="qs">이미 읽었다면 분량만 빠르게 저장해요</div>
+                </div>
+                <div class="qarr">→</div>
+              </div>
+            </div>
+
+            <!-- mode toggle -->
+            <div class="mode-row">
+              <div class="seg">
+                <button class="on-rose"><span class="gl">⌛</span> 뽀모도로</button>
+                <button><span class="gl">∞</span> 자유</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ───── Phone B · 진행 중 (dial running) ───── -->
+      <div class="phone-wrap">
+        <div class="phone-tag rose"><span class="num">B</span>진행 중 · dial running</div>
+        <div class="phone">
+          <div class="screen">
+
+            <div class="status-bar">
+              <span class="time">9:48</span>
+              <span class="icons">● 5G ▪▪▪▪▫</span>
+            </div>
+
+            <div class="topbar">
+              <button class="back">←</button>
+              <span class="title">집중 중</span>
+              <button class="more">⋯</button>
+            </div>
+
+            <div class="book-rail">
+              <div class="cover"><div class="cover-title">나미야<br>잡화점의<br>기적</div></div>
+              <div class="meta">
+                <div class="t">나미야 잡화점의 기적</div>
+                <div class="s">현재 145쪽 · 방금 3쪽</div>
+              </div>
+              <div class="pct">32%</div>
+            </div>
+
+            <div class="run-topcard">
+              <span class="dot-pulse"></span>
+              <span class="t">뽀모도로 25분 · 1 라운드</span>
+              <span class="s">오늘 2번째</span>
+            </div>
+
+            <div class="run-dial-wrap">
+              <svg viewBox="0 0 260 260">
+                <circle class="face-bg" cx="130" cy="130" r="124"></circle>
+                <g>
+                  <circle cx="130" cy="14" r="2" fill="var(--ink-soft)"></circle>
+                  <circle cx="246" cy="130" r="2" fill="var(--ink-soft)"></circle>
+                  <circle cx="130" cy="246" r="2" fill="var(--ink-soft)"></circle>
+                  <circle cx="14" cy="130" r="2" fill="var(--ink-soft)"></circle>
+                </g>
+                <!-- track r=106 · circumference 666.02 -->
+                <circle class="track" cx="130" cy="130" r="106"></circle>
+                <!-- elapsed 25% → 166.5 filled -->
+                <circle class="arc" cx="130" cy="130" r="106"
+                        stroke-dasharray="498.4 666.02"
+                        stroke-dashoffset="0"></circle>
+              </svg>
+              <div class="run-mascot"></div>
+              <div class="run-center">
+                <div class="run-time">18:42</div>
+                <div class="run-meta">남은 시간 · 진행 <b>00:07:18</b></div>
+              </div>
+            </div>
+
+            <div class="run-hint">
+              <span class="dot"></span>
+              방해 금지 · 알림 잠시 꺼뒀어요
+            </div>
+
+            <div class="run-actions">
+              <button class="btn btn-pause">⏸ 잠시 멈춤</button>
+              <button class="btn btn-complete">✓ 완료하기</button>
+            </div>
+            <div style="display:flex; justify-content:center; margin-top:8px;">
+              <button class="btn btn-abort" style="height:32px;">세션 버리기</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ───── Phone C · 쪽수만 기록 시트 ───── -->
+      <div class="phone-wrap">
+        <div class="phone-tag"><span class="num">C</span>쪽수만 기록 · bottom sheet</div>
+        <div class="phone">
+          <!-- 뒷면 (살짝 dim) -->
+          <div class="screen" style="filter: saturate(0.86);">
+            <div class="status-bar">
+              <span class="time">9:41</span>
+              <span class="icons">● 5G ▪▪▪▪▫</span>
+            </div>
+            <div class="topbar">
+              <button class="back">←</button>
+              <span class="title">나미야 잡화점의 기적</span>
+              <button class="more">⋯</button>
+            </div>
+            <div class="book-rail">
+              <div class="cover"><div class="cover-title">나미야<br>잡화점의<br>기적</div></div>
+              <div class="meta">
+                <div class="t">나미야 잡화점의 기적</div>
+                <div class="s">142 / 452쪽 · 31%</div>
+              </div>
+              <div class="pct">31%</div>
+            </div>
+            <div class="dial-wrap" style="opacity: 0.55; width: 180px; height: 180px;">
+              <svg viewBox="0 0 220 220">
+                <circle class="face-bg" cx="110" cy="110" r="104"></circle>
+                <circle class="track" cx="110" cy="110" r="88"></circle>
+                <circle class="arc" cx="110" cy="110" r="88" stroke-dasharray="230.38 552.92"></circle>
+              </svg>
+              <div class="dial-center">
+                <div class="dial-num" style="font-size: 56px;">25</div>
+                <div class="dial-unit">분</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- overlay dim -->
+          <div class="phone-dim"></div>
+
+          <!-- bottom sheet -->
+          <div class="sheet">
+            <div class="sheet-handle"></div>
+
+            <div class="sheet-hd">
+              <div class="mini-mascot"></div>
+              <div class="ttl">오늘 어디까지 읽었나요?</div>
+              <div class="sub">현재 <b>142쪽</b> · 전체 452쪽</div>
+            </div>
+
+            <!-- 큰 숫자 스텝퍼 -->
+            <div class="page-stepper">
+              <button>−</button>
+              <div>
+                <div class="pg">157</div>
+                <div class="pg-unit">쪽까지 읽었어요</div>
+              </div>
+              <button>+</button>
+            </div>
+
+            <!-- 빠른 증분 칩 -->
+            <div class="delta-row">
+              <div class="delta-chip">+<b>5</b>쪽</div>
+              <div class="delta-chip">+<b>10</b>쪽</div>
+              <div class="delta-chip">+<b>20</b>쪽</div>
+              <div class="delta-chip">+<b>한 챕터</b></div>
+            </div>
+
+            <!-- 슬라이더 -->
+            <div class="sheet-slider">
+              <div class="track-row">
+                <div class="fill"></div>
+                <div class="knob"></div>
+              </div>
+              <div class="ranges">
+                <span>0</span>
+                <span>452쪽</span>
+              </div>
+            </div>
+
+            <!-- 액션 -->
+            <div class="sheet-actions">
+              <button class="sheet-save">
+                <span class="check">✓</span>
+                기록하기 · +15쪽
+              </button>
+              <button class="sheet-also">시간도 ▸</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══════════════════ Implementation notes ═══════════════════ -->
+    <section class="impl-notes">
+      <h2>v7.2 <em class="rose">dial · rose</em> + <em class="sage">쪽수 기록</em> — 코드로 옮길 때</h2>
+      <p>
+        v6 컴포넌트 구조는 유지하고, <b>모드별 색 토큰</b>과 <b>QuickRecordEntry</b> 한 덩어리만 추가해요.
+        시트는 이미 존재하는 <code>showTodayModal</code> 패턴을 Bottom Sheet 레이아웃으로 감싸기만 하면 됩니다.
+      </p>
+
+      <div class="palette">
+        <div class="sw"><span class="box" style="background:#5FA48E;"></span>#5FA48E · sage (자유 · 책)</div>
+        <div class="sw"><span class="box" style="background:#3E7E6A;"></span>#3E7E6A · sage-deep</div>
+        <div class="sw"><span class="box" style="background:#D99CAB;"></span>#D99CAB · rose (뽀모도로)</div>
+        <div class="sw"><span class="box" style="background:#B77485;"></span>#B77485 · rose-deep</div>
+        <div class="sw"><span class="box" style="background:#8F4D5E;"></span>#8F4D5E · rose-ink</div>
+        <div class="sw"><span class="box" style="background:#F5D6DE;"></span>#F5D6DE · rose-soft</div>
+      </div>
+
+      <table>
+        <thead>
+          <tr><th>목업 요소</th><th>코드 위치</th><th>변화</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>로즈 토큰 추가</b></td>
+            <td><code>app/globals.css</code> 의 <code>:root</code></td>
+            <td>
+              <code class="rose">--rose</code>, <code class="rose">--rose-deep</code>,
+              <code class="rose">--rose-soft</code>, <code class="rose">--rose-bg</code> 5종 추가.
+              dark 테마 variant는 채도 −8%, 명도 ±6%
+            </td>
+          </tr>
+          <tr>
+            <td><b>모드별 accent 스위치</b></td>
+            <td><code>FocusSessionCard</code> 내부 <code>accent = mode === 'pomo' ? rose : sage</code></td>
+            <td>dial arc, active chip, play 원, status pulse, 완료 버튼, 토글 on 색을 한 변수로 묶음</td>
+          </tr>
+          <tr>
+            <td><b>QuickRecordEntry</b> (NEW)</td>
+            <td>신규 <code>components/book-detail/QuickRecordEntry.tsx</code></td>
+            <td>dashed border 버튼 1개. onClick → <code>setShowTodayModal(true)</code>. Icon + 두 줄 카피 + arrow</td>
+          </tr>
+          <tr>
+            <td><b>쪽수 기록 Bottom Sheet</b></td>
+            <td>기존 <code>showTodayModal</code> 재설계 → <code>PageRecordSheet</code></td>
+            <td>
+              상단 핸들 · 방긋이 40px · "오늘 어디까지 읽었나요?" ·
+              스텝퍼 (−/+) · 증분 칩 4개(+5/+10/+20/+한 챕터) ·
+              슬라이더 · <b>[기록하기] [시간도 ▸]</b>
+            </td>
+          </tr>
+          <tr>
+            <td><b>+한 챕터</b> 칩</td>
+            <td><code>book.chapters</code> 데이터 없으면 숨김</td>
+            <td>Emily: "챕터 없는 책은요?" → optional chaining으로 feature-flag</td>
+          </tr>
+          <tr>
+            <td><b>"시간도 ▸"</b> 보조 액션</td>
+            <td>시트 저장 후 <code>dispatch({type:'START', duration: 0, mode: 'stopwatch'})</code></td>
+            <td>자유(스톱워치)로 이어 붙여 "내가 방금 읽은 분량 + 시간"까지 기록. 뽀모도로로는 안 이음</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p style="margin-top:18px;">
+        <b class="check rose">모드 시각 차별화</b> <span class="arrow">→</span>
+        뽀모도로 on일 때만 rose, 자유 on일 땐 sage로.
+        다이얼 위에 떠 있는 "뽀모도로 한 라운드" 서브 카피는 자유 모드일 땐 "자유 · 원하는 만큼"으로 교체.<br>
+        <b class="check">접근성</b> <span class="arrow">→</span>
+        sheet 은 <code>role="dialog"</code> + <code>aria-labelledby</code>,
+        스텝퍼는 <code>role="spinbutton"</code> + 키보드 ↑↓ 지원.
+        rose/sage 모두 텍스트 대비 4.5:1 이상 (rose-ink #8F4D5E 사용).
+      </p>
+    </section>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>방긋 — 취향 설문 v2</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;word-break:keep-all}
+body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:#DCD5CA;padding:40px 20px;min-height:100vh;color:#1c201d}
+.wrap{max-width:1280px;margin:0 auto}
+.title{font-family:'Gaegu',cursive;font-size:28px;font-weight:700;letter-spacing:0.02em;margin-bottom:6px;text-align:center}
+.sub{color:#556058;font-size:12px;text-align:center;margin-bottom:40px;font-weight:500}
+.sub em{font-style:normal;color:#4d8a72;font-weight:700}
+
+.phones{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-bottom:32px}
+
+/* ═══ 폰 ═══ */
+.phone{width:340px;height:780px;background:#F4EFE8;border-radius:48px;padding:40px 20px 28px;display:flex;flex-direction:column;box-shadow:0 0 0 3px #1a1a1a,0 0 30px rgba(0,0,0,0.1);overflow:hidden;position:relative}
+
+/* 진행 바 */
+.progress-bar{display:flex;gap:8px;margin-bottom:12px;position:relative;z-index:2}
+.progress-seg{flex:1;height:6px;border-radius:100px;background:rgba(90,110,95,0.12);transition:all 0.4s}
+.progress-seg.on{background:linear-gradient(90deg,#4d8a72,#6B9E8A);box-shadow:0 2px 8px rgba(77,138,114,0.25)}
+.progress-mascot{position:absolute;top:-32px;width:32px;height:32px;transition:left 0.5s cubic-bezier(0.34,1.56,0.64,1);filter:drop-shadow(0 4px 8px rgba(77,138,114,0.3))}
+
+/* 질문 영역 */
+.question-zone{margin-top:16px;margin-bottom:24px;display:flex;gap:14px;align-items:center;position:relative;z-index:2}
+.q-mascot{width:84px;height:84px;flex-shrink:0;animation:bounce 2.5s ease-in-out infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.q-text{flex:1}
+.q-label{display:inline-block;font-size:10px;font-weight:600;color:#4d8a72;letter-spacing:0.8px;margin-bottom:6px;background:color-mix(in srgb,#4d8a72 12%,#F4EFE8);padding:3px 10px;border-radius:100px}
+.q-title{font-family:'Gaegu',cursive;font-weight:700;font-size:22px;line-height:1.35;color:#1c201d;letter-spacing:0.01em}
+.q-hint{font-size:12px;color:#8B8B80;margin-top:8px;font-weight:400;line-height:1.5}
+
+/* 스크롤 가능 옵션 영역 */
+.options-area{flex:1;overflow-y:auto;margin:0 -4px;padding:0 4px;display:flex;flex-direction:column}
+.options-area::-webkit-scrollbar{width:0}
+
+/* 장르 그리드 — 더 곡선적이고 많은 장르 */
+.genre-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-bottom:8px}
+.genre-btn{display:flex;gap:10px;padding:14px 14px;border-radius:20px;border:1.5px solid rgba(90,110,95,0.15);background:#FFFFFF;cursor:pointer;transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);text-align:left;align-items:center;min-height:58px;box-shadow:0 2px 6px rgba(45,58,53,0.03)}
+.genre-btn:hover{border-color:rgba(77,138,114,0.4);transform:translateY(-1px);box-shadow:0 4px 12px rgba(45,58,53,0.06)}
+.genre-btn.on{border-color:#4d8a72;background:color-mix(in srgb,#4d8a72 9%,#F4EFE8);box-shadow:0 4px 14px rgba(77,138,114,0.15)}
+.genre-emoji{width:38px;height:38px;border-radius:14px;background:#EAE4DC;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;transition:all 0.2s}
+.genre-btn.on .genre-emoji{background:color-mix(in srgb,#4d8a72 18%,#EAE4DC);transform:rotate(-5deg) scale(1.05)}
+.genre-info-label{font-size:13.5px;font-weight:500;color:#1c201d;letter-spacing:-0.01em;line-height:1.2;white-space:nowrap}
+.genre-btn.on .genre-info-label{color:#4d8a72;font-weight:700}
+.genre-info-desc{font-size:10.5px;color:#8B8B80;line-height:1.3;margin-top:2px;white-space:nowrap}
+
+/* 빈도 리스트 */
+.freq-list{display:flex;flex-direction:column;gap:10px;padding-bottom:8px}
+.freq-btn{display:flex;gap:14px;padding:16px 18px;border-radius:22px;border:1.5px solid rgba(90,110,95,0.15);background:#FFFFFF;cursor:pointer;transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);text-align:left;align-items:center;box-shadow:0 2px 6px rgba(45,58,53,0.03)}
+.freq-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(45,58,53,0.06)}
+.freq-btn.on{border-color:#4d8a72;background:color-mix(in srgb,#4d8a72 9%,#F4EFE8);box-shadow:0 4px 14px rgba(77,138,114,0.15)}
+.freq-icon{width:48px;height:48px;border-radius:18px;background:#EAE4DC;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px;transition:all 0.2s}
+.freq-btn.on .freq-icon{background:color-mix(in srgb,#4d8a72 18%,#EAE4DC);transform:rotate(-5deg) scale(1.05)}
+.freq-label{font-size:15px;font-weight:500;color:#1c201d;letter-spacing:-0.01em;line-height:1.2}
+.freq-btn.on .freq-label{color:#4d8a72;font-weight:700}
+.freq-desc{font-size:12px;color:#8B8B80;margin-top:4px;line-height:1.4}
+
+/* 스타일 리스트 */
+.style-list{display:flex;flex-direction:column;gap:12px;padding-bottom:8px}
+.style-btn{display:flex;flex-direction:column;gap:12px;padding:16px 18px;border-radius:22px;border:1.5px solid rgba(90,110,95,0.15);background:#FFFFFF;cursor:pointer;transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);text-align:left;box-shadow:0 2px 6px rgba(45,58,53,0.03)}
+.style-btn.on{border-color:#4d8a72;background:color-mix(in srgb,#4d8a72 9%,#F4EFE8);box-shadow:0 4px 14px rgba(77,138,114,0.15)}
+.style-top{display:flex;align-items:center;gap:12px}
+.style-top-icon{width:42px;height:42px;border-radius:16px;background:#EAE4DC;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;transition:all 0.2s}
+.style-btn.on .style-top-icon{background:color-mix(in srgb,#4d8a72 18%,#EAE4DC);transform:rotate(-5deg) scale(1.05)}
+.style-name-wrap{flex:1;min-width:0}
+.style-name{font-size:15px;font-weight:700;color:#1c201d;line-height:1.2;margin-bottom:2px}
+.style-btn.on .style-name{color:#4d8a72}
+.style-subtitle{font-size:11.5px;color:#8B8B80;font-weight:400;line-height:1.3}
+.style-sample{border-left:2.5px solid rgba(90,110,95,0.15);padding-left:14px;font-style:italic;font-size:12px;color:#8B8B80;line-height:1.6;border-radius:2px}
+.style-btn.on .style-sample{border-color:#4d8a72}
+
+/* 다음 버튼 */
+.btn-next{margin-top:16px;width:100%;height:54px;border-radius:100px;background:linear-gradient(135deg,#4d8a72,#6B9E8A);color:#F4EFE8;font-family:'Gaegu',cursive;font-size:19px;font-weight:700;letter-spacing:0.04em;border:none;cursor:pointer;transition:all 0.25s;box-shadow:0 6px 18px rgba(77,138,114,0.3)}
+.btn-next:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(77,138,114,0.4)}
+.btn-next:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+
+.label{font-size:10px;font-weight:700;color:#8B9A3A;letter-spacing:1.5px;margin-bottom:10px;text-align:center;text-transform:uppercase}
+
+.note{margin-top:32px;padding:24px 28px;background:#FFFFFF;border:1px solid rgba(90,110,95,0.13);border-radius:20px;color:#1c201d;font-size:12px;line-height:1.85;max-width:800px;margin-left:auto;margin-right:auto;box-shadow:0 4px 16px rgba(45,58,53,0.04)}
+.note-title{font-family:'Gaegu',cursive;font-size:18px;font-weight:700;color:#4d8a72;margin-bottom:12px;letter-spacing:0.02em}
+.note strong{color:#4d8a72;font-weight:700}
+.note em{font-style:normal;color:#8B9A3A;font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title">취향 설문 v2 · 더 곡선적이게</div>
+  <div class="sub">라운드 강화 · <em>12개 장르</em> · 줄바꿈 해결 · 방긋이 통통</div>
+
+  <div class="phones">
+
+    <!-- Q1: 장르 (12개) -->
+    <div>
+      <div class="label">Step 1 · 장르</div>
+      <div class="phone">
+        <div class="progress-bar">
+          <div class="progress-seg on"></div>
+          <div class="progress-seg"></div>
+          <div class="progress-seg"></div>
+          <div class="progress-mascot" style="left:calc(33% - 16px)">
+            <img src="/logo-banggut.svg" width="32" height="32" alt="">
+          </div>
+        </div>
+
+        <div class="question-zone">
+          <div class="q-mascot">
+            <img src="/logo-banggut.svg" width="84" height="84" alt="방긋이">
+          </div>
+          <div class="q-text">
+            <span class="q-label">1 / 3</span>
+            <div class="q-title">어떤 책을<br>좋아하세요?</div>
+            <div class="q-hint">여러 개 선택 가능해요</div>
+          </div>
+        </div>
+
+        <div class="options-area">
+          <div class="genre-grid">
+            <button class="genre-btn on">
+              <div class="genre-emoji">📖</div>
+              <div>
+                <div class="genre-info-label">소설</div>
+                <div class="genre-info-desc">이야기 속으로</div>
+              </div>
+            </button>
+            <button class="genre-btn">
+              <div class="genre-emoji">🌙</div>
+              <div>
+                <div class="genre-info-label">에세이</div>
+                <div class="genre-info-desc">일상의 사색</div>
+              </div>
+            </button>
+            <button class="genre-btn on">
+              <div class="genre-emoji">📚</div>
+              <div>
+                <div class="genre-info-label">인문·사회</div>
+                <div class="genre-info-desc">세상 읽기</div>
+              </div>
+            </button>
+            <button class="genre-btn">
+              <div class="genre-emoji">🌱</div>
+              <div>
+                <div class="genre-info-label">자기계발</div>
+                <div class="genre-info-desc">성장 여정</div>
+              </div>
+            </button>
+            <button class="genre-btn">
+              <div class="genre-emoji">🔬</div>
+              <div>
+                <div class="genre-info-label">과학</div>
+                <div class="genre-info-desc">우주와 생명</div>
+              </div>
+            </button>
+            <button class="genre-btn">
+              <div class="genre-emoji">🏛</div>
+              <div>
+                <div class="genre-info-label">역사</div>
+                <div class="genre-info-desc">시간 여행</div>
+              </div>
+            </button>
+            <button class="genre-btn on">
+              <div class="genre-emoji">✨</div>
+              <div>
+                <div class="genre-info-label">웹소설</div>
+                <div class="genre-info-desc">요즘 핫한 것</div>
+              </div>
+            </button>
+            <button class="genre-btn">
+              <div class="genre-emoji">🔮</div>
+              <div>
+                <div class="genre-info-label">판타지·SF</div>
+                <div class="genre-info-desc">상상의 세계</div>
+              </div>
+            </button>
+            <button class="genre-btn">
+              <div class="genre-emoji">🕵</div>
+              <div>
+                <div class="genre-info-label">추리·스릴러</div>
+                <div class="genre-info-desc">쫄깃한 전개</div>
+              </div>
+            </button>
+            <button class="genre-btn">
+              <div class="genre-emoji">💘</div>
+              <div>
+                <div class="genre-info-label">로맨스</div>
+                <div class="genre-info-desc">설레는 만남</div>
+              </div>
+            </button>
+            <button class="genre-btn">
+              <div class="genre-emoji">💼</div>
+              <div>
+                <div class="genre-info-label">경제·경영</div>
+                <div class="genre-info-desc">돈과 일</div>
+              </div>
+            </button>
+            <button class="genre-btn">
+              <div class="genre-emoji">🎨</div>
+              <div>
+                <div class="genre-info-label">예술·시</div>
+                <div class="genre-info-desc">감각의 언어</div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <button class="btn-next">다음</button>
+      </div>
+    </div>
+
+    <!-- Q2: 빈도 -->
+    <div>
+      <div class="label">Step 2 · 빈도</div>
+      <div class="phone">
+        <div class="progress-bar">
+          <div class="progress-seg on"></div>
+          <div class="progress-seg on"></div>
+          <div class="progress-seg"></div>
+          <div class="progress-mascot" style="left:calc(66% - 16px)">
+            <img src="/logo-banggut.svg" width="32" height="32" alt="">
+          </div>
+        </div>
+
+        <div class="question-zone">
+          <div class="q-mascot">
+            <img src="/logo-banggut.svg" width="84" height="84" alt="방긋이">
+          </div>
+          <div class="q-text">
+            <span class="q-label">2 / 3</span>
+            <div class="q-title">얼마나 자주<br>읽으세요?</div>
+            <div class="q-hint">가까운 것 하나만 골라주세요</div>
+          </div>
+        </div>
+
+        <div class="options-area">
+          <div class="freq-list">
+            <button class="freq-btn">
+              <div class="freq-icon">🌅</div>
+              <div>
+                <div class="freq-label">매일</div>
+                <div class="freq-desc">하루를 책으로 시작하고 끝내요</div>
+              </div>
+            </button>
+            <button class="freq-btn on">
+              <div class="freq-icon">📚</div>
+              <div>
+                <div class="freq-label">주 2~3회</div>
+                <div class="freq-desc">꾸준히 읽는 편이에요</div>
+              </div>
+            </button>
+            <button class="freq-btn">
+              <div class="freq-icon">🌙</div>
+              <div>
+                <div class="freq-label">가끔</div>
+                <div class="freq-desc">여유 있을 때 손에 잡아요</div>
+              </div>
+            </button>
+            <button class="freq-btn">
+              <div class="freq-icon">🌱</div>
+              <div>
+                <div class="freq-label">이제 시작</div>
+                <div class="freq-desc">습관을 만들어가는 중이에요</div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <button class="btn-next">다음</button>
+      </div>
+    </div>
+
+    <!-- Q3: 스타일 -->
+    <div>
+      <div class="label">Step 3 · 스타일</div>
+      <div class="phone">
+        <div class="progress-bar">
+          <div class="progress-seg on"></div>
+          <div class="progress-seg on"></div>
+          <div class="progress-seg on"></div>
+          <div class="progress-mascot" style="left:calc(100% - 32px)">
+            <img src="/logo-banggut.svg" width="32" height="32" alt="">
+          </div>
+        </div>
+
+        <div class="question-zone">
+          <div class="q-mascot">
+            <img src="/logo-banggut.svg" width="84" height="84" alt="방긋이">
+          </div>
+          <div class="q-text">
+            <span class="q-label">3 / 3</span>
+            <div class="q-title">어떤 방식으로<br>이야기할까요?</div>
+            <div class="q-hint">AI 토론 스타일을 골라주세요</div>
+          </div>
+        </div>
+
+        <div class="options-area">
+          <div class="style-list">
+            <button class="style-btn on">
+              <div class="style-top">
+                <div class="style-top-icon">🏛</div>
+                <div class="style-name-wrap">
+                  <div class="style-name">소크라테스식</div>
+                  <div class="style-subtitle">질문으로 생각을 끌어내요</div>
+                </div>
+              </div>
+              <div class="style-sample">"그렇게 느낀 이유를 조금 더 들여다볼까요?<br>당신의 말 속에 답이 있을지도 몰라요."</div>
+            </button>
+            <button class="style-btn">
+              <div class="style-top">
+                <div class="style-top-icon">💗</div>
+                <div class="style-name-wrap">
+                  <div class="style-name">공감식</div>
+                  <div class="style-subtitle">감정과 경험을 나눠요</div>
+                </div>
+              </div>
+              <div class="style-sample">"저도 그 장면에서 숨이 막혔어요.<br>어떤 순간이 떠오르셨어요?"</div>
+            </button>
+            <button class="style-btn">
+              <div class="style-top">
+                <div class="style-top-icon">🔬</div>
+                <div class="style-name-wrap">
+                  <div class="style-name">분석식</div>
+                  <div class="style-subtitle">작가의 의도와 구조를 뜯어봐요</div>
+                </div>
+              </div>
+              <div class="style-sample">"작가가 왜 이 시점에 이 장면을<br>배치했다고 생각하세요?"</div>
+            </button>
+            <button class="style-btn">
+              <div class="style-top">
+                <div class="style-top-icon">🌿</div>
+                <div class="style-name-wrap">
+                  <div class="style-name">자유식</div>
+                  <div class="style-subtitle">떠오르는 대로 편하게</div>
+                </div>
+              </div>
+              <div class="style-sample">"이 부분 어떠셨어요?<br>저도 저만의 생각이 있는데 들어보실래요?"</div>
+            </button>
+          </div>
+        </div>
+
+        <button class="btn-next">완료</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="note">
+    <div class="note-title">✨ v2에서 고친 것</div>
+    • <strong>곡선 강화</strong>: 카드 radius <em>14 → 20~22px</em>, 진행바 <em>4 → 6px round</em>, 버튼 <em>12 → 100px (필)</em><br>
+    • <strong>줄바꿈 해결</strong>: <code style="background:rgba(0,0,0,0.04);padding:1px 5px;border-radius:3px;font-size:11px">word-break:keep-all</code>로 '이야기에 빠져들기' 같은 어색한 줄바꿈 방지<br>
+    • <strong>설명 단축</strong>: '이야기에 빠져들기' → <em>'이야기 속으로'</em> (짧고 감성적으로)<br>
+    • <strong>장르 12개</strong>: 소설·에세이·인문사회·자기계발·과학·역사 + <em>웹소설·판타지SF·추리스릴러·로맨스·경제경영·예술시</em><br>
+    • <strong>방긋이 인터랙션</strong>: 선택 시 아이콘이 <em>살짝 기울어지며 커짐</em> (rotate -5° + scale 1.05)<br>
+    • <strong>버튼 그라데이션</strong>: 민트 그라데이션 + 그림자로 부드러운 입체감<br>
+    • <strong>방긋이 통통</strong>: 제목 옆 심볼 2.5초마다 살짝 튕김<br>
+    <br>
+    <strong>OK면 실제 코드에 적용할게요!</strong>
+  </div>
+</div>
+</body>
+</html>

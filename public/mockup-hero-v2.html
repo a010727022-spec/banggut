@@ -1,0 +1,1802 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>방긋 · HERO 카드 · v2 (AI 대화 · 서평 유도)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet" />
+<style>
+  :root {
+    /* 방긋 팔레트 (DESIGN.md 준거) */
+    --bg: #F7F3ED;
+    --sf: #FFFFFF;
+    --sf2: #F1EBE0;
+    --ac: #5FA48E;      /* 민트 */
+    --ac2: #7AB8A3;     /* 밝은 민트 */
+    --ac3: #D5E8E0;     /* 연 민트 배경 */
+    --peach: #E9A98A;   /* 서평 골든타임 톤 */
+    --peach2: #F2C4A8;
+    --lavender: #B8A8D1;
+    --lavender2: #D3C7E6;
+    --acc: #FFFFFF;
+    --tp: #2C2A26;
+    --tm: #6B685F;
+    --ts: #9A968B;
+    --bd: #E8E1D3;
+    --bd2: #D9D1BE;
+    --font-body: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    --font-playful: 'Gaegu', 'Pretendard', cursive;
+    --ls-gaegu: -0.01em;
+  }
+
+  * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+  html, body { margin: 0; padding: 0; font-family: var(--font-body); color: var(--tp); }
+  body {
+    background:
+      radial-gradient(circle at 20% 10%, #ECE4D2 0%, transparent 55%),
+      radial-gradient(circle at 85% 90%, #E5DBC4 0%, transparent 50%),
+      #F2ECDF;
+    min-height: 100vh;
+    padding: 48px 24px 80px;
+  }
+
+  /* 페이지 타이틀 */
+  .page-head {
+    max-width: 1280px;
+    margin: 0 auto 36px;
+    text-align: center;
+  }
+  .page-head h1 {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin: 0 0 8px;
+    color: var(--tp);
+  }
+  .page-head .sub {
+    font-size: 13px;
+    color: var(--tm);
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+  }
+  .page-head .sub b { color: var(--ac); font-weight: 700; }
+
+  /* 세 폰 가로 배치 */
+  .phones {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    align-items: start;
+  }
+  @media (max-width: 1100px) {
+    .phones { grid-template-columns: 1fr; gap: 40px; }
+  }
+
+  .phone-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .phone-head {
+    text-align: center;
+    max-width: 360px;
+  }
+  .phone-head .chip {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: var(--sf);
+    color: var(--tm);
+    border: 0.5px solid var(--bd);
+    margin-bottom: 6px;
+  }
+  .phone-head .chip.mint { background: var(--ac3); color: var(--ac); border-color: color-mix(in srgb, var(--ac) 30%, var(--bd)); }
+  .phone-head .chip.peach { background: color-mix(in srgb, var(--peach) 22%, var(--sf)); color: #a7593f; border-color: color-mix(in srgb, var(--peach) 40%, var(--bd)); }
+  .phone-head .chip.lav { background: color-mix(in srgb, var(--lavender) 22%, var(--sf)); color: #675289; border-color: color-mix(in srgb, var(--lavender) 40%, var(--bd)); }
+  .phone-head h2 {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 4px;
+    color: var(--tp);
+  }
+  .phone-head p {
+    font-size: 11.5px;
+    color: var(--ts);
+    line-height: 1.55;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  /* 폰 프레임 */
+  .phone {
+    width: 360px;
+    height: 760px;
+    background: var(--bg);
+    border-radius: 38px;
+    border: 10px solid #1d1916;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      0 14px 36px rgba(30, 22, 12, 0.22),
+      0 4px 10px rgba(30, 22, 12, 0.10);
+  }
+  .phone::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 94px;
+    height: 22px;
+    background: #1d1916;
+    border-radius: 0 0 14px 14px;
+    z-index: 4;
+  }
+  .phone-inner {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: 28px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* 공통 상단 여백 (노치) + 그리팅 */
+  .top-pad { height: 46px; flex-shrink: 0; }
+  .greet {
+    padding: 4px 20px 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .mascot {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+  }
+  .greet .text .line1 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--tp);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  .greet .text .line1 b { color: var(--ac); font-weight: 700; }
+  .greet .text .line2 {
+    font-size: 10.5px;
+    color: var(--tm);
+    margin-top: 2px;
+    letter-spacing: -0.01em;
+  }
+
+  .feed {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 20px 20px;
+  }
+
+  /* HERO 공통 */
+  .hero {
+    border-radius: 22px;
+    padding: 18px;
+    color: var(--acc);
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero .deco-a {
+    position: absolute;
+    top: -60px;
+    right: -40px;
+    width: 180px;
+    height: 180px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .hero .deco-b {
+    position: absolute;
+    bottom: -80px;
+    left: -30px;
+    width: 140px;
+    height: 140px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .hero-v1 { background: linear-gradient(155deg, var(--ac) 0%, var(--ac2) 100%); box-shadow: 0 8px 24px color-mix(in srgb, var(--ac) 22%, transparent); }
+  .hero-v2 { background: linear-gradient(155deg, var(--peach) 0%, var(--peach2) 100%); box-shadow: 0 8px 24px color-mix(in srgb, var(--peach) 28%, transparent); }
+  .hero-v6 { background: linear-gradient(155deg, var(--ac) 0%, var(--ac2) 100%); box-shadow: 0 8px 24px color-mix(in srgb, var(--ac) 22%, transparent); }
+  .hero-v3 { background: linear-gradient(160deg, #2d7159 0%, var(--ac) 60%, var(--ac2) 100%); box-shadow: 0 8px 24px color-mix(in srgb, var(--ac) 32%, transparent); }
+  .hero-v4 { background: linear-gradient(165deg, var(--lavender) 0%, var(--lavender2) 100%); box-shadow: 0 8px 24px color-mix(in srgb, var(--lavender) 26%, transparent); }
+  .hero-v5 { background: linear-gradient(155deg, var(--peach) 0%, #CFDCC4 55%, var(--ac2) 100%); box-shadow: 0 8px 24px color-mix(in srgb, var(--peach) 22%, transparent); }
+  .cta.primary-on-lav { background: #fff; color: #5b4686; box-shadow: 0 3px 10px rgba(91,70,134,0.18); }
+
+  /* V3 D-Day 배지 */
+  .dday-pill {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: #E76F51;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    padding: 4px 9px;
+    border-radius: 999px;
+    box-shadow: 0 3px 8px rgba(231, 111, 81, 0.4);
+    z-index: 2;
+  }
+
+  /* V3 비교 바 */
+  .compare {
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 12px;
+    padding: 10px 12px 11px;
+    margin: 12px 0;
+  }
+  .compare .row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10.5px;
+    letter-spacing: -0.01em;
+    margin-bottom: 5px;
+    font-variant-numeric: tabular-nums;
+  }
+  .compare .row:last-child { margin-bottom: 0; }
+  .compare .who { width: 56px; opacity: 0.88; flex-shrink: 0; font-weight: 600; }
+  .compare .bar { flex: 1; height: 4px; background: rgba(255,255,255,0.18); border-radius: 2px; overflow: hidden; }
+  .compare .bar span { display: block; height: 100%; border-radius: 2px; background: #fff; }
+  .compare .bar.peer span { background: rgba(255,255,255,0.55); }
+  .compare .val { width: 34px; text-align: right; font-weight: 700; opacity: 0.95; }
+
+  /* V3 모임 멤버 리스트 */
+  .member-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    background: var(--sf);
+    border: 0.5px solid var(--bd);
+    border-radius: 14px;
+    margin-bottom: 8px;
+    gap: 10px;
+  }
+  .avatars {
+    display: inline-flex;
+    align-items: center;
+  }
+  .avatars .av {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--sf);
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: -0.02em;
+  }
+  .avatars .av + .av { margin-left: -6px; }
+
+  /* V4 회상 말풍선 */
+  .memory {
+    background: rgba(255,255,255,0.22);
+    border: 1px solid rgba(255,255,255,0.32);
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin: 10px 0 12px;
+  }
+  .memory .who {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    opacity: 0.85;
+    margin-bottom: 5px;
+  }
+  .memory .q {
+    font-family: var(--font-playful);
+    font-size: 15px;
+    line-height: 1.5;
+    letter-spacing: var(--ls-gaegu);
+    color: #fff;
+  }
+
+  /* V4 최소 목표 */
+  .tiny-goal {
+    text-align: center;
+    padding: 8px 10px;
+    background: rgba(255,255,255,0.16);
+    border-radius: 10px;
+    font-size: 11.5px;
+    letter-spacing: -0.01em;
+    margin-bottom: 14px;
+  }
+  .tiny-goal b { font-size: 14px; font-weight: 800; }
+
+  /* V5 추천 carousel */
+  .rec-stack {
+    display: flex;
+    gap: 10px;
+    margin: 4px 0 14px;
+    position: relative;
+  }
+  .rec-card {
+    flex: 1;
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 12px;
+    padding: 10px 8px 10px;
+    text-align: center;
+  }
+  .rec-card.main {
+    background: rgba(255,255,255,0.28);
+    border-color: rgba(255,255,255,0.45);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  }
+  .rec-card .rc-cover {
+    width: 56px;
+    height: 80px;
+    margin: 0 auto 8px;
+    border-radius: 3px;
+    box-shadow: 2px 3px 8px rgba(0,0,0,0.18);
+  }
+  .rec-card .rc-title {
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    margin-bottom: 2px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 28px;
+  }
+  .rec-card .rc-reason {
+    font-size: 9.5px;
+    opacity: 0.82;
+    letter-spacing: -0.005em;
+    line-height: 1.3;
+  }
+  .rec-card .rc-main-reason {
+    font-family: var(--font-playful);
+    font-size: 12.5px;
+    letter-spacing: var(--ls-gaegu);
+    line-height: 1.4;
+    color: #fff;
+    padding: 6px 4px 0;
+  }
+
+  /* 섹션 구분 */
+  .section-divider {
+    max-width: 1280px;
+    margin: 52px auto 28px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .section-divider::before,
+  .section-divider::after {
+    content: '';
+    flex: 1;
+    height: 0.5px;
+    background: var(--bd2);
+  }
+  .section-divider span {
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--tm);
+    background: var(--sf);
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 0.5px solid var(--bd);
+  }
+
+  /* state note 태그 — 라벤더 버전 */
+  .tag.trig-l { background: color-mix(in srgb, var(--lavender) 26%, var(--sf)); color: #5b4686; }
+
+  /* V1 폴백 체인 박스 */
+  .fallback-stack {
+    margin-top: 10px;
+    max-width: 360px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .fb-card {
+    border-radius: 14px;
+    padding: 12px 14px;
+    border: 0.5px solid var(--bd);
+    background: var(--sf);
+    font-size: 11px;
+    line-height: 1.55;
+    color: var(--tm);
+    letter-spacing: -0.01em;
+  }
+  .fb-card .fb-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 7px;
+  }
+  .fb-card .fb-label {
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ac);
+    background: var(--ac3);
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+  .fb-card .fb-label.a2 { color: #7a5ea8; background: color-mix(in srgb, var(--lavender) 22%, #fff); }
+  .fb-card .fb-label.a3 { color: var(--tm); background: var(--sf2); }
+  .fb-card .fb-cond { font-size: 10px; color: var(--ts); font-weight: 600; letter-spacing: -0.01em; }
+  .fb-card .fb-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--tp);
+    margin-bottom: 4px;
+    letter-spacing: -0.01em;
+  }
+  .fb-card .fb-sample {
+    font-family: var(--font-playful);
+    font-size: 13.5px;
+    color: var(--tp);
+    letter-spacing: var(--ls-gaegu);
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 7px 10px;
+    margin-top: 5px;
+    line-height: 1.45;
+  }
+
+  .hero-badge {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    opacity: 0.95;
+    margin-bottom: 12px;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .hero-badge svg { flex-shrink: 0; }
+
+  /* 말풍선 — V1 의 핵심 */
+  .bubble {
+    position: relative;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.28);
+    border-radius: 14px 14px 14px 4px;
+    padding: 13px 14px 14px;
+    margin: 6px 0 14px;
+    backdrop-filter: blur(4px);
+  }
+  .bubble .who {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.82;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 5px;
+  }
+  .bubble .who .dot {
+    width: 6px;
+    height: 6px;
+    background: #fff;
+    border-radius: 50%;
+    display: inline-block;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  .bubble .quote {
+    font-family: var(--font-playful);
+    font-size: 15.5px;
+    line-height: 1.55;
+    letter-spacing: var(--ls-gaegu);
+    color: #fff;
+  }
+
+  /* 책 행 (작게) */
+  .book-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    position: relative;
+    margin-bottom: 12px;
+  }
+  .book-row .cover {
+    width: 52px;
+    height: 74px;
+    flex-shrink: 0;
+    border-radius: 4px;
+    background-size: cover;
+    background-position: center;
+    box-shadow: 2px 3px 8px rgba(0,0,0,0.16);
+  }
+  .book-row .meta { flex: 1; min-width: 0; }
+  .book-row .title {
+    font-size: 13.5px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 2px;
+  }
+  .book-row .author {
+    font-size: 11px;
+    opacity: 0.78;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* 진행률 꼬리 */
+  .progress-tail {
+    margin: 10px 0 2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10.5px;
+    opacity: 0.88;
+    font-variant-numeric: tabular-nums;
+  }
+  .progress-tail .bar {
+    flex: 1;
+    height: 3px;
+    background: rgba(255,255,255,0.22);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-tail .bar span {
+    display: block;
+    height: 100%;
+    background: #fff;
+    border-radius: 2px;
+  }
+
+  /* CTA 버튼 */
+  .cta-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    position: relative;
+  }
+  .cta {
+    flex: 1;
+    min-height: 44px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: none;
+    font-size: 13.5px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    letter-spacing: -0.01em;
+  }
+  .cta.primary-on-peach { background: #fff; color: #a7593f; box-shadow: 0 3px 10px rgba(167,89,63,0.18); }
+  .cta.primary-on-mint { background: #fff; color: #2d7159; box-shadow: 0 3px 10px rgba(45,113,89,0.18); }
+  .cta.ghost-on-accent {
+    background: rgba(255,255,255,0.14);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.32);
+  }
+
+  /* V2 축하 템플릿 */
+  .celebrate {
+    position: relative;
+    text-align: center;
+    padding: 8px 0 14px;
+  }
+  .celebrate .big-cover {
+    width: 96px;
+    height: 136px;
+    margin: 0 auto 12px;
+    border-radius: 6px;
+    background-size: cover;
+    background-position: center;
+    box-shadow: 4px 8px 16px rgba(0,0,0,0.22);
+    position: relative;
+  }
+  .celebrate .big-cover::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 10px;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(255,255,255,0.5) 0, transparent 3%),
+      radial-gradient(circle at 80% 20%, rgba(255,255,255,0.4) 0, transparent 2.5%),
+      radial-gradient(circle at 15% 80%, rgba(255,255,255,0.45) 0, transparent 2%),
+      radial-gradient(circle at 90% 70%, rgba(255,255,255,0.35) 0, transparent 2.5%);
+    pointer-events: none;
+  }
+  .celebrate .done-title {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+  .celebrate .done-sub {
+    font-size: 12px;
+    opacity: 0.9;
+    margin-bottom: 14px;
+  }
+  .celebrate .stars {
+    display: inline-flex;
+    gap: 4px;
+    margin-bottom: 12px;
+  }
+  .celebrate .stars .st {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.22);
+    display: inline-flex; align-items: center; justify-content: center;
+    color: #fff;
+    font-size: 13px;
+  }
+  .celebrate .stars .st.fill { background: rgba(255,255,255,0.38); }
+  .reflect-quote {
+    font-family: var(--font-playful);
+    font-size: 18px;
+    letter-spacing: var(--ls-gaegu);
+    margin-bottom: 14px;
+    color: #fff;
+  }
+  .reflect-quote::before, .reflect-quote::after {
+    content: '"';
+    opacity: 0.55;
+    margin: 0 2px;
+  }
+  .remind-note {
+    font-size: 10.5px;
+    opacity: 0.82;
+    margin-top: 10px;
+    text-align: center;
+    letter-spacing: -0.01em;
+  }
+
+  /* 세그먼트 탭 (홈 하단) */
+  .segtabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    background: var(--sf2);
+    border-radius: 14px;
+    padding: 4px;
+    margin-bottom: 12px;
+  }
+  .segtabs .tab {
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--tm);
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+  }
+  .segtabs .tab.on {
+    background: var(--sf);
+    color: var(--ac);
+    font-weight: 700;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  /* 캘린더 미니 */
+  .mini-cal {
+    background: var(--sf);
+    border: 0.5px solid var(--bd);
+    border-radius: 16px;
+    padding: 14px 12px 12px;
+  }
+  .mini-cal .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .mini-cal .title {
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .mini-cal .title b { color: var(--ac); }
+  .mini-cal .streak {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--ac);
+    background: var(--ac3);
+    padding: 3px 8px;
+    border-radius: 999px;
+    letter-spacing: -0.01em;
+  }
+  .mini-cal .grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+  .mini-cal .grid .d {
+    aspect-ratio: 1;
+    border-radius: 7px;
+    background: var(--sf2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10.5px;
+    color: var(--tm);
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+  .mini-cal .grid .d.read { background: var(--ac); color: #fff; font-weight: 700; }
+  .mini-cal .grid .d.today { outline: 2px solid var(--ac); outline-offset: -2px; }
+  .mini-cal .grid .h {
+    font-size: 9.5px;
+    font-weight: 600;
+    color: var(--ts);
+    letter-spacing: 0.04em;
+    background: transparent;
+  }
+
+  /* bottom nav */
+  .nav {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 58px;
+    background: var(--sf);
+    border-top: 0.5px solid var(--bd);
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    align-items: center;
+    justify-items: center;
+    padding-bottom: 4px;
+  }
+  .nav .item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-size: 9.5px;
+    color: var(--tm);
+    letter-spacing: -0.01em;
+  }
+  .nav .item.on { color: var(--ac); font-weight: 700; }
+  .nav .dot {
+    width: 22px; height: 22px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+
+  /* 아이콘 기본 스타일 */
+  svg.ico { flex-shrink: 0; }
+
+  /* 도움 설명 박스 (폰 아래) */
+  .state-note {
+    margin-top: 10px;
+    padding: 12px 14px;
+    background: var(--sf);
+    border: 0.5px solid var(--bd);
+    border-radius: 12px;
+    max-width: 360px;
+    font-size: 11px;
+    color: var(--tm);
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+  }
+  .state-note b { color: var(--tp); font-weight: 700; }
+
+  .state-note .tag {
+    display: inline-block;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 4px;
+    margin-right: 6px;
+  }
+  .tag.trig { background: var(--ac3); color: var(--ac); }
+  .tag.trig-p { background: color-mix(in srgb, var(--peach) 22%, var(--sf)); color: #a7593f; }
+
+  /* 스크롤 숨김 */
+  .feed::-webkit-scrollbar { display: none; }
+  .feed { scrollbar-width: none; }
+
+  /* 하단 범례 */
+  .legend {
+    max-width: 1280px;
+    margin: 48px auto 0;
+    padding: 20px 22px;
+    background: var(--sf);
+    border: 0.5px solid var(--bd);
+    border-radius: 16px;
+  }
+  .legend h3 {
+    font-size: 13px;
+    font-weight: 700;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+  }
+  .legend .line {
+    font-size: 12px;
+    color: var(--tm);
+    line-height: 1.7;
+    letter-spacing: -0.005em;
+    margin-bottom: 4px;
+  }
+  .legend .line b { color: var(--ac); font-weight: 700; }
+  .legend .kick {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 0.5px dashed var(--bd2);
+    font-size: 11.5px;
+    color: var(--ts);
+  }
+</style>
+</head>
+<body>
+
+<header class="page-head">
+  <h1>방긋 · HERO 카드 v2</h1>
+  <div class="sub">
+    <b>기본은 V1 체인</b> (유저 상태에 따라 B→A→C) · <b>책에 모임이 있으면 V3</b><br/>
+    AI가 책 본문을 몰라도 괜찮아요 — 사용자 스크랩 회상 / 범용 질문 / 진입 넛지로 <b>환각 0%</b> 유지
+  </div>
+</header>
+
+<div class="phones">
+
+  <!-- ═══════════════════════════════════════════════════════════
+       PHONE 1 · V1 대화 던짐형 — 읽는 중 (골든존 15~85%)
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="phone-col">
+    <div class="phone-head">
+      <span class="chip mint">V1-B · 회상형 · 메인</span>
+      <h2>스크랩 회상 · 환각 제로</h2>
+      <p>AI가 질문 만드는 게 아니라 <b>지선님이 남긴 문장</b>을 다시 꺼내요<br/>"3일 전 별표 친 이 문장, 지금 읽는 곳이랑 이어져요"</p>
+    </div>
+
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="top-pad"></div>
+
+        <div class="greet">
+          <!-- 마스코트 -->
+          <svg class="mascot" viewBox="0 0 40 40" aria-hidden="true">
+            <ellipse cx="20" cy="24" rx="14" ry="13" fill="#7AB8A3"/>
+            <ellipse cx="20" cy="18" rx="13" ry="11" fill="#5FA48E"/>
+            <circle cx="15" cy="18" r="1.6" fill="#2C2A26"/>
+            <circle cx="25" cy="18" r="1.6" fill="#2C2A26"/>
+            <path d="M16 22 Q 20 24.5 24 22" stroke="#2C2A26" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+            <ellipse cx="13" cy="22" rx="1.6" ry="1" fill="#E9A98A" opacity="0.6"/>
+            <ellipse cx="27" cy="22" rx="1.6" ry="1" fill="#E9A98A" opacity="0.6"/>
+          </svg>
+          <div class="text">
+            <div class="line1">좋은 아침이에요, <b>지선</b>님</div>
+            <div class="line2">오늘은 4월 23일 목요일이에요</div>
+          </div>
+        </div>
+
+        <div class="feed">
+          <!-- HERO V1 -->
+          <div class="hero hero-v1">
+            <div class="deco-a"></div>
+            <div class="deco-b"></div>
+
+            <div class="hero-badge">
+              <svg class="ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              3일 전 지선님 생각이 이어져요
+            </div>
+
+            <!-- 사용자 본인 스크랩 회상 -->
+            <div class="bubble">
+              <div class="who"><span class="dot" style="background:#FFD87A"></span>3일 전 · 별표 친 문장</div>
+              <div class="quote">
+                사람의 표정은<br/>
+                습관이 된 감정이에요.
+              </div>
+            </div>
+
+            <div style="font-size:11.5px; padding:0 2px 10px; opacity:0.92; line-height:1.5; letter-spacing:-0.01em;">
+              지금 읽는 <b style="font-weight:700">3장</b>이 이 문장이랑 맞닿아 있어요
+            </div>
+
+            <!-- 책 정보 compact -->
+            <div class="book-row">
+              <div class="cover" style="background: linear-gradient(135deg, #C13A2F 0%, #8A1F1A 100%); display:flex; align-items:flex-end; justify-content:center; padding: 4px;">
+                <span style="font-family: var(--font-playful); font-size: 8.5px; color: #fff; text-align: center; line-height: 1.05;">캐릭터<br/>심리<br/>사전</span>
+              </div>
+              <div class="meta">
+                <div class="title">캐릭터 심리 사전</div>
+                <div class="author">린다 N. 에델스타인 · 3장까지</div>
+              </div>
+            </div>
+
+            <!-- 진행률 꼬리 -->
+            <div class="progress-tail">
+              <span>6일째</span>
+              <span style="opacity:0.5">·</span>
+              <div class="bar"><span style="width:42%"></span></div>
+              <span>42%</span>
+            </div>
+
+            <!-- CTA 분기 -->
+            <div class="cta-row">
+              <button class="cta primary-on-mint">
+                <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                이어서 생각해보기
+              </button>
+              <button class="cta ghost-on-accent">
+                이어 읽기
+                <svg class="ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- 하단 세그먼트 (맥락용) -->
+          <div class="segtabs">
+            <div class="tab on">
+              <svg class="ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              캘린더
+            </div>
+            <div class="tab">
+              <svg class="ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              커뮤니티
+            </div>
+          </div>
+
+          <div class="mini-cal">
+            <div class="row">
+              <div class="title">2026. <b>4</b> · 이번 주</div>
+              <div class="streak">🔥 6일 연속</div>
+            </div>
+            <div class="grid">
+              <div class="d h">목</div>
+              <div class="d h">금</div>
+              <div class="d h">토</div>
+              <div class="d h">일</div>
+              <div class="d h">월</div>
+              <div class="d h">화</div>
+              <div class="d h">수</div>
+              <div class="d">16</div>
+              <div class="d read">17</div>
+              <div class="d read">18</div>
+              <div class="d read">19</div>
+              <div class="d read">20</div>
+              <div class="d read">21</div>
+              <div class="d today read">22</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- bottom nav -->
+        <div class="nav">
+          <div class="item on"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </span>홈</div>
+          <div class="item"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          </span>서재</div>
+          <div class="item"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </span>모임</div>
+          <div class="item"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+          </span>서평</div>
+          <div class="item"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </span>내정보</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="state-note">
+      <span class="tag trig">트리거</span>스크랩 <b>3개 이상</b> · 읽는 중 12h 경과<br/>
+      <span class="tag trig">데이터</span>사용자 스크랩 중 1개 선택 (AI가 본문 안 건드림)<br/>
+      <span class="tag trig">킥</span>AI 환각 <b>0%</b> — 본인이 썼던 문장 회상이라 가장 안전
+    </div>
+
+    <!-- 폴백 체인 V1-A / V1-C -->
+    <div class="fallback-stack">
+      <div style="font-size:10.5px; font-weight:700; letter-spacing:0.04em; color:var(--tm); text-transform:uppercase; margin: 6px 2px -2px;">스크랩 없으면 · 단계적 폴백</div>
+
+      <div class="fb-card">
+        <div class="fb-head">
+          <span class="fb-label a2">V1-A · 범용 질문형</span>
+          <span class="fb-cond">스크랩 0개 · 읽는 중</span>
+        </div>
+        <div class="fb-title">책 내용 대신 <b>오픈 독서 프롬프트</b></div>
+        질문 풀에서 랜덤 — AI가 책 본문을 몰라도 던질 수 있는 질문만
+        <div class="fb-sample">지금까지 읽은 부분 중,<br/>한 번 더 읽고 싶은 장면 있어요?</div>
+      </div>
+
+      <div class="fb-card">
+        <div class="fb-head">
+          <span class="fb-label a3">V1-C · 넛지만</span>
+          <span class="fb-cond">신규 · AI 대화 미사용</span>
+        </div>
+        <div class="fb-title">질문 없이 <b>대화 진입 칩</b>만</div>
+        V6 폰과 동일한 구조 — 탭하면 AI 대화창이 열리고, 거기서 사용자가 먼저 말해요
+        <div class="fb-sample">🗨️ 방긋이랑 이 책 얘기해요 →</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       PHONE 2 · V2 서평 골든타임 — 방금 완독
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="phone-col">
+    <div class="phone-head">
+      <span class="chip peach">V2 · 서평 골든타임</span>
+      <h2>방금 완독 · 감정이 식기 전</h2>
+      <p>완독 후 <b>첫 진입</b>에서만 뜨는 전환 카드<br/>"서평" 단어 대신 <b>"이 책, 나한테 어땠지?"</b> 자기성찰 톤</p>
+    </div>
+
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="top-pad"></div>
+
+        <div class="greet">
+          <svg class="mascot" viewBox="0 0 40 40" aria-hidden="true">
+            <ellipse cx="20" cy="24" rx="14" ry="13" fill="#F2C4A8"/>
+            <ellipse cx="20" cy="18" rx="13" ry="11" fill="#E9A98A"/>
+            <circle cx="15" cy="18" r="1.6" fill="#2C2A26"/>
+            <circle cx="25" cy="18" r="1.6" fill="#2C2A26"/>
+            <path d="M15 21 Q 20 25 25 21" stroke="#2C2A26" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+            <circle cx="11" cy="13" r="1.2" fill="#fff" opacity="0.8"/>
+            <circle cx="29" cy="14" r="0.9" fill="#fff" opacity="0.6"/>
+            <circle cx="32" cy="20" r="0.7" fill="#fff" opacity="0.7"/>
+          </svg>
+          <div class="text">
+            <div class="line1">축하해요, <b>지선</b>님</div>
+            <div class="line2">어제 <b style="color:#a7593f;font-weight:700">캐릭터 심리 사전</b>을 덮으셨죠</div>
+          </div>
+        </div>
+
+        <div class="feed">
+          <!-- HERO V2 -->
+          <div class="hero hero-v2">
+            <div class="deco-a"></div>
+            <div class="deco-b"></div>
+
+            <div class="hero-badge">
+              <svg class="ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              완독 기념 · 오늘만 이 카드
+            </div>
+
+            <div class="celebrate">
+              <div class="big-cover" style="background: linear-gradient(135deg, #C13A2F 0%, #8A1F1A 100%); display:flex; align-items:flex-end; justify-content:center; padding: 6px;">
+                <span style="font-family: var(--font-playful); font-size: 11px; color: #fff; text-align: center; line-height: 1.1;">캐릭터<br/>심리<br/>사전</span>
+              </div>
+              <div class="done-title">한 권 더 끝냈어요 ✨</div>
+              <div class="done-sub">지선님의 올해 <b style="font-weight:800">9번째</b> 완독이에요</div>
+
+              <div class="reflect-quote">
+                이 책, 나한테<br/>어떤 책이었지?
+              </div>
+
+              <div class="stars">
+                <div class="st fill">★</div>
+                <div class="st fill">★</div>
+                <div class="st fill">★</div>
+                <div class="st fill">★</div>
+                <div class="st">★</div>
+              </div>
+            </div>
+
+            <div class="cta-row">
+              <button class="cta primary-on-peach">
+                <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+                한 줄만 적기
+              </button>
+              <button class="cta ghost-on-accent">
+                길게 적기
+              </button>
+            </div>
+
+            <div class="remind-note">
+              🕒 지금 안 적으면 내일 아침에 한 번 더 여쭤볼게요
+            </div>
+          </div>
+
+          <!-- 보조: 잔잔한 피드 -->
+          <div style="padding: 12px 14px; background: var(--sf); border-radius: 14px; border: 0.5px solid var(--bd); margin-bottom: 10px;">
+            <div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ts); margin-bottom: 6px;">
+              다음 책 힌트
+            </div>
+            <div style="font-size: 12.5px; color: var(--tp); line-height: 1.5; letter-spacing: -0.01em;">
+              서평 한 줄 남기면 방긋이가 <b style="color: #a7593f;">닮은 책 3권</b>을 골라서 보여드려요
+            </div>
+          </div>
+
+          <div class="mini-cal">
+            <div class="row">
+              <div class="title">완독 기록</div>
+              <div class="streak" style="background: color-mix(in srgb, var(--peach) 25%, #fff); color: #a7593f;">📚 올해 9권</div>
+            </div>
+            <div style="display:flex; gap:6px; overflow-x:auto; padding: 2px 0;">
+              <div style="width:38px;height:52px;background:linear-gradient(135deg,#C13A2F,#8A1F1A);border-radius:3px;flex-shrink:0;outline:2px solid var(--peach);outline-offset:2px;"></div>
+              <div style="width:38px;height:52px;background:linear-gradient(135deg,#3B5A7A,#1E3659);border-radius:3px;flex-shrink:0;"></div>
+              <div style="width:38px;height:52px;background:linear-gradient(135deg,#8FA858,#5E7538);border-radius:3px;flex-shrink:0;"></div>
+              <div style="width:38px;height:52px;background:linear-gradient(135deg,#D4B96A,#A08A3C);border-radius:3px;flex-shrink:0;"></div>
+              <div style="width:38px;height:52px;background:linear-gradient(135deg,#9B6FA8,#6A4874);border-radius:3px;flex-shrink:0;"></div>
+              <div style="width:38px;height:52px;background:linear-gradient(135deg,#C87B5E,#8F5339);border-radius:3px;flex-shrink:0;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="nav">
+          <div class="item on"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </span>홈</div>
+          <div class="item"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          </span>서재</div>
+          <div class="item"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </span>모임</div>
+          <div class="item"><span class="dot" style="position:relative;">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+            <span style="position:absolute; top:-2px; right:-2px; width:7px; height:7px; background:#E9A98A; border-radius:50%; border:1.5px solid #fff;"></span>
+          </span>서평</div>
+          <div class="item"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </span>내정보</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="state-note">
+      <span class="tag trig-p">트리거</span><b>reading_status: reading → finished</b> 전환 직후 24~48h<br/>
+      <span class="tag trig-p">하강</span>별점/서평 남긴 순간 이 카드는 사라지고 V1 또는 다음 책 HERO 로<br/>
+      <span class="tag trig-p">킥</span>"감정이 따끈할 때" 의 타이밍 — 이게 방긋의 서평 참여율 비밀
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       PHONE 3 · V6 하이브리드 분기 — 일반 상태 (가장 범용)
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="phone-col">
+    <div class="phone-head">
+      <span class="chip mint">V6 · 하이브리드 분기</span>
+      <h2>읽는 중 · 일반 · 기본값</h2>
+      <p>AI 질문을 본문에 안 띄우고 <b>칩 형태</b>로 조용히 제안<br/>두 CTA <b>이어 읽기 / 책 이야기해요</b> 병치</p>
+    </div>
+
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="top-pad"></div>
+
+        <div class="greet">
+          <svg class="mascot" viewBox="0 0 40 40" aria-hidden="true">
+            <ellipse cx="20" cy="24" rx="14" ry="13" fill="#7AB8A3"/>
+            <ellipse cx="20" cy="18" rx="13" ry="11" fill="#5FA48E"/>
+            <circle cx="15" cy="18" r="1.6" fill="#2C2A26"/>
+            <circle cx="25" cy="18" r="1.6" fill="#2C2A26"/>
+            <path d="M16 22 Q 20 24.5 24 22" stroke="#2C2A26" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+          </svg>
+          <div class="text">
+            <div class="line1">좋은 아침이에요, <b>지선</b>님</div>
+            <div class="line2">오늘은 4월 23일 목요일이에요</div>
+          </div>
+        </div>
+
+        <div class="feed">
+          <!-- HERO V6 -->
+          <div class="hero hero-v6">
+            <div class="deco-a"></div>
+            <div class="deco-b"></div>
+
+            <div class="hero-badge">
+              <svg class="ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              6일째 읽고 있어요 · 3장까지
+            </div>
+
+            <!-- 책 정보 -->
+            <div style="display:flex; gap:14px; margin-bottom:12px; position:relative;">
+              <div style="width:84px; height:120px; flex-shrink:0; border-radius:5px; background: linear-gradient(135deg, #C13A2F 0%, #8A1F1A 100%); box-shadow: 2px 4px 10px rgba(0,0,0,0.2); display:flex; align-items:flex-end; justify-content:center; padding:6px;">
+                <span style="font-family: var(--font-playful); font-size: 12px; color: #fff; text-align: center; line-height: 1.1;">캐릭터<br/>심리<br/>사전</span>
+              </div>
+              <div style="flex:1; min-width:0; display:flex; flex-direction:column; justify-content:space-between; padding: 2px 0;">
+                <div>
+                  <div style="font-size:18px; font-weight:700; line-height:1.25; letter-spacing:-0.02em; margin-bottom:4px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
+                    캐릭터 심리 사전
+                  </div>
+                  <div style="font-size:12px; opacity:0.82;">린다 N. 에델스타인</div>
+                </div>
+                <div style="display:flex; gap:14px; font-size:11px; margin-top:10px;">
+                  <div>
+                    <b style="font-family:var(--font-playful); font-size:16px; font-weight:700; display:block; line-height:1; margin-bottom:2px;">168</b>
+                    <span style="opacity:0.78; font-size:10px;">쪽 / 400</span>
+                  </div>
+                  <div>
+                    <b style="font-family:var(--font-playful); font-size:16px; font-weight:700; display:block; line-height:1; margin-bottom:2px;">42%</b>
+                    <span style="opacity:0.78; font-size:10px;">완독률</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- AI 제안 칩 (본문 소프트) -->
+            <div style="background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.26); border-radius: 11px; padding: 10px 12px; margin-bottom: 14px; display:flex; align-items:center; gap:8px; position:relative;">
+              <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <div style="flex:1; font-size:12px; line-height:1.45; letter-spacing:-0.01em;">
+                방긋이가 <b style="font-weight:700">3장 얘기</b>를 하고 싶어해요
+              </div>
+              <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.7"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+
+            <!-- 두 CTA 병치 -->
+            <div class="cta-row">
+              <button class="cta primary-on-mint">
+                <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                이어 읽기
+              </button>
+              <button class="cta ghost-on-accent">
+                <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                책 이야기해요
+              </button>
+            </div>
+          </div>
+
+          <!-- 보조: 읽는 중 작은 카드 (다른 책) -->
+          <div style="padding: 10px 12px; background: var(--sf); border-radius: 12px; border: 0.5px solid var(--bd); margin-bottom: 10px; display:flex; align-items:center; gap:10px;">
+            <div style="width:34px; height:48px; background: linear-gradient(135deg,#3B5A7A,#1E3659); border-radius: 3px; flex-shrink:0;"></div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:11.5px; font-weight:700; letter-spacing:-0.01em; color: var(--tp); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">불안의 시대</div>
+              <div style="font-size:10px; color: var(--tm); margin-top:1px;">알랭 드 보통 · 8% · 3일 쉼</div>
+            </div>
+            <span style="font-size:10px; font-weight:700; color: var(--ac); background: var(--ac3); padding:3px 8px; border-radius: 999px; letter-spacing:-0.01em;">이어 읽기 →</span>
+          </div>
+
+          <div class="mini-cal">
+            <div class="row">
+              <div class="title">2026. <b>4</b> · 이번 주</div>
+              <div class="streak">🔥 6일 연속</div>
+            </div>
+            <div class="grid">
+              <div class="d h">목</div>
+              <div class="d h">금</div>
+              <div class="d h">토</div>
+              <div class="d h">일</div>
+              <div class="d h">월</div>
+              <div class="d h">화</div>
+              <div class="d h">수</div>
+              <div class="d">16</div>
+              <div class="d read">17</div>
+              <div class="d read">18</div>
+              <div class="d read">19</div>
+              <div class="d read">20</div>
+              <div class="d read">21</div>
+              <div class="d today read">22</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="nav">
+          <div class="item on"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </span>홈</div>
+          <div class="item"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          </span>서재</div>
+          <div class="item"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </span>모임</div>
+          <div class="item"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+          </span>서평</div>
+          <div class="item"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </span>내정보</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="state-note">
+      <span class="tag trig">트리거</span>기본 상태 (다른 특수 트리거 미충족)<br/>
+      <span class="tag trig">밸런스</span>이어 읽기를 거부하지 않으면서 <b>AI 대화 아이콘 노출</b>만 유지<br/>
+      <span class="tag trig">전환</span>사용자 2~3회 이어 읽기 완료 후 V1 로 업그레이드
+    </div>
+  </div>
+
+</div>
+
+<!-- 섹션 구분 -->
+<div class="section-divider"><span>추가 변주 · 컨텍스트 특화</span></div>
+
+<div class="phones">
+
+  <!-- ═══════════════════════════════════════════════════════════
+       PHONE 4 · V3 모임 대비형 — D-3 ~ D-1
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="phone-col">
+    <div class="phone-head">
+      <span class="chip mint">V3 · 모임 대비형</span>
+      <h2>모임 임박 · D-Day 준비</h2>
+      <p>모임원 <b>평균 진도 비교</b> + 준비 팁<br/>경쟁앱에 없는 "같이 가는" 감각</p>
+    </div>
+
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="top-pad"></div>
+
+        <div class="greet">
+          <svg class="mascot" viewBox="0 0 40 40" aria-hidden="true">
+            <ellipse cx="20" cy="24" rx="14" ry="13" fill="#7AB8A3"/>
+            <ellipse cx="20" cy="18" rx="13" ry="11" fill="#5FA48E"/>
+            <circle cx="15" cy="18" r="1.6" fill="#2C2A26"/>
+            <circle cx="25" cy="18" r="1.6" fill="#2C2A26"/>
+            <path d="M15 21.5 Q 20 24.5 25 21.5" stroke="#2C2A26" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          </svg>
+          <div class="text">
+            <div class="line1">내일 모임이에요, <b>지선</b>님</div>
+            <div class="line2">📅 4월 24일 금 19:00 · 세 번째 모임</div>
+          </div>
+        </div>
+
+        <div class="feed">
+          <!-- HERO V3 -->
+          <div class="hero hero-v3">
+            <div class="deco-a"></div>
+            <div class="deco-b"></div>
+
+            <span class="dday-pill">D-1</span>
+
+            <div class="hero-badge">
+              <svg class="ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              모임까지 <b style="font-weight:800">3장</b>을 읽기로 했어요
+            </div>
+
+            <!-- 책 정보 compact -->
+            <div class="book-row">
+              <div class="cover" style="background: linear-gradient(135deg, #3B5A7A 0%, #1E3659 100%); display:flex; align-items:flex-end; justify-content:center; padding: 4px;">
+                <span style="font-family: var(--font-playful); font-size: 8.5px; color: #fff; text-align: center; line-height: 1.05;">불안의<br/>시대</span>
+              </div>
+              <div class="meta">
+                <div class="title">불안의 시대</div>
+                <div class="author">알랭 드 보통 · <b style="font-weight:700">48쪽</b> 남았어요</div>
+              </div>
+            </div>
+
+            <!-- 비교 바 -->
+            <div class="compare">
+              <div class="row">
+                <span class="who">지선님</span>
+                <div class="bar"><span style="width:42%"></span></div>
+                <span class="val">42%</span>
+              </div>
+              <div class="row">
+                <span class="who">모임 평균</span>
+                <div class="bar peer"><span style="width:58%"></span></div>
+                <span class="val">58%</span>
+              </div>
+            </div>
+
+            <!-- 준비 팁 -->
+            <div style="background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.26); border-radius: 11px; padding: 9px 12px; margin-bottom: 12px; font-size: 11.5px; line-height:1.45; letter-spacing:-0.01em;">
+              💡 이번 장에서 <b style="font-weight:800">한 줄</b> 남기면 모임에서 다른 멤버도 볼 수 있어요
+            </div>
+
+            <div class="cta-row">
+              <button class="cta primary-on-mint">
+                <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                이어 읽기
+              </button>
+              <button class="cta ghost-on-accent">
+                모임 준비
+                <svg class="ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- 모임 멤버 진도 -->
+          <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ts); margin: 4px 2px 8px;">같이 읽는 친구들</div>
+
+          <div class="member-row">
+            <span class="avatars">
+              <span class="av" style="background:#7AB8A3">민</span>
+              <span class="av" style="background:#9B6FA8">연</span>
+              <span class="av" style="background:#E9A98A">우</span>
+            </span>
+            <div style="flex:1; min-width:0;">
+              <div style="font-size: 11.5px; font-weight: 700; color: var(--tp); letter-spacing:-0.01em;">민지 · 연수 · 우빈</div>
+              <div style="font-size: 10px; color: var(--tm); margin-top:1px;">2명은 완독 · 1명은 3장</div>
+            </div>
+            <span style="font-size:10px; font-weight:700; color: var(--ac); background: var(--ac3); padding:3px 8px; border-radius: 999px; letter-spacing:-0.01em;">톡방 →</span>
+          </div>
+
+          <div style="padding: 11px 14px; background: var(--sf); border: 0.5px solid var(--bd); border-radius: 14px;">
+            <div style="font-size: 10.5px; font-weight: 700; letter-spacing: -0.01em; color: var(--tp); margin-bottom: 6px;">📝 모임 준비 체크</div>
+            <div style="font-size: 11px; color: var(--tm); line-height: 1.6; letter-spacing:-0.01em;">
+              <div>✓ 3장까지 읽기 <span style="color:var(--ts)">(168/400쪽)</span></div>
+              <div style="opacity:0.55">○ 인상 깊은 한 줄 남기기</div>
+              <div style="opacity:0.55">○ 이번 장 한 줄 요약</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- bottom nav (모임 뱃지) -->
+        <div class="nav">
+          <div class="item on"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </span>홈</div>
+          <div class="item"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          </span>서재</div>
+          <div class="item"><span class="dot" style="position:relative;">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span style="position:absolute; top:-2px; right:-2px; min-width:12px; height:12px; background:#E76F51; color:#fff; font-size:8px; font-weight:800; border-radius:999px; display:flex; align-items:center; justify-content:center; border:1.5px solid #fff; padding: 0 2px;">!</span>
+          </span>모임</div>
+          <div class="item"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+          </span>서평</div>
+          <div class="item"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </span>내정보</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="state-note">
+      <span class="tag trig">트리거</span><b>group_books 있음 + 모임 D-3 이하</b>, D-3·D-1·D-Day 단계별 강도 up<br/>
+      <span class="tag trig">데이터</span>모임 진도 비교 (group_books progress avg) · 멤버 아바타 3명 샘플<br/>
+      <span class="tag trig">킥</span>혼자 vs 같이 — 부담 아닌 <b>"같이 간다"</b> 감각이 우리만의 톤
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       PHONE 5 · V4 슬럼프 복귀형 — 7일+ 휴면
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="phone-col">
+    <div class="phone-head">
+      <span class="chip lav">V4 · 슬럼프 복귀형</span>
+      <h2>오랜만 · 죄책감 없이 돌아오기</h2>
+      <p>"다시 읽어요" 아닌 <b>"여기서 멈추셨어요"</b> 회상 톤<br/>최소 목표 <b>2쪽만</b> · 쉬는 선택지도 함께</p>
+    </div>
+
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="top-pad"></div>
+
+        <div class="greet">
+          <svg class="mascot" viewBox="0 0 40 40" aria-hidden="true">
+            <ellipse cx="20" cy="24" rx="14" ry="13" fill="#D3C7E6"/>
+            <ellipse cx="20" cy="18" rx="13" ry="11" fill="#B8A8D1"/>
+            <circle cx="15" cy="18.5" r="1.5" fill="#2C2A26"/>
+            <circle cx="25" cy="18.5" r="1.5" fill="#2C2A26"/>
+            <path d="M16.5 22 Q 20 23 23.5 22" stroke="#2C2A26" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+            <ellipse cx="13" cy="22" rx="1.4" ry="0.9" fill="#E9A98A" opacity="0.5"/>
+            <ellipse cx="27" cy="22" rx="1.4" ry="0.9" fill="#E9A98A" opacity="0.5"/>
+          </svg>
+          <div class="text">
+            <div class="line1">오랜만이에요, <b style="color:#7a5ea8">지선</b>님</div>
+            <div class="line2">지난번 <b style="color:#7a5ea8;font-weight:700">16일 전</b>에 읽으셨어요</div>
+          </div>
+        </div>
+
+        <div class="feed">
+          <!-- HERO V4 -->
+          <div class="hero hero-v4">
+            <div class="deco-a"></div>
+            <div class="deco-b"></div>
+
+            <div class="hero-badge">
+              <svg class="ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L13.9 8.6L20.5 8.6L15.3 12.7L17.2 19.3L12 15.2L6.8 19.3L8.7 12.7L3.5 8.6L10.1 8.6L12 2Z" opacity="0.4"/><circle cx="12" cy="12" r="3"/></svg>
+              여기서 멈추셨어요
+            </div>
+
+            <!-- 책 + 멈춘 페이지 -->
+            <div style="display:flex; gap:12px; margin-bottom:12px; align-items:center;">
+              <div style="width:62px; height:88px; flex-shrink:0; border-radius:4px; background: linear-gradient(135deg, #C13A2F 0%, #8A1F1A 100%); box-shadow: 2px 3px 8px rgba(0,0,0,0.2); display:flex; align-items:flex-end; justify-content:center; padding:4px; position:relative;">
+                <span style="font-family: var(--font-playful); font-size: 9px; color: #fff; text-align: center; line-height: 1.05;">캐릭터<br/>심리<br/>사전</span>
+                <span style="position:absolute; top:-6px; left:50%; transform:translateX(-50%); background:#fff; color:#5b4686; font-size:9px; font-weight:800; padding:2px 7px; border-radius: 999px; white-space:nowrap; letter-spacing:-0.01em;">168쪽</span>
+              </div>
+              <div style="flex:1;">
+                <div style="font-size:15px; font-weight:700; letter-spacing:-0.02em; line-height:1.3; margin-bottom:4px;">
+                  캐릭터 심리 사전
+                </div>
+                <div style="font-size:11px; opacity:0.82; letter-spacing:-0.01em; line-height:1.5;">3장 중반 · 400쪽 중 168쪽</div>
+              </div>
+            </div>
+
+            <!-- 지난번 기억 (회상) -->
+            <div class="memory">
+              <div class="who">그때 지선님이 별표 친 문장</div>
+              <div class="q">
+                사람의 표정은<br/>습관이 된 감정이에요.
+              </div>
+            </div>
+
+            <!-- 최소 목표 -->
+            <div class="tiny-goal">
+              오늘 <b>2쪽</b>만 읽어도 충분해요 🌱
+            </div>
+
+            <div class="cta-row">
+              <button class="cta primary-on-lav">
+                <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                2쪽만 읽기
+              </button>
+              <button class="cta ghost-on-accent" style="font-size:12.5px;">
+                잠깐 쉴래요
+              </button>
+            </div>
+          </div>
+
+          <!-- 보조: 다른 책 제안 (부담 낮춤) -->
+          <div style="padding: 12px 14px; background: var(--sf); border-radius: 14px; border: 0.5px solid var(--bd); margin-bottom: 10px;">
+            <div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ts); margin-bottom: 6px;">
+              아니면 이건 어때요?
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <div style="width:34px; height:48px; background: linear-gradient(135deg,#8FA858,#5E7538); border-radius: 3px; flex-shrink:0;"></div>
+              <div style="flex:1; min-width:0;">
+                <div style="font-size:12px; font-weight:700; color: var(--tp); letter-spacing:-0.01em;">정원에서 찾은 행복</div>
+                <div style="font-size:10.5px; color: var(--tm); margin-top:2px; line-height:1.4;">가벼운 에세이 · 30분이면 한 챕터</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 캘린더 — streak 끊김 -->
+          <div class="mini-cal">
+            <div class="row">
+              <div class="title">2026. <b style="color:#7a5ea8">4</b> · 이번 주</div>
+              <div class="streak" style="background: color-mix(in srgb, var(--lavender) 28%, #fff); color: #5b4686;">🌱 다시 시작해요</div>
+            </div>
+            <div class="grid">
+              <div class="d h">목</div>
+              <div class="d h">금</div>
+              <div class="d h">토</div>
+              <div class="d h">일</div>
+              <div class="d h">월</div>
+              <div class="d h">화</div>
+              <div class="d h">수</div>
+              <div class="d">16</div>
+              <div class="d">17</div>
+              <div class="d">18</div>
+              <div class="d">19</div>
+              <div class="d">20</div>
+              <div class="d">21</div>
+              <div class="d today" style="outline-color: #7a5ea8; color: #5b4686;">22</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="nav">
+          <div class="item on"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </span>홈</div>
+          <div class="item"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          </span>서재</div>
+          <div class="item"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </span>모임</div>
+          <div class="item"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+          </span>서평</div>
+          <div class="item"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </span>내정보</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="state-note">
+      <span class="tag trig-l">트리거</span><b>last_read &gt; 7일</b> · 단 이 책의 current_page &gt; 0<br/>
+      <span class="tag trig-l">톤</span>죄책감 배제 — "여기서 멈추셨어요" 회상 + 2쪽 최소 목표<br/>
+      <span class="tag trig-l">킥</span>CTA 에 <b>"잠깐 쉴래요"</b> 항상 병치 — 사용자 통제권이 복귀율 올려요
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       PHONE 6 · V5 발견 재추천형 — 완독 후 5일+ (V2 종료)
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="phone-col">
+    <div class="phone-head">
+      <span class="chip peach">V5 · 발견 재추천형</span>
+      <h2>완독 후 공백 · 다음 한 권</h2>
+      <p>3권 carousel + <b>"같은 결"</b> 이유 한 줄<br/>위시 있으면 거기서, 없으면 AI 추천</p>
+    </div>
+
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="top-pad"></div>
+
+        <div class="greet">
+          <svg class="mascot" viewBox="0 0 40 40" aria-hidden="true">
+            <ellipse cx="20" cy="24" rx="14" ry="13" fill="#F2C4A8"/>
+            <ellipse cx="20" cy="18" rx="13" ry="11" fill="#E9A98A"/>
+            <circle cx="15" cy="18" r="1.6" fill="#2C2A26"/>
+            <circle cx="25" cy="18" r="1.6" fill="#2C2A26"/>
+            <path d="M14.5 21.5 Q 20 26 25.5 21.5" stroke="#2C2A26" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+            <circle cx="11.5" cy="12" r="1" fill="#fff" opacity="0.85"/>
+            <circle cx="29" cy="13.5" r="0.8" fill="#fff" opacity="0.7"/>
+          </svg>
+          <div class="text">
+            <div class="line1">새 책 고르실 시간이에요, <b style="color:#a7593f">지선</b>님</div>
+            <div class="line2">지난 주 <b>캐릭터 심리 사전</b>을 덮으셨죠</div>
+          </div>
+        </div>
+
+        <div class="feed">
+          <!-- HERO V5 -->
+          <div class="hero hero-v5">
+            <div class="deco-a"></div>
+            <div class="deco-b"></div>
+
+            <div class="hero-badge">
+              <svg class="ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              다음 한 권을 골라봤어요
+            </div>
+
+            <!-- 3권 carousel -->
+            <div class="rec-stack">
+              <div class="rec-card">
+                <div class="rc-cover" style="background: linear-gradient(135deg,#9B6FA8,#6A4874);"></div>
+                <div class="rc-title">스토리의 해부</div>
+                <div class="rc-reason">인물 탐구 · 중급</div>
+              </div>
+              <div class="rec-card main">
+                <div class="rc-cover" style="background: linear-gradient(135deg,#3B5A7A,#1E3659); height:96px;"></div>
+                <div class="rc-title" style="font-size:12.5px; min-height:32px;">불안의 시대</div>
+                <div class="rc-main-reason">"방긋이가 가장 닮았대요"</div>
+              </div>
+              <div class="rec-card">
+                <div class="rc-cover" style="background: linear-gradient(135deg,#D4B96A,#A08A3C);"></div>
+                <div class="rc-title">표정의 심리학</div>
+                <div class="rc-reason">같은 결 · 220쪽</div>
+              </div>
+            </div>
+
+            <div style="font-size:11.5px; line-height:1.5; letter-spacing:-0.01em; padding: 8px 2px 12px; opacity:0.92; text-align:center;">
+              방금 끝낸 <b style="font-weight:800">캐릭터 심리 사전</b>과 <b>같은 결</b>이에요
+            </div>
+
+            <div class="cta-row">
+              <button class="cta primary-on-peach">
+                <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                바로 시작
+              </button>
+              <button class="cta ghost-on-accent" style="font-size:12.5px;">
+                위시에 담기
+              </button>
+            </div>
+          </div>
+
+          <!-- 위시 안내 -->
+          <div style="padding: 11px 14px; background: var(--sf); border-radius: 14px; border: 0.5px solid var(--bd); margin-bottom: 10px; display:flex; align-items:center; gap:10px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a7593f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7z"/></svg>
+            <div style="flex:1; min-width:0;">
+              <div style="font-size: 11.5px; font-weight: 700; color: var(--tp); letter-spacing:-0.01em;">위시에 이미 <b style="color:#a7593f;font-weight:800">5권</b> 있어요</div>
+              <div style="font-size: 10px; color: var(--tm); margin-top:1px;">거기서 고르실래요? · 가나다 순 정렬</div>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ts)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+
+          <!-- 취향 요약 -->
+          <div style="padding: 12px 14px; background: var(--sf); border-radius: 14px; border: 0.5px solid var(--bd);">
+            <div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ts); margin-bottom: 8px;">
+              지선님의 취향
+            </div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <span style="font-size:11px; font-weight:600; color: var(--ac); background: var(--ac3); padding: 4px 10px; border-radius: 999px; letter-spacing:-0.01em;">심리 · 인문</span>
+              <span style="font-size:11px; font-weight:600; color: #a7593f; background: color-mix(in srgb, var(--peach) 22%, #fff); padding: 4px 10px; border-radius: 999px; letter-spacing:-0.01em;">에세이</span>
+              <span style="font-size:11px; font-weight:600; color: #5b4686; background: color-mix(in srgb, var(--lavender) 22%, #fff); padding: 4px 10px; border-radius: 999px; letter-spacing:-0.01em;">중편 (200~300쪽)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="nav">
+          <div class="item on"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </span>홈</div>
+          <div class="item"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          </span>서재</div>
+          <div class="item"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </span>모임</div>
+          <div class="item"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+          </span>서평</div>
+          <div class="item"><span class="dot">
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </span>내정보</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="state-note">
+      <span class="tag trig-p">트리거</span>완독 후 <b>5일+</b> 지난 책 없음 · V2 종료 후 구간<br/>
+      <span class="tag trig-p">로직</span>위시 있으면 위시 우선 3권 · 없으면 AI 추천 (완독 책과 장르/분량 유사도)<br/>
+      <span class="tag trig-p">킥</span>"닮은 결" 한 줄 이유가 클릭률 올려요 — 단순 장르 매칭보다 강력
+    </div>
+  </div>
+
+</div>
+
+<!-- 범례 -->
+<aside class="legend">
+  <h3>HERO 정책 — 두 갈래 기본, 이벤트 카드는 한시적 덮어씌움</h3>
+
+  <!-- 기본 정책 -->
+  <div style="margin: 14px 0 12px; padding: 14px 16px; background: var(--ac3); border-radius: 14px; border: 0.5px solid color-mix(in srgb, var(--ac) 35%, var(--bd));">
+    <div style="font-size:10.5px; font-weight:800; letter-spacing:0.06em; color:var(--ac); text-transform:uppercase; margin-bottom:8px;">기본 상시 — 유저가 매일 보는 카드</div>
+
+    <div class="line"><b style="color:var(--ac)">📚 책에 모임 있음</b> → <b>V3 모임 대비형</b></div>
+    <div class="line" style="padding-left: 14px; color: var(--tm);">&nbsp;&nbsp;└ D-3 ~ D-Day 단계별 강도 업. 다른 HERO 덮어씌움.</div>
+
+    <div class="line" style="margin-top:6px;"><b style="color:var(--ac)">📖 책에 모임 없음</b> → <b>V1 체인</b> · 유저 상태에 따라 자동 분기</div>
+    <div class="line" style="padding-left: 14px;">&nbsp;&nbsp;└ <b>V1-B 회상형</b> — 스크랩 3개+ 있으면 본인이 썼던 문장 회상 · <b style="color:var(--ac)">환각 0%</b></div>
+    <div class="line" style="padding-left: 14px;">&nbsp;&nbsp;└ <b>V1-A 범용 질문형</b> — 스크랩 없고 읽는 중이면 책 무관 오픈 질문풀</div>
+    <div class="line" style="padding-left: 14px;">&nbsp;&nbsp;└ <b>V1-C 넛지형</b> — 신규/거부감은 칩 하나만, 대화창에서 사용자가 먼저 말해요</div>
+  </div>
+
+  <!-- 이벤트 카드 -->
+  <div style="margin: 12px 0 10px; padding: 12px 16px; background: var(--sf2); border-radius: 14px; border: 0.5px dashed var(--bd2);">
+    <div style="font-size:10.5px; font-weight:800; letter-spacing:0.06em; color:var(--tm); text-transform:uppercase; margin-bottom:8px;">이벤트 덮어씌움 — 특정 타이밍에만 한시적</div>
+
+    <div class="line"><b>V2 완독 골든타임</b> — reading → finished 전환 직후 24~48h (서평 전환율 핵심)</div>
+    <div class="line"><b>V4 슬럼프 복귀</b> — 이 책 last_read &gt; 7일, "여기서 멈추셨어요" 회상 톤</div>
+    <div class="line"><b>V5 발견 재추천</b> — 완독 후 5일+ 공백, V2 식은 뒤 다음 책 제안</div>
+  </div>
+
+  <!-- 의사 코드 -->
+  <div style="margin-top: 12px; padding: 14px 16px; background: var(--bg); border: 0.5px solid var(--bd); border-radius: 12px; font-family: ui-monospace, 'SF Mono', Consolas, monospace; font-size: 11px; line-height: 1.75; color: var(--tp); letter-spacing: -0.005em; overflow-x: auto; white-space: pre-wrap;">
+<span style="color:var(--ts)">// 구현 의사 코드 — 한 함수로 해결</span>
+function <b style="color:var(--ac)">resolveHeroVariant</b>(user, book) {
+  <span style="color:var(--ts)">// 1. 이벤트 카드 (최우선 · 한시적)</span>
+  if (freshlyFinished(book, 48h)) return <b>'V2'</b>;
+  if (daysSinceRead(book) > 7)   return <b>'V4'</b>;
+  if (noActiveBook(user, 5d))    return <b>'V5'</b>;
+
+  <span style="color:var(--ts)">// 2. 모임 책은 V3 덮어씌움</span>
+  if (book.group_books?.length) return <b>'V3'</b>;
+
+  <span style="color:var(--ts)">// 3. 기본 V1 체인 (유저 상태 분기)</span>
+  if (user.scrapCount >= 3)              return <b>'V1-B'</b>;
+  if (book.progress >= 0.15 && book.progress <= 0.85)
+                                          return <b>'V1-A'</b>;
+  return <b>'V1-C'</b>;
+}</div>
+
+  <div class="kick" style="margin-top:14px;">
+    ※ 핵심 원칙: <b style="color:var(--tp)">AI가 책 본문을 모른다는 전제</b>. 그래서 구체적 책 내용 해석은 안 하고, 사용자가 쓴 문장을 회상하거나 책 무관 오픈 질문만 던져요. "AI가 틀린 소리 하네" 역효과 원천 차단.
+  </div>
+</aside>
+
+</body>
+</html>
