@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, BookOpen } from "lucide-react";
+import { Play } from "lucide-react";
 import { coverPalette, upgradeCoverUrl } from "@/lib/reading-utils";
 import type { Book } from "@/lib/types";
 
@@ -14,9 +14,30 @@ function getProgress(b: Book): number {
   return 0;
 }
 
+/** updated_at 기준 마지막 독서 시점 자연어 표기. */
+function lastReadLabel(updatedAt?: string | null): string {
+  if (!updatedAt) return "마지막";
+  const last = new Date(updatedAt);
+  if (isNaN(last.getTime())) return "마지막";
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const lastDay = new Date(last);
+  lastDay.setHours(0, 0, 0, 0);
+  const diff = Math.round(
+    (today.getTime() - lastDay.getTime()) / 86400000
+  );
+  if (diff <= 0) return "오늘";
+  if (diff === 1) return "어제";
+  if (diff <= 6) return `${diff}일 전`;
+  return "최근";
+}
+
 /**
- * ContinueCompactCard (Theme B) — 컴팩트 이어 읽기 + 진행률 바.
- * 읽는 중 책이 없으면 렌더하지 않음 (부모가 조건부로 호출).
+ * ContinueCompactCard — mockup-home-v2.html `.cr.compact` Phone A 스타일.
+ *  - 표지(54x78) + 제목/저자(serif)
+ *  - sage-bg 컨텍스트 박스 ("어제 N쪽에서 멈췄어요")
+ *  - 진행률 바 + 퍼센트
+ *  - 다크 잉크 CTA
  */
 export default function ContinueCompactCard({ book }: { book: Book }) {
   const router = useRouter();
@@ -24,62 +45,27 @@ export default function ContinueCompactCard({ book }: { book: Book }) {
   const coverUrl = useMemo(() => upgradeCoverUrl(book.cover_url), [book.cover_url]);
   const [coverBg, coverFg] = useMemo(() => coverPalette(book.title), [book.title]);
   const progress = useMemo(() => getProgress(book), [book]);
+  const lastWhen = useMemo(() => lastReadLabel(book.updated_at), [book.updated_at]);
 
   const handleContinue = () => router.push(`/book/${book.id}`);
+  const currentPage = book.current_page ?? 0;
+  const totalPages = book.total_pages ?? 0;
 
   return (
     <div
       style={{
         background: "var(--sf)",
         borderRadius: 18,
-        border: "0.5px solid var(--bd)",
-        padding: 16,
-        marginBottom: 8,
-        boxShadow: "0 2px 8px color-mix(in srgb, var(--tp) 3%, transparent)",
+        border: "1.5px solid var(--tp)",
+        padding: 12,
+        marginBottom: 14,
+        boxShadow:
+          "0 1px 0 color-mix(in srgb, var(--tp) 4%, transparent), 2px 4px 0 color-mix(in srgb, var(--tp) 8%, transparent)",
         transition:
           "background var(--duration-slow) var(--easing-default), border-color var(--duration-slow) var(--easing-default)",
       }}
     >
-      {/* 헤더: 라벨 + 진행률 */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 12,
-        }}
-      >
-        <span
-          style={{
-            fontSize: 12,
-            color: "var(--ts)",
-            fontWeight: 600,
-            letterSpacing: "-0.01em",
-          }}
-        >
-          이어 읽기
-        </span>
-        <span
-          style={{
-            fontSize: 12,
-            color: "var(--ac)",
-            fontWeight: 700,
-          }}
-        >
-          <b
-            style={{
-              fontFamily: "var(--font-playful)",
-              fontSize: 14,
-              marginRight: 3,
-            }}
-          >
-            {progress}%
-          </b>
-          완독
-        </span>
-      </div>
-
-      {/* 본문: 표지 + 제목/쪽 */}
+      {/* 본문: 표지 + 정보 */}
       <div
         onClick={handleContinue}
         role="button"
@@ -92,21 +78,22 @@ export default function ContinueCompactCard({ book }: { book: Book }) {
         }}
         style={{
           display: "flex",
-          gap: 13,
-          marginBottom: 14,
+          gap: 12,
+          alignItems: "flex-start",
           cursor: "pointer",
         }}
       >
-        {/* 표지 (sm) */}
+        {/* 표지 (compact 54x78, paperback look) */}
         <div
           style={{
-            width: 78,
-            height: 108,
+            width: 54,
+            height: 78,
             flexShrink: 0,
-            borderRadius: 5,
+            borderRadius: "4px 8px 8px 4px",
             overflow: "hidden",
             position: "relative",
-            boxShadow: "2px 4px 10px rgba(0,0,0,0.18)",
+            boxShadow:
+              "2px 3px 0 color-mix(in srgb, var(--tp) 14%, transparent)",
           }}
         >
           {coverUrl ? (
@@ -122,20 +109,20 @@ export default function ContinueCompactCard({ book }: { book: Book }) {
                 inset: 0,
                 background: `linear-gradient(135deg, ${coverBg}, ${coverFg})`,
                 display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                alignItems: "flex-start",
+                justifyContent: "flex-start",
                 padding: "10px 8px",
               }}
             >
               <span
                 style={{
-                  fontFamily: "var(--font-playful)",
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: "rgba(255,255,255,0.9)",
-                  letterSpacing: "var(--ls-gaegu)",
-                  textAlign: "center",
-                  lineHeight: 1.15,
+                  fontFamily: "Fraunces, 'Times New Roman', serif",
+                  fontStyle: "italic",
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: "rgba(255,255,255,0.92)",
+                  lineHeight: 1.2,
+                  letterSpacing: "-0.01em",
                   display: "-webkit-box",
                   WebkitLineClamp: 3,
                   WebkitBoxOrient: "vertical",
@@ -146,135 +133,166 @@ export default function ContinueCompactCard({ book }: { book: Book }) {
               </span>
             </div>
           )}
+          {/* 책등 그림자 */}
           <div
             aria-hidden
             style={{
               position: "absolute",
-              inset: 0,
-              background:
-                "linear-gradient(90deg, rgba(255,255,255,0.12), transparent 28%)",
+              left: 3,
+              top: 0,
+              bottom: 0,
+              width: 2,
+              background: "rgba(0,0,0,0.2)",
             }}
           />
         </div>
 
         {/* 정보 */}
-        <div
-          style={{
-            flex: 1,
-            minWidth: 0,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            padding: "2px 0",
-          }}
-        >
-          <div>
+        <div style={{ flex: 1, minWidth: 0, paddingTop: 2 }}>
+          <div
+            style={{
+              fontFamily: "Fraunces, 'Times New Roman', serif",
+              fontSize: 13.5,
+              fontWeight: 700,
+              color: "var(--tp)",
+              lineHeight: 1.25,
+              marginBottom: 1,
+              letterSpacing: "-0.01em",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+            }}
+          >
+            {book.title}
+          </div>
+          {book.author && (
             <div
               style={{
-                fontSize: 18,
-                fontWeight: 700,
-                letterSpacing: "-0.02em",
-                lineHeight: 1.25,
-                marginBottom: 3,
-                color: "var(--tp)",
-                display: "-webkit-box",
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: "vertical",
+                fontSize: 10.5,
+                color: "var(--ts)",
+                marginBottom: 4,
+                whiteSpace: "nowrap",
                 overflow: "hidden",
+                textOverflow: "ellipsis",
               }}
             >
-              {book.title}
+              {book.author}
             </div>
-            {book.author && (
-              <div style={{ fontSize: 12, color: "var(--ts)" }}>{book.author}</div>
-            )}
-          </div>
-          <div>
+          )}
+
+          {/* 컨텍스트 박스 — sage bg */}
+          {currentPage > 0 && (
             <div
               style={{
+                background: "color-mix(in srgb, var(--ac) 14%, transparent)",
+                borderRadius: 8,
+                padding: "5px 8px",
+                fontSize: 11,
+                color: "var(--ac-deep)",
+                lineHeight: 1.35,
+                marginBottom: 6,
+              }}
+            >
+              {lastWhen}{" "}
+              <b style={{ fontWeight: 700, color: "var(--ac-deep)" }}>
+                {currentPage}p
+              </b>
+              에서 멈췄어요
+            </div>
+          )}
+
+          {/* 진행률 바 */}
+          <div
+            style={{
+              height: 5,
+              background: "var(--sf2)",
+              borderRadius: 100,
+              overflow: "hidden",
+              marginBottom: 4,
+              width: "100%",
+            }}
+          >
+            <div
+              style={{
+                height: "100%",
+                background: "linear-gradient(90deg, var(--ac-deep), var(--ac))",
+                borderRadius: 100,
+                width: `${progress}%`,
+                transition: "width var(--duration-normal) var(--easing-default)",
+              }}
+            />
+          </div>
+
+          {/* 진행률 텍스트 */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "baseline",
+              fontSize: 10,
+              color: "var(--ts)",
+            }}
+          >
+            <span>
+              {currentPage}
+              {totalPages > 0 ? ` / ${totalPages}p` : "p"}
+            </span>
+            <b
+              style={{
+                fontFamily: "var(--font-playful)",
                 fontSize: 12,
                 color: "var(--tp)",
-                fontWeight: 600,
-                marginTop: 12,
-                display: "flex",
-                alignItems: "baseline",
-                gap: 4,
+                fontWeight: 700,
               }}
             >
-              <b
-                style={{
-                  fontFamily: "var(--font-playful)",
-                  fontSize: 17,
-                  color: "var(--tp)",
-                  fontWeight: 700,
-                }}
-              >
-                {book.current_page ?? 0}
-              </b>
-              {book.total_pages ? `/ ${book.total_pages}쪽` : "쪽"}
-            </div>
-            <div
-              style={{
-                height: 5,
-                background: "var(--sf3)",
-                borderRadius: 100,
-                overflow: "hidden",
-                marginTop: 6,
-                width: "100%",
-              }}
-            >
-              <div
-                style={{
-                  height: "100%",
-                  background: "linear-gradient(90deg, var(--ac), var(--ac2))",
-                  borderRadius: 100,
-                  width: `${progress}%`,
-                  transition: "width var(--duration-normal) var(--easing-default)",
-                }}
-              />
-            </div>
+              {progress}%
+            </b>
           </div>
         </div>
       </div>
 
-      {/* CTA */}
+      {/* 다크 잉크 CTA */}
       <button
         onClick={handleContinue}
         type="button"
         aria-label={`${book.title} 이어 읽기`}
         style={{
-          background: "var(--ac)",
-          color: "var(--acc)",
-          border: "none",
-          width: "100%",
-          padding: 15,
-          borderRadius: 14,
-          fontSize: 15,
-          fontWeight: 700,
-          cursor: "pointer",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           gap: 6,
+          width: "100%",
+          marginTop: 8,
+          padding: 9,
+          background: "var(--tp)",
+          color: "var(--sf)",
+          border: "none",
+          borderRadius: 12,
           fontFamily: "inherit",
-          minHeight: 48,
+          fontSize: 12.5,
+          fontWeight: 700,
+          letterSpacing: "-0.01em",
+          cursor: "pointer",
+          minHeight: 40,
+          boxShadow:
+            "0 2px 0 color-mix(in srgb, var(--tp) 60%, transparent)",
           transition:
             "background var(--duration-fast) var(--easing-default), transform var(--duration-fast) var(--easing-default)",
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.background =
-            "color-mix(in srgb, var(--ac) 80%, #000)";
+            "color-mix(in srgb, var(--tp) 88%, var(--ac))";
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.background = "var(--ac)";
+          e.currentTarget.style.background = "var(--tp)";
           e.currentTarget.style.transform = "";
         }}
         onMouseDown={(e) => (e.currentTarget.style.transform = "translateY(-1px)")}
         onMouseUp={(e) => (e.currentTarget.style.transform = "")}
       >
-        <BookOpen size={17} strokeWidth={2.5} />
+        <Play size={14} strokeWidth={2.5} fill="currentColor" />
         이어 읽기
-        <ArrowRight size={17} strokeWidth={2.5} />
       </button>
     </div>
   );

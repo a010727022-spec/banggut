@@ -13,28 +13,27 @@ function resolveNickname(raw?: string | null): string {
   return nick;
 }
 
-/** 시간대별 인사말 + 마스코트 변형 선택 */
 function pickGreeting(hour: number): { text: string; mascot: string } {
   if (hour >= 5 && hour < 11)
-    return { text: "좋은 아침이에요", mascot: "mascot-morning" };
+    return { text: "오늘도 한 장 펼쳐볼까요?", mascot: "mascot-morning" };
   if (hour >= 11 && hour < 14)
-    return { text: "점심 잘 챙겨요", mascot: "mascot-happy" };
+    return { text: "점심 잘 챙기고 한 장 같이 읽어요", mascot: "mascot-happy" };
   if (hour >= 14 && hour < 18)
-    return { text: "오후에도 한 장 같이 읽어요", mascot: "mascot-reading" };
+    return { text: "오후에도 같이 한 장 읽어볼까요?", mascot: "mascot-reading" };
   if (hour >= 18 && hour < 22)
-    return { text: "오늘도 수고했어요", mascot: "mascot-happy" };
-  return { text: "편안한 밤이에요", mascot: "mascot-sleep" };
+    return { text: "오늘도 수고했어요. 잠시 쉬어가요", mascot: "mascot-happy" };
+  return { text: "편안한 밤이에요. 한 장만 더 펴볼까요?", mascot: "mascot-sleep" };
 }
 
 function formatToday(date: Date): string {
   const months = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
-  const days = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
-  return `오늘은 ${months[date.getMonth()]} ${date.getDate()}일 ${days[date.getDay()]}이에요`;
+  const days = ["일", "월", "화", "수", "목", "금", "토"];
+  return `${months[date.getMonth()]} ${date.getDate()}일 ${days[date.getDay()]}요일`;
 }
 
 /**
- * GreetingBar — 두 테마(A/B) 공통 상단 인사말.
- * 시간대별 인사 + 원형 마스코트 + 오늘 날짜 라벨.
+ * GreetingBar — 마스코트 원형 프레임 + 말풍선 카드.
+ * mockup-home-v2.html Phone A 스타일.
  */
 export default function GreetingBar() {
   const user = useAuthStore((s) => s.user);
@@ -48,9 +47,9 @@ export default function GreetingBar() {
     <div
       style={{
         display: "flex",
-        alignItems: "center",
-        gap: 12,
-        padding: "8px 2px 18px",
+        alignItems: "flex-end",
+        gap: 10,
+        padding: "8px 0 16px",
       }}
     >
       <style>{`
@@ -64,55 +63,75 @@ export default function GreetingBar() {
         }
       `}</style>
 
-      {/* 마스코트 — 동그라미 없이 그대로 */}
-      <img
-        src={`/${greeting.mascot}.png`}
-        alt="방긋이"
-        className="banggut-mascot-bob"
+      {/* 마스코트 — 원형 프레임 */}
+      <div
         style={{
-          width: 56,
-          height: 56,
-          minWidth: 56,
-          objectFit: "contain",
-          display: "block",
+          width: 54,
+          height: 54,
+          minWidth: 54,
+          borderRadius: "50%",
+          background: "var(--sf)",
+          border: "1.5px solid var(--bd)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
           flexShrink: 0,
+          overflow: "hidden",
+          boxShadow: "0 1px 0 color-mix(in srgb, var(--tp) 4%, transparent), 2px 3px 0 color-mix(in srgb, var(--tp) 6%, transparent)",
         }}
-        onError={(e) => {
-          (e.currentTarget as HTMLImageElement).src = "/mascot-happy.png";
-        }}
-      />
+      >
+        <img
+          src={`/${greeting.mascot}.png`}
+          alt="방긋이"
+          className="banggut-mascot-bob"
+          style={{
+            width: "92%",
+            height: "92%",
+            objectFit: "contain",
+            display: "block",
+          }}
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).src = "/mascot-happy.png";
+          }}
+        />
+      </div>
 
-      {/* 인사말 + 날짜 */}
+      {/* 말풍선 */}
       <div
         style={{
           flex: 1,
           minWidth: 0,
-          display: "flex",
-          flexDirection: "column",
-          gap: 3,
+          background: "var(--sf)",
+          border: "1.5px solid var(--tp)",
+          borderRadius: "16px 16px 16px 4px",
+          padding: "10px 14px",
+          boxShadow: "0 1px 0 color-mix(in srgb, var(--tp) 4%, transparent), 2px 3px 0 color-mix(in srgb, var(--tp) 8%, transparent)",
+          transition:
+            "background var(--duration-slow) var(--easing-default), border-color var(--duration-slow) var(--easing-default)",
         }}
       >
         <div
           style={{
-            fontSize: 15,
-            color: "var(--tp)",
-            fontWeight: 600,
-            letterSpacing: "-0.015em",
-            lineHeight: 1.35,
-            transition: "color var(--duration-slow) var(--easing-default)",
+            fontFamily: "var(--font-playful)",
+            color: "var(--tm)",
+            fontSize: 12,
+            lineHeight: 1.2,
+            marginBottom: 2,
+            letterSpacing: "var(--ls-gaegu)",
           }}
         >
-          {greeting.text}, <b style={{ fontWeight: 700, color: "var(--ac)" }}>{nickname}</b>님
+          방긋이 · {dateLabel}
         </div>
         <div
           style={{
-            fontSize: 11.5,
-            color: "var(--ts)",
-            lineHeight: 1.4,
-            transition: "color var(--duration-slow) var(--easing-default)",
+            fontSize: 13.5,
+            color: "var(--tp)",
+            lineHeight: 1.45,
+            letterSpacing: "-0.01em",
           }}
         >
-          {dateLabel}
+          <b style={{ fontWeight: 700, color: "var(--ac)" }}>{nickname}</b>님,{" "}
+          {greeting.text}
         </div>
       </div>
     </div>

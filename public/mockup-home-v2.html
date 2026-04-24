@@ -1,687 +1,1237 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>완독콩 홈 화면 · 테마 비교</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>방긋 · 홈 v2 — 3 variations (Calendar / Reading / Social)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Fraunces:ital,wght@0,600;0,700;0,900;1,600&display=swap" rel="stylesheet" />
 <style>
-:root{
-  --cream:#F7F3ED; --cream-sub:#EFE9DF; --paper:#FEFCF6; --paper-sub:#F5EEE1;
-  --mint:#5FA48E; --mint-dark:#4A8873; --mint-soft:#E7F1EC; --mint-muted:#BFD9CD;
-  --ink:#0F0E0C; --ink-sub:#5A544C; --ink-soft:#8A8177;
-  --bd:rgba(15,14,12,0.08); --bd2:rgba(15,14,12,0.12);
-  --danger:#C8604F; --wish:#D69E52;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{font-family:'Pretendard Variable',Pretendard,-apple-system,sans-serif;background:#141414;color:var(--ink);-webkit-font-smoothing:antialiased}
-body{min-height:100vh;padding:40px 16px 80px}
+  :root {
+    /* Canvas — 크림 테마 */
+    --cream:        #F7F3ED;
+    --cream-sub:    #EFE8DB;
+    --paper:        #FFFFFF;
+    --paper-warm:   #FBF7EE;
 
-.page-head{text-align:center;margin-bottom:30px}
-.page-title{color:#E7E2D9;font-size:20px;font-weight:700;letter-spacing:-0.02em;margin-bottom:10px;display:inline-flex;align-items:center;gap:8px;justify-content:center}
-.page-title .v{color:var(--mint);font-family:'Gaegu',cursive;margin-left:4px;font-size:20px}
-.page-sub{color:#b5afa4;font-size:13px;line-height:1.6;margin-bottom:6px}
-.page-sub b{color:#E7E2D9;font-weight:600}
-.page-hint{color:#7a746a;font-size:11px;line-height:1.55;display:inline-flex;align-items:center;gap:6px;background:#1c1c1c;padding:6px 14px;border-radius:100px;border:1px solid #2a2a2a;margin-top:10px}
-.page-hint svg{width:13px;height:13px;stroke:var(--mint);fill:none;stroke-width:2}
-.page-hint b{color:var(--mint);font-weight:700}
+    /* Brand sage */
+    --sage:         #5FA48E;
+    --sage-deep:    #3E7E6A;
+    --sage-ink:     #264E42;
+    --sage-soft:    #D8EAE1;
+    --sage-bg:      #EDF4F0;
 
-.phones-row{display:flex;gap:28px;justify-content:center;flex-wrap:wrap;max-width:1360px;margin:50px auto 0;padding:0 10px}
+    /* Community rose */
+    --rose:         #D99CAB;
+    --rose-deep:    #B77485;
+    --rose-ink:     #8F4D5E;
+    --rose-soft:    #F5D6DE;
+    --rose-bg:      #FBEEF2;
 
-/* Theme selection wrapper — clickable */
-.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;cursor:pointer;padding:18px 18px 22px;border-radius:58px;transition:all .3s;border:2px solid transparent;position:relative}
-.phone-wrap:hover{background:rgba(255,255,255,0.02)}
-.phone-wrap.selected{border-color:var(--mint);background:rgba(95,164,142,0.07);box-shadow:0 0 60px rgba(95,164,142,0.25),inset 0 0 0 1px rgba(95,164,142,0.15)}
-.theme-badge{display:flex;align-items:center;gap:8px;padding:9px 18px;background:#1c1c1c;border:1.5px solid #2a2a2a;border-radius:100px;transition:all .3s}
-.phone-wrap.selected .theme-badge{background:var(--mint);border-color:var(--mint)}
-.theme-radio{width:18px;height:18px;border-radius:50%;border:2px solid #4a4a4a;background:transparent;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
-.phone-wrap.selected .theme-radio{border-color:var(--paper);background:var(--paper)}
-.theme-radio::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--mint);opacity:0;transition:opacity .2s}
-.phone-wrap.selected .theme-radio::after{opacity:1}
-.theme-name{color:#E7E2D9;font-size:13px;font-weight:700;letter-spacing:-0.01em;transition:color .3s}
-.phone-wrap.selected .theme-name{color:var(--paper)}
-.theme-name .tag{color:var(--mint);font-family:'Gaegu',cursive;font-size:12px;margin-right:6px;font-weight:700}
-.phone-wrap.selected .theme-name .tag{color:var(--paper);opacity:0.9}
-.theme-desc{color:#8a8177;font-size:11px;line-height:1.55;text-align:center;max-width:330px;letter-spacing:-0.01em}
-.theme-desc b{color:#b5afa4;font-weight:600}
-.phone-wrap.selected .theme-desc{color:#a5a095}
+    /* Calendar copper (모임/위시/반납 구분용 보조색) */
+    --copper:       #B79556;
+    --copper-deep:  #8B6F3E;
+    --copper-soft:  #EDDFBE;
+    --copper-bg:    #F7EFD9;
 
-/* Phone shell */
-.phone{width:360px;height:812px;background:#000;border-radius:44px;padding:10px;position:relative;border:1px solid #2a2a2a;box-shadow:0 24px 80px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.04)}
-.phone-inner{width:100%;height:100%;background:var(--cream);border-radius:34px;overflow:hidden;position:relative;display:flex;flex-direction:column}
-.notch{position:absolute;top:18px;left:50%;transform:translateX(-50%);width:100px;height:26px;background:#000;border-radius:100px;z-index:10}
+    /* Ink */
+    --ink:          #2B2420;
+    --ink-soft:     #5A4A3C;
+    --ink-mute:     #8A7862;
+    --ink-faint:    #BDAE94;
 
-.sb{height:44px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 28px 8px;font-size:14px;font-weight:600;color:var(--ink);flex-shrink:0}
-.sb .icons{display:flex;gap:5px;align-items:center}
-.sb svg{width:15px;height:15px;stroke:var(--ink);fill:none;stroke-width:2}
+    /* Lines */
+    --bd:           rgba(43, 36, 32, 0.10);
+    --bd-soft:      rgba(43, 36, 32, 0.06);
+    --bd-sage:      rgba(95, 164, 142, 0.22);
 
-.ab{padding:8px 20px 10px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
-.brand{display:inline-flex;align-items:baseline;font-family:'Gaegu',cursive;font-size:20px;font-weight:700;color:var(--ink);line-height:1;letter-spacing:0}
-.brand .dot{color:var(--mint);margin-left:1px}
-.ab-icons{display:flex;gap:10px;align-items:center}
-.ab-ic{width:38px;height:38px;min-width:38px;border-radius:50%;background:var(--paper);display:flex;align-items:center;justify-content:center;border:1px solid var(--bd);cursor:pointer;position:relative;transition:background .2s}
-.ab-ic:hover{background:var(--paper-sub)}
-.ab-ic svg{width:17px;height:17px;stroke:var(--ink);fill:none;stroke-width:2}
-.ab-ic .bdot{position:absolute;top:7px;right:8px;width:8px;height:8px;background:var(--mint);border-radius:50%;border:1.5px solid var(--paper)}
+    /* Shadows */
+    --shadow-card:  0 1px 0 rgba(43,36,32,.04), 2px 3px 0 rgba(43,36,32,.08);
+    --shadow-cta:   0 1px 0 rgba(43,36,32,.06), 2px 4px 0 rgba(62,126,106,.28);
+    --shadow-soft:  0 10px 28px rgba(43,36,32,.08);
 
-.content{flex:1;overflow-y:auto;padding:0 20px 100px;-ms-overflow-style:none;scrollbar-width:none}
-.content::-webkit-scrollbar{display:none}
+    /* Fonts */
+    --font-body:    'Pretendard Variable', Pretendard, -apple-system, system-ui, sans-serif;
+    --font-playful: 'Gaegu', cursive;
+    --font-serif:   'Fraunces', serif;
+  }
 
-.tabbar{position:absolute;bottom:10px;left:10px;right:10px;height:72px;background:rgba(254,252,246,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--bd);border-bottom-left-radius:34px;border-bottom-right-radius:34px;display:flex;align-items:flex-start;justify-content:space-around;padding:10px 8px 16px}
-.tab{display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px 14px;min-width:48px;cursor:pointer}
-.tab svg{width:22px;height:22px;stroke:var(--ink-soft);fill:none;stroke-width:2}
-.tab span{font-size:10px;color:var(--ink-soft);font-weight:500}
-.tab.on svg{stroke:var(--mint);fill:var(--mint-soft)}
-.tab.on span{color:var(--mint);font-weight:700}
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
 
-/* ========== Greeting (shared) ========== */
-.greet{display:flex;align-items:center;gap:12px;padding:8px 2px 18px}
-.mascot-wrap{width:56px;height:56px;min-width:56px;border-radius:50%;background:var(--mint-soft);border:1px solid rgba(95,164,142,0.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
-.mascot{width:50px;height:50px;object-fit:contain;display:block}
-.greet-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
-.greet-hi{font-size:15px;color:var(--ink);font-weight:600;letter-spacing:-0.015em;line-height:1.35}
-.greet-hi b{font-weight:700;color:var(--mint-dark)}
-.greet-date{font-size:11.5px;color:var(--ink-sub);line-height:1.4}
+  html, body { height: 100%; }
+  body {
+    font-family: var(--font-body);
+    color: var(--ink);
+    background:
+      radial-gradient(#E7DFC9 1px, transparent 1px) 0 0 / 22px 22px,
+      linear-gradient(180deg, #F5EED9 0%, #EEE4CA 100%);
+    min-height: 100vh;
+    padding: 56px 24px 96px;
+    letter-spacing: -0.01em;
+  }
 
-/* ========== Theme A: 이어 읽기 HERO ========== */
-.cch{background:linear-gradient(155deg,var(--mint) 0%,var(--mint-dark) 100%);border-radius:22px;padding:18px;color:var(--paper);margin-bottom:14px;position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(95,164,142,0.22)}
-.cch::before{content:'';position:absolute;top:-60px;right:-40px;width:180px;height:180px;background:rgba(255,255,255,0.06);border-radius:50%;pointer-events:none}
-.cch::after{content:'';position:absolute;bottom:-80px;left:-30px;width:140px;height:140px;background:rgba(255,255,255,0.04);border-radius:50%;pointer-events:none}
-.cch-badge{font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;opacity:0.85;margin-bottom:12px;position:relative;display:inline-flex;align-items:center;gap:6px}
-.cch-badge svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.5}
-.cch-main{display:flex;gap:14px;margin-bottom:12px;position:relative}
-.cch-info{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between;padding:2px 0}
-.cch-ttl{font-size:19px;font-weight:700;line-height:1.25;letter-spacing:-0.02em;margin-bottom:4px}
-.cch-auth{font-size:12px;opacity:0.8;margin-bottom:12px}
-.cch-stats{display:flex;gap:14px;font-size:11px}
-.cch-stat b{font-size:15px;font-weight:700;display:block;font-family:'Gaegu',cursive;line-height:1;margin-bottom:2px}
-.cch-stat span{opacity:0.78;font-size:10px}
-.cch-ctx{background:rgba(255,255,255,0.12);border-radius:12px;padding:11px 13px;font-family:'Gaegu',cursive;font-size:14px;line-height:1.5;margin-bottom:12px;position:relative}
-.cch-ctx-lbl{font-size:9px;font-weight:700;letter-spacing:0.1em;opacity:0.75;margin-bottom:4px;font-family:'Pretendard Variable',sans-serif;text-transform:uppercase;display:flex;align-items:center;gap:5px}
-.cch-ctx-lbl svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2.5}
-.cch-cta{background:var(--paper);color:var(--mint-dark);border:none;width:100%;padding:13px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;min-height:44px;transition:transform .2s}
-.cch-cta:hover{transform:translateY(-1px)}
-.cch-cta svg{width:15px;height:15px;stroke:var(--mint-dark);fill:none;stroke-width:2.5}
+  .page { max-width: 1280px; margin: 0 auto; }
 
-/* Cover (shared) */
-.cover{border-radius:5px;flex-shrink:0;position:relative;overflow:hidden;box-shadow:2px 4px 10px rgba(0,0,0,0.18)}
-.cover::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,0.12),transparent 28%)}
-.cover.md{width:84px;height:120px}
-.cover.sm{width:78px;height:108px}
-.cover .c-ttl{position:absolute;top:12%;left:10%;right:10%;color:#F5EEE1;font-weight:700;line-height:1.15;font-family:'Gaegu',cursive;z-index:1;font-size:13px}
-.cover.sm .c-ttl{font-size:12px}
-.cover .c-auth{position:absolute;bottom:8%;left:10%;color:rgba(245,238,225,0.7);font-weight:500;font-size:9px;z-index:1}
-.cover-sonyeon{background:linear-gradient(135deg,#8A6A3F,#4A3520)}
+  /* ═══ Page header ═══ */
+  .page-hd { text-align: center; margin-bottom: 28px; }
+  .page-hd .kicker {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 5px 13px;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 100px;
+    font-family: var(--font-playful);
+    font-size: 13.5px; font-weight: 700; color: var(--ink);
+    margin-bottom: 18px;
+    box-shadow: var(--shadow-card);
+  }
+  .page-hd .kicker .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--sage); }
+  .page-hd .kicker .dot.rose { background: var(--rose); }
+  .page-hd .kicker .dot.copper { background: var(--copper); }
+  .page-hd h1 {
+    font-family: var(--font-serif);
+    font-weight: 900;
+    font-size: 42px;
+    letter-spacing: -0.025em;
+    margin: 0 0 10px;
+    line-height: 1.1;
+  }
+  .page-hd h1 em { font-style: italic; font-weight: 700; color: var(--sage-ink); }
+  .page-hd p { color: var(--ink-soft); font-size: 15px; margin: 0 auto; line-height: 1.6; max-width: 600px; }
 
-/* Segmented tabs (Theme A) */
-.seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--cream-sub);padding:4px;border-radius:14px;margin-bottom:14px}
-.seg-btn{padding:10px 8px;border-radius:10px;font-size:12px;font-weight:600;color:var(--ink-soft);text-align:center;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .2s;border:none;background:transparent;font-family:inherit;min-height:40px;letter-spacing:-0.01em}
-.seg-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
-.seg-btn.on{background:var(--paper);color:var(--ink);font-weight:700;box-shadow:0 1px 3px rgba(15,14,12,0.08)}
-.seg-btn.on svg{stroke:var(--mint-dark)}
-.panel{display:none}
-.panel.on{display:block;animation:fadeIn .25s ease-out}
-@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+  .team-note {
+    max-width: 860px;
+    margin: 20px auto 0;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 14px;
+    padding: 14px 22px;
+    font-size: 12.5px; line-height: 1.7; color: var(--ink-soft);
+    box-shadow: var(--shadow-card);
+  }
+  .team-note b { color: var(--ink); font-weight: 700; }
+  .team-note b.sage { color: var(--sage-deep); }
+  .team-note b.rose { color: var(--rose-deep); }
+  .team-note b.copper { color: var(--copper-deep); }
+  .team-note .sep { color: var(--ink-mute); margin: 0 4px; }
 
-/* ========== Calendar card (shared both themes) ========== */
-.cal{background:var(--paper);border-radius:18px;border:1px solid var(--bd);padding:18px 16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(15,14,12,0.03)}
-.cal-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.cal-mo{font-size:15px;font-weight:700;color:var(--ink);letter-spacing:-0.01em}
-.cal-mo span{color:var(--ink-soft);font-weight:500;font-size:12px;margin-left:4px}
-.streak{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--mint-dark);font-weight:700;background:var(--mint-soft);padding:6px 11px;border-radius:100px}
-.streak b{font-size:13px;font-family:'Gaegu',cursive;line-height:1}
-.streak svg{width:13px;height:13px;fill:var(--mint-dark)}
-.cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:16px}
-.cd{display:flex;flex-direction:column;align-items:center;gap:6px;padding:2px 0}
-.cd-lbl{font-size:10px;color:var(--ink-soft);font-weight:600;letter-spacing:0.04em}
-.cd-dot{width:28px;height:28px;border-radius:50%;background:var(--cream-sub);font-size:11px;font-weight:600;color:var(--ink-soft);display:flex;align-items:center;justify-content:center}
-.cd-dot.read{background:var(--mint);color:var(--paper)}
-.cd-dot.read svg{width:13px;height:13px;stroke:var(--paper);fill:none;stroke-width:3}
-.cd-dot.today{background:var(--paper);border:2px solid var(--mint);color:var(--mint-dark);font-weight:700}
-.cal-events{border-top:1px dashed var(--bd2);padding-top:14px;display:flex;flex-direction:column;gap:13px}
-.ev{display:flex;align-items:center;gap:11px}
-.ev-ic{width:36px;height:36px;min-width:36px;border-radius:11px;background:var(--mint-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.ev-ic svg{width:18px;height:18px;stroke:var(--mint-dark);fill:none;stroke-width:2}
-.ev-ic.wish{background:rgba(214,158,82,0.15)}
-.ev-ic.wish svg{stroke:var(--wish)}
-.ev-ic.lib{background:rgba(200,96,79,0.12)}
-.ev-ic.lib svg{stroke:var(--danger)}
-.ev-body{flex:1;min-width:0}
-.ev-ttl{font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-0.01em}
-.ev-meta{font-size:11px;color:var(--ink-sub);margin-top:2px}
-.ev-dday{font-size:10px;font-weight:700;color:var(--mint-dark);background:var(--mint-soft);padding:4px 9px;border-radius:8px;flex-shrink:0}
-.ev-dday.wish{color:var(--wish);background:rgba(214,158,82,0.15)}
-.ev-dday.warn{color:var(--danger);background:rgba(200,96,79,0.1)}
+  /* ═══ Phones frame ═══ */
+  .phones { display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; margin-top: 56px; }
+  .phone-wrap { width: 360px; position: relative; }
+  .phone-tag {
+    position: absolute; top: -28px; left: 50%; transform: translateX(-50%);
+    background: var(--ink); color: var(--paper);
+    font-family: var(--font-playful); font-size: 13px;
+    padding: 4px 14px; border-radius: 100px; font-weight: 700;
+    white-space: nowrap; z-index: 3; letter-spacing: 0.02em;
+  }
+  .phone-tag .num { margin-right: 6px; }
+  .phone-tag.sage .num { color: var(--sage-soft); }
+  .phone-tag.rose .num { color: var(--rose-soft); }
+  .phone-tag.copper .num { color: var(--copper-soft); }
+  .phone {
+    width: 360px; height: 812px;
+    border-radius: 44px;
+    background: var(--cream);
+    border: 8px solid #151311;
+    box-shadow: 0 30px 80px -20px rgba(43,36,32,.3), 0 12px 24px -12px rgba(43,36,32,.18);
+    overflow: hidden;
+    position: relative;
+  }
+  .notch {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 120px; height: 26px; background: #151311;
+    border-radius: 0 0 18px 18px; z-index: 10;
+  }
+  .screen {
+    width: 100%; height: 100%;
+    overflow-y: auto; overflow-x: hidden;
+    padding-bottom: 86px;
+    position: relative;
+  }
+  .screen::-webkit-scrollbar { display: none; }
 
-/* ========== Theme B: 컴팩트 이어 읽기 ========== */
-.cc{background:var(--paper);border-radius:18px;border:1px solid var(--bd);padding:16px;margin-bottom:8px;box-shadow:0 2px 8px rgba(15,14,12,0.03)}
-.cc-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.cc-lbl{font-size:12px;color:var(--ink-sub);font-weight:600;letter-spacing:-0.01em}
-.cc-pct{font-size:12px;color:var(--mint-dark);font-weight:700}
-.cc-pct b{font-family:'Gaegu',cursive;font-size:14px;margin-right:3px}
-.cc-body{display:flex;gap:13px;margin-bottom:14px}
-.cc-info{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between;padding:2px 0}
-.cc-ttl{font-size:18px;font-weight:700;letter-spacing:-0.02em;line-height:1.25;margin-bottom:3px;color:var(--ink)}
-.cc-auth{font-size:12px;color:var(--ink-sub)}
-.cc-stats{font-size:12px;color:var(--ink);font-weight:600;margin-top:12px;display:flex;align-items:baseline;gap:4px}
-.cc-stats b{font-family:'Gaegu',cursive;font-size:17px;color:var(--ink);font-weight:700}
-.cc-bar{height:5px;background:var(--cream-sub);border-radius:100px;overflow:hidden;margin-top:6px;width:100%}
-.cc-fill{height:100%;background:linear-gradient(90deg,var(--mint),var(--mint-dark));border-radius:100px;transition:width 0.3s}
-.cc-cta{background:var(--mint);color:var(--paper);border:none;width:100%;padding:15px;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;min-height:48px;transition:background .2s,transform .2s}
-.cc-cta:hover{background:var(--mint-dark);transform:translateY(-1px)}
-.cc-cta svg{width:17px;height:17px;stroke:var(--paper);fill:none;stroke-width:2.5}
+  /* ═══ Status bar ═══ */
+  .status-bar {
+    height: 44px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px 0 28px;
+    font-size: 13px; font-weight: 600; color: var(--ink);
+    position: relative; z-index: 5;
+  }
+  .status-bar .right { display: flex; align-items: center; gap: 6px; }
+  .status-bar .right svg { opacity: 0.85; }
 
-/* Section header (Theme B) */
-.sec-hd{display:flex;justify-content:space-between;align-items:center;padding:16px 2px 10px}
-.sec-hd .title{font-size:14px;font-weight:700;color:var(--ink);letter-spacing:-0.01em}
-.sec-hd .more{font-size:11px;color:var(--ink-soft);font-weight:600;display:flex;align-items:center;gap:3px;text-decoration:none;cursor:pointer}
-.sec-hd .more svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2.5}
+  /* ═══ App header (avatar + name + bell) ═══ */
+  .app-hd {
+    padding: 8px 20px 4px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .app-hd .avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--sage-soft), var(--sage));
+    color: var(--paper); font-weight: 700; font-size: 15px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; flex-shrink: 0;
+    box-shadow: 0 2px 0 rgba(43,36,32,.08);
+  }
+  .app-hd .avatar .streak-badge {
+    position: absolute; bottom: -3px; right: -6px;
+    background: var(--copper); color: #1a1000;
+    font-size: 9.5px; font-weight: 800;
+    padding: 1.5px 6px; border-radius: 100px;
+    border: 2px solid var(--cream);
+    letter-spacing: 0.02em;
+  }
+  .app-hd .name-col { flex: 1; min-width: 0; }
+  .app-hd .nm {
+    font-family: var(--font-playful);
+    font-size: 15.5px; font-weight: 700;
+    color: var(--ink); letter-spacing: 0.02em;
+  }
+  .app-hd .nm em { color: var(--sage-deep); font-style: normal; }
+  .app-hd .sub { font-size: 11.5px; color: var(--ink-mute); margin-top: 1px; }
+  .app-hd .bell {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--paper); border: 1px solid var(--bd);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; position: relative;
+  }
+  .app-hd .bell::after {
+    content: ''; position: absolute; top: 9px; right: 10px;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--rose); border: 1.5px solid var(--paper);
+  }
 
-/* Community feed (shared) */
-.feed{background:var(--paper);border-radius:18px;border:1px solid var(--bd);padding:4px 14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(15,14,12,0.03)}
-.fd{display:flex;gap:11px;padding:13px 0;border-bottom:1px solid var(--bd)}
-.fd:last-child{border-bottom:none}
-.av{width:36px;height:36px;min-width:36px;border-radius:50%;background:var(--mint-soft);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--mint-dark);flex-shrink:0;font-family:'Gaegu',cursive}
-.fd-body{flex:1;min-width:0}
-.fd-hd{display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap}
-.fd-nm{font-size:13px;font-weight:700;color:var(--ink);letter-spacing:-0.01em}
-.fd-vb{font-size:11px;color:var(--ink-sub)}
-.fd-tm{font-size:10px;color:var(--ink-soft);margin-left:auto;flex-shrink:0}
-.fd-bk{font-size:11px;color:var(--mint-dark);font-weight:600;margin-bottom:6px;letter-spacing:-0.01em}
-.fd-qt{background:var(--cream-sub);border-radius:10px;padding:9px 12px;font-family:'Gaegu',cursive;font-size:13px;line-height:1.5;color:var(--ink);margin-bottom:7px;position:relative}
-.fd-qt::before{content:'\201C';position:absolute;left:5px;top:-4px;font-size:22px;color:var(--mint-muted);font-family:Georgia,serif;line-height:1}
-.fd-act{display:flex;gap:14px;font-size:11px;color:var(--ink-soft)}
-.fa{display:flex;align-items:center;gap:4px;cursor:pointer;min-height:28px;padding:2px 0}
-.fa svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
-.fa.on{color:var(--mint-dark);font-weight:700}
-.fa.on svg{fill:var(--mint);stroke:var(--mint)}
+  /* ═══ Greeting row (mascot + bubble) ═══ */
+  .greet {
+    padding: 6px 20px 16px;
+    display: flex; align-items: flex-end; gap: 10px;
+  }
+  .greet .mascot {
+    width: 54px; height: 54px;
+    background: var(--paper-warm);
+    border: 1.5px solid var(--bd);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; overflow: hidden;
+    box-shadow: var(--shadow-card);
+  }
+  .greet .mascot img { width: 90%; height: 90%; object-fit: contain; }
+  .greet .bubble {
+    flex: 1;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 16px 16px 16px 4px;
+    padding: 10px 14px;
+    font-size: 13.5px; line-height: 1.45;
+    color: var(--ink);
+    box-shadow: var(--shadow-card);
+    position: relative;
+  }
+  .greet .bubble b { color: var(--sage-deep); font-weight: 700; }
+  .greet .bubble .hi {
+    font-family: var(--font-playful);
+    color: var(--ink-mute);
+    font-size: 12px;
+    margin-bottom: 2px;
+    display: block;
+  }
 
-/* ========== Theme Picker Modal (in-app selection UI) ========== */
-.modal-hd{padding:10px 16px 14px;display:flex;align-items:center;gap:8px;flex-shrink:0;border-bottom:1px solid var(--bd)}
-.modal-back{width:36px;height:36px;min-width:36px;border-radius:50%;background:transparent;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);transition:background .2s}
-.modal-back:hover{background:var(--paper-sub)}
-.modal-back svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.2}
-.modal-ttl{flex:1;font-size:16px;font-weight:700;color:var(--ink);letter-spacing:-0.02em;text-align:center}
-.modal-close{width:36px;height:36px;min-width:36px;border-radius:50%;background:var(--paper);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft)}
-.modal-close svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5}
+  /* ═══ Section labels ═══ */
+  .slbl {
+    font-family: var(--font-playful);
+    font-size: 13px; font-weight: 700;
+    color: var(--ink-mute);
+    text-transform: uppercase; letter-spacing: 0.12em;
+    display: flex; align-items: center; gap: 6px;
+    margin: 0 0 8px;
+  }
+  .slbl .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--sage); }
+  .slbl.rose .dot { background: var(--rose); }
+  .slbl.copper .dot { background: var(--copper); }
+  .slbl .more {
+    margin-left: auto; font-family: var(--font-body);
+    font-size: 11.5px; color: var(--ink-mute); letter-spacing: 0;
+    text-transform: none; font-weight: 500;
+  }
 
-.tp-hero{padding:22px 4px 20px;text-align:center}
-.tp-hero-mascot{display:flex;justify-content:center;margin-bottom:14px}
-.tp-hero-mascot .mascot-wrap{width:68px;height:68px;min-width:68px}
-.tp-hero-mascot .mascot{width:60px;height:60px}
-.tp-hero h2{font-size:20px;font-weight:700;color:var(--ink);line-height:1.3;letter-spacing:-0.02em;margin-bottom:8px}
-.tp-hero p{font-size:12.5px;color:var(--ink-sub);line-height:1.5}
+  .sec { padding: 0 20px; margin-bottom: 18px; }
 
-.tp-opts{display:flex;flex-direction:column;gap:12px;margin-bottom:18px}
-.tp-opt{background:var(--paper);border:2px solid var(--bd);border-radius:16px;padding:14px;display:grid;grid-template-columns:72px 1fr 22px;gap:14px;align-items:center;cursor:pointer;transition:all .25s;font-family:inherit;text-align:left;width:100%}
-.tp-opt:hover{background:var(--paper-sub)}
-.tp-opt.on{border-color:var(--mint);background:var(--mint-soft)}
-.tp-opt.on .tp-opt-tag{background:var(--mint);color:var(--paper)}
-.tp-opt-meta{display:flex;flex-direction:column;gap:4px;min-width:0}
-.tp-opt-name{font-size:14px;font-weight:700;color:var(--ink);letter-spacing:-0.015em;display:flex;align-items:center;gap:6px}
-.tp-opt-tag{font-family:'Gaegu',cursive;font-size:11px;font-weight:700;background:var(--cream-sub);color:var(--ink-sub);padding:2px 8px;border-radius:100px;transition:all .25s;line-height:1.4}
-.tp-opt-desc{font-size:11px;color:var(--ink-sub);line-height:1.5}
-.tp-opt-rd{width:22px;height:22px;border-radius:50%;border:2px solid var(--bd2);background:var(--paper);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .25s}
-.tp-opt.on .tp-opt-rd{background:var(--mint);border-color:var(--mint)}
-.tp-opt-rd svg{width:12px;height:12px;stroke:var(--paper);fill:none;stroke-width:3;opacity:0;transition:opacity .2s}
-.tp-opt.on .tp-opt-rd svg{opacity:1}
+  /* ═══ Calendar widget (Phone A hero / B+C compact) ═══ */
+  .cal {
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 18px;
+    padding: 14px;
+    box-shadow: var(--shadow-card);
+  }
+  .cal-hd { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+  .cal-hd .today {
+    font-family: var(--font-serif);
+    font-size: 19px; font-weight: 700;
+    color: var(--ink); line-height: 1;
+  }
+  .cal-hd .streak {
+    font-size: 11.5px; color: var(--sage-deep);
+    font-weight: 700;
+    background: var(--sage-bg);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  .cal-hd .streak .num { font-family: var(--font-playful); }
+  .cal-hd .arrow {
+    margin-left: auto; width: 22px; height: 22px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ink-mute);
+  }
 
-/* Mini preview (abstract layout thumbnail) */
-.tp-prev{width:72px;height:104px;border-radius:9px;background:var(--cream);border:1px solid var(--bd);padding:7px 6px;display:flex;flex-direction:column;gap:4px;overflow:hidden;position:relative}
-.mn-bar{height:4px;border-radius:100px;background:var(--cream-sub)}
-.mn-bar.m{width:60%}
-.mn-bar.s{width:36%}
-.tp-prev.a .mn-hero{flex:1.6;background:linear-gradient(155deg,var(--mint),var(--mint-dark));border-radius:5px;position:relative}
-.tp-prev.a .mn-hero::after{content:'';position:absolute;left:6px;bottom:5px;right:6px;height:7px;background:var(--paper);border-radius:2px;opacity:0.92}
-.tp-prev.a .mn-seg{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--cream-sub);padding:2px;border-radius:3px;min-height:10px}
-.tp-prev.a .mn-seg-btn{background:var(--paper);border-radius:2px}
-.tp-prev.a .mn-seg-btn.off{background:transparent}
-.tp-prev.b .mn-cal{flex:1.2;background:var(--paper);border:1px solid var(--bd);border-radius:5px;padding:4px;display:flex;flex-direction:column;gap:3px;justify-content:space-around}
-.tp-prev.b .mn-cal-dots{display:flex;gap:2px;justify-content:space-between}
-.tp-prev.b .mn-cal-dot{width:5px;height:5px;border-radius:50%;background:var(--mint)}
-.tp-prev.b .mn-cal-dot.last{background:transparent;border:1px solid var(--mint)}
-.tp-prev.b .mn-cc{background:var(--paper);border:1px solid var(--bd);border-radius:4px;padding:3px 4px;display:flex;gap:3px;align-items:center;min-height:20px}
-.tp-prev.b .mn-cover{width:9px;height:13px;background:linear-gradient(135deg,#8A6A3F,#4A3520);border-radius:1px;flex-shrink:0}
-.tp-prev.b .mn-cc-right{flex:1;display:flex;flex-direction:column;gap:2px}
-.tp-prev.b .mn-cta{height:8px;border-radius:3px;background:var(--mint);margin-top:1px}
+  /* 7일 streak strip */
+  .streak-strip {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    padding: 8px 4px 4px;
+  }
+  .streak-strip .d {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 4px;
+  }
+  .streak-strip .dow {
+    font-family: var(--font-playful);
+    font-size: 11px;
+    color: var(--ink-mute);
+  }
+  .streak-strip .dot {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600;
+    background: var(--cream-sub);
+    color: var(--ink-mute);
+    border: 1.5px solid transparent;
+  }
+  .streak-strip .dot.done {
+    background: var(--sage);
+    color: var(--paper);
+    font-weight: 700;
+  }
+  .streak-strip .dot.today {
+    background: var(--paper);
+    color: var(--sage-ink);
+    border: 1.5px solid var(--sage-deep);
+    font-weight: 800;
+    box-shadow: 0 0 0 3px var(--sage-soft);
+  }
+  .streak-strip .dot.future {
+    background: var(--paper);
+    color: var(--ink-faint);
+    border: 1.5px dashed var(--bd);
+  }
 
-.tp-apply{width:100%;padding:15px;border-radius:14px;background:var(--mint);color:var(--paper);border:none;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;min-height:48px;transition:background .2s,transform .2s;display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:6px}
-.tp-apply:hover{background:var(--mint-dark);transform:translateY(-1px)}
-.tp-apply svg{width:16px;height:16px;stroke:var(--paper);fill:none;stroke-width:2.5}
-.tp-note{text-align:center;font-size:10.5px;color:var(--ink-soft);line-height:1.5}
+  .cal-divider {
+    height: 1px; background: var(--bd-soft);
+    margin: 10px 0 10px;
+  }
 
-/* Entrance animations */
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
-.content>*{animation:fadeUp .5s ease-out both}
-.content>*:nth-child(1){animation-delay:.05s}
-.content>*:nth-child(2){animation-delay:.12s}
-.content>*:nth-child(3){animation-delay:.2s}
-.content>*:nth-child(4){animation-delay:.28s}
-.content>*:nth-child(5){animation-delay:.36s}
-.mascot{animation:bob 3.5s ease-in-out infinite}
-@media (prefers-reduced-motion:reduce){.content>*,.mascot,.phone-wrap{animation:none;transition:none}}
+  /* 이벤트 아이템 (모임/위시/반납) */
+  .evt-list { display: flex; flex-direction: column; gap: 8px; }
+  .evt {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px;
+    background: var(--cream);
+    border-radius: 12px;
+    border: 1px solid var(--bd-soft);
+  }
+  .evt .dt {
+    min-width: 46px;
+    text-align: center;
+    padding: 4px 0;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  .evt .dt .mm {
+    font-size: 9.5px; font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+  .evt .dt .dd {
+    font-family: var(--font-serif);
+    font-size: 17px; font-weight: 700;
+    line-height: 1.1;
+    margin-top: -1px;
+  }
+  .evt.meeting .dt { background: var(--sage-bg); color: var(--sage-ink); }
+  .evt.meeting .dt .mm { color: var(--sage-deep); }
+  .evt.wish .dt { background: var(--rose-bg); color: var(--rose-ink); }
+  .evt.wish .dt .mm { color: var(--rose-deep); }
+  .evt.library .dt { background: var(--copper-bg); color: var(--copper-deep); }
+  .evt.library .dt .mm { color: var(--copper-deep); }
+  .evt .info { flex: 1; min-width: 0; }
+  .evt .tag {
+    font-family: var(--font-playful);
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.04em;
+    margin-bottom: 2px;
+  }
+  .evt.meeting .tag { color: var(--sage-deep); }
+  .evt.wish .tag { color: var(--rose-deep); }
+  .evt.library .tag { color: var(--copper-deep); }
+  .evt .ttl {
+    font-size: 13px; font-weight: 600;
+    color: var(--ink);
+    line-height: 1.3;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .evt .meta {
+    font-size: 11px; color: var(--ink-mute);
+    margin-top: 2px;
+  }
+  .evt .go {
+    width: 20px; height: 20px;
+    color: var(--ink-mute);
+    flex-shrink: 0;
+  }
+
+  /* ═══ Continue reading card ═══ */
+  .cr {
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 18px;
+    padding: 14px;
+    box-shadow: var(--shadow-card);
+    position: relative;
+    overflow: hidden;
+  }
+  .cr-row { display: flex; gap: 12px; align-items: flex-start; }
+  .cr .cover-box {
+    position: relative;
+    flex-shrink: 0;
+  }
+  .cr .cover {
+    width: 68px; height: 98px;
+    border-radius: 4px 8px 8px 4px;
+    background: linear-gradient(135deg, #7B8D8A, #3E5F55);
+    position: relative;
+    box-shadow: 2px 3px 0 rgba(43,36,32,.14), -3px 0 0 rgba(43,36,32,.06) inset;
+    overflow: hidden;
+  }
+  .cr .cover::before {
+    content: ''; position: absolute; left: 3px; top: 0; bottom: 0;
+    width: 2px; background: rgba(0,0,0,.2);
+  }
+  .cr .cover .ttl-s {
+    position: absolute; left: 10px; right: 8px; top: 12px;
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: rgba(255,255,255,.92);
+    font-size: 11px; line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .cr .cover .auth {
+    position: absolute; left: 10px; right: 8px; bottom: 10px;
+    font-size: 9px; font-weight: 600; letter-spacing: 0.04em;
+    color: rgba(255,255,255,.6);
+    text-transform: uppercase;
+  }
+  .cr .cover-chip {
+    position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+    background: var(--sage);
+    color: var(--paper);
+    font-size: 9.5px; font-weight: 700;
+    padding: 2px 8px; border-radius: 100px;
+    white-space: nowrap;
+    border: 2px solid var(--paper);
+  }
+
+  .cr-body { flex: 1; min-width: 0; padding-top: 2px; }
+  .cr .book-ttl {
+    font-family: var(--font-serif);
+    font-size: 15px; font-weight: 700;
+    color: var(--ink); line-height: 1.25;
+    margin-bottom: 1px;
+  }
+  .cr .book-auth { font-size: 11.5px; color: var(--ink-mute); margin-bottom: 6px; }
+  .cr .context {
+    background: var(--sage-bg);
+    border-radius: 8px;
+    padding: 6px 9px;
+    font-size: 11.5px;
+    color: var(--sage-ink);
+    line-height: 1.35;
+    margin-bottom: 8px;
+  }
+  .cr .context b { color: var(--sage-deep); font-weight: 700; }
+  .cr .progress {
+    height: 6px; border-radius: 100px;
+    background: var(--cream-sub);
+    overflow: hidden; margin-bottom: 6px;
+  }
+  .cr .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--sage-deep), var(--sage));
+    border-radius: 100px;
+  }
+  .cr .progress-text {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 10.5px; color: var(--ink-mute);
+  }
+  .cr .progress-text b {
+    color: var(--ink); font-weight: 700;
+    font-family: var(--font-playful);
+    font-size: 12px;
+  }
+
+  .cr-cta {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none; border-radius: 12px;
+    font-family: var(--font-body);
+    font-size: 13.5px; font-weight: 700;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    box-shadow: var(--shadow-cta);
+  }
+  .cr-cta svg { flex-shrink: 0; }
+
+  /* Reading-first Hero (Phone B) — 더 큰 버전 */
+  .cr.hero .cover {
+    width: 92px; height: 134px;
+  }
+  .cr.hero .book-ttl { font-size: 17px; }
+  .cr.hero .book-auth { font-size: 12px; }
+  .cr.hero .yesterday-bar {
+    font-family: var(--font-playful);
+    color: var(--sage-deep);
+    font-size: 12px;
+    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .cr.hero .yesterday-bar::before {
+    content: ''; width: 5px; height: 5px; border-radius: 50%;
+    background: var(--sage);
+  }
+
+  /* 이어읽기 컴팩트 (Phone A/C) */
+  .cr.compact { padding: 12px; }
+  .cr.compact .cover { width: 54px; height: 78px; }
+  .cr.compact .book-ttl { font-size: 13.5px; }
+  .cr.compact .book-auth { font-size: 10.5px; margin-bottom: 4px; }
+  .cr.compact .context { font-size: 11px; padding: 5px 8px; margin-bottom: 6px; }
+  .cr.compact .progress { height: 5px; margin-bottom: 4px; }
+  .cr.compact .progress-text { font-size: 10px; }
+  .cr.compact .cr-cta {
+    margin-top: 8px; padding: 9px; font-size: 12.5px;
+  }
+
+  /* ═══ Community feed ═══ */
+  .feed {
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 18px;
+    padding: 14px;
+    box-shadow: var(--shadow-card);
+  }
+  .feed-hd { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .feed-hd .grp {
+    font-family: var(--font-serif);
+    font-size: 15px; font-weight: 700;
+    color: var(--ink);
+  }
+  .feed-hd .members {
+    font-size: 11px; color: var(--ink-mute);
+    background: var(--rose-bg);
+    color: var(--rose-deep);
+    padding: 2px 8px; border-radius: 100px; font-weight: 600;
+  }
+  .feed-hd .more {
+    margin-left: auto; font-size: 11.5px;
+    color: var(--ink-mute);
+  }
+
+  .post {
+    padding: 10px 0;
+    border-top: 1px solid var(--bd-soft);
+  }
+  .post:first-of-type { border-top: none; padding-top: 2px; }
+  .post-hd { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .post .av {
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: var(--paper);
+    flex-shrink: 0;
+  }
+  .post .av.a1 { background: linear-gradient(135deg, #E8B4BC, var(--rose-deep)); }
+  .post .av.a2 { background: linear-gradient(135deg, #A8CFC1, var(--sage-deep)); }
+  .post .av.a3 { background: linear-gradient(135deg, #E1C491, var(--copper-deep)); }
+  .post .av.a4 { background: linear-gradient(135deg, #B8B5E1, #7D78B6); }
+  .post .nm {
+    font-size: 12.5px; font-weight: 700;
+    color: var(--ink);
+  }
+  .post .tm {
+    font-size: 10.5px; color: var(--ink-mute);
+    margin-left: auto;
+  }
+  .post .tag-mini {
+    font-family: var(--font-playful);
+    font-size: 10.5px; font-weight: 700;
+    background: var(--sage-bg);
+    color: var(--sage-deep);
+    padding: 1px 7px;
+    border-radius: 100px;
+    letter-spacing: 0.02em;
+  }
+  .post .tag-mini.rose { background: var(--rose-bg); color: var(--rose-deep); }
+  .post-body {
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    padding-left: 34px;
+    margin-bottom: 6px;
+  }
+  .post-body b { color: var(--ink); font-weight: 700; }
+  .post-actions {
+    display: flex; align-items: center; gap: 14px;
+    padding-left: 34px;
+    font-size: 11px; color: var(--ink-mute);
+  }
+  .post-actions .act {
+    display: flex; align-items: center; gap: 4px;
+  }
+  .post-actions .act svg { width: 13px; height: 13px; }
+  .post-actions .act.liked { color: var(--rose-deep); font-weight: 600; }
+
+  /* 커뮤니티 한 줄 카드 (Phone A/B) */
+  .feed.mini { padding: 12px; }
+  .feed.mini .feed-hd { margin-bottom: 8px; }
+  .feed.mini .feed-hd .grp { font-size: 13px; }
+  .feed.mini .post:nth-of-type(n+2) { display: none; } /* only first post */
+  .feed.mini .post-body { font-size: 11.5px; margin-bottom: 0; }
+  .feed.mini .post-actions { display: none; }
+
+  /* ═══ Pair row (two cards side by side) — Phone C ═══ */
+  .pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .pair-card {
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 14px;
+    padding: 10px;
+    box-shadow: var(--shadow-card);
+    display: flex; flex-direction: column;
+    min-height: 112px;
+  }
+  .pair-card .ph-lbl {
+    font-family: var(--font-playful);
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--ink-mute);
+    margin-bottom: 4px;
+  }
+  .pair-card.read .ph-lbl { color: var(--sage-deep); }
+  .pair-card.cal .ph-lbl { color: var(--copper-deep); }
+  .pair-card .big-ttl {
+    font-family: var(--font-serif);
+    font-size: 13.5px; font-weight: 700;
+    color: var(--ink); line-height: 1.25;
+    margin-bottom: 6px;
+    overflow: hidden;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  }
+  .pair-card .meta-mini {
+    font-size: 10.5px; color: var(--ink-mute);
+    margin-top: auto;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .pair-card .meta-mini b {
+    color: var(--ink); font-weight: 700;
+    font-family: var(--font-playful);
+  }
+  .pair-card.read .meta-mini b { color: var(--sage-deep); }
+  .pair-card.cal .meta-mini b { color: var(--copper-deep); }
+  .pair-card .mini-progress {
+    height: 4px; background: var(--cream-sub);
+    border-radius: 100px; overflow: hidden;
+    margin-top: 4px;
+  }
+  .pair-card .mini-progress span {
+    display: block; height: 100%;
+    background: var(--sage);
+  }
+  .pair-card .tiny-evt {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--ink-soft);
+    margin-top: 2px;
+  }
+  .pair-card .tiny-evt .dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .pair-card .tiny-evt .dot.meeting { background: var(--sage); }
+  .pair-card .tiny-evt .dot.wish { background: var(--rose); }
+  .pair-card .tiny-evt .dot.library { background: var(--copper); }
+
+  /* ═══ Bottom tab nav ═══ */
+  .tabbar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 72px;
+    background: var(--paper);
+    border-top: 1px solid var(--bd);
+    display: flex; align-items: center; justify-content: space-around;
+    padding: 6px 14px 18px;
+    z-index: 8;
+  }
+  .tab {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    font-size: 10.5px; font-weight: 500;
+    color: var(--ink-mute);
+    flex: 1;
+  }
+  .tab.active { color: var(--sage-deep); }
+  .tab svg { width: 22px; height: 22px; }
+
+  /* ═══ Utility — focus session preview chip (for Phone B) ═══ */
+  .focus-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--sage-soft);
+    color: var(--sage-ink);
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 11px; font-weight: 700;
+    margin-top: 8px;
+  }
+  .focus-chip .dial-mini {
+    width: 10px; height: 10px; border-radius: 50%;
+    border: 2px solid var(--sage-deep);
+    border-right-color: transparent;
+    transform: rotate(-45deg);
+  }
+
+  /* 콩(bean) 리워드 프리뷰 */
+  .bean-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px;
+    background: var(--copper-bg);
+    border-radius: 10px;
+    margin-top: 8px;
+  }
+  .bean-row .bean {
+    width: 20px; height: 20px;
+    border-radius: 60% 60% 50% 50%;
+    background: linear-gradient(135deg, var(--copper), var(--copper-deep));
+    position: relative;
+    flex-shrink: 0;
+  }
+  .bean-row .bean::after {
+    content: ''; position: absolute; top: 40%; left: 0; right: 0;
+    height: 1px; background: rgba(0,0,0,.25);
+  }
+  .bean-row .bean-t {
+    font-size: 11.5px; color: var(--copper-deep);
+    font-weight: 600;
+  }
+  .bean-row .bean-t b { font-family: var(--font-playful); font-weight: 700; }
+
 </style>
 </head>
 <body>
-<div class="page-head">
-  <div class="page-title">
-    완독콩 홈 화면
-    <span class="v">테마 비교</span>
-  </div>
-  <div class="page-sub">두 테마를 모두 구현하고, 사용자가 <b>설정에서 자유롭게 전환</b>할 수 있어요</div>
-  <div class="page-hint">
-    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-    <span>왼쪽 두 폰은 <b>각 테마 적용 시</b>, 세 번째는 <b>실제 선택 UI</b></span>
-  </div>
-</div>
 
-<div class="phones-row">
-<!-- ============ THEME A · 이어 읽기 HERO ============ -->
-<div class="phone-wrap" data-theme="A">
-  <div class="theme-badge">
-    <div class="theme-radio"></div>
-    <div class="theme-name"><span class="tag">테마 A</span>이어 읽기 HERO</div>
-  </div>
-  <div class="theme-desc"><b>책과 이어지는 순간</b>이 가장 크게. 어제 멈춘 곳·마지막 문장이 한눈에,<br>캘린더 ↔ 커뮤니티는 아래 탭으로 전환해요.</div>
-  <div class="phone">
-    <div class="notch"></div>
-    <div class="phone-inner">
-      <div class="sb">
-        <span>9:41</span>
-        <div class="icons">
-          <svg viewBox="0 0 24 24"><path d="M2 20h.01M7 20v-4M12 20v-8M17 20V8M22 4v16"/></svg>
-          <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
-          <svg viewBox="0 0 24 24"><rect x="1" y="6" width="18" height="12" rx="2"/><line x1="23" y1="13" x2="23" y2="11"/></svg>
-        </div>
-      </div>
-      <div class="ab">
-        <div class="brand"><span>완독콩<span class="dot">.</span></span></div>
-        <div class="ab-icons">
-          <div class="ab-ic" aria-label="알림">
-            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            <span class="bdot"></span>
-          </div>
-          <div class="ab-ic" aria-label="내 프로필">
-            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          </div>
-        </div>
-      </div>
-      <div class="content">
-        <div class="greet">
-          <div class="mascot-wrap"><img src="/mascot-morning.png" class="mascot" alt="아침 인사를 하는 완독콩"></div>
-          <div class="greet-txt">
-            <div class="greet-hi">좋은 아침이에요, <b>지선</b>님</div>
-            <div class="greet-date">오늘은 4월 22일 수요일이에요</div>
-          </div>
-        </div>
+<div class="page">
 
-        <div class="cch">
-          <div class="cch-badge">
-            <svg viewBox="0 0 24 24"><polyline points="12 6 12 12 16 14"/><circle cx="12" cy="12" r="10"/></svg>
-            어제 멈춘 곳
-          </div>
-          <div class="cch-main">
-            <div class="cover md cover-sonyeon"><div class="c-ttl">소년이<br>온다</div><div class="c-auth">한강</div></div>
-            <div class="cch-info">
-              <div>
-                <div class="cch-ttl">소년이 온다</div>
-                <div class="cch-auth">한강 · 창비</div>
-              </div>
-              <div class="cch-stats">
-                <div class="cch-stat"><b>218</b><span>쪽 / 404</span></div>
-                <div class="cch-stat"><b>54%</b><span>완독률</span></div>
-              </div>
+  <!-- ═══ Page header ═══ -->
+  <header class="page-hd">
+    <div class="kicker"><span class="dot"></span><span>Home v2 · 3 variations</span></div>
+    <h1>오늘의 홈, <em>어디에 무게를</em> 둘까요</h1>
+    <p>캘린더 · 이어 읽기 · 커뮤니티 중 하나를 hero로 잡고,<br/>나머지는 컴팩트 카드로 풀어낸 세 가지 버전</p>
+    <div class="team-note">
+      <b>드림팀 6인 회의</b>
+      — <b class="sage">Amy</b>: 홈은 1초 안에 "오늘 할 일"이 보여야 해요.
+      <span class="sep">·</span>
+      <b class="sage">Gail</b>: 폰별로 hero 하나, 나머지는 미니로.
+      <span class="sep">·</span>
+      <b>Claire</b>: 마스코트+인사말은 모든 폰 공통 헤더로.
+      <span class="sep">·</span>
+      <b class="copper">Dan</b>: 모임/위시/반납은 단일 캘린더 stream.
+      <span class="sep">·</span>
+      <b>Emily</b>: 시간 + 컨텍스트 한 줄로("19:00 · 노을모임 5장").
+      <span class="sep">·</span>
+      <b class="rose">Taasha</b>: 색 도트만으론 안 돼요. 라벨 동반.
+    </div>
+  </header>
+
+  <!-- ═══ Phones ═══ -->
+  <div class="phones">
+
+    <!-- ══════════ Phone A · Calendar-first ══════════ -->
+    <div class="phone-wrap">
+      <div class="phone-tag copper"><span class="num">A</span>캘린더 우선</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+
+          <!-- status bar -->
+          <div class="status-bar">
+            <span>9:41</span>
+            <div class="right">
+              <svg width="18" height="10" viewBox="0 0 18 10" fill="currentColor"><rect x="0" y="4" width="3" height="6" rx="1"/><rect x="5" y="2" width="3" height="8" rx="1"/><rect x="10" y="0" width="3" height="10" rx="1"/></svg>
+              <svg width="18" height="12" viewBox="0 0 18 12" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="14" height="8" rx="2"/><rect x="3" y="4" width="9" height="4" rx="1" fill="currentColor"/><rect x="16" y="5" width="1.5" height="2" rx="0.5" fill="currentColor" stroke="none"/></svg>
             </div>
           </div>
-          <div class="cch-ctx">
-            <div class="cch-ctx-lbl">
-              <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h12M4 17h10"/></svg>
-              어제 마지막 문장
-            </div>
-            "그 밤, 우리는 모두 말을 잃었다. 남은 건 서로의 숨소리뿐이었다."
-          </div>
-          <button class="cch-cta" type="button">
-            이어 읽기
-            <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-          </button>
-        </div>
 
-        <div class="seg" role="tablist">
-          <button class="seg-btn on" role="tab" aria-selected="true" type="button">
-            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            캘린더
-          </button>
-          <button class="seg-btn" role="tab" aria-selected="false" type="button">
-            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            커뮤니티
-          </button>
-        </div>
-
-        <div class="panel on">
-          <div class="cal">
-            <div class="cal-hd">
-              <div class="cal-mo">2026. 4<span>· 이번 주</span></div>
-              <div class="streak">
-                <svg viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
-                <b>12</b> 일 연속
-              </div>
+          <!-- app header -->
+          <div class="app-hd">
+            <div class="avatar">지<div class="streak-badge">12일</div></div>
+            <div class="name-col">
+              <div class="nm"><em>지선</em>님, 오늘도 방긋</div>
+              <div class="sub">4월 24일 금요일 · 맑음</div>
             </div>
-            <div class="cal-days">
-              <div class="cd"><span class="cd-lbl">목</span><div class="cd-dot read"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
-              <div class="cd"><span class="cd-lbl">금</span><div class="cd-dot read"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
-              <div class="cd"><span class="cd-lbl">토</span><div class="cd-dot read"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
-              <div class="cd"><span class="cd-lbl">일</span><div class="cd-dot read"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
-              <div class="cd"><span class="cd-lbl">월</span><div class="cd-dot read"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
-              <div class="cd"><span class="cd-lbl">화</span><div class="cd-dot read"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
-              <div class="cd"><span class="cd-lbl">수</span><div class="cd-dot today">22</div></div>
-            </div>
-            <div class="cal-events">
-              <div class="ev">
-                <div class="ev-ic"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-                <div class="ev-body"><div class="ev-ttl">4월 독서모임 · 동백꽃 필 무렵</div><div class="ev-meta">내일 19:00 · 홍대 카페 테마</div></div>
-                <div class="ev-dday">D-1</div>
-              </div>
-              <div class="ev">
-                <div class="ev-ic wish"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M2 7l2-4h16l2 4M8 11h8"/></svg></div>
-                <div class="ev-body"><div class="ev-ttl">파친코 1권 도착 예정</div><div class="ev-meta">4/25 토 · 위시 리스트</div></div>
-                <div class="ev-dday wish">D-3</div>
-              </div>
+            <div class="bell">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
             </div>
           </div>
-        </div>
 
-        <div class="panel">
-          <div class="feed">
-            <div class="fd">
-              <div class="av">민</div>
-              <div class="fd-body">
-                <div class="fd-hd"><span class="fd-nm">민지</span><span class="fd-vb">· 문장을 그었어요</span><span class="fd-tm">2h</span></div>
-                <div class="fd-bk">소년이 온다 · 한강</div>
-                <div class="fd-qt">우리는 너를 기억해. 네 얼굴 하나하나, 네가 남긴 말 하나하나까지.</div>
-                <div class="fd-act">
-                  <div class="fa on"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> 7</div>
-                  <div class="fa"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 3</div>
+          <!-- greeting -->
+          <div class="greet">
+            <div class="mascot"><img src="/mascot-morning.png" alt="방긋이"/></div>
+            <div class="bubble">
+              <span class="hi">방긋이</span>
+              오늘은 <b>노을모임</b>이 있어요. 출발 전에 5장만 펴볼까요?
+            </div>
+          </div>
+
+          <!-- HERO: Calendar -->
+          <div class="sec">
+            <div class="slbl copper"><span class="dot"></span>이번 주 · 읽기 일정</div>
+            <div class="cal">
+              <div class="cal-hd">
+                <div class="today">4월 24일 금</div>
+                <div class="streak">🫘 <span class="num">12</span>일째</div>
+                <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+
+              <div class="streak-strip">
+                <div class="d"><span class="dow">월</span><span class="dot done">20</span></div>
+                <div class="d"><span class="dow">화</span><span class="dot done">21</span></div>
+                <div class="d"><span class="dow">수</span><span class="dot done">22</span></div>
+                <div class="d"><span class="dow">목</span><span class="dot done">23</span></div>
+                <div class="d"><span class="dow">금</span><span class="dot today">24</span></div>
+                <div class="d"><span class="dow">토</span><span class="dot future">25</span></div>
+                <div class="d"><span class="dow">일</span><span class="dot future">26</span></div>
+              </div>
+
+              <div class="cal-divider"></div>
+
+              <div class="evt-list">
+                <div class="evt meeting">
+                  <div class="dt"><div class="mm">오늘</div><div class="dd">19:00</div></div>
+                  <div class="info">
+                    <div class="tag">모임 일정</div>
+                    <div class="ttl">노을모임 · 5장 토론</div>
+                    <div class="meta">서촌 빗살무늬책방 · 6명 참여</div>
+                  </div>
+                  <svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+                <div class="evt wish">
+                  <div class="dt"><div class="mm">내일</div><div class="dd">04/25</div></div>
+                  <div class="info">
+                    <div class="tag">위시 책 시작</div>
+                    <div class="ttl">도파민네이션 · 읽기 시작</div>
+                    <div class="meta">애나 렘키 · 예약해 두셨어요</div>
+                  </div>
+                  <svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+                <div class="evt library">
+                  <div class="dt"><div class="mm">3일 후</div><div class="dd">04/27</div></div>
+                  <div class="info">
+                    <div class="tag">도서관 반납</div>
+                    <div class="ttl">클라라와 태양</div>
+                    <div class="meta">강남도서관 · 연장 1회 가능</div>
+                  </div>
+                  <svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-      <div class="tabbar">
-        <div class="tab on"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>홈</span></div>
-        <div class="tab"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 3v18"/></svg><span>서재</span></div>
-        <div class="tab"><svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4z"/></svg><span>쓰기</span></div>
-        <div class="tab"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>친구</span></div>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- END THEME A -->
 
-<!-- ============ THEME B · 캘린더 First ============ -->
-<div class="phone-wrap" data-theme="B">
-  <div class="theme-badge">
-    <div class="theme-radio"></div>
-    <div class="theme-name"><span class="tag">테마 B</span>캘린더 First</div>
-  </div>
-  <div class="theme-desc"><b>오늘 일정부터 확인</b>. 이어 읽기는 진행률로 담백하게,<br>친구들의 오늘은 아래 섹션에서 천천히 살펴요.</div>
-  <div class="phone">
-    <div class="notch"></div>
-    <div class="phone-inner">
-      <div class="sb">
-        <span>9:41</span>
-        <div class="icons">
-          <svg viewBox="0 0 24 24"><path d="M2 20h.01M7 20v-4M12 20v-8M17 20V8M22 4v16"/></svg>
-          <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
-          <svg viewBox="0 0 24 24"><rect x="1" y="6" width="18" height="12" rx="2"/><line x1="23" y1="13" x2="23" y2="11"/></svg>
-        </div>
-      </div>
-      <div class="ab">
-        <div class="brand"><span>완독콩<span class="dot">.</span></span></div>
-        <div class="ab-icons">
-          <div class="ab-ic" aria-label="알림">
-            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            <span class="bdot"></span>
-          </div>
-          <div class="ab-ic" aria-label="내 프로필">
-            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          </div>
-        </div>
-      </div>
-      <div class="content">
-        <div class="greet">
-          <div class="mascot-wrap"><img src="/mascot-morning.png" class="mascot" alt="아침 인사를 하는 완독콩"></div>
-          <div class="greet-txt">
-            <div class="greet-hi">좋은 아침이에요, <b>지선</b>님</div>
-            <div class="greet-date">오늘은 4월 22일 수요일이에요</div>
-          </div>
-        </div>
-        <div class="cal">
-          <div class="cal-hd">
-            <div class="cal-mo">2026. 4<span>· 이번 주</span></div>
-            <div class="streak">
-              <svg viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
-              <b>12</b> 일 연속
-            </div>
-          </div>
-          <div class="cal-days">
-            <div class="cd"><span class="cd-lbl">목</span><div class="cd-dot read"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
-            <div class="cd"><span class="cd-lbl">금</span><div class="cd-dot read"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
-            <div class="cd"><span class="cd-lbl">토</span><div class="cd-dot read"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
-            <div class="cd"><span class="cd-lbl">일</span><div class="cd-dot read"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
-            <div class="cd"><span class="cd-lbl">월</span><div class="cd-dot read"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
-            <div class="cd"><span class="cd-lbl">화</span><div class="cd-dot read"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
-            <div class="cd"><span class="cd-lbl">수</span><div class="cd-dot today">22</div></div>
-          </div>
-          <div class="cal-events">
-            <div class="ev">
-              <div class="ev-ic"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-              <div class="ev-body"><div class="ev-ttl">4월 독서모임 · 동백꽃 필 무렵</div><div class="ev-meta">내일 19:00 · 홍대 카페 테마</div></div>
-              <div class="ev-dday">D-1</div>
-            </div>
-            <div class="ev">
-              <div class="ev-ic wish"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M2 7l2-4h16l2 4M8 11h8"/></svg></div>
-              <div class="ev-body"><div class="ev-ttl">파친코 1권 도착 예정</div><div class="ev-meta">4/25 토 · 위시 리스트 주문</div></div>
-              <div class="ev-dday wish">D-3</div>
-            </div>
-            <div class="ev">
-              <div class="ev-ic lib"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
-              <div class="ev-body"><div class="ev-ttl">작별하지 않는다 · 반납일</div><div class="ev-meta">4/28 화 · 강남도서관</div></div>
-              <div class="ev-dday warn">D-6</div>
-            </div>
-          </div>
-        </div>
-        <div class="cc">
-          <div class="cc-hd"><span class="cc-lbl">이어 읽기</span><span class="cc-pct"><b>54%</b>완독</span></div>
-          <div class="cc-body">
-            <div class="cover sm cover-sonyeon"><div class="c-ttl">소년이<br>온다</div><div class="c-auth">한강</div></div>
-            <div class="cc-info">
-              <div><div class="cc-ttl">소년이 온다</div><div class="cc-auth">한강 · 창비</div></div>
-              <div><div class="cc-stats"><b>218</b> / 404쪽</div><div class="cc-bar"><div class="cc-fill" style="width:54%"></div></div></div>
-            </div>
-          </div>
-          <button class="cc-cta" type="button">이어 읽기<svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>
-        </div>
-        <div class="sec-hd">
-          <span class="title">친구들의 오늘</span>
-          <a class="more">더보기 <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></a>
-        </div>
-        <div class="feed">
-          <div class="fd">
-            <div class="av">민</div>
-            <div class="fd-body">
-              <div class="fd-hd"><span class="fd-nm">민지</span><span class="fd-vb">· 문장을 그었어요</span><span class="fd-tm">2h</span></div>
-              <div class="fd-bk">소년이 온다 · 한강</div>
-              <div class="fd-qt">우리는 너를 기억해. 네 얼굴 하나하나, 네가 남긴 말 하나하나까지.</div>
-              <div class="fd-act">
-                <div class="fa on"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> 7</div>
-                <div class="fa"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 3</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="tabbar">
-        <div class="tab on"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>홈</span></div>
-        <div class="tab"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 3v18"/></svg><span>서재</span></div>
-        <div class="tab"><svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4z"/></svg><span>쓰기</span></div>
-        <div class="tab"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>친구</span></div>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- END THEME B -->
-
-<!-- ============ PHONE C · 실제 선택 UI (설정 > 홈 화면 테마) ============ -->
-<div class="phone-wrap demo" data-theme="C">
-  <div class="theme-badge">
-    <div class="theme-radio"></div>
-    <div class="theme-name"><span class="tag">실제 화면</span>설정 · 홈 화면 테마</div>
-  </div>
-  <div class="theme-desc"><b>앱 안에서 직접 고르는 UI</b>. 미니 프리뷰로 한눈에 비교하고,<br>언제든 설정에서 다른 테마로 바꿀 수 있어요.</div>
-  <div class="phone">
-    <div class="notch"></div>
-    <div class="phone-inner">
-      <div class="sb">
-        <span>9:41</span>
-        <div class="icons">
-          <svg viewBox="0 0 24 24"><path d="M2 20h.01M7 20v-4M12 20v-8M17 20V8M22 4v16"/></svg>
-          <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
-          <svg viewBox="0 0 24 24"><rect x="1" y="6" width="18" height="12" rx="2"/><line x1="23" y1="13" x2="23" y2="11"/></svg>
-        </div>
-      </div>
-      <div class="modal-hd">
-        <button class="modal-back" type="button" aria-label="뒤로 가기">
-          <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        </button>
-        <div class="modal-ttl">홈 화면 테마</div>
-        <button class="modal-close" type="button" aria-label="닫기">
-          <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
-        </button>
-      </div>
-      <div class="content">
-        <div class="tp-hero">
-          <div class="tp-hero-mascot">
-            <div class="mascot-wrap"><img src="/mascot-happy.png" class="mascot" alt="웃고 있는 완독콩"></div>
-          </div>
-          <h2>나에게 맞는 홈을<br>골라보세요</h2>
-          <p>언제든 설정에서 다시 바꿀 수 있어요</p>
-        </div>
-
-        <div class="tp-opts">
-          <button class="tp-opt on" type="button" data-opt="A">
-            <div class="tp-prev a">
-              <div class="mn-hero"></div>
-              <div class="mn-seg">
-                <div class="mn-seg-btn"></div>
-                <div class="mn-seg-btn off"></div>
-              </div>
-              <div class="mn-bar m"></div>
-              <div class="mn-bar s"></div>
-            </div>
-            <div class="tp-opt-meta">
-              <div class="tp-opt-name">이어 읽기 HERO <span class="tp-opt-tag">책 중심</span></div>
-              <div class="tp-opt-desc">어제 멈춘 곳·마지막 문장을 크게. 캘린더·커뮤니티는 탭으로 전환.</div>
-            </div>
-            <div class="tp-opt-rd">
-              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-            </div>
-          </button>
-
-          <button class="tp-opt" type="button" data-opt="B">
-            <div class="tp-prev b">
-              <div class="mn-cal">
-                <div class="mn-cal-dots">
-                  <div class="mn-cal-dot"></div>
-                  <div class="mn-cal-dot"></div>
-                  <div class="mn-cal-dot"></div>
-                  <div class="mn-cal-dot"></div>
-                  <div class="mn-cal-dot"></div>
-                  <div class="mn-cal-dot"></div>
-                  <div class="mn-cal-dot last"></div>
+          <!-- continue reading mini -->
+          <div class="sec">
+            <div class="slbl"><span class="dot"></span>어제 멈춘 책 <span class="more">지금 펴기 →</span></div>
+            <div class="cr compact">
+              <div class="cr-row">
+                <div class="cover-box">
+                  <div class="cover">
+                    <div class="ttl-s">시간의<br/>기원</div>
+                    <div class="auth">토머스 핼핀</div>
+                  </div>
                 </div>
-                <div class="mn-bar m"></div>
-                <div class="mn-bar s"></div>
-              </div>
-              <div class="mn-cc">
-                <div class="mn-cover"></div>
-                <div class="mn-cc-right">
-                  <div class="mn-bar m"></div>
-                  <div class="mn-bar s"></div>
+                <div class="cr-body">
+                  <div class="book-ttl">시간의 기원</div>
+                  <div class="book-auth">토머스 핼핀</div>
+                  <div class="context">어제 <b>174p</b>에서 멈췄어요 · 4장 "빅뱅 이전"</div>
+                  <div class="progress"><div class="progress-bar" style="width: 56%;"></div></div>
+                  <div class="progress-text"><span>174 / 312p</span><b>56%</b></div>
                 </div>
               </div>
-              <div class="mn-cta"></div>
+              <button class="cr-cta">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20"/></svg>
+                이어 읽기
+              </button>
             </div>
-            <div class="tp-opt-meta">
-              <div class="tp-opt-name">캘린더 First <span class="tp-opt-tag">일정 중심</span></div>
-              <div class="tp-opt-desc">오늘 일정부터 한눈에. 이어 읽기는 진행률로 담백하게.</div>
-            </div>
-            <div class="tp-opt-rd">
-              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-            </div>
-          </button>
-        </div>
+          </div>
 
-        <button class="tp-apply" type="button">
-          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-          테마 적용하기
-        </button>
-        <div class="tp-note">설정 &gt; 앱 설정 &gt; 홈 화면에서 다시 바꿀 수 있어요</div>
-      </div>
-      <div class="tabbar">
-        <div class="tab"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>홈</span></div>
-        <div class="tab"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 3v18"/></svg><span>서재</span></div>
-        <div class="tab"><svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4z"/></svg><span>쓰기</span></div>
-        <div class="tab"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>친구</span></div>
+          <!-- community mini -->
+          <div class="sec">
+            <div class="slbl rose"><span class="dot"></span>노을모임 한 마디</div>
+            <div class="feed mini">
+              <div class="feed-hd">
+                <div class="grp">노을모임 · 6명</div>
+                <div class="members">🌿 6명</div>
+                <div class="more">피드 →</div>
+              </div>
+              <div class="post">
+                <div class="post-hd">
+                  <div class="av a1">민</div>
+                  <div class="nm">민정</div>
+                  <div class="tag-mini">75p ✓</div>
+                  <div class="tm">34분 전</div>
+                </div>
+                <div class="post-body">오늘은 <b>5장</b>까지 읽고 갈게요. 저녁에 봬요 🌙</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- tabbar -->
+        <div class="tabbar">
+          <div class="tab active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v11h14V10"/></svg>
+            <span>홈</span>
+          </div>
+          <div class="tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5V5a2 2 0 0 1 2-2h13v17H6a2 2 0 0 0-2 2z"/></svg>
+            <span>서재</span>
+          </div>
+          <div class="tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+            <span>집중</span>
+          </div>
+          <div class="tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 11V7a5 5 0 0 0-10 0v4"/><rect x="4" y="11" width="16" height="10" rx="2"/></svg>
+            <span>모임</span>
+          </div>
+          <div class="tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+            <span>나</span>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- ══════════ Phone B · Reading-first ══════════ -->
+    <div class="phone-wrap">
+      <div class="phone-tag sage"><span class="num">B</span>이어 읽기 우선</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+
+          <div class="status-bar">
+            <span>9:41</span>
+            <div class="right">
+              <svg width="18" height="10" viewBox="0 0 18 10" fill="currentColor"><rect x="0" y="4" width="3" height="6" rx="1"/><rect x="5" y="2" width="3" height="8" rx="1"/><rect x="10" y="0" width="3" height="10" rx="1"/></svg>
+              <svg width="18" height="12" viewBox="0 0 18 12" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="14" height="8" rx="2"/><rect x="3" y="4" width="9" height="4" rx="1" fill="currentColor"/><rect x="16" y="5" width="1.5" height="2" rx="0.5" fill="currentColor" stroke="none"/></svg>
+            </div>
+          </div>
+
+          <div class="app-hd">
+            <div class="avatar">지<div class="streak-badge">12일</div></div>
+            <div class="name-col">
+              <div class="nm"><em>지선</em>님, 오늘도 방긋</div>
+              <div class="sub">4월 24일 금요일 · 맑음</div>
+            </div>
+            <div class="bell">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+            </div>
+          </div>
+
+          <div class="greet">
+            <div class="mascot"><img src="/mascot-reading.png" alt="방긋이"/></div>
+            <div class="bubble">
+              <span class="hi">방긋이</span>
+              어제 <b>174p</b>에서 멈추셨네요. 계속 읽어볼까요?
+            </div>
+          </div>
+
+          <!-- HERO: Continue Reading -->
+          <div class="sec">
+            <div class="slbl"><span class="dot"></span>이어 읽기</div>
+            <div class="cr hero">
+              <div class="yesterday-bar">어제 저녁 22:14 · 38분 읽음</div>
+              <div class="cr-row">
+                <div class="cover-box">
+                  <div class="cover">
+                    <div class="ttl-s">시간의<br/>기원</div>
+                    <div class="auth">토머스 핼핀</div>
+                  </div>
+                  <div class="cover-chip">📖 읽는 중</div>
+                </div>
+                <div class="cr-body">
+                  <div class="book-ttl">시간의 기원</div>
+                  <div class="book-auth">토머스 핼핀 · 2023</div>
+                  <div class="context">
+                    4장 <b>"빅뱅 이전"</b> 중간에서 멈췄어요.<br/>
+                    다음 소제목: <b>"시간의 화살"</b>
+                  </div>
+                  <div class="progress"><div class="progress-bar" style="width: 56%;"></div></div>
+                  <div class="progress-text"><span>174 / 312p</span><b>56%</b></div>
+                  <div class="focus-chip">
+                    <span class="dial-mini"></span>
+                    오늘 목표 · 25분 / 10쪽
+                  </div>
+                </div>
+              </div>
+              <button class="cr-cta">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20"/></svg>
+                175쪽부터 이어 읽기
+              </button>
+              <div class="bean-row">
+                <div class="bean"></div>
+                <div class="bean-t"><b>연속 12일째</b> · 오늘도 읽으면 콩 1개 더</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- calendar compact -->
+          <div class="sec">
+            <div class="slbl copper"><span class="dot"></span>다가오는 일정 <span class="more">전체 →</span></div>
+            <div class="cal" style="padding: 12px 14px;">
+              <div class="evt-list" style="gap: 6px;">
+                <div class="evt meeting">
+                  <div class="dt"><div class="mm">오늘</div><div class="dd">19:00</div></div>
+                  <div class="info">
+                    <div class="tag">모임</div>
+                    <div class="ttl">노을모임 · 5장 토론</div>
+                  </div>
+                  <svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+                <div class="evt library">
+                  <div class="dt"><div class="mm">3일 후</div><div class="dd">04/27</div></div>
+                  <div class="info">
+                    <div class="tag">반납</div>
+                    <div class="ttl">클라라와 태양 · 강남도서관</div>
+                  </div>
+                  <svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- community mini -->
+          <div class="sec">
+            <div class="slbl rose"><span class="dot"></span>노을모임 한 마디</div>
+            <div class="feed mini">
+              <div class="feed-hd">
+                <div class="grp">노을모임 · 6명</div>
+                <div class="more">피드 →</div>
+              </div>
+              <div class="post">
+                <div class="post-hd">
+                  <div class="av a3">채</div>
+                  <div class="nm">채윤</div>
+                  <div class="tag-mini rose">하이라이트</div>
+                  <div class="tm">1시간 전</div>
+                </div>
+                <div class="post-body">"시간은 강이 아니라 <b>주름</b>일지도" — 이 문장이 오래 남네요.</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class="tabbar">
+          <div class="tab active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v11h14V10"/></svg>
+            <span>홈</span>
+          </div>
+          <div class="tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5V5a2 2 0 0 1 2-2h13v17H6a2 2 0 0 0-2 2z"/></svg>
+            <span>서재</span>
+          </div>
+          <div class="tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+            <span>집중</span>
+          </div>
+          <div class="tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 11V7a5 5 0 0 0-10 0v4"/><rect x="4" y="11" width="16" height="10" rx="2"/></svg>
+            <span>모임</span>
+          </div>
+          <div class="tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+            <span>나</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ Phone C · Social-first ══════════ -->
+    <div class="phone-wrap">
+      <div class="phone-tag rose"><span class="num">C</span>커뮤니티 우선</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+
+          <div class="status-bar">
+            <span>9:41</span>
+            <div class="right">
+              <svg width="18" height="10" viewBox="0 0 18 10" fill="currentColor"><rect x="0" y="4" width="3" height="6" rx="1"/><rect x="5" y="2" width="3" height="8" rx="1"/><rect x="10" y="0" width="3" height="10" rx="1"/></svg>
+              <svg width="18" height="12" viewBox="0 0 18 12" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="14" height="8" rx="2"/><rect x="3" y="4" width="9" height="4" rx="1" fill="currentColor"/><rect x="16" y="5" width="1.5" height="2" rx="0.5" fill="currentColor" stroke="none"/></svg>
+            </div>
+          </div>
+
+          <div class="app-hd">
+            <div class="avatar">지<div class="streak-badge">12일</div></div>
+            <div class="name-col">
+              <div class="nm"><em>지선</em>님, 오늘도 방긋</div>
+              <div class="sub">4월 24일 금요일 · 맑음</div>
+            </div>
+            <div class="bell">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+            </div>
+          </div>
+
+          <div class="greet">
+            <div class="mascot"><img src="/mascot-talking.png" alt="방긋이"/></div>
+            <div class="bubble">
+              <span class="hi">방긋이</span>
+              <b>민정·채윤</b>님이 오늘 새 기록을 남겼어요. 구경해볼까요?
+            </div>
+          </div>
+
+          <!-- pair row: reading + calendar mini side-by-side -->
+          <div class="sec">
+            <div class="pair">
+              <div class="pair-card read">
+                <div class="ph-lbl">이어 읽기</div>
+                <div class="big-ttl">시간의 기원</div>
+                <div class="meta-mini"><span>어제</span><b>174p</b></div>
+                <div class="mini-progress"><span style="width: 56%;"></span></div>
+              </div>
+              <div class="pair-card cal">
+                <div class="ph-lbl">오늘 · 19:00</div>
+                <div class="big-ttl">노을모임 · 5장 토론</div>
+                <div class="tiny-evt"><span class="dot meeting"></span>서촌 빗살무늬</div>
+                <div class="tiny-evt"><span class="dot library"></span>04/27 반납 · 클라라와 태양</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- HERO: Community feed -->
+          <div class="sec">
+            <div class="slbl rose"><span class="dot"></span>노을모임 피드 <span class="more">전체 →</span></div>
+            <div class="feed">
+              <div class="feed-hd">
+                <div class="grp">노을모임</div>
+                <div class="members">🌿 6명 · 오늘 4개</div>
+              </div>
+
+              <div class="post">
+                <div class="post-hd">
+                  <div class="av a1">민</div>
+                  <div class="nm">민정</div>
+                  <div class="tag-mini">75p ✓</div>
+                  <div class="tm">34분 전</div>
+                </div>
+                <div class="post-body">5장까지 읽고 갑니다. 저녁에 봬요 🌙 생각 정리해서 가져갈게요.</div>
+                <div class="post-actions">
+                  <div class="act liked">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    5
+                  </div>
+                  <div class="act">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    2
+                  </div>
+                </div>
+              </div>
+
+              <div class="post">
+                <div class="post-hd">
+                  <div class="av a3">채</div>
+                  <div class="nm">채윤</div>
+                  <div class="tag-mini rose">하이라이트</div>
+                  <div class="tm">1시간 전</div>
+                </div>
+                <div class="post-body">"시간은 강이 아니라 <b>주름</b>일지도" — 이 문장이 자꾸 떠올라요.</div>
+                <div class="post-actions">
+                  <div class="act">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    8
+                  </div>
+                  <div class="act">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    3
+                  </div>
+                </div>
+              </div>
+
+              <div class="post">
+                <div class="post-hd">
+                  <div class="av a2">준</div>
+                  <div class="nm">준호</div>
+                  <div class="tag-mini">완독 🎉</div>
+                  <div class="tm">3시간 전</div>
+                </div>
+                <div class="post-body"><b>클라라와 태양</b> 완독했어요. 다음 책은 뭐로 갈까요? 추천 있나요?</div>
+                <div class="post-actions">
+                  <div class="act liked">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    12
+                  </div>
+                  <div class="act">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    6
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+        <div class="tabbar">
+          <div class="tab active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v11h14V10"/></svg>
+            <span>홈</span>
+          </div>
+          <div class="tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5V5a2 2 0 0 1 2-2h13v17H6a2 2 0 0 0-2 2z"/></svg>
+            <span>서재</span>
+          </div>
+          <div class="tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+            <span>집중</span>
+          </div>
+          <div class="tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 11V7a5 5 0 0 0-10 0v4"/><rect x="4" y="11" width="16" height="10" rx="2"/></svg>
+            <span>모임</span>
+          </div>
+          <div class="tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+            <span>나</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
-<!-- END PHONE C -->
-</div>
 
-<script>
-// Phone-wrap outer selection — visual comparison tool
-document.querySelectorAll('.phone-wrap').forEach(function(wrap){
-  wrap.addEventListener('click',function(e){
-    // Don't trigger wrap selection if clicking interactive elements inside the phone
-    if(e.target.closest('.seg-btn')||e.target.closest('.cch-cta')||e.target.closest('.cc-cta')||e.target.closest('.ab-ic')||e.target.closest('.tab')||e.target.closest('.more')||e.target.closest('.fa')||e.target.closest('.tp-opt')||e.target.closest('.tp-apply')||e.target.closest('.modal-back')||e.target.closest('.modal-close'))return;
-    document.querySelectorAll('.phone-wrap').forEach(function(w){w.classList.remove('selected');});
-    wrap.classList.add('selected');
-  });
-});
-
-// Segmented tabs inside Theme A
-document.querySelectorAll('.phone').forEach(function(phone){
-  var btns=phone.querySelectorAll('.seg-btn');
-  var panels=phone.querySelectorAll('.panel');
-  btns.forEach(function(btn,i){
-    btn.addEventListener('click',function(e){
-      e.stopPropagation();
-      btns.forEach(function(b){b.classList.remove('on');b.setAttribute('aria-selected','false');});
-      panels.forEach(function(p){p.classList.remove('on');});
-      btn.classList.add('on');
-      btn.setAttribute('aria-selected','true');
-      if(panels[i])panels[i].classList.add('on');
-    });
-  });
-});
-
-// Theme picker inside Phone C — real in-app selection UI
-document.querySelectorAll('.tp-opts').forEach(function(group){
-  var opts=group.querySelectorAll('.tp-opt');
-  opts.forEach(function(opt){
-    opt.addEventListener('click',function(e){
-      e.stopPropagation();
-      opts.forEach(function(o){o.classList.remove('on');});
-      opt.classList.add('on');
-    });
-  });
-});
-</script>
 </body>
 </html>

@@ -7,6 +7,13 @@
       "runtimeArgs": ["run", "dev", "--", "-p", "3100"],
       "port": 3100,
       "autoPort": false
+    },
+    {
+      "name": "vercel-preview",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["--yes", "serve", ".preview-vercel", "-p", "3200", "-L"],
+      "port": 3200,
+      "autoPort": false
     }
   ]
 }
