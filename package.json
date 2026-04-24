@@ -24,6 +24,7 @@
     "lucide-react": "^0.577.0",
     "next": "14.2.35",
     "openai": "^6.27.0",
+    "posthog-js": "^1.368.2",
     "qrcode.react": "^4.2.0",
     "react": "^18",
     "react-dom": "^18",

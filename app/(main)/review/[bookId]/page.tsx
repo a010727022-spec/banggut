@@ -14,13 +14,16 @@ import {
   upsertStreak,
 } from "@/lib/supabase/queries";
 import type { Book, Message, Diagnosis } from "@/lib/types";
+import { track, EVENTS } from "@/lib/analytics";
 import { countMeaningfulTurns, REQUIRED_MEANINGFUL_TURNS } from "@/lib/meaningful-turns";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Sparkles, Save, Eye, EyeOff, Check, Undo2, X, Lock } from "lucide-react";
+import { ArrowLeft, Sparkles, Save, Eye, EyeOff, Check, Undo2, X, Lock, Share2 } from "lucide-react";
 import { toast } from "sonner";
+import ShareCard from "@/components/shared/ShareCard";
+import { shareReviewCard } from "@/lib/share-utils";
 
 /* ───── localStorage 임시저장 유틸 ───── */
 
@@ -83,7 +86,7 @@ function SaveStatus({ status, savedAt }: { status: "idle" | "saving" | "saved" |
 
   return (
     <span className="text-[11px] text-warmgray flex items-center gap-1">
-      {status === "saving" && "저장 중..."}
+      {status === "saving" && "저장 중"}
       {status === "saved" && savedAt && (
         <>
           <Check className="w-3 h-3 text-ink-green" />
@@ -122,7 +125,7 @@ function AIDraftSheet({
       >
         <div className="flex items-center justify-between mb-1">
           <h3 className="text-base font-bold text-ink">AI 초안 적용 방식</h3>
-          <button onClick={onCancel} className="text-warmgray p-1">
+          <button onClick={onCancel} aria-label="닫기" className="text-warmgray -m-2 p-3">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -174,7 +177,7 @@ function AIDraftPreview({
     <div className="bg-ink-green/5 border border-ink-green/20 rounded-card p-4 mb-4">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-semibold text-ink-green">🤖 AI 초안 미리보기</h3>
-        <button onClick={onClose} className="text-warmgray p-1 hover:text-ink">
+        <button onClick={onClose} aria-label="닫기" className="text-warmgray -m-2 p-3 hover:text-ink">
           <X className="w-4 h-4" />
         </button>
       </div>
@@ -220,6 +223,11 @@ export default function ReviewPage() {
   const [diagnosing, setDiagnosing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loadError, setLoadError] = useState(false);
+
+  // 공유 관련
+  const [showShareCard, setShowShareCard] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const shareCardRef = useRef<HTMLDivElement>(null);
 
   // 자동저장 상태
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -593,6 +601,48 @@ export default function ReviewPage() {
     setDiagnosing(false);
   };
 
+  /* ───── 공유하기 ───── */
+
+  const handleShare = async () => {
+    setShowShareCard(true);
+    setSharing(true);
+
+    // Wait for the card to render
+    await new Promise((r) => setTimeout(r, 100));
+
+    if (!shareCardRef.current) {
+      toast.error("공유 카드를 생성할 수 없어요");
+      setSharing(false);
+      setShowShareCard(false);
+      return;
+    }
+
+    try {
+      const reviewOneliner = mode === "essay"
+        ? essayBody.slice(0, 100)
+        : oneliner || structuredBody.slice(0, 100);
+
+      const result = await shareReviewCard({
+        element: shareCardRef.current,
+        bookTitle: book?.title || "",
+        oneliner: reviewOneliner,
+      });
+
+      if (result === "shared") {
+        toast.success("서평 카드를 공유했어요");
+      } else if (result === "copied") {
+        toast.success("서평 텍스트를 복사했어요");
+      } else {
+        toast.success("서평 카드 이미지가 저장되었어요");
+      }
+    } catch {
+      toast.error("공유에 실패했어요");
+    }
+
+    setSharing(false);
+    setShowShareCard(false);
+  };
+
   /* ───── 최종 저장 ───── */
 
   const handleSave = async () => {
@@ -618,6 +668,12 @@ export default function ReviewPage() {
         is_public: isPublic,
       });
       await updateBook(supabase, bookId, { has_review: true });
+      track(EVENTS.REVIEW_SAVED, {
+        book_id: bookId,
+        mode,
+        is_public: isPublic,
+        has_diagnosis: !!diagnosis,
+      });
       // 스트릭 기록
       if (user) upsertStreak(supabase, user.id, { review: true }).catch(() => {});
       clearDraftFromLocal(bookId);
@@ -653,7 +709,7 @@ export default function ReviewPage() {
   if (!book) {
     return (
       <div className="flex items-center justify-center min-h-screen text-warmgray text-sm">
-        불러오는 중...
+        불러오는 중
       </div>
     );
   }
@@ -732,7 +788,7 @@ export default function ReviewPage() {
             size="sm"
             className="text-xs border-ink-green text-ink-green hover:bg-ink-green/5 rounded-btn"
           >
-            {diagnosing ? "분석 중..." : "진단하기"}
+            {diagnosing ? "분석 중" : "진단하기"}
           </Button>
         </div>
         {!diagnosis && !diagnosing && (
@@ -847,7 +903,7 @@ export default function ReviewPage() {
               <Lock className="w-4 h-4 mr-2" />
             )}
             {generating
-              ? "생성 중..."
+              ? "생성 중"
               : canUseAI
                 ? "AI 초안 생성"
                 : "AI로 쓰기 🔒"}
@@ -891,15 +947,53 @@ export default function ReviewPage() {
           </button>
         </div>
 
-        <Button
-          onClick={handleSave}
-          disabled={saving}
-          className="w-full bg-ink-green text-paper hover:bg-ink-medium rounded-btn h-12 text-base font-semibold"
-        >
-          <Save className="w-4 h-4 mr-2" />
-          {saving ? "저장 중..." : "서평 저장"}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={handleSave}
+            disabled={saving}
+            className="flex-1 bg-ink-green text-paper hover:bg-ink-medium rounded-btn h-12 text-base font-semibold"
+          >
+            <Save className="w-4 h-4 mr-2" />
+            {saving ? "저장 중" : "서평 저장"}
+          </Button>
+          <Button
+            onClick={handleShare}
+            disabled={sharing || (!essayBody && !oneliner && !structuredBody)}
+            variant="outline"
+            className="h-12 px-4 rounded-btn border-ink-green text-ink-green hover:bg-ink-green/5"
+            title="공유하기"
+          >
+            <Share2 className="w-5 h-5" />
+          </Button>
+        </div>
       </div>
+
+      {/* Hidden ShareCard for image capture */}
+      {showShareCard && (
+        <div
+          style={{
+            position: "fixed",
+            left: "-9999px",
+            top: 0,
+            zIndex: -1,
+            pointerEvents: "none",
+          }}
+        >
+          <ShareCard
+            ref={shareCardRef}
+            bookTitle={book?.title || ""}
+            bookAuthor={book?.author || null}
+            oneliner={
+              mode === "essay"
+                ? essayBody.slice(0, 100)
+                : oneliner || structuredBody.slice(0, 100)
+            }
+            rating={book?.rating || null}
+            nickname={user?.nickname || "독서가"}
+            mode={mode}
+          />
+        </div>
+      )}
 
       {/* AI 초안 선택 바텀시트 */}
       {showDraftSheet && pendingAIDraft && (

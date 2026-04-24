@@ -6,7 +6,22 @@
       "Bash(python3 \"C:\\\\Users\\\\kimjisun\\\\.claude\\\\skills\\\\sector-analyst\\\\scripts\\\\analyze_sector_rotation.py\")",
       "Bash(git clone:*)",
       "Bash(bash C:/Users/kimjisun/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/brainstorming/scripts/start-server.sh --project-dir c:/Users/kimjisun/Desktop/banggut)",
-      "Bash(cat c:/Users/kimjisun/Desktop/banggut/.superpowers/brainstorm/*/state/server-info)"
+      "Bash(cat c:/Users/kimjisun/Desktop/banggut/.superpowers/brainstorm/*/state/server-info)",
+      "Bash(gh auth:*)",
+      "Bash(gh repo:*)",
+      "Bash(npx supabase:*)",
+      "Bash(supabase --version)",
+      "Bash(npm install:*)",
+      "Bash(winget --version)",
+      "Bash(powershell -Command \"winget --version\")",
+      "Bash(curl -sL \"https://api.github.com/repos/supabase/cli/releases/latest\")",
+      "Bash(where psql:*)",
+      "Bash(node -e ':*)",
+      "Bash(curl -s \"https://bgxfrrglkndigqcxlnnw.supabase.co/rest/v1/\" -H \"apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJneGZycmdsa25kaWdxY3hsbm53Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5MTM2NjYsImV4cCI6MjA4ODQ4OTY2Nn0.Msa5jQnWCgp_7Xfyz371Genauc7RaGdP6YVB3lWTW3E\")",
+      "Bash(nslookup db.bgxfrrglkndigqcxlnnw.supabase.co)",
+      "Bash(wc -l \"/c/Users/kimjisun/Desktop/banggut/app/\\(main\\)/discuss/\"*)",
+      "Bash(find \"/c/Users/kimjisun/Desktop/banggut/app/\\(main\\)\" -type f -name \"*.tsx\" -exec wc -l {} +)",
+      "Bash(find \"/c/Users/kimjisun/Desktop/banggut/app/api\" -type f -name \"route.ts\" -exec wc -l {} +)"
     ]
   }
 }

@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>방긋 · Atelier × JW Anderson</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Playfair+Display:ital,wght@0,700;1,700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;1,9..144,400;1,9..144,700&family=Space+Grotesk:wght@400;500;600;700&family=Unbounded:wght@700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css" />
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  font-family: 'Pretendard Variable', -apple-system, sans-serif;
+  background: #1F1B15;
+  color: #EFE8D9;
+  padding: 48px 24px;
+  min-height: 100vh;
+}
+
+.lab-hero { max-width: 1200px; margin: 0 auto 40px; text-align: center; }
+.lab-hero h1 {
+  font-family: 'Unbounded', sans-serif; font-weight: 800;
+  font-size: 42px; letter-spacing: -0.01em; margin-bottom: 6px;
+}
+.lab-hero .wave {
+  display: inline-block;
+  font-family: 'Fraunces', serif; font-style: italic;
+  font-size: 16px; color: #C8DE3F; letter-spacing: 0.04em;
+  padding: 10px 0;
+}
+.lab-hero .wave::before,
+.lab-hero .wave::after {
+  content: ""; display: inline-block; width: 36px; height: 1px;
+  background: #C8DE3F; vertical-align: middle; margin: 0 14px;
+}
+.lab-hero .sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px; color: #A08659; margin-top: 8px; letter-spacing: 0.06em;
+}
+
+.phones-row { max-width: 1200px; margin: 0 auto; display: flex; gap: 60px; justify-content: center; flex-wrap: wrap; }
+.phone-col { display: flex; flex-direction: column; gap: 18px; align-items: center; }
+
+.phone-label {
+  font-family: 'Unbounded', sans-serif; font-weight: 700;
+  font-size: 18px; letter-spacing: 0.08em; text-transform: uppercase;
+  text-align: center; color: #EFE8D9;
+}
+.phone-label em {
+  display: block;
+  font-family: 'Fraunces', serif; font-style: italic; font-weight: 400;
+  font-size: 12px; letter-spacing: 0.04em; color: #A08659;
+  text-transform: none; margin-top: 4px;
+}
+
+.palette-strip {
+  display: flex; gap: 6px; padding: 6px;
+  background: rgba(255,255,255,0.04); border: 1px solid #3E3424;
+}
+.palette-strip .sw { width: 28px; height: 28px; border: 1px solid rgba(255,255,255,0.08); }
+
+/* ═══ PHONE BASE ═══ */
+.phone {
+  width: 360px; height: 812px;
+  background: var(--bg);
+  border-radius: 48px;
+  overflow: hidden;
+  position: relative;
+  display: flex; flex-direction: column;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 0 10px #0A0804;
+  color: var(--tp);
+}
+.status { height: 44px; padding: 14px 28px 0; display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; flex-shrink: 0; color: var(--mono); }
+.scroll { flex: 1; overflow-y: auto; padding: 0 0 24px; }
+.scroll::-webkit-scrollbar { display: none; }
+
+/* ════════════════════ ATELIER · Dior 한글 정제본 ════════════════════ */
+.phone.atelier {
+  --bg: #F0ECE1;
+  --sf2: #FAF6EB;
+  --sf3: #E9E3D4;
+  --tp: #2A2520;
+  --mono: #5A5048;
+  --stripe: #B5AEA0;
+  --stripe2: #D4CCBD;
+  --gold: #A08245;
+  --rose: #D08E96;
+  --rose-soft: #EDCFD3;
+  --rose-deep: #884E58;
+  --mint: #A3C3B2;
+  --mint-soft: #D6E4DA;
+  --mint-deep: #5E8172;
+}
+
+.atelier .toile-band {
+  height: 44px;
+  background: linear-gradient(180deg, var(--sf2), var(--bg));
+  border-bottom: 1px solid var(--stripe);
+  position: relative;
+  overflow: hidden;
+}
+.atelier .toile-band svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.85; }
+
+.atelier .stripe-bar {
+  height: 8px;
+  background: repeating-linear-gradient(90deg,
+    var(--stripe) 0, var(--stripe) 8px,
+    var(--sf2) 8px, var(--sf2) 10px,
+    var(--rose) 10px, var(--rose) 14px,
+    var(--sf2) 14px, var(--sf2) 16px,
+    var(--mint) 16px, var(--mint) 20px,
+    var(--sf2) 20px, var(--sf2) 22px);
+}
+
+.atelier .wordmark { text-align: center; padding: 16px 24px 4px; }
+.atelier .wordmark h1 {
+  font-family: 'Playfair Display', serif; font-weight: 700;
+  font-size: 26px; letter-spacing: 0.05em; color: var(--tp); line-height: 1;
+}
+.atelier .wordmark h1 em {
+  font-weight: 700; font-style: italic; color: var(--rose-deep);
+}
+.atelier .wordmark .sub {
+  font-family: 'Cormorant Garamond', serif; font-style: italic;
+  font-size: 13px; color: var(--mono); margin-top: 4px;
+  letter-spacing: 0.02em;
+}
+.atelier .wordmark .sub .est {
+  font-family: 'IBM Plex Mono', monospace; font-style: normal;
+  font-size: 10px; color: var(--gold); letter-spacing: 0.12em; margin-left: 6px;
+}
+
+/* 방긋님 태그 */
+.atelier .miss-tag {
+  margin: 14px 24px 0; padding: 10px 16px;
+  border: 1px solid var(--tp); background: var(--sf2);
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 3px 3px 0 var(--stripe);
+  position: relative;
+}
+.atelier .miss-tag::before {
+  content: ""; position: absolute; left: -1px; top: 50%; transform: translateY(-50%);
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--bg); border: 1px solid var(--tp);
+  box-shadow: inset 1px 0 0 var(--sf2);
+}
+.atelier .miss-tag .name {
+  font-family: 'Playfair Display', serif; font-style: italic; font-weight: 700;
+  font-size: 16px; color: var(--tp);
+}
+.atelier .miss-tag .streak {
+  font-family: 'Cormorant Garamond', serif; font-style: italic;
+  font-size: 13px; color: var(--rose-deep);
+}
+.atelier .miss-tag .streak strong {
+  font-family: 'Playfair Display', serif; font-style: italic; font-weight: 700;
+  font-size: 15px; margin-right: 2px;
+}
+
+/* Hero 스캘럽 카드 */
+.atelier .hero {
+  margin: 14px 24px 16px;
+  background: var(--sf2); border: 1px solid var(--tp);
+  padding: 16px 16px 18px; position: relative;
+}
+.atelier .hero::before {
+  content: ""; position: absolute; top: -7px; left: 0; right: 0; height: 7px;
+  background: radial-gradient(circle at 7px 0, var(--sf2) 6.5px, transparent 7px) repeat-x;
+  background-size: 14px 7px;
+}
+.atelier .hero::after {
+  content: ""; position: absolute; top: -7px; left: 0; right: 0; height: 7px;
+  background: radial-gradient(circle at 7px 0, transparent 5.5px, var(--tp) 6px, var(--tp) 6.5px, transparent 7px) repeat-x;
+  background-size: 14px 7px;
+}
+
+.atelier .hero .meta-top {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding-bottom: 10px; margin-bottom: 14px;
+  border-bottom: 1px solid var(--stripe);
+}
+.atelier .hero .meta-top .cat {
+  font-family: 'Playfair Display', serif; font-style: italic;
+  font-size: 13px; color: var(--rose-deep);
+}
+.atelier .hero .meta-top .cat::before {
+  content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--rose); border: 1px solid var(--rose-deep);
+  margin-right: 6px; vertical-align: middle;
+}
+.atelier .hero .meta-top .num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; letter-spacing: 0.1em; color: var(--mono);
+}
+
+.atelier .hero .book-row { display: flex; gap: 14px; margin-bottom: 14px; }
+.atelier .hero .cover {
+  width: 84px; height: 120px;
+  background: repeating-linear-gradient(90deg,
+    var(--stripe) 0, var(--stripe) 4px,
+    var(--stripe2) 4px, var(--stripe2) 8px);
+  border: 1px solid var(--tp);
+  position: relative; flex-shrink: 0;
+}
+.atelier .hero .cover::before {
+  content: ""; position: absolute; top: 14px; left: 0; right: 0; height: 28px;
+  background: var(--sf2);
+  border-top: 1px solid var(--tp); border-bottom: 1px solid var(--tp);
+}
+.atelier .hero .cover .lbl {
+  position: absolute; top: 20px; left: 0; right: 0; text-align: center;
+  font-family: 'Playfair Display', serif; font-style: italic; font-weight: 700;
+  font-size: 12px; color: var(--tp); letter-spacing: 0.02em;
+}
+.atelier .hero .cover .ribbon {
+  position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%);
+  padding: 2px 10px; background: var(--rose); border: 1px solid var(--rose-deep);
+  font-family: 'Cormorant Garamond', serif; font-style: italic;
+  font-size: 9px; color: var(--sf2); letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.atelier .hero .info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.atelier .hero .info .title {
+  font-family: 'Playfair Display', serif; font-style: italic; font-weight: 700;
+  font-size: 22px; line-height: 1.1; color: var(--tp);
+}
+.atelier .hero .info .author {
+  font-family: 'Pretendard Variable', sans-serif; font-size: 12px;
+  color: var(--mono); margin-top: 2px; letter-spacing: 0;
+}
+.atelier .hero .info .quote {
+  font-family: 'Cormorant Garamond', serif; font-style: italic;
+  font-size: 12.5px; line-height: 1.45; color: var(--tp);
+  margin-top: 6px; padding-top: 6px;
+  border-top: 1px dashed var(--stripe);
+}
+
+.atelier .ribbon-progress { margin-bottom: 14px; }
+.atelier .ribbon-progress .meta {
+  display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px;
+}
+.atelier .ribbon-progress .meta .chapter {
+  font-family: 'Pretendard Variable', sans-serif; font-size: 12px;
+  color: var(--rose-deep); font-weight: 500;
+}
+.atelier .ribbon-progress .meta .pct {
+  font-family: 'Playfair Display', serif; font-style: italic; font-weight: 700;
+  font-size: 14px; color: var(--tp);
+}
+.atelier .ribbon-progress .satin {
+  height: 12px; background: var(--sf3); border: 1px solid var(--tp);
+  position: relative; overflow: hidden;
+}
+.atelier .ribbon-progress .satin .fill {
+  position: absolute; inset: 0 auto 0 0; width: 47%;
+  background: repeating-linear-gradient(45deg,
+    var(--rose) 0, var(--rose) 4px,
+    var(--rose-soft) 4px, var(--rose-soft) 6px);
+  border-right: 1px solid var(--tp);
+}
+.atelier .ribbon-progress .satin .knot {
+  position: absolute; top: 50%; left: 47%; transform: translate(-50%, -50%);
+  width: 14px; height: 14px; border: 1px solid var(--tp);
+  background: var(--mint);
+}
+
+.atelier .cta {
+  width: 100%; padding: 14px; background: var(--tp); color: var(--sf2);
+  border: none; font-family: 'Pretendard Variable', sans-serif;
+  font-size: 14px; font-weight: 700; letter-spacing: -0.01em;
+  cursor: pointer; position: relative;
+}
+.atelier .cta::before {
+  content: ""; position: absolute; inset: 3px;
+  border: 1px solid var(--rose-soft); pointer-events: none;
+}
+
+.atelier .section {
+  margin: 0 24px 14px; background: var(--sf2); border: 1px solid var(--tp);
+  padding: 16px; position: relative;
+}
+.atelier .section .head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--stripe);
+}
+.atelier .section .head h3 {
+  font-family: 'Playfair Display', serif; font-style: italic; font-weight: 700;
+  font-size: 17px; color: var(--tp);
+}
+.atelier .section .head h3 em {
+  font-family: 'IBM Plex Mono', monospace; font-style: normal; font-weight: 400;
+  font-size: 10px; letter-spacing: 0.12em; color: var(--mono);
+  margin-left: 6px; vertical-align: 2px;
+}
+.atelier .section .head .more {
+  font-family: 'Cormorant Garamond', serif; font-style: italic;
+  font-size: 12px; color: var(--rose-deep);
+}
+
+.atelier .days {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 12px;
+}
+.atelier .day { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.atelier .day .lbl {
+  font-family: 'Cormorant Garamond', serif; font-style: italic;
+  font-size: 10px; color: var(--mono);
+}
+.atelier .day .dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 1px solid var(--tp); background: var(--bg); position: relative;
+}
+.atelier .day.read .dot { background: var(--rose); border-color: var(--rose-deep); }
+.atelier .day.today .dot {
+  background: var(--mint); border-color: var(--mint-deep);
+  transform: scale(1.35);
+  box-shadow: 0 0 0 2px var(--sf2), 0 0 0 3px var(--tp);
+}
+.atelier .day.event .dot::after {
+  content: ""; position: absolute; top: -5px; right: -5px;
+  width: 4px; height: 4px; background: var(--gold); border-radius: 50%;
+  border: 0.5px solid var(--tp);
+}
+.atelier .day .dnum {
+  font-family: 'Pretendard Variable', sans-serif; font-size: 10px; color: var(--mono);
+}
+
+.atelier .events {
+  display: flex; flex-direction: column; padding-top: 10px;
+  border-top: 1px dashed var(--stripe); gap: 8px;
+}
+.atelier .event-row { display: flex; align-items: center; gap: 10px; }
+.atelier .event-row .date {
+  font-family: 'Playfair Display', serif; font-style: italic; font-weight: 700;
+  font-size: 13px; color: var(--rose-deep); min-width: 38px;
+}
+.atelier .event-row .ttl {
+  font-family: 'Pretendard Variable', sans-serif; font-size: 12.5px;
+  font-weight: 500; color: var(--tp); flex: 1;
+}
+.atelier .event-row .pin {
+  width: 8px; height: 8px; border-radius: 50%; border: 1px solid var(--tp);
+}
+.atelier .event-row.a .pin { background: var(--rose); }
+.atelier .event-row.b .pin { background: var(--mint); }
+.atelier .event-row.c .pin { background: var(--gold); }
+
+.atelier .lectrices { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+.atelier .lectrices .av {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 1px solid var(--tp); background: var(--rose-soft);
+  font-family: 'Playfair Display', serif; font-style: italic;
+  font-size: 13px; color: var(--rose-deep);
+  display: flex; align-items: center; justify-content: center; position: relative;
+}
+.atelier .lectrices .av::after {
+  content: ""; position: absolute; inset: -3px;
+  border: 0.5px solid var(--rose); border-radius: 50%;
+}
+.atelier .lectrices .av:nth-child(2) { background: var(--mint-soft); color: var(--mint-deep); }
+.atelier .lectrices .av:nth-child(2)::after { border-color: var(--mint); }
+.atelier .lectrices .av:nth-child(3) { background: var(--sf3); color: var(--mono); }
+.atelier .lectrices .av:nth-child(3)::after { border-color: var(--gold); }
+
+.atelier .lec-note {
+  font-family: 'Pretendard Variable', sans-serif; font-size: 12.5px;
+  line-height: 1.55; color: var(--tp); padding-top: 8px;
+  border-top: 1px dashed var(--stripe);
+}
+.atelier .lec-note strong {
+  font-family: 'Playfair Display', serif; font-style: italic; font-weight: 700;
+  color: var(--rose-deep); margin-right: 3px;
+}
+
+/* ════════════════════ JW ANDERSON ════════════════════ */
+.phone.jwa {
+  --bg: #F1ECDB;
+  --sf2: #FCF8EA;
+  --sf3: #E5DEC7;
+  --tp: #161613;
+  --mono: #555049;
+  --lime: #CADE3A;
+  --lime-deep: #8FA521;
+  --lilac: #C6A8DE;
+  --lilac-deep: #7551A4;
+  --tangerine: #F09050;
+  --kraft: #C9A775;
+}
+
+/* 상단 라임 배너 */
+.jwa .top-banner {
+  background: var(--lime);
+  border-bottom: 2px solid var(--tp);
+  padding: 10px 20px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.jwa .top-banner .season {
+  font-family: 'Unbounded', sans-serif; font-weight: 800;
+  font-size: 13px; letter-spacing: 0.04em; color: var(--tp);
+  text-transform: uppercase;
+}
+.jwa .top-banner .anchor {
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--tp);
+  letter-spacing: 0.08em; display: flex; align-items: center; gap: 6px;
+}
+.jwa .top-banner .anchor svg { width: 14px; height: 14px; }
+
+/* Kraft 테이프 데코 */
+.jwa .kraft-tape {
+  position: absolute; width: 84px; height: 22px;
+  background: var(--kraft);
+  opacity: 0.92;
+  transform: rotate(-12deg);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.1);
+  z-index: 5;
+}
+.jwa .kraft-tape.right {
+  top: 60px; right: -14px;
+  background: repeating-linear-gradient(90deg,
+    #C9A775 0, #C9A775 6px,
+    #BC9668 6px, #BC9668 7px);
+}
+.jwa .kraft-tape .label {
+  font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+  color: #7A5A30; text-align: center; line-height: 22px;
+  letter-spacing: 0.1em;
+}
+
+/* Wordmark */
+.jwa .wordmark {
+  padding: 26px 20px 12px;
+  position: relative;
+}
+.jwa .wordmark h1 {
+  font-family: 'Unbounded', sans-serif; font-weight: 800;
+  font-size: 38px; letter-spacing: -0.03em; color: var(--tp);
+  line-height: 0.9;
+}
+.jwa .wordmark .sub {
+  font-family: 'Fraunces', serif; font-style: italic;
+  font-size: 14px; color: var(--mono); margin-top: 4px;
+  letter-spacing: 0;
+}
+.jwa .wordmark .sub em { color: var(--lilac-deep); font-weight: 700; }
+
+/* Lime sticker */
+.jwa .lime-sticker {
+  position: absolute; top: 16px; right: 20px;
+  width: 64px; height: 64px; border-radius: 50%;
+  background: var(--lime); border: 2px solid var(--tp);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  transform: rotate(8deg);
+  box-shadow: 2px 2px 0 var(--tp);
+}
+.jwa .lime-sticker .num {
+  font-family: 'Unbounded', sans-serif; font-weight: 800;
+  font-size: 20px; letter-spacing: -0.02em; color: var(--tp); line-height: 1;
+}
+.jwa .lime-sticker .txt {
+  font-family: 'IBM Plex Mono', monospace; font-size: 8px;
+  color: var(--tp); letter-spacing: 0.1em; margin-top: 2px;
+}
+
+/* 인사 */
+.jwa .greet {
+  padding: 0 20px 16px;
+}
+.jwa .greet .hi {
+  font-family: 'Unbounded', sans-serif; font-weight: 700;
+  font-size: 22px; letter-spacing: -0.02em; color: var(--tp);
+  line-height: 1.1;
+}
+.jwa .greet .hi em {
+  font-family: 'Fraunces', serif; font-style: italic; font-weight: 700;
+  color: var(--lilac-deep);
+}
+.jwa .greet .meta {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10.5px;
+  color: var(--mono); letter-spacing: 0.08em; margin-top: 6px;
+  display: flex; gap: 8px;
+}
+.jwa .greet .meta span { padding: 2px 6px; background: var(--sf3); border: 1px solid var(--tp); }
+
+/* Hero: museum label card */
+.jwa .hero {
+  margin: 0 20px 16px;
+  background: var(--sf2);
+  border: 2px solid var(--tp);
+  padding: 16px;
+  position: relative;
+}
+.jwa .hero .cat-label {
+  position: absolute; top: -1px; left: 16px;
+  transform: translateY(-50%);
+  background: var(--sf2); padding: 0 8px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+  letter-spacing: 0.14em; color: var(--tp);
+}
+
+.jwa .now-sticker {
+  position: absolute; top: -12px; right: 14px;
+  background: var(--lime); border: 2px solid var(--tp);
+  padding: 4px 10px;
+  font-family: 'Unbounded', sans-serif; font-weight: 800;
+  font-size: 10px; letter-spacing: 0.08em; color: var(--tp);
+  transform: rotate(4deg);
+  box-shadow: 2px 2px 0 var(--tp);
+}
+
+.jwa .hero .book-row { display: flex; gap: 14px; margin: 10px 0 14px; }
+.jwa .hero .cover {
+  width: 86px; height: 122px;
+  background: var(--lilac);
+  border: 2px solid var(--tp);
+  position: relative;
+  flex-shrink: 0;
+  padding: 12px 10px;
+  box-shadow: 3px 3px 0 var(--tp);
+}
+.jwa .hero .cover .title-jp {
+  font-family: 'Fraunces', serif; font-style: italic; font-weight: 700;
+  font-size: 14px; color: var(--tp); line-height: 1.1;
+}
+.jwa .hero .cover .author-sm {
+  position: absolute; bottom: 10px; left: 10px; right: 10px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 8px;
+  color: var(--tp); letter-spacing: 0.1em;
+  padding-top: 6px; border-top: 1px solid var(--tp);
+}
+.jwa .hero .cover .spine-band {
+  position: absolute; top: -2px; left: -2px; width: 10px; height: 124px;
+  background: var(--tangerine); border: 2px solid var(--tp);
+}
+
+.jwa .hero .info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.jwa .hero .info .title-kr {
+  font-family: 'Unbounded', sans-serif; font-weight: 800;
+  font-size: 20px; letter-spacing: -0.03em; color: var(--tp);
+  line-height: 1;
+}
+.jwa .hero .info .author {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+  color: var(--mono); letter-spacing: 0.14em; margin-top: 4px;
+  text-transform: uppercase;
+}
+.jwa .hero .info .quote {
+  font-family: 'Fraunces', serif; font-style: italic; font-weight: 400;
+  font-size: 12.5px; line-height: 1.45; color: var(--tp);
+  margin-top: 8px;
+  padding-left: 8px;
+  border-left: 2px solid var(--lime-deep);
+}
+
+/* Anchor chain progress */
+.jwa .chain-progress { margin-bottom: 14px; }
+.jwa .chain-progress .meta {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 6px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+  letter-spacing: 0.06em; color: var(--mono);
+}
+.jwa .chain-progress .meta .pct {
+  font-family: 'Unbounded', sans-serif; font-weight: 800;
+  font-size: 14px; color: var(--tp); letter-spacing: -0.02em;
+}
+.jwa .chain-progress .chain {
+  display: flex; gap: 2px; align-items: center;
+  height: 14px;
+}
+.jwa .chain-progress .link {
+  flex: 1; height: 8px; border: 1.5px solid var(--tp);
+  background: var(--sf3); border-radius: 2px;
+}
+.jwa .chain-progress .link.on { background: var(--lime); }
+.jwa .chain-progress .link.now { background: var(--lilac); transform: scaleY(1.4); }
+
+.jwa .cta-wrap { display: flex; gap: 8px; }
+.jwa .cta {
+  flex: 1; padding: 14px;
+  background: var(--tp); color: var(--sf2);
+  border: 2px solid var(--tp);
+  font-family: 'Unbounded', sans-serif; font-weight: 800;
+  font-size: 14px; letter-spacing: -0.01em;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--lime);
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.jwa .cta svg { width: 16px; height: 16px; }
+.jwa .cta-mini {
+  width: 50px; background: var(--sf2); border: 2px solid var(--tp);
+  color: var(--tp); font-size: 16px; cursor: pointer;
+  box-shadow: 3px 3px 0 var(--lilac);
+}
+
+/* Sections */
+.jwa .section {
+  margin: 0 20px 14px;
+  background: var(--sf2);
+  border: 2px solid var(--tp);
+  padding: 16px;
+  position: relative;
+}
+.jwa .section .head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 12px;
+}
+.jwa .section .head h3 {
+  font-family: 'Unbounded', sans-serif; font-weight: 800;
+  font-size: 15px; letter-spacing: -0.02em; color: var(--tp);
+  text-transform: uppercase;
+}
+.jwa .section .head h3 em {
+  font-family: 'Fraunces', serif; font-style: italic; font-weight: 400;
+  font-size: 12px; color: var(--lilac-deep); letter-spacing: 0;
+  text-transform: none; margin-left: 6px;
+}
+.jwa .section .head .more {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+  color: var(--tp); letter-spacing: 0.1em;
+  padding: 3px 6px; background: var(--lime); border: 1px solid var(--tp);
+}
+
+.jwa .days {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+  margin-bottom: 12px;
+}
+.jwa .day { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.jwa .day .lbl {
+  font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+  color: var(--mono); letter-spacing: 0.08em; text-transform: uppercase;
+}
+.jwa .day .sq {
+  width: 32px; height: 32px;
+  border: 1.5px solid var(--tp);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Unbounded', sans-serif; font-weight: 700;
+  font-size: 11px; color: var(--tp);
+  background: var(--sf2);
+}
+.jwa .day.read .sq { background: var(--lime); }
+.jwa .day.today .sq {
+  background: var(--lilac);
+  box-shadow: 2px 2px 0 var(--tp);
+  position: relative;
+}
+.jwa .day.today .sq::after {
+  content: "★"; position: absolute; top: -8px; right: -6px;
+  font-size: 14px; color: var(--tangerine);
+  -webkit-text-stroke: 1px var(--tp);
+}
+.jwa .day.event .sq::before {
+  content: ""; position: absolute; top: -4px; right: -4px;
+  width: 6px; height: 6px; background: var(--tangerine);
+  border: 1px solid var(--tp); border-radius: 50%;
+}
+.jwa .day.event .sq { position: relative; }
+
+.jwa .events {
+  display: flex; flex-direction: column; gap: 8px;
+  padding-top: 10px;
+  border-top: 1.5px solid var(--tp);
+}
+.jwa .event-row {
+  display: grid; grid-template-columns: auto 42px 1fr auto; align-items: center;
+  gap: 10px;
+}
+.jwa .event-row .pin {
+  width: 10px; height: 10px; border: 1.5px solid var(--tp);
+}
+.jwa .event-row.a .pin { background: var(--lime); border-radius: 2px; }
+.jwa .event-row.b .pin { background: var(--lilac); border-radius: 50%; }
+.jwa .event-row.c .pin { background: var(--tangerine); transform: rotate(45deg); }
+.jwa .event-row .date {
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+  color: var(--tp); letter-spacing: 0.06em; font-weight: 500;
+}
+.jwa .event-row .ttl {
+  font-family: 'Pretendard Variable', sans-serif; font-size: 12.5px;
+  font-weight: 500; color: var(--tp);
+}
+.jwa .event-row .cat-tag {
+  font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+  padding: 2px 6px; background: var(--sf3); border: 1px solid var(--tp);
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+
+/* Crew */
+.jwa .crew { display: flex; gap: 6px; align-items: center; margin-bottom: 12px; }
+.jwa .crew .av {
+  width: 36px; height: 36px;
+  border: 2px solid var(--tp);
+  font-family: 'Unbounded', sans-serif; font-weight: 800;
+  font-size: 14px; color: var(--tp);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 2px 2px 0 var(--tp);
+}
+.jwa .crew .av.a { background: var(--lime); }
+.jwa .crew .av.b { background: var(--lilac); border-radius: 50%; }
+.jwa .crew .av.c { background: var(--tangerine); }
+.jwa .crew .av.more {
+  background: var(--sf2);
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+}
+
+.jwa .crew-note {
+  font-family: 'Pretendard Variable', sans-serif; font-size: 12.5px;
+  line-height: 1.55; color: var(--tp); padding-top: 10px;
+  border-top: 1.5px solid var(--tp);
+}
+.jwa .crew-note strong {
+  font-family: 'Unbounded', sans-serif; font-weight: 700;
+  color: var(--lilac-deep); margin-right: 3px;
+}
+.jwa .crew-note em {
+  font-family: 'Fraunces', serif; font-style: italic; font-weight: 700;
+  color: var(--tp);
+}
+
+/* Bottom museum bar */
+.jwa .bottom-bar {
+  background: var(--tp); color: var(--sf2);
+  padding: 10px 20px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+  letter-spacing: 0.1em;
+}
+.jwa .bottom-bar .dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--lime);
+}
+
+/* ═══ NOTES ═══ */
+.notes { max-width: 1200px; margin: 52px auto 0; background: #2B2218; border: 1px solid #A78148; padding: 28px; }
+.notes h2 { font-family: 'Unbounded', sans-serif; font-size: 22px; letter-spacing: -0.02em; color: #EFE8D9; margin-bottom: 6px; text-align: center; }
+.notes > .caption { font-family: 'Fraunces', serif; font-style: italic; text-align: center; color: #C8DE3F; margin-bottom: 22px; }
+.notes .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; }
+.notes .col { color: #D4C8AE; }
+.notes .col h4 { font-family: 'Unbounded', sans-serif; font-size: 14px; letter-spacing: 0.02em; color: #EFE8D9; margin-bottom: 4px; padding-bottom: 4px; border-bottom: 1px solid #A78148; }
+.notes .col .tagline { font-family: 'Fraunces', serif; font-style: italic; font-size: 12px; color: #C8DE3F; margin-bottom: 10px; }
+.notes .col p { font-family: 'Pretendard Variable', sans-serif; font-size: 13px; line-height: 1.7; margin-bottom: 6px; color: #C4B9A2; }
+.notes .col p strong { color: #EFE8D9; font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 0.02em; margin-right: 4px; }
+.notes .col .pal { display: flex; gap: 6px; margin-top: 14px; }
+.notes .col .pal .s { width: 28px; height: 28px; border: 1px solid #A78148; }
+.notes .col.b h4 { border-color: #C8DE3F; }
+</style>
+</head>
+<body>
+
+<div class="lab-hero">
+  <h1>Atelier × JW Anderson</h1>
+  <div class="wave">dior 한글패치 &amp; jwa 리인터프리팅</div>
+  <div class="sub">2026.04.21 · LAB/ROSE-MINT/V2</div>
+</div>
+
+<div class="phones-row">
+
+  <!-- ════════════ ATELIER · 한글 정제본 ════════════ -->
+  <div class="phone-col">
+    <div class="phone atelier">
+      <div class="status">
+        <span>9:41</span>
+        <span>◉ 4G · 82%</span>
+      </div>
+
+      <div class="toile-band">
+        <svg viewBox="0 0 360 44" xmlns="http://www.w3.org/2000/svg">
+          <g stroke="#884E58" stroke-width="0.7" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.7">
+            <circle cx="20" cy="20" r="3"/><path d="M20 23 L20 33 L14 38 M20 33 L26 38 M15 26 L25 26"/>
+            <rect x="22" y="24" width="5" height="4" fill="#D08E96" stroke-width="0.5"/>
+            <path d="M60 38 L60 28 M60 32 C57 30, 55 26, 57 24"/>
+            <circle cx="57" cy="24" r="1.5" fill="#A3C3B2" stroke-width="0.3"/>
+            <path d="M100 30 L100 36 L108 36 L116 36 L116 30 L108 32 Z M108 32 L108 36"/>
+            <circle cx="150" cy="18" r="2.5"/><path d="M150 20 L150 30 L145 34 M150 30 L155 34"/>
+            <rect x="146" y="22" width="8" height="3" fill="#D08E96" stroke-width="0.5"/>
+            <circle cx="190" cy="26" r="1.5" fill="#D08E96" stroke-width="0.3"/>
+            <circle cx="187" cy="23" r="1.2" fill="#EDCFD3" stroke-width="0.3"/>
+            <circle cx="193" cy="23" r="1.2" fill="#EDCFD3" stroke-width="0.3"/>
+            <path d="M190 30 L190 38"/>
+            <rect x="220" y="30" width="14" height="2.5" fill="#D08E96" stroke-width="0.4"/>
+            <rect x="222" y="26" width="14" height="2.5" fill="#A3C3B2" stroke-width="0.4"/>
+            <circle cx="270" cy="20" r="3"/><path d="M270 23 L270 33 L264 38 M270 33 L276 38"/>
+            <rect x="272" y="24" width="5" height="4" fill="#A3C3B2" stroke-width="0.5"/>
+            <path d="M310 20 Q315 16, 320 20 Q325 16, 330 20"/>
+            <path d="M345 26 L345 32 M343 26 Q340 24, 342 28 M347 26 Q350 24, 348 28"/>
+          </g>
+        </svg>
+      </div>
+
+      <div class="stripe-bar"></div>
+
+      <div class="scroll">
+        <div class="wordmark">
+          <h1><em>방긋</em> 아뜰리에</h1>
+          <div class="sub">독서 다이어리 <span class="est">EST. 2025</span></div>
+        </div>
+
+        <div class="miss-tag">
+          <div class="name">방긋님 · 007</div>
+          <div class="streak"><strong>7</strong>일 연속 읽는 중</div>
+        </div>
+
+        <div class="hero">
+          <div class="meta-top">
+            <span class="cat">읽는 중</span>
+            <span class="num">3장 · 148 / 312 p</span>
+          </div>
+
+          <div class="book-row">
+            <div class="cover">
+              <div class="lbl"></div>
+              <div class="ribbon">Miss B.</div>
+            </div>
+            <div class="info">
+              <div class="title">달까지<br>가자</div>
+              <div class="author">장류진 · 창비</div>
+              <div class="quote">"그건 정말 꿈 같은 얘기였지만, 나는 그 꿈을 믿어보기로 했다."</div>
+            </div>
+          </div>
+
+          <div class="ribbon-progress">
+            <div class="meta">
+              <span class="chapter">어제 148쪽에서 멈춤</span>
+              <span class="pct">47%</span>
+            </div>
+            <div class="satin">
+              <div class="fill"></div>
+              <div class="knot"></div>
+            </div>
+          </div>
+
+          <button class="cta">이어 읽기</button>
+        </div>
+
+        <div class="section">
+          <div class="head">
+            <h3>이번 주 <em>4월 3주차</em></h3>
+            <span class="more">전체보기 →</span>
+          </div>
+
+          <div class="days">
+            <div class="day read"><span class="lbl">월</span><span class="dot"></span><span class="dnum">15</span></div>
+            <div class="day read"><span class="lbl">화</span><span class="dot"></span><span class="dnum">16</span></div>
+            <div class="day read"><span class="lbl">수</span><span class="dot"></span><span class="dnum">17</span></div>
+            <div class="day read"><span class="lbl">목</span><span class="dot"></span><span class="dnum">18</span></div>
+            <div class="day read"><span class="lbl">금</span><span class="dot"></span><span class="dnum">19</span></div>
+            <div class="day read event"><span class="lbl">토</span><span class="dot"></span><span class="dnum">20</span></div>
+            <div class="day today"><span class="lbl">일</span><span class="dot"></span><span class="dnum">21</span></div>
+          </div>
+
+          <div class="events">
+            <div class="event-row a"><span class="pin"></span><span class="date">4.23</span><span class="ttl">목요 독서모임</span></div>
+            <div class="event-row b"><span class="pin"></span><span class="date">4.25</span><span class="ttl">위시 · 새 소설 시작</span></div>
+            <div class="event-row c"><span class="pin"></span><span class="date">4.28</span><span class="ttl">도서관 반납 · 코스모스</span></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="head">
+            <h3>함께 읽는 친구</h3>
+            <span class="more">서클 열기 →</span>
+          </div>
+
+          <div class="lectrices">
+            <div class="av">수</div>
+            <div class="av">지</div>
+            <div class="av">민</div>
+          </div>
+          <div class="lec-note">
+            <strong>수진</strong>님이 <em>시선으로부터</em>를 완독했어요.<br>
+            <strong>지민</strong>님이 이번 주 모임 후기를 남겼어요.
+          </div>
+        </div>
+      </div>
+
+      <div class="stripe-bar"></div>
+    </div>
+
+    <div class="phone-label">
+      ATELIER · 한글 정제본
+      <em>Dior inspired, simplified Korean</em>
+    </div>
+    <div class="palette-strip">
+      <div class="sw" style="background:#F0ECE1"></div>
+      <div class="sw" style="background:#B5AEA0"></div>
+      <div class="sw" style="background:#D08E96"></div>
+      <div class="sw" style="background:#A3C3B2"></div>
+      <div class="sw" style="background:#A08245"></div>
+      <div class="sw" style="background:#2A2520"></div>
+    </div>
+  </div>
+
+  <!-- ════════════ JW ANDERSON ════════════ -->
+  <div class="phone-col">
+    <div class="phone jwa">
+      <div class="status">
+        <span>9:41</span>
+        <span>◉ 4G · 82%</span>
+      </div>
+
+      <div class="top-banner">
+        <span class="season">Banggut · Season 07</span>
+        <span class="anchor">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="5" r="2"/>
+            <path d="M12 7 L12 22 M8 10 L16 10 M5 18 Q12 24, 19 18"/>
+          </svg>
+          a reading anchor
+        </span>
+      </div>
+
+      <div class="kraft-tape right">
+        <div class="label">S/S 2026</div>
+      </div>
+
+      <div class="scroll">
+        <div class="wordmark">
+          <h1>BANGGUT.</h1>
+          <div class="sub">오늘의 <em>독서</em>를 기록합니다</div>
+          <div class="lime-sticker">
+            <div class="num">7</div>
+            <div class="txt">DAYS IN</div>
+          </div>
+        </div>
+
+        <div class="greet">
+          <div class="hi">오늘도 <em>한 장</em></div>
+          <div class="meta">
+            <span>4월 21일 일</span>
+            <span>흐림</span>
+            <span>21°</span>
+          </div>
+        </div>
+
+        <div class="hero">
+          <span class="cat-label">EDITION 003 · NOW READING</span>
+          <span class="now-sticker">READ ▸</span>
+
+          <div class="book-row">
+            <div class="cover">
+              <div class="spine-band"></div>
+              <div class="title-jp">Aller à la lune</div>
+              <div class="author-sm">JANG · 2021</div>
+            </div>
+            <div class="info">
+              <div class="title-kr">달까지<br>가자</div>
+              <div class="author">JANG RYU-JIN · CHANGBI</div>
+              <div class="quote">그건 정말 꿈 같은 얘기였지만, 나는 그 꿈을 믿어보기로 했다.</div>
+            </div>
+          </div>
+
+          <div class="chain-progress">
+            <div class="meta">
+              <span>148/312 · 어제 멈춘 쪽</span>
+              <span class="pct">47%</span>
+            </div>
+            <div class="chain">
+              <div class="link on"></div>
+              <div class="link on"></div>
+              <div class="link on"></div>
+              <div class="link on"></div>
+              <div class="link on"></div>
+              <div class="link now"></div>
+              <div class="link"></div>
+              <div class="link"></div>
+              <div class="link"></div>
+              <div class="link"></div>
+              <div class="link"></div>
+              <div class="link"></div>
+            </div>
+          </div>
+
+          <div class="cta-wrap">
+            <button class="cta">
+              이어 읽기
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12 L19 12 M13 6 L19 12 L13 18"/></svg>
+            </button>
+            <button class="cta-mini">♡</button>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="head">
+            <h3>THIS WEEK <em>4월 3주차</em></h3>
+            <span class="more">ALL →</span>
+          </div>
+
+          <div class="days">
+            <div class="day read"><span class="lbl">MON</span><span class="sq">15</span></div>
+            <div class="day read"><span class="lbl">TUE</span><span class="sq">16</span></div>
+            <div class="day read"><span class="lbl">WED</span><span class="sq">17</span></div>
+            <div class="day read"><span class="lbl">THU</span><span class="sq">18</span></div>
+            <div class="day read"><span class="lbl">FRI</span><span class="sq">19</span></div>
+            <div class="day read event"><span class="lbl">SAT</span><span class="sq">20</span></div>
+            <div class="day today"><span class="lbl">SUN</span><span class="sq">21</span></div>
+          </div>
+
+          <div class="events">
+            <div class="event-row a"><span class="pin"></span><span class="date">04·23</span><span class="ttl">목요 독서모임</span><span class="cat-tag">MEET</span></div>
+            <div class="event-row b"><span class="pin"></span><span class="date">04·25</span><span class="ttl">위시 · 새 소설 시작</span><span class="cat-tag">WISH</span></div>
+            <div class="event-row c"><span class="pin"></span><span class="date">04·28</span><span class="ttl">도서관 반납 · 코스모스</span><span class="cat-tag">DUE</span></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="head">
+            <h3>THE CREW <em>함께 읽는 친구</em></h3>
+            <span class="more">OPEN →</span>
+          </div>
+
+          <div class="crew">
+            <div class="av a">S</div>
+            <div class="av b">J</div>
+            <div class="av c">M</div>
+            <div class="av more">+4</div>
+          </div>
+          <div class="crew-note">
+            <strong>SUJIN</strong>님이 <em>시선으로부터</em>를 완독했어요.<br>
+            <strong>JIMIN</strong>님이 이번 주 모임 후기를 남겼어요.
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <span>CAT. NO. 2026.04.21</span>
+        <span class="dot"></span>
+        <span>ED. 1 / 1</span>
+      </div>
+    </div>
+
+    <div class="phone-label">
+      BANGGUT · SEASON 07
+      <em>JW Anderson inspired · lime &amp; lilac</em>
+    </div>
+    <div class="palette-strip">
+      <div class="sw" style="background:#F1ECDB"></div>
+      <div class="sw" style="background:#CADE3A"></div>
+      <div class="sw" style="background:#C6A8DE"></div>
+      <div class="sw" style="background:#F09050"></div>
+      <div class="sw" style="background:#C9A775"></div>
+      <div class="sw" style="background:#161613"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="notes">
+  <h2>Atelier × JWA</h2>
+  <div class="caption">— 두 번째 라운드: 한글 정제 &amp; 완전 새 아이덴티티 —</div>
+
+  <div class="grid">
+    <div class="col a">
+      <h4>ATELIER · 한글 정제본</h4>
+      <div class="tagline">Dior의 언어를 덜고 얼개만 유지</div>
+      <p><strong>뺀 것</strong> Bonjour / Miss lectrice / Nos Lectrices / chapitre III / Ouvrir le livre / Roman 날짜(IV·23). 불어 대사는 은근한 "est. 2025" 한 줄만.</p>
+      <p><strong>유지</strong> Toile 일러 밴드 (살짝 축소 54→44px), 디올 스트라이프 상하 띠, 스캘럽 카드 상단, 새틴 리본 진행바 + 민트 매듭, Playfair italic 한 글자씩.</p>
+      <p><strong>핵심 한글화</strong> "방긋 아뜰리에" 워드마크(Playfair로 방긋+이탤릭). 태그 "방긋님 · 007". 헤더 "이번 주 · 4월 3주차". 이벤트 "4.23 목요 독서모임". 커뮤니티 "함께 읽는 친구".</p>
+      <p><strong>세리프 사용 규칙</strong> 한국어 본문은 전부 Pretendard. Playfair italic은 <em>강조하고 싶은 단어 한두 개</em>에만 (이름, 책 제목). Cormorant italic은 인용구/서브라인에만.</p>
+      <div class="pal">
+        <div class="s" style="background:#F0ECE1"></div>
+        <div class="s" style="background:#B5AEA0"></div>
+        <div class="s" style="background:#D08E96"></div>
+        <div class="s" style="background:#A3C3B2"></div>
+        <div class="s" style="background:#A08245"></div>
+        <div class="s" style="background:#2A2520"></div>
+      </div>
+    </div>
+
+    <div class="col b">
+      <h4>BANGGUT · SEASON 07 (JWA)</h4>
+      <div class="tagline">Lime + Lilac + Kraft · anchor identity</div>
+      <p><strong>Palette</strong> 라임 <code>#CADE3A</code> · 라일락 <code>#C6A8DE</code> · 탠저린 <code>#F09050</code> · 크래프트 <code>#C9A775</code> · 크림 + 잉크 블랙. JWA의 상징적 클래시 조합.</p>
+      <p><strong>Anchor identity</strong> 상단 배너에 ⚓ "a reading anchor". 책을 '정박지'로 읽는 브랜드 은유. 진행바는 <em>chain link</em> 12칸 — 닻 체인.</p>
+      <p><strong>라임 스티커</strong> 7 DAYS IN이 라임 원형 스티커로 붙어있음 (8도 회전, 섀도 2px). 브랜드 DNA.</p>
+      <p><strong>Kraft tape</strong> S/S 2026이 비스듬히 붙은 크래프트 테이프 — 패션 컬렉션 넘버링.</p>
+      <p><strong>뮤지엄 라벨</strong> EDITION 003 · CAT. NO. 2026.04.21 · ED. 1/1. JWA 쇼룸/갤러리 전시 감성. IBM Plex Mono.</p>
+      <p><strong>타이포</strong> Unbounded 800 (워드마크, 섹션 헤더) + Fraunces italic (강조 단어, 인용) + IBM Plex Mono (메타). 한국어 Pretendard.</p>
+      <p><strong>버튼</strong> 검정 + 라임 3px 섀도. 세컨더리 버튼은 라일락 섀도. 시각적 유머.</p>
+      <p><strong>아바타/핀</strong> 라임 사각 · 라일락 원 · 탠저린 다이아. 모양+색 모두 다름 — JWA 특유의 미스매치.</p>
+      <div class="pal">
+        <div class="s" style="background:#F1ECDB"></div>
+        <div class="s" style="background:#CADE3A"></div>
+        <div class="s" style="background:#C6A8DE"></div>
+        <div class="s" style="background:#F09050"></div>
+        <div class="s" style="background:#C9A775"></div>
+        <div class="s" style="background:#161613"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

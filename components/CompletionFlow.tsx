@@ -117,33 +117,34 @@ export default function CompletionFlow({ book, scraps, onClose, onSave, onNaviga
       padding: 20,
     }}>
       <div style={{
-        background: "#fff", borderRadius: 24, width: "100%", maxWidth: 380,
+        background: "var(--sf)", borderRadius: 24, width: "100%", maxWidth: 380,
         maxHeight: "85vh", overflowY: "auto",
         boxShadow: "0 24px 80px rgba(0,0,0,0.25)",
+        border: "0.5px solid var(--bd)",
         position: "relative",
       }}>
         {/* 닫기 */}
-        <button onClick={onClose} style={{
+        <button onClick={onClose} aria-label="닫기" style={{
           position: "absolute", top: 14, right: 14, zIndex: 10,
           width: 32, height: 32, borderRadius: "50%",
           display: "flex", alignItems: "center", justifyContent: "center",
-          background: "rgba(0,0,0,0.06)",
+          background: "var(--sf2)", border: "none", cursor: "pointer",
         }}>
-          <X size={16} color="#666" />
+          <X size={16} color="var(--tm)" />
         </button>
 
         {/* ===== 1단계: 팡파레 ===== */}
         {step === "celebrate" && (
           <div style={{ padding: "48px 28px 32px", textAlign: "center" }}>
             <div style={{ fontSize: 64, marginBottom: 16 }}>🎉</div>
-            <h2 style={{ fontSize: 22, fontWeight: 800, color: "#111", marginBottom: 8 }}>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--tp)", marginBottom: 8 }}>
               완독을 축하해요!
             </h2>
-            <p style={{ fontSize: 18, fontWeight: 700, color: "var(--theme-deep, #2B4C3F)", marginBottom: 6 }}>
+            <p style={{ fontSize: 18, fontWeight: 700, color: "var(--ac)", marginBottom: 6 }}>
               {book.title}
             </p>
             {readingDays && (
-              <p style={{ fontSize: 14, color: "#888", marginBottom: 32 }}>
+              <p style={{ fontSize: 14, color: "var(--tm)", marginBottom: 32 }}>
                 {readingDays}일 만에 읽었어요
               </p>
             )}
@@ -153,7 +154,7 @@ export default function CompletionFlow({ book, scraps, onClose, onSave, onNaviga
                 onClick={() => setStep("rate")}
                 style={{
                   padding: "14px 0", borderRadius: 14, border: "none",
-                  background: "var(--theme-deep, #2B4C3F)", color: "#fff",
+                  background: "var(--ac)", color: "var(--acc)",
                   fontSize: 15, fontWeight: 700, cursor: "pointer",
                 }}
               >
@@ -163,7 +164,7 @@ export default function CompletionFlow({ book, scraps, onClose, onSave, onNaviga
                 onClick={() => setStep("next")}
                 style={{
                   padding: "12px 0", borderRadius: 14, border: "none",
-                  background: "transparent", color: "#aaa",
+                  background: "transparent", color: "var(--tm)",
                   fontSize: 14, fontWeight: 500, cursor: "pointer",
                 }}
               >
@@ -176,7 +177,7 @@ export default function CompletionFlow({ book, scraps, onClose, onSave, onNaviga
         {/* ===== 2단계: 별점 + 한줄평 ===== */}
         {step === "rate" && (
           <div style={{ padding: "40px 28px 32px" }}>
-            <h3 style={{ fontSize: 18, fontWeight: 800, color: "#111", textAlign: "center", marginBottom: 24 }}>
+            <h3 style={{ fontSize: 18, fontWeight: 800, color: "var(--tp)", textAlign: "center", marginBottom: 24 }}>
               이 책 어땠어요?
             </h3>
 
@@ -190,8 +191,8 @@ export default function CompletionFlow({ book, scraps, onClose, onSave, onNaviga
                 >
                   <Star
                     size={36}
-                    fill={v <= localRating ? "#fbbf24" : "none"}
-                    stroke={v <= localRating ? "#fbbf24" : "#ddd"}
+                    fill={v <= localRating ? "var(--milestone)" : "none"}
+                    stroke={v <= localRating ? "var(--milestone)" : "var(--bd2)"}
                     strokeWidth={1.5}
                   />
                 </button>
@@ -200,7 +201,7 @@ export default function CompletionFlow({ book, scraps, onClose, onSave, onNaviga
 
             {/* 한줄평 */}
             <div style={{ marginBottom: 24 }}>
-              <p style={{ fontSize: 12, color: "#aaa", marginBottom: 6 }}>한줄평 (선택)</p>
+              <p style={{ fontSize: 12, color: "var(--tm)", marginBottom: 6 }}>한줄평 (선택)</p>
               <input
                 type="text"
                 value={localOneLiner}
@@ -209,7 +210,8 @@ export default function CompletionFlow({ book, scraps, onClose, onSave, onNaviga
                 maxLength={100}
                 style={{
                   width: "100%", padding: "12px 14px", borderRadius: 12,
-                  border: "1px solid #e5e7eb", fontSize: 14,
+                  border: "1px solid var(--bd2)", fontSize: 14,
+                  background: "var(--sf2)", color: "var(--tp)",
                   outline: "none", boxSizing: "border-box",
                 }}
               />
@@ -221,18 +223,18 @@ export default function CompletionFlow({ book, scraps, onClose, onSave, onNaviga
                 disabled={saving}
                 style={{
                   padding: "14px 0", borderRadius: 14, border: "none",
-                  background: "var(--theme-deep, #2B4C3F)", color: "#fff",
+                  background: "var(--ac)", color: "var(--acc)",
                   fontSize: 15, fontWeight: 700, cursor: "pointer",
                   opacity: saving ? 0.6 : 1,
                 }}
               >
-                {saving ? "저장 중..." : "다음"}
+                {saving ? "저장 중" : "다음"}
               </button>
               <button
                 onClick={() => setStep("next")}
                 style={{
                   padding: "12px 0", borderRadius: 14, border: "none",
-                  background: "transparent", color: "#aaa",
+                  background: "transparent", color: "var(--tm)",
                   fontSize: 14, fontWeight: 500, cursor: "pointer",
                 }}
               >
@@ -245,10 +247,10 @@ export default function CompletionFlow({ book, scraps, onClose, onSave, onNaviga
         {/* ===== 3단계: 다음 행동 ===== */}
         {step === "next" && (
           <div style={{ padding: "40px 28px 32px" }}>
-            <h3 style={{ fontSize: 18, fontWeight: 800, color: "#111", textAlign: "center", marginBottom: 8 }}>
+            <h3 style={{ fontSize: 18, fontWeight: 800, color: "var(--tp)", textAlign: "center", marginBottom: 8 }}>
               다음은 뭘 할까요?
             </h3>
-            <p style={{ fontSize: 13, color: "#aaa", textAlign: "center", marginBottom: 24 }}>
+            <p style={{ fontSize: 13, color: "var(--tm)", textAlign: "center", marginBottom: 24 }}>
               아무거나 골라도, 안 골라도 괜찮아요
             </p>
 
@@ -265,7 +267,7 @@ export default function CompletionFlow({ book, scraps, onClose, onSave, onNaviga
                   style={{
                     display: "flex", alignItems: "center", gap: 14,
                     padding: "14px 16px", borderRadius: 14,
-                    border: "1px solid #f0f0f0", background: "#fafafa",
+                    border: "0.5px solid var(--bd)", background: "var(--sf2)",
                     cursor: "pointer", textAlign: "left",
                     transition: "all 0.15s",
                   }}
@@ -275,13 +277,13 @@ export default function CompletionFlow({ book, scraps, onClose, onSave, onNaviga
                 >
                   <div style={{
                     width: 40, height: 40, borderRadius: 12,
-                    background: "var(--theme-deep, #2B4C3F)", color: "#fff",
+                    background: "var(--ac)", color: "var(--acc)",
                     display: "flex", alignItems: "center", justifyContent: "center",
                     flexShrink: 0,
                   }}>{icon}</div>
                   <div>
-                    <p style={{ fontSize: 14, fontWeight: 700, color: "#111" }}>{label}</p>
-                    <p style={{ fontSize: 11, color: "#aaa", marginTop: 2 }}>{desc}</p>
+                    <p style={{ fontSize: 14, fontWeight: 700, color: "var(--tp)" }}>{label}</p>
+                    <p style={{ fontSize: 11, color: "var(--tm)", marginTop: 2 }}>{desc}</p>
                   </div>
                 </button>
               ))}
@@ -292,7 +294,7 @@ export default function CompletionFlow({ book, scraps, onClose, onSave, onNaviga
               style={{
                 width: "100%", marginTop: 16,
                 padding: "12px 0", borderRadius: 14, border: "none",
-                background: "transparent", color: "#aaa",
+                background: "transparent", color: "var(--tm)",
                 fontSize: 14, fontWeight: 500, cursor: "pointer",
               }}
             >
@@ -304,7 +306,7 @@ export default function CompletionFlow({ book, scraps, onClose, onSave, onNaviga
         {/* ===== 4단계: 완독 카드 ===== */}
         {step === "card" && (
           <div style={{ padding: "32px 20px 28px" }}>
-            <h3 style={{ fontSize: 16, fontWeight: 800, color: "#111", textAlign: "center", marginBottom: 16 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 800, color: "var(--tp)", textAlign: "center", marginBottom: 16 }}>
               완독 카드
             </h3>
 
@@ -407,8 +409,8 @@ export default function CompletionFlow({ book, scraps, onClose, onSave, onNaviga
                 onClick={handleSaveCard}
                 style={{
                   flex: 1, padding: "13px 0", borderRadius: 14,
-                  border: "1px solid #e5e7eb", background: "#fff",
-                  fontSize: 14, fontWeight: 700, color: "#333", cursor: "pointer",
+                  border: "0.5px solid var(--bd2)", background: "var(--sf2)",
+                  fontSize: 14, fontWeight: 700, color: "var(--tp)", cursor: "pointer",
                 }}
               >
                 이미지 저장
@@ -417,8 +419,8 @@ export default function CompletionFlow({ book, scraps, onClose, onSave, onNaviga
                 onClick={handleShareCard}
                 style={{
                   flex: 1, padding: "13px 0", borderRadius: 14,
-                  border: "none", background: "var(--theme-deep, #2B4C3F)",
-                  fontSize: 14, fontWeight: 700, color: "#fff", cursor: "pointer",
+                  border: "none", background: "var(--ac)",
+                  fontSize: 14, fontWeight: 700, color: "var(--acc)", cursor: "pointer",
                 }}
               >
                 공유하기
@@ -430,7 +432,7 @@ export default function CompletionFlow({ book, scraps, onClose, onSave, onNaviga
               style={{
                 width: "100%", marginTop: 10,
                 padding: "12px 0", borderRadius: 14, border: "none",
-                background: "transparent", color: "#aaa",
+                background: "transparent", color: "var(--tm)",
                 fontSize: 14, fontWeight: 500, cursor: "pointer",
               }}
             >

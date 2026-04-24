@@ -1,0 +1,1282 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>완독콩 · 포커스 히어로 v4 — 통계 + 캘린더 연동</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;0,900;1,700&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<style>
+  :root {
+    --bg:        #F5EEDE;     /* 방구석 크림 */
+    --paper:     #FFFDF6;     /* 종이 */
+    --paper2:    #FBF4DF;     /* 포스트잇 톤 */
+    --ink:       #2B2420;
+    --ink-soft:  #5A4A3C;
+    --ink-mute:  #8A7862;
+    --bd:        #E7D9B6;
+    --bd2:       #F0E3C2;
+
+    --kong:      #B07A4B;     /* 콩이 */
+    --kong-deep: #5A3F28;
+    --kong-soft: #EED8B6;
+
+    --honey:     #F0B742;
+    --honey-soft:#FFE8A8;
+    --honey-bg:  #FFF4C7;
+
+    --mint:      #6FC0A0;
+    --mint-soft: #CFE9DA;
+    --mint-bg:   #DFF2E6;
+
+    --peach:     #F4A07D;
+    --peach-soft:#FFD9C0;
+    --peach-bg:  #FFE4D2;
+
+    --rose:      #E8948E;
+    --rose-soft: #F7CFC9;
+
+    --sage:      #9AB97D;
+    --sage-soft: #D4E4BB;
+
+    --lav:       #B7A8DD;
+    --lav-soft:  #DCD3F0;
+
+    --shadow-stick:    3px 4px 0 rgba(43,36,32,.14);
+    --shadow-stick-lg: 4px 5px 0 rgba(43,36,32,.16);
+    --shadow-soft:     0 8px 24px rgba(43,36,32,.08);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, system-ui, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(#E1D3B0 1.2px, transparent 1.2px) 0 0 / 22px 22px,
+      linear-gradient(180deg, #F8F1DF 0%, #F2E8CE 100%);
+    min-height: 100vh;
+    padding: 48px 24px 80px;
+    letter-spacing: -0.01em;
+  }
+
+  .page {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  .page-hd {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+  .page-hd .kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 100px;
+    font-family: 'Gaegu', cursive;
+    font-size: 15px;
+    transform: rotate(-2deg);
+    box-shadow: var(--shadow-stick);
+    margin-bottom: 14px;
+  }
+  .page-hd h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 42px;
+    letter-spacing: -0.02em;
+    margin: 0 0 8px;
+    line-height: 1.1;
+  }
+  .page-hd h1 em {
+    font-style: italic;
+    font-weight: 700;
+    color: var(--kong-deep);
+  }
+  .page-hd p {
+    color: var(--ink-soft);
+    font-size: 15px;
+    margin: 0;
+    line-height: 1.55;
+  }
+
+  .team-note {
+    max-width: 720px;
+    margin: 20px auto 0;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    padding: 16px 20px;
+    box-shadow: var(--shadow-stick-lg);
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    transform: rotate(-0.4deg);
+  }
+  .team-note b { color: var(--ink); }
+
+  /* ═══ Phones row ═══ */
+  .phones {
+    display: flex;
+    gap: 44px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 54px;
+  }
+
+  .phone-wrap {
+    width: 360px;
+    position: relative;
+  }
+
+  .phone-tag {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-2deg);
+    background: var(--kong-deep);
+    color: var(--honey-soft);
+    font-family: 'Gaegu', cursive;
+    font-size: 14px;
+    padding: 4px 14px;
+    border-radius: 100px;
+    font-weight: 700;
+    box-shadow: var(--shadow-stick);
+    white-space: nowrap;
+    z-index: 3;
+  }
+
+  .phone {
+    width: 360px;
+    height: 812px;
+    background: #FAF4E4;
+    border-radius: 44px;
+    border: 10px solid #2B2420;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 22px 48px rgba(43,36,32,.18), 0 4px 12px rgba(43,36,32,.08);
+  }
+
+  /* dot paper background */
+  .phone::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(#E5D6B1 1px, transparent 1px);
+    background-size: 18px 18px;
+    opacity: 0.55;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* iOS notch */
+  .phone::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 110px;
+    height: 24px;
+    background: #2B2420;
+    border-radius: 100px;
+    z-index: 10;
+  }
+
+  .screen {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    padding: 44px 18px 18px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ═══ Status bar ═══ */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink);
+    padding: 0 14px;
+    margin-bottom: 10px;
+  }
+  .status-bar .time { font-family: 'Fraunces', serif; font-size: 13px; font-weight: 700; }
+  .status-bar .icons { display: flex; gap: 5px; align-items: center; }
+
+  /* ═══ Top bar ═══ */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 2px 12px;
+  }
+  .topbar .back,
+  .topbar .more {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    box-shadow: var(--shadow-stick);
+    color: var(--ink);
+    font-size: 15px;
+    cursor: pointer;
+  }
+  .topbar .title {
+    font-family: 'Gaegu', cursive;
+    font-size: 14px;
+    color: var(--ink-soft);
+    transform: rotate(-1deg);
+  }
+
+  /* ═══ Book strip ═══ */
+  .book-strip {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px 12px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    margin: 0 2px 14px;
+    box-shadow: var(--shadow-stick);
+    transform: rotate(-0.6deg);
+  }
+  .book-strip .cover {
+    width: 40px; height: 56px;
+    background: linear-gradient(150deg, #7B9B6E 0%, #4E6D50 100%);
+    border-radius: 4px;
+    border: 1.5px solid var(--ink);
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .book-strip .cover::after {
+    content: '';
+    position: absolute;
+    left: 3px; top: 0; bottom: 0;
+    width: 2px;
+    background: rgba(255,255,255,0.18);
+  }
+  .book-strip .meta { flex: 1; min-width: 0; }
+  .book-strip .t {
+    font-size: 13px; font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .book-strip .a {
+    font-size: 11px;
+    color: var(--ink-mute);
+  }
+  .book-strip .pgs {
+    font-family: 'Fraunces', serif;
+    font-size: 12px;
+    color: var(--kong-deep);
+    font-weight: 700;
+    padding: 3px 8px;
+    background: var(--honey-bg);
+    border: 1.5px solid var(--ink);
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+
+  /* ═══ Hero focus area ═══ */
+  .focus-hero {
+    position: relative;
+    background: var(--paper);
+    border: 2.5px solid var(--ink);
+    border-radius: 24px;
+    padding: 22px 18px 20px;
+    box-shadow: var(--shadow-stick-lg);
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+
+  .deco-emoji {
+    position: absolute;
+    font-size: 16px;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .focus-hero .mode-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    background: var(--kong-deep);
+    color: var(--honey-soft);
+    border-radius: 100px;
+    font-family: 'Gaegu', cursive;
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    transform: rotate(-2deg);
+    box-shadow: var(--shadow-stick);
+  }
+
+  .focus-hero .headline {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+    margin: 4px 0 14px;
+  }
+  .focus-hero .headline em {
+    font-style: italic;
+    font-weight: 700;
+    color: var(--kong-deep);
+  }
+
+  /* ═══ Timer + Bean area ═══ */
+  .stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0 14px;
+    position: relative;
+  }
+
+  .ring-wrap {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ring-svg { position: absolute; inset: 0; }
+
+  .ring-svg circle.bg { fill: none; stroke: var(--bd2); stroke-width: 8; }
+  .ring-svg circle.fg {
+    fill: none; stroke-width: 8; stroke-linecap: round;
+    transform: rotate(-90deg); transform-origin: center;
+  }
+  .ring-svg circle.fg.idle   { stroke: var(--honey); }
+  .ring-svg circle.fg.run    { stroke: var(--mint); animation: breathe 4s ease-in-out infinite; }
+  .ring-svg circle.fg.done   { stroke: var(--sage); }
+
+  .timer-num {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 44px;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    line-height: 1;
+    position: relative;
+    z-index: 2;
+  }
+  .timer-num small {
+    font-family: 'Gaegu', cursive;
+    font-size: 12px;
+    color: var(--ink-mute);
+    display: block;
+    font-weight: 400;
+    margin-top: 4px;
+    letter-spacing: 0;
+  }
+
+  /* Bean character */
+  .kongi {
+    width: 92px;
+    height: 92px;
+    flex-shrink: 0;
+    filter: drop-shadow(2px 3px 0 rgba(43,36,32,.12));
+  }
+  .kongi.wiggle { animation: wiggle 3.5s ease-in-out infinite; transform-origin: 50% 80%; }
+  .kongi.float { animation: float 4s ease-in-out infinite; transform-origin: center; }
+
+  /* ═══ Sticker row (stats) ═══ */
+  .stickers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    justify-content: center;
+    margin-top: 4px;
+  }
+
+  .sticker {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 11px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    box-shadow: var(--shadow-stick);
+    color: var(--ink);
+    white-space: nowrap;
+    letter-spacing: -0.01em;
+  }
+  .sticker b {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    color: var(--ink);
+    font-size: 13px;
+  }
+  .sticker .ico { font-size: 12px; }
+  .sticker.honey { background: var(--honey-bg); }
+  .sticker.mint  { background: var(--mint-bg); }
+  .sticker.peach { background: var(--peach-bg); }
+  .sticker.sage  { background: var(--sage-soft); }
+  .sticker.kong  { background: var(--kong-soft); }
+  .sticker.rose  { background: var(--rose-soft); }
+
+  .sticker.r-neg   { transform: rotate(-3deg); }
+  .sticker.r-zero  { transform: rotate(0deg); }
+  .sticker.r-pos   { transform: rotate(3deg); }
+  .sticker.r-neg1  { transform: rotate(-1.5deg); }
+  .sticker.r-pos1  { transform: rotate(1.5deg); }
+
+  .sticker.delta { gap: 4px; }
+  .sticker.delta .chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 6px;
+    background: var(--mint);
+    color: var(--paper);
+    border-radius: 100px;
+    font-family: 'Fraunces', serif;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .sticker.delta .chip.up { background: var(--mint); }
+  .sticker.delta .chip.down { background: var(--rose); }
+
+  /* ═══ CTA button ═══ */
+  .cta {
+    margin-top: 12px;
+    width: 100%;
+    padding: 15px;
+    font-family: 'Pretendard Variable', Pretendard, sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    color: var(--paper);
+    background: var(--kong-deep);
+    border: 2.5px solid var(--ink);
+    border-radius: 18px;
+    box-shadow: var(--shadow-stick-lg);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    letter-spacing: -0.01em;
+    transition: transform .12s ease;
+  }
+  .cta:hover { transform: translate(-1px,-1px); }
+
+  .cta.ghost {
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .cta.pause {
+    background: var(--honey);
+    color: var(--ink);
+  }
+  .cta.done {
+    background: var(--mint);
+    color: var(--ink);
+  }
+  .cta .ico { font-size: 18px; }
+
+  /* ═══ Calendar strip (읽은 날들) ═══ */
+  .cal-strip {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 18px;
+    padding: 14px 14px 12px;
+    box-shadow: var(--shadow-stick);
+    position: relative;
+  }
+  .cal-strip .hd {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 0 2px;
+  }
+  .cal-strip .hd .t {
+    font-family: 'Gaegu', cursive;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .cal-strip .hd .m {
+    font-size: 11px;
+    color: var(--ink-mute);
+    font-weight: 700;
+  }
+  .cal-strip .hd .m b {
+    color: var(--kong-deep);
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 13px;
+  }
+
+  .cal-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+  .day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .day .lbl {
+    font-family: 'Gaegu', cursive;
+    font-size: 11px;
+    color: var(--ink-mute);
+    font-weight: 700;
+  }
+  .day .dot {
+    width: 32px; height: 32px;
+    border-radius: 10px;
+    border: 2px solid var(--ink);
+    background: var(--paper2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink-mute);
+    position: relative;
+  }
+  .day .dot.read {
+    background: var(--mint-bg);
+    color: var(--ink);
+  }
+  .day .dot.read::after {
+    content: '';
+    position: absolute;
+    width: 10px; height: 10px;
+    bottom: -4px; right: -4px;
+    background: var(--mint);
+    border: 1.5px solid var(--ink);
+    border-radius: 50%;
+  }
+  .day .dot.today {
+    background: var(--honey-soft);
+    border-style: dashed;
+    color: var(--ink);
+    font-weight: 900;
+  }
+  .day .dot.today.fresh {
+    background: var(--sage);
+    border-style: solid;
+    color: var(--ink);
+    animation: pop 1.6s ease-in-out;
+  }
+  .day .min {
+    font-family: 'Gaegu', cursive;
+    font-size: 10px;
+    color: var(--mint);
+    font-weight: 700;
+  }
+  .day .min.muted { color: var(--ink-mute); opacity: 0.5; }
+
+  /* ═══ Reward card (done state) ═══ */
+  .reward {
+    background: var(--honey-bg);
+    border: 2.5px solid var(--ink);
+    border-radius: 22px;
+    padding: 18px 16px;
+    box-shadow: var(--shadow-stick-lg);
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .reward .row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .reward .bean-prize {
+    width: 58px; height: 58px;
+    background: var(--kong);
+    border: 2.5px solid var(--ink);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    box-shadow: var(--shadow-stick);
+    transform: rotate(-6deg);
+    flex-shrink: 0;
+  }
+  .reward .txt { flex: 1; min-width: 0; }
+  .reward .txt .top {
+    font-family: 'Gaegu', cursive;
+    font-size: 15px;
+    color: var(--ink-soft);
+    margin-bottom: 2px;
+  }
+  .reward .txt .big {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--ink);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+  .reward .txt .big em {
+    color: var(--kong-deep);
+    font-style: italic;
+  }
+  .reward .plus {
+    position: absolute;
+    top: -12px; right: 12px;
+    background: var(--sage);
+    border: 2.5px solid var(--ink);
+    border-radius: 100px;
+    padding: 4px 10px;
+    font-family: 'Fraunces', serif;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--ink);
+    transform: rotate(8deg);
+    box-shadow: var(--shadow-stick);
+  }
+
+  /* Page input (done) */
+  .page-input {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: var(--shadow-stick);
+  }
+  .page-input .lbl {
+    font-family: 'Gaegu', cursive;
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-weight: 700;
+    flex: 1;
+  }
+  .page-input .inp {
+    width: 52px;
+    padding: 6px 8px;
+    border: 1.5px solid var(--ink);
+    border-radius: 8px;
+    background: var(--paper2);
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+    text-align: center;
+  }
+  .page-input .suffix {
+    font-family: 'Gaegu', cursive;
+    font-size: 13px;
+    color: var(--ink-mute);
+  }
+
+  /* ═══ Misc stickers on card ═══ */
+  .corner-petal {
+    position: absolute;
+    top: -8px; left: -10px;
+    width: 22px; height: 22px;
+    background: var(--rose);
+    border: 2px solid var(--ink);
+    border-radius: 50% 50% 50% 10%;
+    transform: rotate(-30deg);
+    box-shadow: var(--shadow-stick);
+  }
+
+  .tape {
+    position: absolute;
+    top: -8px;
+    width: 44px; height: 18px;
+    background: rgba(213,165,104,0.55);
+    border-top: 1px solid rgba(100,70,38,.28);
+    border-bottom: 1px solid rgba(100,70,38,.28);
+    transform: rotate(-3deg);
+  }
+
+  /* ═══ Bottom nav ═══ */
+  .nav {
+    position: absolute;
+    bottom: 8px; left: 10px; right: 10px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 100px;
+    padding: 10px 16px;
+    display: flex;
+    justify-content: space-around;
+    box-shadow: var(--shadow-stick-lg);
+    z-index: 4;
+  }
+  .nav .item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-family: 'Gaegu', cursive;
+    font-size: 10px;
+    color: var(--ink-mute);
+  }
+  .nav .item.on { color: var(--kong-deep); font-weight: 700; }
+  .nav .ico {
+    width: 22px; height: 22px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+
+  /* ═══ Animations ═══ */
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(-2deg); }
+    50% { transform: rotate(2deg); }
+  }
+  @keyframes breathe {
+    0%, 100% { stroke-width: 8; opacity: 1; }
+    50% { stroke-width: 11; opacity: 0.7; }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+  @keyframes pop {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.25); box-shadow: 0 0 0 6px rgba(154, 185, 125, 0.35); }
+    100% { transform: scale(1); }
+  }
+  @keyframes zzz {
+    0% { transform: translate(0,0); opacity: 0; }
+    30% { opacity: 1; }
+    100% { transform: translate(10px,-12px); opacity: 0; }
+  }
+  .zz {
+    position: absolute;
+    font-family: 'Gaegu', cursive;
+    font-weight: 700;
+    color: var(--lav);
+    font-size: 16px;
+    animation: zzz 2.2s ease-in-out infinite;
+    pointer-events: none;
+  }
+  .zz.b { animation-delay: .8s; color: var(--mint); font-size: 13px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .kongi.wiggle, .kongi.float,
+    .ring-svg circle.fg.run,
+    .day .dot.today.fresh, .zz { animation: none !important; }
+  }
+
+  /* ═══ Footnotes (implementation notes) ═══ */
+  .notes {
+    max-width: 960px;
+    margin: 56px auto 0;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 18px;
+    padding: 22px 26px;
+    box-shadow: var(--shadow-stick-lg);
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--ink-soft);
+  }
+  .notes h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 17px;
+    color: var(--ink);
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+  }
+  .notes h4 {
+    font-family: 'Gaegu', cursive;
+    font-size: 15px;
+    color: var(--kong-deep);
+    margin: 18px 0 6px;
+  }
+  .notes code {
+    font-family: 'SF Mono', monospace;
+    background: var(--honey-bg);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--kong-deep);
+  }
+  .notes ul { margin: 4px 0 0 0; padding-left: 20px; }
+  .notes li { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ═══ Header ═══ -->
+  <header class="page-hd">
+    <div class="kicker">🫘 완독콩 · Focus Hero v4</div>
+    <h1>귀여움 + <em>기록</em>은 계속 남아요</h1>
+    <p>v3 귀여움 그대로 · 캘린더 연동 + 총 집중 분 + 완독 ETA 통합</p>
+    <div class="team-note">
+      <b>드림팀 결론.</b>
+      스티커 3종(오늘 · 누적 · ETA) + 하단 주간 캘린더 스트립. 세션 완료 시 오늘 칸에 <b>사각 도트가 펑</b> 찍히고 ETA가 당겨지면 <span style="color:var(--kong-deep)">"어제보다 3일 가까워졌어요"</span> 챕 스티커가 등장해요.
+      컬러 규칙 — <b>honey=시간</b>, <b>mint=오늘/진행</b>, <b>peach=미래/ETA</b>, <b>sage=캘린더 도장</b>.
+    </div>
+  </header>
+
+  <div class="phones">
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- Phone A — IDLE (포커스 시작 전, 통계 요약 표시)            -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <div class="phone-wrap">
+      <div class="phone-tag">A · 시작 전 · 통계 요약</div>
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar">
+            <span class="time">09:41</span>
+            <span class="icons">●●● ●●●● 🔋</span>
+          </div>
+
+          <!-- 상단바 -->
+          <div class="topbar">
+            <div class="back" aria-label="뒤로가기">‹</div>
+            <div class="title">📖 이 책에 집중</div>
+            <div class="more" aria-label="더보기">⋯</div>
+          </div>
+
+          <!-- 책 정보 스트립 -->
+          <div class="book-strip" role="group" aria-label="현재 책 정보">
+            <div class="cover" aria-hidden="true"></div>
+            <div class="meta">
+              <div class="t">한밤의 도서관</div>
+              <div class="a">매트 헤이그 · 236 / 384쪽</div>
+            </div>
+            <span class="pgs">61%</span>
+          </div>
+
+          <!-- 포커스 히어로 -->
+          <div class="focus-hero" style="overflow: visible;">
+            <span class="deco-emoji" style="top:10px;right:14px;transform:rotate(12deg)">🌼</span>
+            <span class="deco-emoji" style="bottom:86px;left:10px;font-size:14px;transform:rotate(-12deg)">✨</span>
+
+            <span class="mode-tag">⏱ 뽀모도로 25분</span>
+            <div class="headline">오늘도 한 장, <em>콩이</em>랑 같이 읽어볼까요?</div>
+
+            <div class="stage">
+              <!-- bean + ring side-by-side -->
+              <div class="ring-wrap" aria-label="25분 타이머 준비됨">
+                <svg class="ring-svg" viewBox="0 0 200 200">
+                  <circle class="bg" cx="100" cy="100" r="90" />
+                  <circle class="fg idle" cx="100" cy="100" r="90" stroke-dasharray="565" stroke-dashoffset="565" />
+                </svg>
+                <div style="display:flex;align-items:center;gap:4px;flex-direction:column;">
+                  <!-- 콩이 idle: 반짝 눈, 나뭇잎 모자 -->
+                  <svg class="kongi wiggle" viewBox="0 0 120 120" aria-label="콩이 준비 자세">
+                    <ellipse cx="60" cy="108" rx="28" ry="3" fill="rgba(43,36,32,.1)"/>
+                    <path d="M 30,58 C 30,30 90,30 90,58 C 90,82 85,102 60,102 C 35,102 30,82 30,58 Z" fill="#B8875A" stroke="#2B2420" stroke-width="2.5"/>
+                    <path d="M 52,38 Q 62,55 52,82" stroke="#5A3F28" stroke-width="1.5" fill="none" opacity="0.45"/>
+                    <circle cx="38" cy="68" r="4.5" fill="#EF9A9A" opacity="0.55"/>
+                    <circle cx="82" cy="68" r="4.5" fill="#EF9A9A" opacity="0.55"/>
+                    <!-- eyes sparkle -->
+                    <circle cx="47" cy="60" r="3.5" fill="#2B2420"/>
+                    <circle cx="73" cy="60" r="3.5" fill="#2B2420"/>
+                    <circle cx="48" cy="58.5" r="1.2" fill="#FFF"/>
+                    <circle cx="74" cy="58.5" r="1.2" fill="#FFF"/>
+                    <!-- smile -->
+                    <path d="M 52,74 Q 60,80 68,74" stroke="#2B2420" stroke-width="2" fill="none" stroke-linecap="round"/>
+                    <!-- leaf -->
+                    <g transform="translate(0 0) rotate(-18 60 28)">
+                      <path d="M 60,16 Q 72,8 78,18 Q 72,26 60,26 Z" fill="#A8C49A" stroke="#2B2420" stroke-width="1.5"/>
+                      <line x1="60" y1="16" x2="60" y2="28" stroke="#5A7A42" stroke-width="2"/>
+                    </g>
+                  </svg>
+                </div>
+              </div>
+
+              <div class="timer-num">25:00<small>길게 눌러 시간 바꾸기</small></div>
+            </div>
+
+            <button class="cta">
+              <span class="ico">▶</span>
+              <span>시작하기</span>
+            </button>
+          </div>
+
+          <!-- 통계 스티커 3종 -->
+          <div class="stickers" role="group" aria-label="이 책 독서 통계">
+            <span class="sticker mint r-neg" aria-label="오늘 읽은 시간 0분">
+              <span class="ico">🕐</span> 오늘 <b>0분</b>
+            </span>
+            <span class="sticker honey r-pos1" aria-label="이 책 총 집중 시간 2시간 35분">
+              <span class="ico">💛</span> 누적 <b>2h 35m</b>
+            </span>
+            <span class="sticker peach r-neg1" aria-label="현재 속도 기준 예상 완독일 3월 15일">
+              <span class="ico">🌿</span> 이 속도면 <b>3.15</b>쯤
+            </span>
+          </div>
+
+          <!-- 이번 주 캘린더 스트립 -->
+          <div class="cal-strip" style="margin-top: 14px;">
+            <div class="hd">
+              <span class="t">이번 주 · <span style="color:var(--kong-deep)">한밤의 도서관</span></span>
+              <span class="m"><b>4</b>/7일</span>
+            </div>
+            <div class="cal-days">
+              <div class="day">
+                <span class="lbl">월</span>
+                <div class="dot read">18</div>
+                <span class="min">22분</span>
+              </div>
+              <div class="day">
+                <span class="lbl">화</span>
+                <div class="dot read">19</div>
+                <span class="min">34분</span>
+              </div>
+              <div class="day">
+                <span class="lbl">수</span>
+                <div class="dot">20</div>
+                <span class="min muted">·</span>
+              </div>
+              <div class="day">
+                <span class="lbl">목</span>
+                <div class="dot read">21</div>
+                <span class="min">25분</span>
+              </div>
+              <div class="day">
+                <span class="lbl">금</span>
+                <div class="dot read">22</div>
+                <span class="min">18분</span>
+              </div>
+              <div class="day">
+                <span class="lbl">토</span>
+                <div class="dot today">23</div>
+                <span class="min muted">오늘</span>
+              </div>
+              <div class="day">
+                <span class="lbl">일</span>
+                <div class="dot">24</div>
+                <span class="min muted">·</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- Phone B — RUNNING (타이머 돌아가는 중, 라이브 스탯)         -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <div class="phone-wrap">
+      <div class="phone-tag">B · 진행 중 · 라이브 스탯</div>
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar">
+            <span class="time">09:53</span>
+            <span class="icons">●●● ●●●● 🔋</span>
+          </div>
+
+          <div class="topbar">
+            <div class="back" aria-label="뒤로가기">‹</div>
+            <div class="title">🌿 집중 중이에요</div>
+            <div class="more" aria-label="더보기">⋯</div>
+          </div>
+
+          <div class="book-strip">
+            <div class="cover"></div>
+            <div class="meta">
+              <div class="t">한밤의 도서관</div>
+              <div class="a">매트 헤이그 · 236 / 384쪽</div>
+            </div>
+            <span class="pgs">61%</span>
+          </div>
+
+          <div class="focus-hero" style="overflow: visible;">
+            <span class="deco-emoji" style="top:10px;right:14px;font-size:18px">🌿</span>
+            <span class="deco-emoji" style="top:50px;right:30px;font-size:12px;transform:rotate(20deg)">✨</span>
+
+            <span class="mode-tag" style="background: var(--mint); color: var(--ink);">🌿 집중 중</span>
+            <div class="headline">조용조용, <em>12분 40초</em>째 몰입</div>
+
+            <div class="stage">
+              <div class="ring-wrap" aria-label="진행 중인 25분 타이머">
+                <svg class="ring-svg" viewBox="0 0 200 200">
+                  <circle class="bg" cx="100" cy="100" r="90" />
+                  <!-- 진행률 50% 정도 (dashoffset 컨트롤) -->
+                  <circle class="fg run" cx="100" cy="100" r="90"
+                    stroke-dasharray="565" stroke-dashoffset="283" />
+                </svg>
+                <div style="display:flex;align-items:center;gap:4px;flex-direction:column;position:relative">
+                  <!-- 콩이 running: 눈 감음, z z -->
+                  <svg class="kongi float" viewBox="0 0 120 120" aria-label="콩이 평화롭게 집중 중">
+                    <ellipse cx="60" cy="108" rx="28" ry="3" fill="rgba(43,36,32,.1)"/>
+                    <path d="M 30,58 C 30,30 90,30 90,58 C 90,82 85,102 60,102 C 35,102 30,82 30,58 Z" fill="#B8875A" stroke="#2B2420" stroke-width="2.5"/>
+                    <path d="M 52,38 Q 62,55 52,82" stroke="#5A3F28" stroke-width="1.5" fill="none" opacity="0.45"/>
+                    <circle cx="38" cy="68" r="4.5" fill="#EF9A9A" opacity="0.55"/>
+                    <circle cx="82" cy="68" r="4.5" fill="#EF9A9A" opacity="0.55"/>
+                    <!-- eyes closed (calm ~ ~) -->
+                    <path d="M 43,60 Q 47,63 51,60" stroke="#2B2420" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                    <path d="M 69,60 Q 73,63 77,60" stroke="#2B2420" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                    <!-- calm smile -->
+                    <path d="M 54,76 Q 60,80 66,76" stroke="#2B2420" stroke-width="2" fill="none" stroke-linecap="round"/>
+                    <!-- leaf -->
+                    <g transform="rotate(-18 60 28)">
+                      <path d="M 60,16 Q 72,8 78,18 Q 72,26 60,26 Z" fill="#A8C49A" stroke="#2B2420" stroke-width="1.5"/>
+                      <line x1="60" y1="16" x2="60" y2="28" stroke="#5A7A42" stroke-width="2"/>
+                    </g>
+                  </svg>
+                  <span class="zz" style="top:-4px;right:-18px">z</span>
+                  <span class="zz b" style="top:6px;right:-6px">z</span>
+                </div>
+              </div>
+
+              <div class="timer-num">12:20<small>남은 12분 40초</small></div>
+            </div>
+
+            <!-- 라이브 스탯: 진행 중엔 간결하게 2개만 -->
+            <div class="stickers" aria-label="라이브 통계">
+              <span class="sticker mint r-neg" aria-label="이번 세션 12분 경과">
+                <span class="ico">🕐</span> 이번 세션 <b>12분째</b>
+              </span>
+              <span class="sticker honey r-pos1" aria-label="이 책 누적 2시간 47분">
+                <span class="ico">💛</span> 누적 <b>2h 47m</b>
+              </span>
+            </div>
+
+            <button class="cta pause">
+              <span class="ico">⏸</span>
+              <span>잠깐 쉬기</span>
+            </button>
+          </div>
+
+          <!-- 방해 금지 알림 -->
+          <div class="cal-strip" style="margin-top: 10px; background: var(--lav-soft);">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:36px;height:36px;background:var(--lav);border:2px solid var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🔕</div>
+              <div style="flex:1;font-family:'Gaegu',cursive;font-size:13px;color:var(--ink);line-height:1.4">
+                <b style="font-weight:700">방해 금지 중</b><br>
+                <span style="color:var(--ink-mute);font-size:12px">알림은 세션 끝나고 한꺼번에 보여드릴게요</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- Phone C — DONE (세션 완료, 콩알 보상 + 캘린더 도장)         -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <div class="phone-wrap">
+      <div class="phone-tag">C · 완료 · 보상 + 캘린더 도장</div>
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar">
+            <span class="time">10:18</span>
+            <span class="icons">●●● ●●●● 🔋</span>
+          </div>
+
+          <div class="topbar">
+            <div class="back" aria-label="뒤로가기">‹</div>
+            <div class="title">🎉 한 세션 완료!</div>
+            <div class="more" aria-label="더보기">⋯</div>
+          </div>
+
+          <div class="book-strip">
+            <div class="cover"></div>
+            <div class="meta">
+              <div class="t">한밤의 도서관</div>
+              <div class="a">매트 헤이그 · 261 / 384쪽</div>
+            </div>
+            <span class="pgs">68%</span>
+          </div>
+
+          <!-- 리워드 카드 -->
+          <div class="reward">
+            <span class="plus">+1 🫘</span>
+            <span class="deco-emoji" style="top:12px;left:16px;font-size:20px;transform:rotate(-14deg)">🎉</span>
+            <span class="deco-emoji" style="bottom:14px;right:20px;font-size:16px;transform:rotate(20deg)">✨</span>
+            <div class="row">
+              <div class="bean-prize" aria-label="콩알 1개 획득">
+                <!-- 만세 콩이 -->
+                <svg viewBox="0 0 120 120" width="46" height="46" aria-hidden="true">
+                  <path d="M 30,58 C 30,30 90,30 90,58 C 90,82 85,102 60,102 C 35,102 30,82 30,58 Z" fill="#EED8B6" stroke="#2B2420" stroke-width="2.5"/>
+                  <path d="M 52,38 Q 62,55 52,82" stroke="#5A3F28" stroke-width="1.5" fill="none" opacity="0.45"/>
+                  <circle cx="38" cy="68" r="4" fill="#EF9A9A" opacity="0.6"/>
+                  <circle cx="82" cy="68" r="4" fill="#EF9A9A" opacity="0.6"/>
+                  <!-- happy ^ ^ eyes -->
+                  <path d="M 43,60 L 47,56 L 51,60" stroke="#2B2420" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                  <path d="M 69,60 L 73,56 L 77,60" stroke="#2B2420" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                  <!-- big smile -->
+                  <path d="M 48,72 Q 60,84 72,72" stroke="#2B2420" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                  <!-- arms up -->
+                  <line x1="22" y1="50" x2="14" y2="30" stroke="#2B2420" stroke-width="2.5" stroke-linecap="round"/>
+                  <line x1="98" y1="50" x2="106" y2="30" stroke="#2B2420" stroke-width="2.5" stroke-linecap="round"/>
+                  <circle cx="14" cy="30" r="3" fill="#B8875A" stroke="#2B2420" stroke-width="1.5"/>
+                  <circle cx="106" cy="30" r="3" fill="#B8875A" stroke="#2B2420" stroke-width="1.5"/>
+                </svg>
+              </div>
+              <div class="txt">
+                <div class="top">25분 집중 성공!</div>
+                <div class="big"><em>콩알 1개</em> 획득 🫘</div>
+              </div>
+            </div>
+
+            <!-- 페이지 몇 쪽까지 봤어요? -->
+            <div class="page-input">
+              <span class="lbl">몇 쪽까지 봤어요?</span>
+              <span class="inp">261</span>
+              <span class="suffix">쪽 (+25)</span>
+            </div>
+          </div>
+
+          <!-- 업데이트된 통계 — 변화 강조 -->
+          <div class="stickers" role="group" aria-label="이번 세션으로 업데이트된 통계">
+            <span class="sticker mint r-neg delta">
+              <span class="ico">🕐</span> 오늘 <b>50분</b>
+              <span class="chip up">+25</span>
+            </span>
+            <span class="sticker honey r-pos1 delta">
+              <span class="ico">💛</span> 누적 <b>3h 0m</b>
+              <span class="chip up">+25</span>
+            </span>
+            <span class="sticker peach r-neg1 delta">
+              <span class="ico">🌿</span> ETA <b>3.13</b>
+              <span class="chip down">-2일</span>
+            </span>
+          </div>
+
+          <!-- 이번 주 캘린더 — 오늘이 sage 도장으로 바뀜 -->
+          <div class="cal-strip" style="margin-top: 14px; position: relative;">
+            <span class="deco-emoji" style="top:-10px;right:14px;font-size:18px;transform:rotate(14deg)">⭐</span>
+            <div class="hd">
+              <span class="t">이번 주 · 도장 찍힌 날</span>
+              <span class="m"><b>5</b>/7일 · <span style="color:var(--mint)">새 기록!</span></span>
+            </div>
+            <div class="cal-days">
+              <div class="day">
+                <span class="lbl">월</span>
+                <div class="dot read">18</div>
+                <span class="min">22분</span>
+              </div>
+              <div class="day">
+                <span class="lbl">화</span>
+                <div class="dot read">19</div>
+                <span class="min">34분</span>
+              </div>
+              <div class="day">
+                <span class="lbl">수</span>
+                <div class="dot">20</div>
+                <span class="min muted">·</span>
+              </div>
+              <div class="day">
+                <span class="lbl">목</span>
+                <div class="dot read">21</div>
+                <span class="min">25분</span>
+              </div>
+              <div class="day">
+                <span class="lbl">금</span>
+                <div class="dot read">22</div>
+                <span class="min">18분</span>
+              </div>
+              <div class="day">
+                <span class="lbl">토</span>
+                <div class="dot today fresh">23</div>
+                <span class="min" style="color:var(--sage)">50분 🎉</span>
+              </div>
+              <div class="day">
+                <span class="lbl">일</span>
+                <div class="dot">24</div>
+                <span class="min muted">·</span>
+              </div>
+            </div>
+          </div>
+
+          <button class="cta done" style="margin-top: 12px;">
+            <span class="ico">✓</span>
+            <span>기록 저장하기</span>
+          </button>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ Implementation notes ═══ -->
+  <div class="notes">
+    <h3>🛠 구현 가이드 — 실 코드로 어떻게 옮길까?</h3>
+
+    <h4>새로 만들 것</h4>
+    <ul>
+      <li><code>components/book-detail/FocusStatsRow.tsx</code> — 스티커 3종 (오늘 · 누적 · ETA) 렌더러
+        <ul>
+          <li><code>oddsOfToday</code>, <code>totalMinutesForBook</code>, <code>etaDate</code> props</li>
+          <li>변화(delta) chip는 세션 직후에만 표시되도록 <code>showDelta?: {today?: number; total?: number; eta?: number}</code></li>
+        </ul>
+      </li>
+      <li><code>components/book-detail/BookFocusCalendar.tsx</code> — 이번 주 7일 + 도장 + 하단 분수
+        <ul>
+          <li>read=mint-bg 사각 도트, read-today=honey dashed, fresh=sage + pop 애니</li>
+          <li>쿼리: <code>focus_sessions WHERE book_id = ? AND ended_at &gt;= monday</code> → 일자별 분 합산</li>
+        </ul>
+      </li>
+      <li><code>components/book-detail/KongyBean.tsx</code> — idle/running/done 3포즈 (인라인 SVG)</li>
+      <li><code>lib/reading-pace.ts</code> — ETA 계산 유틸
+        <ul>
+          <li><code>computeETA(book, sessions)</code>: 최근 5세션의 (pages_delta / duration_minutes) 평균 × 하루 평균 집중 분 × 남은 쪽수 = 남은 일수</li>
+          <li>엣지 케이스: 세션 3개 미만이면 "데이터 부족 · 더 읽으면 알려드릴게요" 표시</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h4>수정할 것</h4>
+    <ul>
+      <li><code>components/book-detail/FocusSessionCard.tsx</code> — 하단에 <code>&lt;FocusStatsRow&gt;</code> + <code>&lt;BookFocusCalendar&gt;</code> 삽입</li>
+      <li><code>components/home/HomeCalendarWidget.tsx</code> — 도트에 "총 X분" 서브텍스트 옵션 추가 (책별 아님, 전체 합산)</li>
+      <li><code>components/shared/ReadingCalendar.tsx</code> — <code>CalEvent</code>에 <code>type: "focus"</code> 추가해서 월간 뷰에도 표시</li>
+    </ul>
+
+    <h4>DB/데이터</h4>
+    <ul>
+      <li><code>supabase/add-focus-sessions.sql</code> — 이미 존재 (실행은 아직 필요)</li>
+      <li>ETA 계산에 <code>pages_delta</code>, <code>duration_minutes</code>, <code>ended_at</code> 필드 사용</li>
+      <li>최적화: <code>focus_sessions</code> 쿼리는 books 로드 시 함께 배치 (N+1 방지)</li>
+    </ul>
+
+    <h4>완독콩 톤 규칙 (v3/v4 공통)</h4>
+    <ul>
+      <li>스티커: <code>2px #2B2420</code> 테두리 + <code>3-4px offset shadow</code> + ±3deg 회전</li>
+      <li>폰트: Fraunces(숫자/헤드라인), Gaegu(손글씨 포인트), Pretendard(본문)</li>
+      <li>색: honey=시간, mint=오늘/진행, peach=미래/ETA, sage=도장, rose=포인트, lav=평온/방해금지</li>
+      <li>모션: wiggle · breathe · float · pop (전부 <code>prefers-reduced-motion</code> 무시 시 정지)</li>
+      <li>ETA 표기: "이 속도면 3.15쯤" / "3일 가까워졌어요" — 절대 "X일 남음" 처럼 압박 주지 않기</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>

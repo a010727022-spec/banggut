@@ -7,10 +7,11 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import {
   getMyGroups, getGroupByInviteCode, createGroup, joinGroup,
   getGroupBooks, getMemberCount, getGroupLiveReaders, getGroupMemberProgress,
+  getPublicGroups,
 } from "@/lib/supabase/queries";
 import type { ReadingGroup, MeetingCycle } from "@/lib/types";
 import type { LiveReader } from "@/lib/supabase/queries";
-import { Plus, ChevronRight, Search, ArrowRight, Hash, BookOpen } from "lucide-react";
+import { Plus, ChevronRight, Search, ArrowRight, Hash, BookOpen, AlertTriangle, Link, Users, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import AppHeader from "@/components/shared/AppHeader";
 import { useLibraryStore } from "@/stores/useLibraryStore";
@@ -168,18 +169,18 @@ function GroupCard({ group, onClick }: { group: GroupWithMeta; onClick: () => vo
         }}>
           <BookOpen size={22} color="var(--ac)" strokeWidth={1.5} />
         </div>
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 3 }}>
-            <span style={{ fontSize: 14, fontWeight: 800, color: "var(--tp)", transition: "color 0.4s" }}>{group.name}</span>
+            <span style={{ fontSize: 14, fontWeight: 800, color: "var(--tp)", transition: "color 0.4s", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 }}>{group.name}</span>
             <span style={{
               fontSize: 8, fontWeight: 800, padding: "2px 8px", borderRadius: 100,
               color: hasBook ? "var(--ac)" : "var(--tm)",
               background: hasBook ? "color-mix(in srgb, var(--ac) 12%, transparent)" : "var(--sf2)",
-              transition: "all 0.4s",
+              transition: "all 0.4s", flexShrink: 0, whiteSpace: "nowrap",
             }}>{hasBook ? "진행 중" : "책 선정 중"}</span>
           </div>
           {hasBook && (
-            <div style={{ fontSize: 11, color: "var(--ts)", marginTop: 2, transition: "color 0.4s" }}>
+            <div style={{ fontSize: 11, color: "var(--ts)", marginTop: 2, transition: "color 0.4s", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {group.currentBook!.book_title} · {weekNum}주차
             </div>
           )}
@@ -295,6 +296,245 @@ function CreateGroupSheet({ onClose, onCreated }: { onClose: () => void; onCreat
   );
 }
 
+/* ═══ 독서 모임 찾아보기 ═══ */
+type DiscoverGroup = {
+  id: string;
+  name: string;
+  description: string | null;
+  memberCount: number;
+  currentBookTitle: string | null;
+  currentBookAuthor: string | null;
+};
+
+function DiscoverGroupsSheet({ onClose, onJoined }: { onClose: () => void; onJoined: () => void }) {
+  const user = useAuthStore((s) => s.user);
+  const [groups, setGroups] = useState<DiscoverGroup[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [joiningId, setJoiningId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      try {
+        const supabase = createClient();
+        const data = await getPublicGroups(supabase, user.id);
+        setGroups(data);
+      } catch {
+        toast.error("모임 목록을 불러올 수 없어요");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [user]);
+
+  const handleJoin = async (groupId: string) => {
+    if (!user || joiningId) return;
+    setJoiningId(groupId);
+    try {
+      const supabase = createClient();
+      await joinGroup(supabase, groupId, user.id);
+      toast.success("모임에 참가했어요");
+      onJoined();
+    } catch {
+      toast.error("참가에 실패했어요");
+    } finally {
+      setJoiningId(null);
+    }
+  };
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 100, background: "var(--bg)", animation: "slideUp 0.3s ease-out", transition: "background 0.4s" }}>
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "0 20px", height: 52, borderBottom: "0.5px solid var(--bd)",
+        transition: "border-color 0.4s",
+      }}>
+        <button onClick={onClose} style={{ fontSize: 14, fontWeight: 600, color: "var(--ts)" }}>닫기</button>
+        <span style={{ fontSize: 14, fontWeight: 700, color: "var(--tp)" }}>독서 모임 찾아보기</span>
+        <div style={{ width: 32 }} />
+      </div>
+
+      <div style={{ padding: "20px 20px", overflowY: "auto", height: "calc(100vh - 52px)" }}>
+        {loading ? (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "60px 0", gap: 12 }}>
+            <Loader2 size={24} color="var(--tm)" strokeWidth={1.5} style={{ animation: "spin 1s linear infinite" }} />
+            <span style={{ fontSize: 13, color: "var(--tm)" }}>모임을 찾고 있어요</span>
+          </div>
+        ) : groups.length === 0 ? (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "60px 0", gap: 14 }}>
+            <div style={{
+              width: 56, height: 56, borderRadius: 16,
+              background: "color-mix(in srgb, var(--ac) 8%, transparent)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              transition: "background 0.4s",
+            }}>
+              <Search size={24} color="var(--tm)" strokeWidth={1.5} />
+            </div>
+            <p style={{ fontSize: 15, fontWeight: 700, color: "var(--tp)", textAlign: "center" }}>
+              아직 공개된 모임이 없어요
+            </p>
+            <p style={{ fontSize: 12, color: "var(--ts)", textAlign: "center", lineHeight: 1.6 }}>
+              직접 모임을 만들어 친구들을 초대해 보세요
+            </p>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {groups.map((g) => (
+              <div key={g.id} style={{
+                padding: "16px 18px", borderRadius: 16,
+                background: "var(--sf)", border: "0.5px solid var(--bd)",
+                transition: "all 0.2s, background 0.4s, border-color 0.4s",
+              }}>
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                  <div style={{
+                    width: 42, height: 42, borderRadius: 12,
+                    background: "color-mix(in srgb, var(--ac) 15%, var(--sf2))",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    flexShrink: 0, transition: "background 0.4s",
+                  }}>
+                    <BookOpen size={20} color="var(--ac)" strokeWidth={1.5} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: "var(--tp)", marginBottom: 3, transition: "color 0.4s" }}>
+                      {g.name}
+                    </div>
+                    {g.description && (
+                      <div style={{ fontSize: 11, color: "var(--ts)", marginBottom: 6, lineHeight: 1.5, transition: "color 0.4s" }}>
+                        {g.description}
+                      </div>
+                    )}
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                      <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 600, color: "var(--tm)", transition: "color 0.4s" }}>
+                        <Users size={12} strokeWidth={2} />
+                        {g.memberCount}명
+                      </span>
+                      {g.currentBookTitle && (
+                        <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 600, color: "var(--tm)", transition: "color 0.4s" }}>
+                          <BookOpen size={12} strokeWidth={2} />
+                          {g.currentBookTitle}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleJoin(g.id)}
+                  disabled={joiningId === g.id}
+                  className="btn-main"
+                  style={{
+                    marginTop: 12, width: "100%", padding: 11,
+                    fontSize: 13, fontWeight: 700,
+                    opacity: joiningId === g.id ? 0.6 : 1,
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                  }}
+                >
+                  {joiningId === g.id ? (
+                    <>
+                      <Loader2 size={14} strokeWidth={2} style={{ animation: "spin 1s linear infinite" }} />
+                      참가 중...
+                    </>
+                  ) : (
+                    <>
+                      <Plus size={14} strokeWidth={2.5} />
+                      참가하기
+                    </>
+                  )}
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
+/* ═══ 카카오 초대 코드 인라인 입력 ═══ */
+function KakaoInviteSection() {
+  const user = useAuthStore((s) => s.user);
+  const router = useRouter();
+  const [expanded, setExpanded] = useState(false);
+  const [code, setCode] = useState("");
+  const [joining, setJoining] = useState(false);
+
+  const handleJoin = async () => {
+    if (!code.trim() || !user) return;
+    setJoining(true);
+    try {
+      const supabase = createClient();
+      const group = await getGroupByInviteCode(supabase, code.trim());
+      if (!group) {
+        toast.error("초대 코드가 유효하지 않아요");
+        return;
+      }
+      await joinGroup(supabase, group.id, user.id);
+      toast.success("참여 완료!");
+      router.push(`/groups/${group.id}`);
+    } catch {
+      toast.error("초대 코드가 유효하지 않아요");
+    } finally {
+      setJoining(false);
+    }
+  };
+
+  if (!expanded) {
+    return (
+      <div onClick={() => setExpanded(true)} style={{ display: "flex", alignItems: "center", gap: 11, padding: "12px 16px", cursor: "pointer", transition: "background 0.15s" }}>
+        <div style={{ width: 30, height: 30, borderRadius: 8, background: "color-mix(in srgb, var(--ac) 10%, var(--sf2))", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "background 0.4s" }}>
+          <Link size={14} color="var(--ac)" strokeWidth={2} />
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--tp)", transition: "color 0.4s" }}>카카오로 초대받았나요?</div>
+          <div style={{ fontSize: 10, color: "var(--tm)", marginTop: 1, transition: "color 0.4s" }}>초대 코드를 붙여넣어 바로 참가하세요</div>
+        </div>
+        <ChevronRight size={13} color="var(--tm)" strokeWidth={2} />
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ padding: "12px 16px" }}>
+      <div style={{ fontSize: 12, fontWeight: 700, color: "var(--tp)", marginBottom: 8, transition: "color 0.4s" }}>초대 코드 입력</div>
+      <div style={{ display: "flex", gap: 6 }}>
+        <input
+          value={code}
+          onChange={(e) => setCode(e.target.value.toUpperCase())}
+          onKeyDown={(e) => { if (e.key === "Enter") handleJoin(); }}
+          placeholder="BG-XXXX"
+          maxLength={10}
+          autoFocus
+          style={{
+            flex: 1, padding: "10px 12px", borderRadius: 10,
+            border: "1px solid var(--bd2)", background: "var(--sf2)",
+            fontSize: 14, fontWeight: 700, color: "var(--tp)",
+            letterSpacing: "1.5px", outline: "none",
+            transition: "border-color 0.2s, background 0.4s, color 0.4s",
+          }}
+        />
+        <button
+          onClick={handleJoin}
+          disabled={!code.trim() || joining}
+          style={{
+            padding: "10px 16px", borderRadius: 10,
+            background: "var(--ac)", color: "var(--acc)",
+            fontSize: 12, fontWeight: 800, border: "none",
+            cursor: !code.trim() || joining ? "default" : "pointer",
+            opacity: !code.trim() || joining ? 0.5 : 1,
+            transition: "opacity 0.15s, background 0.4s",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {joining ? "..." : "참가하기"}
+        </button>
+      </div>
+      <button onClick={() => { setExpanded(false); setCode(""); }} style={{ fontSize: 10, color: "var(--tm)", marginTop: 6, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+        닫기
+      </button>
+    </div>
+  );
+}
+
 /* ═══ 초대 코드 참여 ═══ */
 function JoinGroupSheet({ onClose, onJoined }: { onClose: () => void; onJoined: () => void }) {
   const user = useAuthStore((s) => s.user);
@@ -328,7 +568,7 @@ function JoinGroupSheet({ onClose, onJoined }: { onClose: () => void; onJoined: 
           setSearching(true);
           try { const s = createClient(); const g = await getGroupByInviteCode(s, code.trim()); setFound(g); if (!g) toast.error("모임을 찾을 수 없어요"); } catch { toast.error("검색에 실패했어요"); } finally { setSearching(false); }
         }} disabled={!code.trim() || searching} className="btn-main" style={{ maxWidth: 240, margin: "16px auto 0", display: "block", opacity: !code.trim() || searching ? 0.5 : 1 }}>
-          {searching ? "검색 중..." : "검색"}
+          {searching ? "검색 중" : "검색"}
         </button>
         {found && (
           <div style={{ marginTop: 24, padding: 20, borderRadius: 14, background: "var(--sf)", border: "0.5px solid var(--bd)", textAlign: "left" }}>
@@ -355,9 +595,11 @@ export default function GroupsPage() {
   const { books, setBooks } = useLibraryStore();
   const [groups, setGroups] = useState<GroupWithMeta[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
   const [showFab, setShowFab] = useState(false);
+  const [showDiscover, setShowDiscover] = useState(false);
   const [streakDates, setStreakDates] = useState<string[]>([]);
 
   const counts = {
@@ -369,6 +611,7 @@ export default function GroupsPage() {
   const loadGroups = useCallback(async () => {
     if (!user) return;
     const supabase = createClient();
+    setLoadError(false);
     try {
       // 공통 데이터 (books, streaks)
       const [booksData, streakData] = await Promise.all([
@@ -428,7 +671,10 @@ export default function GroupsPage() {
         };
       }));
       setGroups(enriched);
-    } catch {} finally { setLoading(false); }
+    } catch (e) {
+      console.error("[Groups] load failed:", e);
+      setLoadError(true);
+    } finally { setLoading(false); }
   }, [user]);
 
   useEffect(() => { loadGroups(); }, [loadGroups]);
@@ -462,6 +708,30 @@ export default function GroupsPage() {
         <div style={{ padding: "0 20px" }}>
           <div className="skeleton" style={{ height: 140, borderRadius: 14, marginBottom: 10 }} />
           <div className="skeleton" style={{ height: 120, borderRadius: 16, marginBottom: 10 }} />
+        </div>
+      ) : loadError ? (
+        <div style={{
+          display: "flex", flexDirection: "column", alignItems: "center",
+          justifyContent: "center", padding: "60px 20px", gap: 14,
+        }}>
+          <AlertTriangle size={36} color="var(--tm)" strokeWidth={1.5} />
+          <p style={{ fontSize: 15, fontWeight: 700, color: "var(--tp)", textAlign: "center" }}>
+            모임을 불러올 수 없어요
+          </p>
+          <p style={{ fontSize: 12, color: "var(--ts)", textAlign: "center" }}>
+            네트워크 상태를 확인하고 다시 시도해 주세요
+          </p>
+          <button
+            onClick={() => { setLoading(true); loadGroups(); }}
+            style={{
+              marginTop: 4, fontSize: 13, fontWeight: 700,
+              color: "var(--acc)", background: "var(--ac)",
+              border: "none", borderRadius: 100, padding: "10px 28px",
+              cursor: "pointer", transition: "opacity 0.2s",
+            }}
+          >
+            다시 시도
+          </button>
         </div>
       ) : groups.length === 0 ? (
         <>
@@ -523,10 +793,10 @@ export default function GroupsPage() {
                     <div style={{ width: 46, height: 64, borderRadius: 8, overflow: "hidden", flexShrink: 0, background: "var(--sf2)", boxShadow: "0 4px 14px rgba(0,0,0,0.4)" }}>
                       {readingBook.cover_url ? <img src={readingBook.cover_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : null}
                     </div>
-                    <div style={{ flex: 1 }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 9, fontWeight: 800, color: "var(--ac)", letterSpacing: "1px", textTransform: "uppercase", marginBottom: 4, transition: "color 0.4s" }}>지금 읽는 중</div>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: "var(--tp)", letterSpacing: "-0.3px", lineHeight: 1.25, marginBottom: 2, transition: "color 0.4s" }}>{readingBook.title}</div>
-                      <div style={{ fontSize: 10, color: "var(--tm)", transition: "color 0.4s" }}>{readingBook.author}</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: "var(--tp)", letterSpacing: "-0.3px", lineHeight: 1.25, marginBottom: 2, transition: "color 0.4s", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{readingBook.title}</div>
+                      <div style={{ fontSize: 10, color: "var(--tm)", transition: "color 0.4s", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{readingBook.author}</div>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 3, flexShrink: 0 }}>
                       <div style={{ fontSize: 20, fontWeight: 800, color: "var(--ac)", letterSpacing: "-0.8px", lineHeight: 1, transition: "color 0.4s" }}>{pct}%</div>
@@ -562,17 +832,8 @@ export default function GroupsPage() {
 
             <div style={{ height: 0.5, background: "var(--bd)", margin: "0 16px", transition: "background 0.4s" }} />
 
-            {/* 카카오 힌트 */}
-            <div onClick={() => toast("카카오 링크 열기")} style={{ display: "flex", alignItems: "center", gap: 11, padding: "12px 16px", cursor: "pointer", transition: "background 0.15s" }}>
-              <div style={{ width: 30, height: 30, borderRadius: 8, background: "color-mix(in srgb, #c8a030 10%, var(--sf2))", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "background 0.4s" }}>
-                <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#a08010" strokeWidth={2}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "var(--tp)", transition: "color 0.4s" }}>카카오로 초대받았나요?</div>
-                <div style={{ fontSize: 10, color: "var(--tm)", marginTop: 1, transition: "color 0.4s" }}>링크를 열면 바로 참가할 수 있어요</div>
-              </div>
-              <ChevronRight size={13} color="var(--tm)" strokeWidth={2} />
-            </div>
+            {/* 초대 코드로 참가 */}
+            <KakaoInviteSection />
           </div>
           <div style={{ height: 20 }} />
         </>
@@ -614,7 +875,7 @@ export default function GroupsPage() {
           <div style={{ padding: "0 20px" }}>
             <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--tp)", marginBottom: 12, transition: "color 0.4s" }}>둘러보기</h2>
             {[
-              { icon: <Search size={16} color="var(--ac)" strokeWidth={1.5} />, title: "다른 독서 모임 찾아보기", sub: "같은 책 읽는 사람들과 만나보세요", onClick: () => toast("준비 중이에요", { duration: 1500 }) },
+              { icon: <Search size={16} color="var(--ac)" strokeWidth={1.5} />, title: "다른 독서 모임 찾아보기", sub: "같은 책 읽는 사람들과 만나보세요", onClick: () => setShowDiscover(true) },
               { icon: <ArrowRight size={16} color="var(--ac)" strokeWidth={1.5} />, title: "초대 코드로 참여하기", sub: "친구에게 받은 코드가 있나요?", onClick: () => setShowJoin(true) },
             ].map((item, i) => (
               <button key={i} onClick={item.onClick} className="card-tap" style={{
@@ -637,8 +898,8 @@ export default function GroupsPage() {
 
       {/* FAB */}
       {groups.length > 0 && (
-        <button onClick={() => setShowFab(!showFab)} style={{
-          position: "fixed", bottom: 80, right: 20, zIndex: 80,
+        <button onClick={() => setShowFab(!showFab)} aria-label={showFab ? "메뉴 닫기" : "새 모임 메뉴 열기"} style={{
+          position: "fixed", bottom: "calc(80px + env(safe-area-inset-bottom))", right: 20, zIndex: 80,
           width: 52, height: 52, borderRadius: 16,
           background: "var(--ac)", color: "var(--acc)",
           display: "flex", alignItems: "center", justifyContent: "center",
@@ -653,7 +914,7 @@ export default function GroupsPage() {
       {showFab && (
         <>
           <div onClick={() => setShowFab(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.2)", zIndex: 90 }} />
-          <div style={{ position: "fixed", bottom: 140, right: 20, zIndex: 91, display: "flex", flexDirection: "column", gap: 8, alignItems: "flex-end" }}>
+          <div style={{ position: "fixed", bottom: "calc(140px + env(safe-area-inset-bottom))", right: 20, zIndex: 91, display: "flex", flexDirection: "column", gap: 8, alignItems: "flex-end" }}>
             {[
               { id: "create", icon: <BookOpen size={14} color="var(--ac)" strokeWidth={1.5} />, label: "모임 만들기" },
               { id: "join", icon: <Hash size={14} color="var(--ac)" strokeWidth={1.5} />, label: "코드로 참여" },
@@ -670,6 +931,7 @@ export default function GroupsPage() {
 
       {showCreate && <CreateGroupSheet onClose={() => setShowCreate(false)} onCreated={() => { setShowCreate(false); loadGroups(); }} />}
       {showJoin && <JoinGroupSheet onClose={() => setShowJoin(false)} onJoined={() => { setShowJoin(false); loadGroups(); }} />}
+      {showDiscover && <DiscoverGroupsSheet onClose={() => setShowDiscover(false)} onJoined={() => { setShowDiscover(false); loadGroups(); }} />}
     </div>
   );
 }

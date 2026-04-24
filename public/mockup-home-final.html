@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>방긋 홈 · 최종 구조</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;word-break:keep-all;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#F7F3ED; --sf:#EDE7DF; --sf2:#E0D9D0; --sf3:#D0C8BC;
+  --bd:rgba(95,164,142,0.14); --bd2:rgba(95,164,142,0.28);
+  --tp:#1c201d; --ts:#4a5550; --tm:#7a8b7e; --tf:rgba(28,32,29,0.35);
+  --ac:#5FA48E; --ac2:#7ABBA4; --ac3:#A4D4C0; --acc:#f7f3ed;
+  --milestone:#B79556; --rose:#E09B8E; --sky:#8BA4C0;
+}
+body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:#DCD5CA;padding:40px 20px;min-height:100vh;color:var(--tp)}
+.wrap{max-width:2000px;margin:0 auto}
+.title{font-family:'Gaegu',cursive;font-size:32px;font-weight:700;letter-spacing:0.02em;text-align:center;margin-bottom:6px}
+.sub{color:var(--ts);font-size:13px;text-align:center;margin-bottom:40px;font-weight:500}
+.phones{display:flex;gap:24px;justify-content:center;flex-wrap:wrap}
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;max-width:360px}
+.phone-badge{display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:100px;background:#FFFFFF;border:1px solid var(--bd2);font-size:11px;font-weight:700;color:var(--ac);letter-spacing:0.5px}
+.phone{width:360px;height:812px;background:var(--bg);border-radius:44px;display:flex;flex-direction:column;box-shadow:0 0 0 3px #1a1a1a,0 0 26px rgba(0,0,0,0.1);overflow:auto;position:relative;padding-bottom:72px}
+.phone::-webkit-scrollbar{width:0}
+.phone-desc{font-size:11px;color:var(--ts);text-align:center;line-height:1.6;max-width:340px}
+.phone-desc strong{color:var(--ac);font-weight:700}
+
+/* 헤더 */
+.header{padding:52px 20px 10px;display:flex;align-items:center;gap:12px}
+.header-mascot{width:38px;height:38px;flex-shrink:0;animation:bob 3s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-3px) rotate(2deg)}}
+.header-text{flex:1}
+.header-greet{font-family:'Gaegu',cursive;font-size:16px;font-weight:700;color:var(--tp);letter-spacing:0.02em;line-height:1.25}
+.header-greet em{font-style:normal;color:var(--ac)}
+.header-sub{font-size:11px;color:var(--tm);margin-top:2px}
+.icon-btn{width:36px;height:36px;border-radius:50%;background:var(--sf);border:0.5px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.icon-btn svg{width:16px;height:16px;stroke:var(--ts);fill:none;stroke-width:2}
+.icon-btn .dot{position:absolute;top:7px;right:7px;width:6px;height:6px;border-radius:50%;background:var(--ac);border:1.5px solid var(--bg)}
+
+/* 상단 탭 (홈 안의 4탭) */
+.htabs{display:flex;gap:4px;padding:4px 20px 8px;border-bottom:0.5px solid var(--bd);overflow-x:auto;scrollbar-width:none}
+.htabs::-webkit-scrollbar{height:0}
+.htab{padding:8px 12px;font-size:12px;font-weight:700;color:var(--tm);border:none;background:transparent;cursor:pointer;position:relative;white-space:nowrap}
+.htab.on{color:var(--ac)}
+.htab.on::after{content:"";position:absolute;bottom:-0.5px;left:10%;right:10%;height:2px;background:var(--ac);border-radius:2px}
+.htab-count{font-size:10px;font-weight:800;background:var(--sf2);color:var(--tm);padding:1px 6px;border-radius:100px;margin-left:3px}
+.htab.on .htab-count{background:color-mix(in srgb,var(--ac) 15%,transparent);color:var(--ac)}
+
+/* 섹션 라벨 */
+.sec-label{display:flex;justify-content:space-between;align-items:center;padding:14px 20px 10px}
+.sec-title{font-family:'Gaegu',cursive;font-size:14px;font-weight:700;color:var(--tp);letter-spacing:0.02em}
+.sec-more{font-size:11px;color:var(--ac);font-weight:600;cursor:pointer}
+
+/* ═══ 읽는 중 탭 ═══ */
+/* 미니 heatmap 바 */
+.heat-bar{margin:0 20px 14px;padding:10px 14px;background:var(--sf);border:0.5px solid var(--bd);border-radius:14px;display:flex;align-items:center;gap:12px;cursor:pointer}
+.heat-visual{display:grid;grid-template-columns:repeat(10,7px);gap:2px;flex-shrink:0}
+.heat-dot{width:7px;height:7px;border-radius:2px;background:var(--sf2)}
+.heat-dot.on{background:var(--ac3)}
+.heat-dot.hot{background:var(--ac)}
+.heat-dot.today{background:linear-gradient(135deg,var(--ac),var(--ac2));outline:1.5px solid var(--bg);outline-offset:-1px}
+.heat-body{flex:1;min-width:0}
+.heat-title{font-size:12px;font-weight:700;color:var(--tp);line-height:1.3}
+.heat-title em{font-style:normal;color:var(--milestone)}
+.heat-sub{font-size:10.5px;color:var(--tm);margin-top:1px}
+.heat-arrow{font-size:13px;color:var(--tf);flex-shrink:0}
+
+/* 이어 읽기 히어로 */
+.hero{margin:0 20px 16px;border-radius:20px;overflow:hidden;background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 8%,var(--sf)),var(--sf));border:0.5px solid var(--bd);position:relative}
+.hero::before{content:"";position:absolute;top:-30px;right:-30px;width:140px;height:140px;background:radial-gradient(circle,color-mix(in srgb,var(--ac) 20%,transparent),transparent 70%)}
+.hero-inner{padding:16px;position:relative;z-index:2}
+.hero-bubble{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:100px;background:var(--bg);border:0.5px solid var(--bd2);font-family:'Gaegu',cursive;font-size:11px;font-weight:700;color:var(--ac);margin-bottom:12px;letter-spacing:0.02em}
+.hero-bubble::before{content:"";width:12px;height:12px;background-image:url('/logo-banggut.svg');background-size:contain;background-repeat:no-repeat}
+.hero-row{display:flex;gap:14px;margin-bottom:14px}
+.hero-cover{width:80px;height:116px;border-radius:8px;flex-shrink:0;box-shadow:0 8px 20px color-mix(in srgb,var(--ac) 15%,rgba(0,0,0,0.1));background:linear-gradient(135deg,#2d5a3f,#1a3a2a);color:#f4efe8;display:flex;align-items:flex-end;padding:6px;font-size:10.5px;font-weight:700;line-height:1.2}
+.hero-info{flex:1;min-width:0;padding-top:4px}
+.hero-title{font-size:17px;font-weight:800;color:var(--tp);line-height:1.3;letter-spacing:-0.3px;margin-bottom:2px}
+.hero-author{font-size:11px;color:var(--tm);margin-bottom:10px}
+.hero-bar{height:4px;background:color-mix(in srgb,var(--ac) 10%,var(--sf2));border-radius:2px;margin-bottom:6px;overflow:hidden}
+.hero-fill{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:2px;width:72%}
+.hero-stat{display:flex;justify-content:space-between;font-size:10.5px;color:var(--tm);font-weight:500}
+.hero-stat em{font-style:normal;color:var(--ac);font-weight:700}
+.hero-cta{width:100%;padding:13px;border-radius:100px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:var(--acc);font-family:'Gaegu',cursive;font-size:16px;font-weight:700;letter-spacing:0.04em;border:none;cursor:pointer;box-shadow:0 6px 18px color-mix(in srgb,var(--ac) 25%,transparent);display:flex;align-items:center;justify-content:center;gap:6px}
+
+/* 다른 읽는 책 */
+.other-row{display:flex;gap:10px;padding:0 20px 16px;overflow-x:auto;scrollbar-width:none}
+.other-row::-webkit-scrollbar{height:0}
+.other-card{flex-shrink:0;width:112px;cursor:pointer}
+.other-cover{width:100%;aspect-ratio:7/10;border-radius:8px;overflow:hidden;margin-bottom:6px;background:linear-gradient(135deg,#3a2a1a,#8a6030);color:#f4efe8;display:flex;align-items:flex-end;padding:6px;font-size:10px;font-weight:700;line-height:1.2;box-shadow:0 4px 10px rgba(0,0,0,0.1)}
+.other-title{font-size:11px;font-weight:700;color:var(--tp);line-height:1.3;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.other-prog{display:flex;align-items:center;gap:5px;font-size:9.5px;color:var(--tm)}
+.other-prog-bar{flex:1;height:2px;background:var(--sf2);border-radius:1px;overflow:hidden}
+.other-prog-fill{height:100%;background:var(--ac);border-radius:1px}
+
+/* 넛지 */
+.nudge{margin:0 20px 10px;display:flex;gap:10px;padding:12px 14px;background:var(--sf);border:0.5px solid var(--bd);border-radius:14px;align-items:center;cursor:pointer}
+.nudge-emoji{width:30px;height:30px;border-radius:10px;background:color-mix(in srgb,var(--ac) 12%,var(--bg));display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.nudge-text{flex:1;font-size:11.5px;color:var(--tp);line-height:1.4;font-weight:500}
+.nudge-text em{font-style:normal;font-weight:700;color:var(--ac)}
+
+/* ═══ 완독/위시 탭 (인스타 그리드) ═══ */
+.insta-bio{padding:4px 20px 14px;display:flex;gap:14px;align-items:center;border-bottom:0.5px solid var(--bd)}
+.insta-avatar{width:60px;height:60px;border-radius:50%;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,var(--ac3),var(--ac));padding:2px;border:2px solid var(--bg);box-shadow:0 0 0 2px var(--ac2)}
+.insta-avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.insta-info{flex:1}
+.insta-stats{display:flex;gap:18px;margin-bottom:6px}
+.insta-stat{display:flex;flex-direction:column;align-items:center}
+.insta-stat-v{font-size:16px;font-weight:800;color:var(--tp);letter-spacing:-0.3px;line-height:1}
+.insta-stat-l{font-size:9.5px;color:var(--tm);font-weight:600;margin-top:3px}
+.insta-caption{font-family:'Gaegu',cursive;font-size:13px;color:var(--ts);line-height:1.4;letter-spacing:0.02em}
+.insta-caption em{color:var(--ac);font-style:normal;font-weight:700}
+
+/* 정렬 바 */
+.sort-row{display:flex;gap:6px;padding:10px 20px;align-items:center;overflow-x:auto;scrollbar-width:none}
+.sort-row::-webkit-scrollbar{height:0}
+.sort-chip{padding:5px 12px;border-radius:100px;font-size:11px;font-weight:700;white-space:nowrap;border:0.5px solid var(--bd2);background:transparent;color:var(--tm);cursor:pointer;flex-shrink:0}
+.sort-chip.on{background:var(--ac);color:var(--acc);border-color:var(--ac)}
+
+/* 인스타 그리드 */
+.insta-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;padding:2px}
+.insta-cell{aspect-ratio:7/10;background:linear-gradient(135deg,#2d5a3f,#1a3a2a);display:flex;align-items:flex-end;padding:8px;color:#f4efe8;font-size:10.5px;font-weight:700;line-height:1.25;letter-spacing:-0.01em;position:relative;cursor:pointer;overflow:hidden}
+.insta-cell:hover{opacity:0.9}
+.insta-cell .badge{position:absolute;top:6px;right:6px;background:rgba(255,255,255,0.94);color:var(--ac);font-size:8px;font-weight:800;padding:2px 6px;border-radius:100px}
+.insta-cell .badge-plan{background:rgba(183,149,86,0.95);color:#fff}
+.insta-cell .badge-heart{background:rgba(224,155,142,0.95);color:#fff}
+.insta-cell .overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.3),transparent 50%);pointer-events:none}
+
+/* ═══ 스크랩 탭 ═══ */
+.scrap-item{padding:14px 20px;border-bottom:0.5px solid var(--bd);cursor:pointer}
+.scrap-quote{font-family:'Gaegu',cursive;font-size:16px;color:var(--tp);line-height:1.6;letter-spacing:0.01em;margin-bottom:10px;padding-left:10px;border-left:3px solid var(--ac);font-style:italic}
+.scrap-meta{display:flex;align-items:center;justify-content:space-between;font-size:10.5px;color:var(--tm)}
+.scrap-meta em{color:var(--tp);font-style:normal;font-weight:700}
+.scrap-actions{display:flex;gap:12px}
+.scrap-action{display:flex;align-items:center;gap:3px;cursor:pointer;color:var(--tm)}
+.scrap-action.liked{color:var(--rose)}
+.scrap-action svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* ═══ 달력 탭 전체 ═══ */
+.cal-hero{margin:0 20px 18px;padding:20px;background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 10%,var(--sf)),var(--sf));border:0.5px solid var(--bd);border-radius:22px;position:relative;overflow:hidden}
+.cal-hero::before{content:"";position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,color-mix(in srgb,var(--ac) 20%,transparent),transparent 70%);pointer-events:none}
+.cal-hero-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;position:relative;z-index:2}
+.cal-month{font-family:'Gaegu',cursive;font-size:26px;font-weight:700;color:var(--tp);letter-spacing:0.02em;line-height:1}
+.cal-year{font-size:11px;color:var(--tm);font-weight:600;margin-top:3px}
+.cal-nav{display:flex;gap:6px}
+.cal-nav-btn{width:28px;height:28px;border-radius:50%;background:var(--bg);border:0.5px solid var(--bd);display:flex;align-items:center;justify-content:center;color:var(--ts);font-size:14px;cursor:pointer}
+
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:12px;position:relative;z-index:2}
+.cal-dow{font-size:9.5px;font-weight:700;color:var(--tm);text-align:center;padding:3px 0;letter-spacing:0.3px}
+.cal-dow.sun{color:var(--rose)}
+.cal-cell{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--ts);position:relative;cursor:pointer;border-radius:9px}
+.cal-cell.other{color:var(--tf)}
+.cal-cell.read{background:color-mix(in srgb,var(--ac) 15%,transparent);color:var(--ac);font-weight:700}
+.cal-cell.streak{background:linear-gradient(135deg,var(--ac),var(--ac2));color:var(--acc);font-weight:800;box-shadow:0 2px 8px color-mix(in srgb,var(--ac) 25%,transparent)}
+.cal-cell.today{outline:1.5px solid var(--ac);outline-offset:-1.5px;font-weight:800}
+.cal-cell .dots{position:absolute;bottom:3px;left:50%;transform:translateX(-50%);display:flex;gap:2px}
+.cal-cell .d{width:3px;height:3px;border-radius:50%}
+.cal-cell .d.meet{background:var(--sky)}
+.cal-cell .d.plan{background:var(--milestone)}
+.cal-cell .d.due{background:var(--rose)}
+
+.cal-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;position:relative;z-index:2}
+.cal-stat{background:var(--bg);border:0.5px solid var(--bd);border-radius:12px;padding:10px;text-align:center}
+.cal-stat-v{font-size:18px;font-weight:800;color:var(--tp);letter-spacing:-0.3px;line-height:1}
+.cal-stat-l{font-size:9px;color:var(--tm);font-weight:700;margin-top:4px;letter-spacing:0.3px}
+
+/* 이벤트 타임라인 */
+.event-card{display:flex;gap:12px;padding:12px 14px;margin:0 20px 8px;background:var(--sf);border:0.5px solid var(--bd);border-radius:14px;align-items:center;cursor:pointer}
+.event-date{display:flex;flex-direction:column;align-items:center;justify-content:center;width:44px;height:44px;border-radius:12px;background:var(--bg);border:0.5px solid var(--bd);flex-shrink:0}
+.event-date-m{font-size:9px;font-weight:700;color:var(--tm);line-height:1}
+.event-date-d{font-family:'Gaegu',cursive;font-size:18px;font-weight:700;color:var(--tp);line-height:1;margin-top:2px}
+.event-body{flex:1;min-width:0}
+.event-type{font-size:9.5px;font-weight:700;letter-spacing:0.4px;margin-bottom:2px}
+.event-type.meet{color:var(--sky)}
+.event-type.plan{color:var(--milestone)}
+.event-type.due{color:var(--rose)}
+.event-title{font-size:13px;font-weight:700;color:var(--tp);line-height:1.3;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.event-sub{font-size:10.5px;color:var(--tm)}
+.event-arrow{color:var(--tf);font-size:14px;flex-shrink:0}
+
+/* 빈 상태 간단 */
+.empty-simple{padding:30px 20px;text-align:center;color:var(--tm);font-size:12px}
+
+/* 하단 네비 */
+.bnav{position:absolute;bottom:0;left:0;right:0;background:rgba(247,243,237,0.95);backdrop-filter:blur(16px);border-top:0.5px solid var(--bd);padding:8px 4px 24px;display:flex;justify-content:space-around;z-index:50}
+.bnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9px;color:var(--tm);padding:5px 8px;border-radius:10px;cursor:pointer;min-width:52px;font-weight:600}
+.bnav-item.on{background:color-mix(in srgb,var(--ac) 10%,transparent);color:var(--ac)}
+.bnav-item svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* FAB */
+.fab{position:absolute;bottom:88px;right:20px;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac2));color:var(--acc);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 18px color-mix(in srgb,var(--ac) 30%,transparent);z-index:40;font-size:24px}
+
+.note{margin-top:40px;padding:24px 28px;background:#FFFFFF;border:1px solid rgba(90,110,95,0.13);border-radius:20px;color:var(--tp);font-size:12px;line-height:1.9;max-width:920px;margin-left:auto;margin-right:auto}
+.note-title{font-family:'Gaegu',cursive;font-size:18px;font-weight:700;color:var(--ac);margin-bottom:14px}
+.note h4{font-family:'Gaegu',cursive;font-size:15px;font-weight:700;color:var(--tp);letter-spacing:0.02em;margin-top:14px;margin-bottom:6px}
+.note strong{color:var(--ac);font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title">방긋 홈 · 최종 구조</div>
+  <div class="sub">탭별 성격 분리 · 인스타 전시 · 이어읽기 허브 · 캘린더 허브</div>
+
+  <div class="phones">
+
+    <!-- ═══ 1a. 오늘 뷰 (첫 진입) ═══ -->
+    <div class="phone-wrap">
+      <div class="phone-badge">① 홈 → 오늘</div>
+      <div class="phone">
+        <div class="header">
+          <img src="/logo-banggut.svg" class="header-mascot" alt="">
+          <div class="header-text">
+            <div class="header-greet">안녕, <em>지선</em>님</div>
+            <div class="header-sub">어제 245쪽에서 멈췄어요</div>
+          </div>
+          <div class="icon-btn">
+            <svg viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 00-4-5.7V5a2 2 0 00-4 0v.3A6 6 0 006 11v3.2c0 .5-.2 1-.6 1.4L4 17h5"/><path d="M9 17a3 3 0 006 0"/></svg>
+            <div class="dot"></div>
+          </div>
+        </div>
+
+        <div class="htabs">
+          <div class="htab on">오늘</div>
+          <div class="htab">읽는 중<span class="htab-count">2</span></div>
+          <div class="htab">완독<span class="htab-count">12</span></div>
+          <div class="htab">위시<span class="htab-count">5</span></div>
+          <div class="htab">스크랩<span class="htab-count">8</span></div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <!-- 스트릭 미니 heatmap -->
+        <div class="heat-bar">
+          <div class="heat-visual">
+            <div class="heat-dot on"></div><div class="heat-dot on"></div><div class="heat-dot"></div><div class="heat-dot on"></div><div class="heat-dot on"></div><div class="heat-dot hot"></div><div class="heat-dot hot"></div><div class="heat-dot hot"></div><div class="heat-dot hot"></div><div class="heat-dot hot"></div>
+            <div class="heat-dot hot"></div><div class="heat-dot hot"></div><div class="heat-dot today"></div><div class="heat-dot"></div><div class="heat-dot"></div><div class="heat-dot"></div><div class="heat-dot"></div><div class="heat-dot"></div><div class="heat-dot"></div><div class="heat-dot"></div>
+          </div>
+          <div class="heat-body">
+            <div class="heat-title">🔥 <em>7일 연속</em> 독서 중</div>
+            <div class="heat-sub">달력 열기 →</div>
+          </div>
+          <div class="heat-arrow">→</div>
+        </div>
+
+        <!-- 이어 읽기 히어로 -->
+        <div class="hero">
+          <div class="hero-inner">
+            <span class="hero-bubble">오늘도 한 장만 같이</span>
+            <div class="hero-row">
+              <div class="hero-cover">작별하지<br>않는다</div>
+              <div class="hero-info">
+                <div class="hero-title">작별하지 않는다</div>
+                <div class="hero-author">한강</div>
+                <div class="hero-bar"><div class="hero-fill"></div></div>
+                <div class="hero-stat"><span><em>245</em> / 340쪽</span><em>72%</em></div>
+              </div>
+            </div>
+            <button class="hero-cta">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+              지금 이어 읽기
+            </button>
+          </div>
+        </div>
+
+        <!-- AI 독서토론 CTA 카드 (새로운 킥) -->
+        <div class="sec-label">
+          <div class="sec-title">💬 방긋이와 이야기</div>
+        </div>
+        <div style="margin:0 20px 16px;padding:16px;background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 12%,var(--sf)),var(--sf));border:0.5px solid var(--bd2);border-radius:18px;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden;cursor:pointer">
+          <div style="position:absolute;top:-20px;right:-20px;width:120px;height:120px;background:radial-gradient(circle,color-mix(in srgb,var(--ac) 20%,transparent),transparent 70%);pointer-events:none"></div>
+          <img src="/logo-banggut.svg" style="width:50px;height:50px;flex-shrink:0;position:relative;z-index:2;animation:bob 2.5s ease-in-out infinite" alt="">
+          <div style="flex:1;min-width:0;position:relative;z-index:2">
+            <div style="font-family:'Gaegu',cursive;font-size:13.5px;font-weight:700;color:var(--tp);letter-spacing:0.02em;line-height:1.3;margin-bottom:3px">방금 그은 문장, 함께 곱씹어봐요</div>
+            <div style="font-size:11px;color:var(--tm);line-height:1.4">한강의 이 구절로 5분 토론 <strong style="color:var(--ac);font-weight:700">소크라테스식</strong> →</div>
+          </div>
+        </div>
+
+        <!-- 오늘의 넛지 -->
+        <div class="sec-label">
+          <div class="sec-title">🌿 오늘의 넛지</div>
+        </div>
+        <div class="nudge">
+          <div class="nudge-emoji">📅</div>
+          <div class="nudge-text"><em>프로젝트 헤일메리</em> 내일부터 읽기로 했어요</div>
+        </div>
+        <div class="nudge">
+          <div class="nudge-emoji">💬</div>
+          <div class="nudge-text"><em>민지</em>가 새 질문을 던졌어요 · 답변 대기 중</div>
+        </div>
+        <div class="nudge">
+          <div class="nudge-emoji">🏛</div>
+          <div class="nudge-text"><em>양천도서관</em> 반납일 4일 남았어요</div>
+        </div>
+
+        <div class="fab">+</div>
+        <div class="bnav">
+          <div class="bnav-item on"><svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m10-11v10a1 1 0 01-1 1h-3m-6 0a1 1 0 01-1-1v-4a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4z"/></svg>홈</div>
+          <div class="bnav-item"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>달력</div>
+          <div class="bnav-item"><svg viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857"/><circle cx="12" cy="7" r="3"/></svg>모임</div>
+          <div class="bnav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21v-1a7 7 0 0114 0v1"/></svg>MY</div>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>🌅 오늘 뷰</strong> · 첫 진입 기본. 스트릭 + 이어읽기 + <strong>AI 독서토론 CTA</strong> + 넛지</div>
+    </div>
+
+    <!-- ═══ 1b. 읽는 중 탭 (순수 리스트) ═══ -->
+    <div class="phone-wrap">
+      <div class="phone-badge">② 홈 → 읽는 중 (리스트)</div>
+      <div class="phone">
+        <div class="header">
+          <img src="/logo-banggut.svg" class="header-mascot" alt="">
+          <div class="header-text">
+            <div class="header-greet">지금 <em>2권</em> 함께 읽는 중</div>
+            <div class="header-sub">한 권에 집중할까요?</div>
+          </div>
+          <div class="icon-btn">
+            <svg viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 00-4-5.7V5a2 2 0 00-4 0v.3A6 6 0 006 11v3.2c0 .5-.2 1-.6 1.4L4 17h5"/></svg>
+          </div>
+        </div>
+
+        <div class="htabs">
+          <div class="htab">오늘</div>
+          <div class="htab on">읽는 중<span class="htab-count">2</span></div>
+          <div class="htab">완독<span class="htab-count">12</span></div>
+          <div class="htab">위시<span class="htab-count">5</span></div>
+          <div class="htab">스크랩<span class="htab-count">8</span></div>
+        </div>
+
+        <!-- 정렬 -->
+        <div class="sort-row">
+          <div class="sort-chip on">최근 읽은 순</div>
+          <div class="sort-chip">진행률순</div>
+          <div class="sort-chip">추가순</div>
+        </div>
+
+        <!-- 책 카드 리스트 (AI 토론 버튼 내장) -->
+        <div style="padding:0 20px;display:flex;flex-direction:column;gap:12px">
+          <div style="background:var(--sf);border:0.5px solid var(--bd);border-radius:18px;padding:14px;cursor:pointer">
+            <div style="display:flex;gap:12px;margin-bottom:12px">
+              <div style="width:60px;height:86px;border-radius:7px;background:linear-gradient(135deg,#2d5a3f,#1a3a2a);color:#f4efe8;display:flex;align-items:flex-end;padding:5px;font-size:10px;font-weight:700;line-height:1.2;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,0.12)">작별하지<br>않는다</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:14px;font-weight:800;color:var(--tp);line-height:1.3;margin-bottom:2px">작별하지 않는다</div>
+                <div style="font-size:11px;color:var(--tm);margin-bottom:8px">한강 · 어제 읽음</div>
+                <div style="height:4px;background:color-mix(in srgb,var(--ac) 10%,var(--sf2));border-radius:2px;overflow:hidden;margin-bottom:4px"><div style="height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));width:72%"></div></div>
+                <div style="font-size:10.5px;color:var(--tm)"><span style="color:var(--ac);font-weight:700">245</span> / 340쪽 · <span style="color:var(--ac);font-weight:700">72%</span></div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button style="flex:1;padding:9px;border-radius:100px;background:var(--ac);color:var(--acc);font-size:12px;font-weight:700;border:none;cursor:pointer">이어 읽기</button>
+              <button style="padding:9px 12px;border-radius:100px;background:var(--bg);border:0.5px solid var(--bd2);color:var(--ac);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px">💬 토론</button>
+              <button style="width:36px;height:36px;border-radius:50%;background:var(--bg);border:0.5px solid var(--bd2);color:var(--tm);cursor:pointer">⋯</button>
+            </div>
+          </div>
+
+          <div style="background:var(--sf);border:0.5px solid var(--bd);border-radius:18px;padding:14px;cursor:pointer">
+            <div style="display:flex;gap:12px;margin-bottom:12px">
+              <div style="width:60px;height:86px;border-radius:7px;background:linear-gradient(135deg,#8a6030,#4a3020);color:#f4efe8;display:flex;align-items:flex-end;padding:5px;font-size:10px;font-weight:700;line-height:1.2;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,0.12)">이기적<br>유전자</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:14px;font-weight:800;color:var(--tp);line-height:1.3;margin-bottom:2px">이기적 유전자</div>
+                <div style="font-size:11px;color:var(--tm);margin-bottom:8px">리처드 도킨스 · 3일 전</div>
+                <div style="height:4px;background:color-mix(in srgb,var(--ac) 10%,var(--sf2));border-radius:2px;overflow:hidden;margin-bottom:4px"><div style="height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));width:34%"></div></div>
+                <div style="font-size:10.5px;color:var(--tm)"><span style="color:var(--ac);font-weight:700">118</span> / 348쪽 · <span style="color:var(--ac);font-weight:700">34%</span></div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button style="flex:1;padding:9px;border-radius:100px;background:var(--bg);border:0.5px solid var(--bd2);color:var(--ac);font-size:12px;font-weight:700;cursor:pointer">다시 읽기</button>
+              <button style="padding:9px 12px;border-radius:100px;background:var(--bg);border:0.5px solid var(--bd2);color:var(--ac);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px">💬 토론</button>
+              <button style="width:36px;height:36px;border-radius:50%;background:var(--bg);border:0.5px solid var(--bd2);color:var(--tm);cursor:pointer">⋯</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="fab">+</div>
+        <div class="bnav">
+          <div class="bnav-item on"><svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m10-11v10a1 1 0 01-1 1h-3"/></svg>홈</div>
+          <div class="bnav-item"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>달력</div>
+          <div class="bnav-item"><svg viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857"/><circle cx="12" cy="7" r="3"/></svg>모임</div>
+          <div class="bnav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21v-1a7 7 0 0114 0v1"/></svg>MY</div>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>📖 순수 책 리스트</strong> · 각 책 카드에 <strong>[이어읽기] [💬 토론] [⋯]</strong> 3버튼. AI 토론 즉시 시작</div>
+    </div>
+
+    <!-- ═══ 1c. AI 토론 화면 ═══ -->
+    <div class="phone-wrap">
+      <div class="phone-badge">③ AI 독서토론</div>
+      <div class="phone">
+        <div style="padding:44px 16px 14px;display:flex;align-items:center;gap:10px;border-bottom:0.5px solid var(--bd)">
+          <div style="width:34px;height:34px;border-radius:50%;background:var(--sf);display:flex;align-items:center;justify-content:center;cursor:pointer">←</div>
+          <div style="flex:1">
+            <div style="font-family:'Gaegu',cursive;font-size:14px;font-weight:700;color:var(--tp);letter-spacing:0.02em;line-height:1.2">작별하지 않는다</div>
+            <div style="font-size:10.5px;color:var(--tm);display:flex;align-items:center;gap:4px">
+              <span style="display:inline-block;padding:1px 6px;border-radius:100px;background:color-mix(in srgb,var(--ac) 12%,transparent);color:var(--ac);font-size:9px;font-weight:700">소크라테스식</span>
+              p.142 구절 · 3분째
+            </div>
+          </div>
+          <div style="width:34px;height:34px;border-radius:50%;background:var(--sf);display:flex;align-items:center;justify-content:center;cursor:pointer">⋮</div>
+        </div>
+
+        <!-- 인용된 구절 -->
+        <div style="margin:14px 16px 0;padding:14px;background:color-mix(in srgb,var(--ac) 7%,var(--sf));border-left:3px solid var(--ac);border-radius:12px">
+          <div style="font-size:9px;font-weight:700;color:var(--ac);letter-spacing:0.5px;margin-bottom:6px">💬 이 구절로 시작한 대화</div>
+          <div style="font-family:'Gaegu',cursive;font-size:13px;color:var(--tp);line-height:1.6;font-style:italic">"우리는 서로의 눈을 보며 알고 있었다, 이것이 마지막이 아니라는 것을."</div>
+          <div style="font-size:10px;color:var(--tm);margin-top:6px">한강 · p.142</div>
+        </div>
+
+        <!-- 채팅 메시지들 -->
+        <div style="padding:16px 16px 80px;display:flex;flex-direction:column;gap:14px">
+          <!-- AI (방긋이) -->
+          <div style="display:flex;gap:8px;align-items:flex-start">
+            <img src="/logo-banggut.svg" style="width:28px;height:28px;flex-shrink:0" alt="">
+            <div style="flex:1">
+              <div style="font-size:10px;font-weight:700;color:var(--ac);margin-bottom:3px">방긋이</div>
+              <div style="padding:10px 13px;background:var(--sf);border-radius:14px 14px 14px 4px;font-size:12.5px;color:var(--tp);line-height:1.55">이 구절이 유독 마음에 남으신 이유가 있을까요? 어떤 순간이 떠올랐는지 먼저 들어볼게요.</div>
+            </div>
+          </div>
+
+          <!-- 유저 -->
+          <div style="display:flex;justify-content:flex-end">
+            <div style="max-width:78%;padding:10px 13px;background:var(--ac);color:var(--acc);border-radius:14px 14px 4px 14px;font-size:12.5px;line-height:1.55">이별을 앞두고도 마지막이 아니라고 서로 확신할 수 있다는 게 묘하게 위로가 됐어요.</div>
+          </div>
+
+          <!-- AI -->
+          <div style="display:flex;gap:8px;align-items:flex-start">
+            <img src="/logo-banggut.svg" style="width:28px;height:28px;flex-shrink:0" alt="">
+            <div style="flex:1">
+              <div style="padding:10px 13px;background:var(--sf);border-radius:14px 14px 14px 4px;font-size:12.5px;color:var(--tp);line-height:1.55">위로라는 단어가 흥미롭네요. 이별이 위로가 된다는 건 조금 역설적이잖아요. 지선님에게 "마지막이 아니다"는 말은 어떤 감각이에요?</div>
+              <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+                <button style="padding:6px 11px;border-radius:100px;background:color-mix(in srgb,var(--ac) 8%,var(--bg));border:0.5px solid var(--bd2);color:var(--ts);font-size:11px;font-weight:600;cursor:pointer">기다림 같아요</button>
+                <button style="padding:6px 11px;border-radius:100px;background:color-mix(in srgb,var(--ac) 8%,var(--bg));border:0.5px solid var(--bd2);color:var(--ts);font-size:11px;font-weight:600;cursor:pointer">기억이요</button>
+                <button style="padding:6px 11px;border-radius:100px;background:color-mix(in srgb,var(--ac) 8%,var(--bg));border:0.5px solid var(--bd2);color:var(--ts);font-size:11px;font-weight:600;cursor:pointer">직접 입력</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 채팅 입력 -->
+        <div style="position:absolute;bottom:70px;left:0;right:0;padding:10px 16px;background:rgba(247,243,237,0.95);backdrop-filter:blur(12px);border-top:0.5px solid var(--bd);display:flex;gap:8px;align-items:center">
+          <div style="width:34px;height:34px;border-radius:50%;background:var(--sf);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--tm);cursor:pointer">✏️</div>
+          <input type="text" placeholder="답해보세요" style="flex:1;height:36px;padding:0 14px;border-radius:100px;background:var(--sf);border:0.5px solid var(--bd);color:var(--tp);font-size:12px;outline:none;font-family:inherit">
+          <div style="width:34px;height:34px;border-radius:50%;background:var(--ac);color:var(--acc);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;font-weight:700">→</div>
+        </div>
+
+        <div class="bnav">
+          <div class="bnav-item on"><svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9"/></svg>홈</div>
+          <div class="bnav-item"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/></svg>달력</div>
+          <div class="bnav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="3"/></svg>모임</div>
+          <div class="bnav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/></svg>MY</div>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>💬 AI 독서토론</strong> · 방긋 킥. 구절 인용 → 소크라테스식 질문 → 제안 버튼 → 깊이 있는 대화</div>
+    </div>
+
+    <!-- ═══ 완독 탭 ═══ -->
+    <div class="phone-wrap">
+      <div class="phone-badge">④ 홈 → 완독 (인스타)</div>
+      <div class="phone">
+        <div class="header">
+          <img src="/logo-banggut.svg" class="header-mascot" alt="">
+          <div class="header-text">
+            <div class="header-greet">안녕, <em>지선</em>님</div>
+            <div class="header-sub">12권의 여정</div>
+          </div>
+          <div class="icon-btn">
+            <svg viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 00-4-5.7V5a2 2 0 00-4 0v.3A6 6 0 006 11v3.2c0 .5-.2 1-.6 1.4L4 17h5"/><path d="M9 17a3 3 0 006 0"/></svg>
+          </div>
+        </div>
+
+        <div class="htabs">
+          <div class="htab">오늘</div>
+          <div class="htab">읽는 중<span class="htab-count">2</span></div>
+          <div class="htab on">완독<span class="htab-count">12</span></div>
+          <div class="htab">위시<span class="htab-count">5</span></div>
+          <div class="htab">스크랩<span class="htab-count">8</span></div>
+        </div>
+
+        <!-- 인스타 프로필 -->
+        <div class="insta-bio">
+          <div class="insta-avatar">
+            <img src="/logo-banggut.svg" alt="">
+          </div>
+          <div class="insta-info">
+            <div class="insta-stats">
+              <div class="insta-stat"><div class="insta-stat-v">12</div><div class="insta-stat-l">완독</div></div>
+              <div class="insta-stat"><div class="insta-stat-v">★ 4.6</div><div class="insta-stat-l">평균</div></div>
+              <div class="insta-stat"><div class="insta-stat-v">3</div><div class="insta-stat-l">인생책</div></div>
+            </div>
+            <div class="insta-caption">2026년 <em>12권째</em> · 올해 목표 24권</div>
+          </div>
+        </div>
+
+        <!-- 정렬 -->
+        <div class="sort-row">
+          <div class="sort-chip on">최근순</div>
+          <div class="sort-chip">별점순</div>
+          <div class="sort-chip">제목순</div>
+          <div class="sort-chip">♥ 인생책</div>
+        </div>
+
+        <!-- 인스타 그리드 -->
+        <div class="insta-grid">
+          <div class="insta-cell" style="background:linear-gradient(135deg,#2d5a3f,#1a3a2a)"><span class="badge badge-heart">♥ ★5</span><div class="overlay"></div>작별하지<br>않는다</div>
+          <div class="insta-cell" style="background:linear-gradient(135deg,#8a6030,#4a3020)"><span class="badge">★ 4.5</span><div class="overlay"></div>이기적<br>유전자</div>
+          <div class="insta-cell" style="background:linear-gradient(135deg,#7a4090,#3a1a5a)"><span class="badge badge-heart">♥ ★5</span><div class="overlay"></div>달러구트<br>꿈 백화점</div>
+          <div class="insta-cell" style="background:linear-gradient(135deg,#4a80b8,#2a4a80)"><span class="badge">★ 4.0</span><div class="overlay"></div>사피엔스</div>
+          <div class="insta-cell" style="background:linear-gradient(135deg,#b8606a,#804050)"><span class="badge">★ 4.5</span><div class="overlay"></div>아몬드</div>
+          <div class="insta-cell" style="background:linear-gradient(135deg,#c89060,#806040)"><span class="badge badge-heart">♥ ★5</span><div class="overlay"></div>보건교사<br>안은영</div>
+          <div class="insta-cell" style="background:linear-gradient(135deg,#6aa890,#4a8070)"><span class="badge">★ 4.0</span><div class="overlay"></div>연금술사</div>
+          <div class="insta-cell" style="background:linear-gradient(135deg,#d0904a,#a06020)"><span class="badge">★ 5.0</span><div class="overlay"></div>나미야<br>잡화점</div>
+          <div class="insta-cell" style="background:linear-gradient(135deg,#5a5a8a,#2a2a5a)"><span class="badge">★ 4.5</span><div class="overlay"></div>미드나잇<br>라이브러리</div>
+          <div class="insta-cell" style="background:linear-gradient(135deg,#3a6a5a,#1a4030)"><span class="badge">★ 4.0</span><div class="overlay"></div>호밀밭의<br>파수꾼</div>
+          <div class="insta-cell" style="background:linear-gradient(135deg,#7a5030,#4a2810)"><span class="badge">★ 4.5</span><div class="overlay"></div>위대한<br>개츠비</div>
+          <div class="insta-cell" style="background:linear-gradient(135deg,#6a3050,#3a1028)"><span class="badge">★ 5.0</span><div class="overlay"></div>채식주의자</div>
+        </div>
+
+        <div class="bnav">
+          <div class="bnav-item on"><svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m10-11v10a1 1 0 01-1 1h-3"/></svg>홈</div>
+          <div class="bnav-item"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>달력</div>
+          <div class="bnav-item"><svg viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857"/><circle cx="12" cy="7" r="3"/></svg>모임</div>
+          <div class="bnav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21v-1a7 7 0 0114 0v1"/></svg>MY</div>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>🖼 전시·자랑</strong> · 인스타 프로필 헤더 + 3칸 그리드 + 별점/♥ 뱃지 + 정렬 칩</div>
+    </div>
+
+    <!-- ═══ 위시 탭 ═══ -->
+    <div class="phone-wrap">
+      <div class="phone-badge">⑤ 홈 → 위시 (인스타)</div>
+      <div class="phone">
+        <div class="header">
+          <img src="/logo-banggut.svg" class="header-mascot" alt="">
+          <div class="header-text">
+            <div class="header-greet">안녕, <em>지선</em>님</div>
+            <div class="header-sub">언젠가 같이 읽어요</div>
+          </div>
+          <div class="icon-btn">
+            <svg viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 00-4-5.7V5a2 2 0 00-4 0v.3A6 6 0 006 11v3.2c0 .5-.2 1-.6 1.4L4 17h5"/></svg>
+          </div>
+        </div>
+
+        <div class="htabs">
+          <div class="htab">오늘</div>
+          <div class="htab">읽는 중<span class="htab-count">2</span></div>
+          <div class="htab">완독<span class="htab-count">12</span></div>
+          <div class="htab on">위시<span class="htab-count">5</span></div>
+          <div class="htab">스크랩<span class="htab-count">8</span></div>
+        </div>
+
+        <!-- 위시 헤더 -->
+        <div class="insta-bio">
+          <div class="insta-avatar">
+            <img src="/logo-banggut.svg" alt="">
+          </div>
+          <div class="insta-info">
+            <div class="insta-stats">
+              <div class="insta-stat"><div class="insta-stat-v">5</div><div class="insta-stat-l">위시</div></div>
+              <div class="insta-stat"><div class="insta-stat-v">2</div><div class="insta-stat-l">곧 시작</div></div>
+              <div class="insta-stat"><div class="insta-stat-v">3</div><div class="insta-stat-l">장르</div></div>
+            </div>
+            <div class="insta-caption"><em>다음 책</em> 프로젝트 헤일메리 · 내일부터</div>
+          </div>
+        </div>
+
+        <!-- 정렬 -->
+        <div class="sort-row">
+          <div class="sort-chip on">시작 예정순</div>
+          <div class="sort-chip">추가순</div>
+          <div class="sort-chip">장르별</div>
+        </div>
+
+        <!-- 위시 그리드 -->
+        <div class="insta-grid">
+          <div class="insta-cell" style="background:linear-gradient(135deg,#6a5a40,#3a2a10)"><span class="badge badge-plan">📅 D-1</span><div class="overlay"></div>프로젝트<br>헤일메리</div>
+          <div class="insta-cell" style="background:linear-gradient(135deg,#3a6a5a,#1a4030)"><span class="badge badge-plan">📅 5/8</span><div class="overlay"></div>달에<br>관하여</div>
+          <div class="insta-cell" style="background:linear-gradient(135deg,#7a4090,#3a1a5a)"><span class="badge badge-plan">📅 5/15</span><div class="overlay"></div>나의<br>눈부신<br>친구</div>
+          <div class="insta-cell" style="background:linear-gradient(135deg,#b8606a,#804050)"><div class="overlay"></div>눈먼<br>자들의<br>도시</div>
+          <div class="insta-cell" style="background:linear-gradient(135deg,#4a80b8,#2a4a80)"><div class="overlay"></div>코스모스</div>
+        </div>
+
+        <div class="bnav">
+          <div class="bnav-item on"><svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m10-11v10a1 1 0 01-1 1h-3"/></svg>홈</div>
+          <div class="bnav-item"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>달력</div>
+          <div class="bnav-item"><svg viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857"/><circle cx="12" cy="7" r="3"/></svg>모임</div>
+          <div class="bnav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21v-1a7 7 0 0114 0v1"/></svg>MY</div>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>🌙 기대·계획</strong> · 위시 그리드 + 📅 시작예정 뱃지 + 시작예정순 정렬</div>
+    </div>
+
+    <!-- ═══ 스크랩 탭 ═══ -->
+    <div class="phone-wrap">
+      <div class="phone-badge">⑥ 홈 → 스크랩 (피드)</div>
+      <div class="phone">
+        <div class="header">
+          <img src="/logo-banggut.svg" class="header-mascot" alt="">
+          <div class="header-text">
+            <div class="header-greet">내가 <em>그은</em> 문장</div>
+            <div class="header-sub">8개의 순간들</div>
+          </div>
+          <div class="icon-btn">
+            <svg viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 00-4-5.7V5a2 2 0 00-4 0v.3A6 6 0 006 11v3.2c0 .5-.2 1-.6 1.4L4 17h5"/></svg>
+          </div>
+        </div>
+
+        <div class="htabs">
+          <div class="htab">오늘</div>
+          <div class="htab">읽는 중<span class="htab-count">2</span></div>
+          <div class="htab">완독<span class="htab-count">12</span></div>
+          <div class="htab">위시<span class="htab-count">5</span></div>
+          <div class="htab on">스크랩<span class="htab-count">8</span></div>
+        </div>
+
+        <!-- 정렬 -->
+        <div class="sort-row">
+          <div class="sort-chip on">최근순</div>
+          <div class="sort-chip">책별</div>
+          <div class="sort-chip">♥ 좋아한 순</div>
+        </div>
+
+        <!-- 스크랩 피드 -->
+        <div class="scrap-item">
+          <div class="scrap-quote">우리는 서로의 눈을 보며 알고 있었다, 이것이 마지막이 아니라는 것을.</div>
+          <div class="scrap-meta">
+            <div><em>작별하지 않는다</em> · 한강 · p.142 · 오늘</div>
+            <div class="scrap-actions">
+              <span class="scrap-action liked"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg> 3</span>
+              <span class="scrap-action"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="scrap-item">
+          <div class="scrap-quote">그 뒤로 여러 해가 지났지만, 나는 여전히 그 겨울의 빛을 기억한다.</div>
+          <div class="scrap-meta">
+            <div><em>작별하지 않는다</em> · 한강 · p.98 · 어제</div>
+            <div class="scrap-actions">
+              <span class="scrap-action"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></span>
+              <span class="scrap-action"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8"/></svg> 1</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="scrap-item">
+          <div class="scrap-quote">슬픔은 슬픔의 힘으로만 견딜 수 있는 것이었다.</div>
+          <div class="scrap-meta">
+            <div><em>작별하지 않는다</em> · 한강 · p.53 · 4월 12일</div>
+            <div class="scrap-actions">
+              <span class="scrap-action liked"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg> 4</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="scrap-item">
+          <div class="scrap-quote">아무것도 태우지 않고 어떻게 빛을 낼 수 있을까.</div>
+          <div class="scrap-meta">
+            <div><em>이기적 유전자</em> · 도킨스 · p.76 · 4월 10일</div>
+          </div>
+        </div>
+
+        <div class="bnav">
+          <div class="bnav-item on"><svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m10-11v10a1 1 0 01-1 1h-3"/></svg>홈</div>
+          <div class="bnav-item"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>달력</div>
+          <div class="bnav-item"><svg viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857"/><circle cx="12" cy="7" r="3"/></svg>모임</div>
+          <div class="bnav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21v-1a7 7 0 0114 0v1"/></svg>MY</div>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>📝 내 문장 아카이브</strong> · 개구체 인용 + 책 출처 + ♥ 좋아요 카운트</div>
+    </div>
+
+    <!-- ═══ 달력 탭 ═══ -->
+    <div class="phone-wrap">
+      <div class="phone-badge">⑦ 달력 탭 (별도 허브)</div>
+      <div class="phone">
+        <div class="header">
+          <img src="/logo-banggut.svg" class="header-mascot" alt="">
+          <div class="header-text">
+            <div class="header-greet">나의 <em>독서 달력</em></div>
+            <div class="header-sub">2026년 4월 · 15일 읽음</div>
+          </div>
+          <div class="icon-btn">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </div>
+        </div>
+
+        <!-- 풀 캘린더 -->
+        <div class="cal-hero">
+          <div class="cal-hero-top">
+            <div>
+              <div class="cal-month">4월</div>
+              <div class="cal-year">2026</div>
+            </div>
+            <div class="cal-nav">
+              <div class="cal-nav-btn">‹</div>
+              <div class="cal-nav-btn">›</div>
+            </div>
+          </div>
+          <div class="cal-grid">
+            <div class="cal-dow sun">일</div><div class="cal-dow">월</div><div class="cal-dow">화</div><div class="cal-dow">수</div><div class="cal-dow">목</div><div class="cal-dow">금</div><div class="cal-dow">토</div>
+            <div class="cal-cell other">30</div><div class="cal-cell other">31</div>
+            <div class="cal-cell read">1</div><div class="cal-cell read">2</div><div class="cal-cell">3</div><div class="cal-cell read">4</div><div class="cal-cell read">5</div>
+            <div class="cal-cell read" style="color:var(--rose);background:color-mix(in srgb,var(--rose) 12%, transparent)">6</div><div class="cal-cell">7</div><div class="cal-cell read">8</div><div class="cal-cell read">9</div><div class="cal-cell read"><div class="dots"><div class="d meet"></div></div>10</div><div class="cal-cell">11</div><div class="cal-cell">12</div>
+            <div class="cal-cell read" style="color:var(--rose);background:color-mix(in srgb,var(--rose) 12%, transparent)">13</div><div class="cal-cell streak">14</div><div class="cal-cell streak">15</div><div class="cal-cell streak">16</div><div class="cal-cell streak">17</div><div class="cal-cell streak"><div class="dots"><div class="d meet"></div></div>18</div><div class="cal-cell streak">19</div>
+            <div class="cal-cell streak today">20</div><div class="cal-cell"><div class="dots"><div class="d plan"></div></div>21</div><div class="cal-cell">22</div><div class="cal-cell">23</div><div class="cal-cell"><div class="dots"><div class="d due"></div></div>24</div><div class="cal-cell"><div class="dots"><div class="d meet"></div></div>25</div><div class="cal-cell">26</div>
+            <div class="cal-cell">27</div><div class="cal-cell">28</div><div class="cal-cell">29</div><div class="cal-cell">30</div><div class="cal-cell other">1</div><div class="cal-cell other">2</div><div class="cal-cell other">3</div>
+          </div>
+          <!-- 월간 통계 -->
+          <div class="cal-stats">
+            <div class="cal-stat"><div class="cal-stat-v">15</div><div class="cal-stat-l">읽은 날</div></div>
+            <div class="cal-stat"><div class="cal-stat-v">7</div><div class="cal-stat-l">연속</div></div>
+            <div class="cal-stat"><div class="cal-stat-v">420p</div><div class="cal-stat-l">총 쪽수</div></div>
+          </div>
+        </div>
+
+        <!-- 다가오는 일정 -->
+        <div class="sec-label">
+          <div class="sec-title">📆 이번 주 일정</div>
+          <div class="sec-more">필터</div>
+        </div>
+        <div class="event-card">
+          <div class="event-date">
+            <div class="event-date-m">4월</div>
+            <div class="event-date-d">21</div>
+          </div>
+          <div class="event-body">
+            <div class="event-type plan">📅 시작 예정</div>
+            <div class="event-title">프로젝트 헤일메리</div>
+            <div class="event-sub">내일부터 읽기로 했어요</div>
+          </div>
+          <div class="event-arrow">→</div>
+        </div>
+        <div class="event-card">
+          <div class="event-date">
+            <div class="event-date-m">4월</div>
+            <div class="event-date-d">24</div>
+          </div>
+          <div class="event-body">
+            <div class="event-type due">🏛 반납일</div>
+            <div class="event-title">작별하지 않는다</div>
+            <div class="event-sub">양천도서관 · 4일 남음</div>
+          </div>
+          <div class="event-arrow">→</div>
+        </div>
+        <div class="event-card">
+          <div class="event-date">
+            <div class="event-date-m">4월</div>
+            <div class="event-date-d">25</div>
+          </div>
+          <div class="event-body">
+            <div class="event-type meet">💬 수요 독서 모임</div>
+            <div class="event-title">5회차 · 3장 토론</div>
+            <div class="event-sub">민지 · 서연 · 하은과</div>
+          </div>
+          <div class="event-arrow">→</div>
+        </div>
+
+        <!-- 지난 완독 -->
+        <div class="sec-label">
+          <div class="sec-title">🏆 이번 달 완독</div>
+          <div class="sec-more">2권</div>
+        </div>
+        <div class="other-row">
+          <div class="other-card">
+            <div class="other-cover" style="background:linear-gradient(135deg,#b8606a,#804050)">아몬드</div>
+            <div class="other-title">아몬드</div>
+            <div class="other-prog"><span>4/8 완독 · ★ 4.5</span></div>
+          </div>
+          <div class="other-card">
+            <div class="other-cover" style="background:linear-gradient(135deg,#c89060,#806040)">보건교사<br>안은영</div>
+            <div class="other-title">보건교사 안은영</div>
+            <div class="other-prog"><span>4/2 완독 · ★ 5.0</span></div>
+          </div>
+        </div>
+
+        <div class="bnav">
+          <div class="bnav-item"><svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m10-11v10a1 1 0 01-1 1h-3"/></svg>홈</div>
+          <div class="bnav-item on"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>달력</div>
+          <div class="bnav-item"><svg viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857"/><circle cx="12" cy="7" r="3"/></svg>모임</div>
+          <div class="bnav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21v-1a7 7 0 0114 0v1"/></svg>MY</div>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>📅 캘린더 허브</strong> · 전체 캘린더 + 월간 통계 3칸 + 다가오는 일정 + 이번 달 완독</div>
+    </div>
+
+  </div>
+
+  <div class="note">
+    <div class="note-title">🎯 최종 구조 정리</div>
+
+    <h4>🏠 홈 (탭 4개)</h4>
+    <strong>① 읽는 중</strong> · 행동 — 미니 heatmap + 이어읽기 히어로 + 다른 책 + 넛지<br>
+    <strong>② 완독</strong> · 인스타 전시 — 프로필 헤더 + 3칸 그리드 + 별점/♥ 뱃지<br>
+    <strong>③ 위시</strong> · 인스타 기대 — 시작예정 뱃지 + 정렬<br>
+    <strong>④ 스크랩</strong> · 내 문장 피드 — 개구체 인용 + 좋아요
+
+    <h4>📅 달력 (하단 내비 별도 탭)</h4>
+    전체 캘린더 + 스트릭 heatmap + 월간 통계 + 다가오는 일정 + 이번 달 완독<br>
+    → 홈 읽는중 탭의 미니 heatmap에서 <strong>"달력 열기 →"</strong>로 이동
+
+    <h4>🗂 하단 내비 4개</h4>
+    <strong>홈 · 달력 · 모임 · MY</strong> (깔끔)
+
+    <h4>➕ FAB (홈에만)</h4>
+    플로팅 + 버튼 → 책 추가/검색 (setup 페이지)
+
+    <br>
+    <strong>OK면 실제 코드에 이 구조 그대로 적용할게요!</strong>
+  </div>
+</div>
+</body>
+</html>

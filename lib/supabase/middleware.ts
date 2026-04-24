@@ -25,16 +25,22 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  } catch (e) {
+    console.error("[middleware] auth check failed:", e);
+    // Let request through — auth-guard will handle it
+  }
 
   const isOnboarding = request.nextUrl.pathname.startsWith("/onboarding");
   const isAuthCallback = request.nextUrl.pathname.startsWith("/auth");
   const isApi = request.nextUrl.pathname.startsWith("/api");
+  const isInvite = request.nextUrl.pathname.startsWith("/invite");
 
-  // 미로그인 → 온보딩으로
-  if (!user && !isOnboarding && !isAuthCallback && !isApi) {
+  // 미로그인 → 온보딩으로 (단, /invite는 비로그인도 볼 수 있음)
+  if (!user && !isOnboarding && !isAuthCallback && !isApi && !isInvite) {
     const url = request.nextUrl.clone();
     url.pathname = "/onboarding";
     return NextResponse.redirect(url);

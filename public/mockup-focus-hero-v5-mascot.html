@@ -1,0 +1,1170 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>완독콩 · 포커스 히어로 v5 — 방긋이 마스코트 통합</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;0,900;1,700&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<style>
+  :root {
+    --bg:        #F5EEDE;
+    --paper:     #FFFDF6;
+    --paper2:    #FBF4DF;
+    --ink:       #2B2420;
+    --ink-soft:  #5A4A3C;
+    --ink-mute:  #8A7862;
+    --bd:        #E7D9B6;
+    --bd2:       #F0E3C2;
+
+    --kong:      #B07A4B;
+    --kong-deep: #5A3F28;
+    --kong-soft: #EED8B6;
+
+    --honey:     #F0B742;
+    --honey-soft:#FFE8A8;
+    --honey-bg:  #FFF4C7;
+
+    --mint:      #6FC0A0;
+    --mint-soft: #CFE9DA;
+    --mint-bg:   #DFF2E6;
+
+    --peach:     #F4A07D;
+    --peach-soft:#FFD9C0;
+    --peach-bg:  #FFE4D2;
+
+    --rose:      #E8948E;
+    --rose-soft: #F7CFC9;
+
+    --sage:      #9AB97D;
+    --sage-soft: #D4E4BB;
+
+    --lav:       #B7A8DD;
+    --lav-soft:  #DCD3F0;
+
+    --shadow-stick:    3px 4px 0 rgba(43,36,32,.14);
+    --shadow-stick-lg: 4px 5px 0 rgba(43,36,32,.16);
+    --shadow-soft:     0 8px 24px rgba(43,36,32,.08);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, system-ui, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(#E1D3B0 1.2px, transparent 1.2px) 0 0 / 22px 22px,
+      linear-gradient(180deg, #F8F1DF 0%, #F2E8CE 100%);
+    min-height: 100vh;
+    padding: 48px 24px 80px;
+    letter-spacing: -0.01em;
+  }
+
+  .page { max-width: 1280px; margin: 0 auto; }
+
+  /* ═══ Header ═══ */
+  .page-hd { text-align: center; margin-bottom: 36px; }
+  .page-hd .kicker {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 14px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 100px;
+    font-family: 'Gaegu', cursive;
+    font-size: 15px;
+    transform: rotate(-2deg);
+    box-shadow: var(--shadow-stick);
+    margin-bottom: 14px;
+  }
+  .page-hd h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 42px;
+    letter-spacing: -0.02em;
+    margin: 0 0 8px;
+    line-height: 1.1;
+  }
+  .page-hd h1 em {
+    font-style: italic;
+    font-weight: 700;
+    color: var(--kong-deep);
+  }
+  .page-hd p {
+    color: var(--ink-soft);
+    font-size: 15px;
+    margin: 0;
+    line-height: 1.55;
+  }
+  .team-note {
+    max-width: 780px;
+    margin: 20px auto 0;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    padding: 16px 20px;
+    box-shadow: var(--shadow-stick-lg);
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    transform: rotate(-0.4deg);
+  }
+  .team-note b { color: var(--ink); }
+
+  /* ═══ Mascot legend (v5 전용) ═══ */
+  .legend {
+    max-width: 840px;
+    margin: 28px auto 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .legend-card {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: var(--shadow-stick);
+  }
+  .legend-card .pose {
+    width: 52px; height: 52px;
+    background: var(--paper2);
+    border: 1.5px solid var(--bd);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .legend-card .pose img { width: 90%; height: 90%; object-fit: contain; }
+  .legend-card .txt { flex: 1; min-width: 0; }
+  .legend-card .label {
+    font-family: 'Gaegu', cursive;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--kong-deep);
+    margin-bottom: 2px;
+  }
+  .legend-card .name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  /* ═══ Phones ═══ */
+  .phones {
+    display: flex;
+    gap: 44px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 54px;
+  }
+
+  .phone-wrap { width: 360px; position: relative; }
+
+  .phone-tag {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-2deg);
+    background: var(--kong-deep);
+    color: var(--honey-soft);
+    font-family: 'Gaegu', cursive;
+    font-size: 14px;
+    padding: 4px 14px;
+    border-radius: 100px;
+    font-weight: 700;
+    box-shadow: var(--shadow-stick);
+    white-space: nowrap;
+    z-index: 3;
+  }
+
+  .phone {
+    width: 360px;
+    height: 812px;
+    background: #FAF4E4;
+    border-radius: 44px;
+    border: 10px solid #2B2420;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 22px 48px rgba(43,36,32,.18), 0 4px 12px rgba(43,36,32,.08);
+  }
+
+  .phone::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(#E5D6B1 1px, transparent 1px);
+    background-size: 18px 18px;
+    opacity: 0.55;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .phone::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 110px;
+    height: 24px;
+    background: #2B2420;
+    border-radius: 100px;
+    z-index: 10;
+  }
+
+  .screen {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    padding: 44px 18px 18px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ═══ Status bar ═══ */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink);
+    padding: 0 14px;
+    margin-bottom: 10px;
+  }
+  .status-bar .time { font-family: 'Fraunces', serif; font-size: 13px; font-weight: 700; }
+  .status-bar .icons { display: flex; gap: 5px; align-items: center; }
+
+  /* ═══ Top bar ═══ */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 2px 12px;
+  }
+  .topbar .back,
+  .topbar .more {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    box-shadow: var(--shadow-stick);
+    color: var(--ink);
+    font-size: 15px;
+    cursor: pointer;
+  }
+  .topbar .title {
+    font-family: 'Gaegu', cursive;
+    font-size: 14px;
+    color: var(--ink-soft);
+    transform: rotate(-1deg);
+  }
+
+  /* ═══ Book strip ═══ */
+  .book-strip {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px 12px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    margin: 0 2px 14px;
+    box-shadow: var(--shadow-stick);
+    transform: rotate(-0.6deg);
+  }
+  .book-strip .cover {
+    width: 40px; height: 56px;
+    background: linear-gradient(150deg, #7B9B6E 0%, #4E6D50 100%);
+    border-radius: 4px;
+    border: 1.5px solid var(--ink);
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .book-strip .cover::after {
+    content: '';
+    position: absolute;
+    left: 3px; top: 0; bottom: 0;
+    width: 2px;
+    background: rgba(255,255,255,0.18);
+  }
+  .book-strip .meta { flex: 1; min-width: 0; }
+  .book-strip .t {
+    font-size: 13px; font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .book-strip .a { font-size: 11px; color: var(--ink-mute); }
+  .book-strip .pgs {
+    font-family: 'Fraunces', serif;
+    font-size: 12px;
+    color: var(--kong-deep);
+    font-weight: 700;
+    padding: 3px 8px;
+    background: var(--honey-bg);
+    border: 1.5px solid var(--ink);
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+
+  /* ═══ Focus hero ═══ */
+  .focus-hero {
+    position: relative;
+    background: var(--paper);
+    border: 2.5px solid var(--ink);
+    border-radius: 24px;
+    padding: 22px 18px 20px;
+    box-shadow: var(--shadow-stick-lg);
+    margin-bottom: 14px;
+  }
+
+  .deco-emoji {
+    position: absolute;
+    font-size: 16px;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .focus-hero .mode-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    background: var(--kong-deep);
+    color: var(--honey-soft);
+    border-radius: 100px;
+    font-family: 'Gaegu', cursive;
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    transform: rotate(-2deg);
+    box-shadow: var(--shadow-stick);
+  }
+  .focus-hero .headline {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+    margin: 4px 0 14px;
+  }
+  .focus-hero .headline em {
+    font-style: italic;
+    font-weight: 700;
+    color: var(--kong-deep);
+  }
+
+  /* ═══ Timer + Mascot stage ═══ */
+  .stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0 14px;
+    position: relative;
+  }
+
+  .ring-wrap {
+    position: relative;
+    width: 210px;
+    height: 210px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ring-svg { position: absolute; inset: 0; }
+  .ring-svg circle.bg { fill: none; stroke: var(--bd2); stroke-width: 8; }
+  .ring-svg circle.fg {
+    fill: none; stroke-width: 8; stroke-linecap: round;
+    transform: rotate(-90deg); transform-origin: center;
+  }
+  .ring-svg circle.fg.idle   { stroke: var(--honey); }
+  .ring-svg circle.fg.run    { stroke: var(--mint); animation: breathe 4s ease-in-out infinite; }
+  .ring-svg circle.fg.done   { stroke: var(--sage); }
+
+  /* ═══ 마스코트 (방긋이) ═══ */
+  .mascot {
+    width: 112px;
+    height: 112px;
+    object-fit: contain;
+    filter: drop-shadow(2px 3px 0 rgba(43,36,32,.12));
+    position: relative;
+    z-index: 2;
+    user-select: none;
+  }
+  .mascot.bob   { animation: bob 3.2s ease-in-out infinite; }
+  .mascot.breath { animation: breath 4s ease-in-out infinite; transform-origin: center bottom; }
+  .mascot.cheer  { animation: cheer 2.4s ease-in-out infinite; transform-origin: center bottom; }
+
+  .timer-num {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 28px;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    line-height: 1;
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--paper);
+    padding: 5px 14px;
+    border: 2px solid var(--ink);
+    border-radius: 100px;
+    box-shadow: var(--shadow-stick);
+    z-index: 3;
+    white-space: nowrap;
+  }
+  .timer-num.bottom {
+    top: auto;
+    bottom: -8px;
+  }
+
+  /* ═══ Sticker row ═══ */
+  .stickers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    justify-content: center;
+    margin-top: 4px;
+  }
+
+  .sticker {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 11px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    box-shadow: var(--shadow-stick);
+    color: var(--ink);
+    white-space: nowrap;
+    letter-spacing: -0.01em;
+  }
+  .sticker b {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    color: var(--ink);
+    font-size: 13px;
+  }
+  .sticker .ico { font-size: 12px; }
+  .sticker.honey { background: var(--honey-bg); }
+  .sticker.mint  { background: var(--mint-bg); }
+  .sticker.peach { background: var(--peach-bg); }
+  .sticker.sage  { background: var(--sage-soft); }
+  .sticker.kong  { background: var(--kong-soft); }
+  .sticker.rose  { background: var(--rose-soft); }
+
+  .sticker.r-neg   { transform: rotate(-3deg); }
+  .sticker.r-zero  { transform: rotate(0deg); }
+  .sticker.r-pos   { transform: rotate(3deg); }
+  .sticker.r-neg1  { transform: rotate(-1.5deg); }
+  .sticker.r-pos1  { transform: rotate(1.5deg); }
+
+  .sticker.delta { gap: 4px; }
+  .sticker.delta .chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 6px;
+    background: var(--mint);
+    color: var(--paper);
+    border-radius: 100px;
+    font-family: 'Fraunces', serif;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .sticker.delta .chip.up { background: var(--mint); }
+  .sticker.delta .chip.down { background: var(--rose); }
+
+  /* ═══ CTA ═══ */
+  .cta {
+    margin-top: 12px;
+    width: 100%;
+    padding: 15px;
+    font-family: 'Pretendard Variable', Pretendard, sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    color: var(--paper);
+    background: var(--kong-deep);
+    border: 2.5px solid var(--ink);
+    border-radius: 18px;
+    box-shadow: var(--shadow-stick-lg);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    letter-spacing: -0.01em;
+    transition: transform .12s ease;
+  }
+  .cta:hover { transform: translate(-1px,-1px); }
+
+  .cta.pause { background: var(--honey); color: var(--ink); }
+  .cta.done  { background: var(--mint);  color: var(--ink); }
+  .cta .ico  { font-size: 18px; }
+
+  /* ═══ Calendar strip ═══ */
+  .cal-strip {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 18px;
+    padding: 14px 14px 12px;
+    box-shadow: var(--shadow-stick);
+    position: relative;
+  }
+  .cal-strip .hd {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 0 2px;
+  }
+  .cal-strip .hd .t {
+    font-family: 'Gaegu', cursive;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .cal-strip .hd .m {
+    font-size: 11px;
+    color: var(--ink-mute);
+    font-weight: 700;
+  }
+  .cal-strip .hd .m b {
+    color: var(--kong-deep);
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 13px;
+  }
+
+  .cal-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+  .day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .day .lbl {
+    font-family: 'Gaegu', cursive;
+    font-size: 11px;
+    color: var(--ink-mute);
+    font-weight: 700;
+  }
+  .day .dot {
+    width: 32px; height: 32px;
+    border-radius: 10px;
+    border: 2px solid var(--ink);
+    background: var(--paper2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink-mute);
+    position: relative;
+  }
+  /* ⭐ 도장 = 방긋이 미니 도장! */
+  .day .dot.read {
+    background: var(--mint-bg);
+    color: var(--ink);
+    overflow: visible;
+  }
+  .day .dot.read::before {
+    content: '';
+    position: absolute;
+    bottom: -5px; right: -5px;
+    width: 16px; height: 16px;
+    background-image: url('/mascot-happy.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: drop-shadow(1px 1px 0 rgba(43,36,32,.2));
+    transform: rotate(8deg);
+  }
+  .day .dot.today {
+    background: var(--honey-soft);
+    border-style: dashed;
+    color: var(--ink);
+    font-weight: 900;
+  }
+  .day .dot.today.fresh {
+    background: var(--sage);
+    border-style: solid;
+    color: var(--ink);
+    animation: pop 1.6s ease-in-out;
+  }
+  .day .dot.today.fresh::before {
+    content: '';
+    position: absolute;
+    bottom: -7px; right: -7px;
+    width: 22px; height: 22px;
+    background-image: url('/mascot-happy.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: drop-shadow(1.5px 2px 0 rgba(43,36,32,.22));
+    transform: rotate(-8deg);
+    animation: stamp 1.2s ease-out;
+  }
+  .day .min {
+    font-family: 'Gaegu', cursive;
+    font-size: 10px;
+    color: var(--mint);
+    font-weight: 700;
+  }
+  .day .min.muted { color: var(--ink-mute); opacity: 0.5; }
+
+  /* ═══ Reward card ═══ */
+  .reward {
+    background: var(--honey-bg);
+    border: 2.5px solid var(--ink);
+    border-radius: 22px;
+    padding: 18px 16px;
+    box-shadow: var(--shadow-stick-lg);
+    margin-bottom: 14px;
+    position: relative;
+    overflow: visible;
+  }
+  .reward .row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .reward .bean-prize {
+    width: 72px; height: 72px;
+    background: var(--paper);
+    border: 2.5px solid var(--ink);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-stick);
+    transform: rotate(-6deg);
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .reward .bean-prize img {
+    width: 86%;
+    height: 86%;
+    object-fit: contain;
+    filter: drop-shadow(1px 1px 0 rgba(43,36,32,.1));
+  }
+  .reward .txt { flex: 1; min-width: 0; }
+  .reward .txt .top {
+    font-family: 'Gaegu', cursive;
+    font-size: 15px;
+    color: var(--ink-soft);
+    margin-bottom: 2px;
+  }
+  .reward .txt .big {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--ink);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+  .reward .txt .big em {
+    color: var(--kong-deep);
+    font-style: italic;
+  }
+  .reward .plus {
+    position: absolute;
+    top: -14px; right: 12px;
+    background: var(--sage);
+    border: 2.5px solid var(--ink);
+    border-radius: 100px;
+    padding: 4px 10px;
+    font-family: 'Fraunces', serif;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--ink);
+    transform: rotate(8deg);
+    box-shadow: var(--shadow-stick);
+  }
+
+  .page-input {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: var(--shadow-stick);
+  }
+  .page-input .lbl {
+    font-family: 'Gaegu', cursive;
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-weight: 700;
+    flex: 1;
+  }
+  .page-input .inp {
+    width: 52px;
+    padding: 6px 8px;
+    border: 1.5px solid var(--ink);
+    border-radius: 8px;
+    background: var(--paper2);
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+    text-align: center;
+  }
+  .page-input .suffix {
+    font-family: 'Gaegu', cursive;
+    font-size: 13px;
+    color: var(--ink-mute);
+  }
+
+  /* ═══ Animations ═══ */
+  @keyframes bob {
+    0%, 100% { transform: translateY(0) rotate(-1deg); }
+    50% { transform: translateY(-4px) rotate(1deg); }
+  }
+  @keyframes breath {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+  }
+  @keyframes cheer {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    20% { transform: translateY(-8px) rotate(3deg); }
+    40% { transform: translateY(-2px) rotate(-3deg); }
+    60% { transform: translateY(-6px) rotate(2deg); }
+    80% { transform: translateY(0) rotate(-1deg); }
+  }
+  @keyframes breathe {
+    0%, 100% { stroke-width: 8; opacity: 1; }
+    50% { stroke-width: 11; opacity: 0.7; }
+  }
+  @keyframes pop {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.25); box-shadow: 0 0 0 6px rgba(154, 185, 125, 0.35); }
+    100% { transform: scale(1); }
+  }
+  @keyframes stamp {
+    0% { transform: rotate(45deg) scale(0); opacity: 0; }
+    60% { transform: rotate(-16deg) scale(1.4); opacity: 1; }
+    100% { transform: rotate(-8deg) scale(1); opacity: 1; }
+  }
+  @keyframes zzz {
+    0% { transform: translate(0,0); opacity: 0; }
+    30% { opacity: 1; }
+    100% { transform: translate(10px,-12px); opacity: 0; }
+  }
+  .zz {
+    position: absolute;
+    font-family: 'Gaegu', cursive;
+    font-weight: 700;
+    color: var(--lav);
+    font-size: 16px;
+    animation: zzz 2.2s ease-in-out infinite;
+    pointer-events: none;
+  }
+  .zz.b { animation-delay: .8s; color: var(--mint); font-size: 13px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mascot.bob, .mascot.breath, .mascot.cheer,
+    .ring-svg circle.fg.run,
+    .day .dot.today.fresh,
+    .day .dot.today.fresh::before,
+    .zz { animation: none !important; }
+  }
+
+  /* ═══ Notes ═══ */
+  .notes {
+    max-width: 960px;
+    margin: 56px auto 0;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 18px;
+    padding: 22px 26px;
+    box-shadow: var(--shadow-stick-lg);
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--ink-soft);
+  }
+  .notes h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 17px;
+    color: var(--ink);
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+  }
+  .notes h4 {
+    font-family: 'Gaegu', cursive;
+    font-size: 15px;
+    color: var(--kong-deep);
+    margin: 18px 0 6px;
+  }
+  .notes code {
+    font-family: 'SF Mono', monospace;
+    background: var(--honey-bg);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--kong-deep);
+  }
+  .notes ul { margin: 4px 0 0 0; padding-left: 20px; }
+  .notes li { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ═══ Header ═══ -->
+  <header class="page-hd">
+    <div class="kicker">🌿 완독콩 · Focus Hero v5</div>
+    <h1>방긋이가 <em>도장</em> 찍으러 나왔어요</h1>
+    <p>v4 구조 그대로 · SVG 콩이 ➜ 방긋이 마스코트 PNG 교체 · 캘린더 도장은 방긋이 미니 스탬프</p>
+
+    <div class="team-note">
+      <b>v5에서 바뀐 것.</b>
+      v4의 인라인 SVG 콩이 자리에 <code style="font-family:monospace;font-size:11.5px;background:var(--honey-bg);padding:1px 5px;border-radius:4px;color:var(--kong-deep)">public/mascot-*.png</code>를 직접 써요.
+      시작 전은 <b>mascot-morning</b>, 집중 중은 <b>mascot-read</b>, 완료는 <b>mascot-happy</b>.
+      캘린더 사각 도트 오른쪽 아래에 <b>방긋이가 작게 스탬프</b>처럼 박혀요 — 완료 시엔 더 크고 회전하며 "펑!" 애니로 등장.
+    </div>
+
+    <div class="legend">
+      <div class="legend-card">
+        <div class="pose"><img src="/mascot-morning.png" alt="아침 방긋이"></div>
+        <div class="txt">
+          <div class="label">A · 시작 전</div>
+          <div class="name">mascot-morning.png</div>
+        </div>
+      </div>
+      <div class="legend-card">
+        <div class="pose"><img src="/mascot-read.png" alt="읽는 방긋이"></div>
+        <div class="txt">
+          <div class="label">B · 집중 중</div>
+          <div class="name">mascot-read.png</div>
+        </div>
+      </div>
+      <div class="legend-card">
+        <div class="pose"><img src="/mascot-happy.png" alt="기쁜 방긋이"></div>
+        <div class="txt">
+          <div class="label">C · 완료 + 도장</div>
+          <div class="name">mascot-happy.png</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="phones">
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- Phone A — IDLE                                             -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <div class="phone-wrap">
+      <div class="phone-tag">A · 시작 전 · 방긋이 아침</div>
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar">
+            <span class="time">09:41</span>
+            <span class="icons">●●● ●●●● 🔋</span>
+          </div>
+
+          <div class="topbar">
+            <div class="back" aria-label="뒤로가기">‹</div>
+            <div class="title">📖 이 책에 집중</div>
+            <div class="more" aria-label="더보기">⋯</div>
+          </div>
+
+          <div class="book-strip" role="group" aria-label="현재 책 정보">
+            <div class="cover" aria-hidden="true"></div>
+            <div class="meta">
+              <div class="t">한밤의 도서관</div>
+              <div class="a">매트 헤이그 · 236 / 384쪽</div>
+            </div>
+            <span class="pgs">61%</span>
+          </div>
+
+          <div class="focus-hero" style="overflow: visible;">
+            <span class="deco-emoji" style="top:10px;right:14px;transform:rotate(12deg)">🌼</span>
+            <span class="deco-emoji" style="bottom:76px;left:10px;font-size:14px;transform:rotate(-12deg)">✨</span>
+
+            <span class="mode-tag">⏱ 뽀모도로 25분</span>
+            <div class="headline">오늘도 한 장, <em>방긋이</em>랑 같이 읽어볼까요?</div>
+
+            <div class="stage">
+              <div class="ring-wrap" aria-label="25분 타이머 준비됨">
+                <svg class="ring-svg" viewBox="0 0 220 220">
+                  <circle class="bg" cx="110" cy="110" r="100" />
+                  <circle class="fg idle" cx="110" cy="110" r="100" stroke-dasharray="628" stroke-dashoffset="628" />
+                </svg>
+                <img class="mascot bob" src="/mascot-morning.png" alt="아침 인사하는 방긋이" />
+                <div class="timer-num bottom">25:00</div>
+              </div>
+            </div>
+
+            <button class="cta">
+              <span class="ico">▶</span>
+              <span>시작하기</span>
+            </button>
+          </div>
+
+          <div class="stickers" role="group" aria-label="이 책 독서 통계">
+            <span class="sticker mint r-neg" aria-label="오늘 읽은 시간 0분">
+              <span class="ico">🕐</span> 오늘 <b>0분</b>
+            </span>
+            <span class="sticker honey r-pos1" aria-label="이 책 총 집중 시간 2시간 35분">
+              <span class="ico">💛</span> 누적 <b>2h 35m</b>
+            </span>
+            <span class="sticker peach r-neg1" aria-label="현재 속도 기준 예상 완독일 3월 15일">
+              <span class="ico">🌿</span> 이 속도면 <b>3.15</b>쯤
+            </span>
+          </div>
+
+          <div class="cal-strip" style="margin-top: 14px;">
+            <div class="hd">
+              <span class="t">이번 주 · <span style="color:var(--kong-deep)">한밤의 도서관</span></span>
+              <span class="m"><b>4</b>/7일</span>
+            </div>
+            <div class="cal-days">
+              <div class="day"><span class="lbl">월</span><div class="dot read">18</div><span class="min">22분</span></div>
+              <div class="day"><span class="lbl">화</span><div class="dot read">19</div><span class="min">34분</span></div>
+              <div class="day"><span class="lbl">수</span><div class="dot">20</div><span class="min muted">·</span></div>
+              <div class="day"><span class="lbl">목</span><div class="dot read">21</div><span class="min">25분</span></div>
+              <div class="day"><span class="lbl">금</span><div class="dot read">22</div><span class="min">18분</span></div>
+              <div class="day"><span class="lbl">토</span><div class="dot today">23</div><span class="min muted">오늘</span></div>
+              <div class="day"><span class="lbl">일</span><div class="dot">24</div><span class="min muted">·</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- Phone B — RUNNING                                          -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <div class="phone-wrap">
+      <div class="phone-tag">B · 진행 중 · 방긋이 독서</div>
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar">
+            <span class="time">09:53</span>
+            <span class="icons">●●● ●●●● 🔋</span>
+          </div>
+
+          <div class="topbar">
+            <div class="back" aria-label="뒤로가기">‹</div>
+            <div class="title">🌿 집중 중이에요</div>
+            <div class="more" aria-label="더보기">⋯</div>
+          </div>
+
+          <div class="book-strip">
+            <div class="cover"></div>
+            <div class="meta">
+              <div class="t">한밤의 도서관</div>
+              <div class="a">매트 헤이그 · 236 / 384쪽</div>
+            </div>
+            <span class="pgs">61%</span>
+          </div>
+
+          <div class="focus-hero" style="overflow: visible;">
+            <span class="deco-emoji" style="top:10px;right:14px;font-size:18px">🌿</span>
+            <span class="deco-emoji" style="top:50px;right:30px;font-size:12px;transform:rotate(20deg)">✨</span>
+
+            <span class="mode-tag" style="background: var(--mint); color: var(--ink);">🌿 집중 중</span>
+            <div class="headline">조용조용, <em>12분 40초</em>째 몰입</div>
+
+            <div class="stage">
+              <div class="ring-wrap" aria-label="진행 중인 25분 타이머">
+                <svg class="ring-svg" viewBox="0 0 220 220">
+                  <circle class="bg" cx="110" cy="110" r="100" />
+                  <circle class="fg run" cx="110" cy="110" r="100"
+                    stroke-dasharray="628" stroke-dashoffset="314" />
+                </svg>
+                <img class="mascot breath" src="/mascot-read.png" alt="책을 읽는 방긋이" />
+                <span class="zz" style="top:14px;right:36px">z</span>
+                <span class="zz b" style="top:28px;right:22px">z</span>
+                <div class="timer-num bottom">12:20</div>
+              </div>
+            </div>
+
+            <div class="stickers" aria-label="라이브 통계">
+              <span class="sticker mint r-neg">
+                <span class="ico">🕐</span> 이번 세션 <b>12분째</b>
+              </span>
+              <span class="sticker honey r-pos1">
+                <span class="ico">💛</span> 누적 <b>2h 47m</b>
+              </span>
+            </div>
+
+            <button class="cta pause">
+              <span class="ico">⏸</span>
+              <span>잠깐 쉬기</span>
+            </button>
+          </div>
+
+          <div class="cal-strip" style="margin-top: 10px; background: var(--lav-soft);">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:36px;height:36px;background:var(--lav);border:2px solid var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🔕</div>
+              <div style="flex:1;font-family:'Gaegu',cursive;font-size:13px;color:var(--ink);line-height:1.4">
+                <b style="font-weight:700">방해 금지 중</b><br>
+                <span style="color:var(--ink-mute);font-size:12px">알림은 세션 끝나고 한꺼번에 보여드릴게요</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- Phone C — DONE                                             -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <div class="phone-wrap">
+      <div class="phone-tag">C · 완료 · 방긋이 도장 펑!</div>
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar">
+            <span class="time">10:18</span>
+            <span class="icons">●●● ●●●● 🔋</span>
+          </div>
+
+          <div class="topbar">
+            <div class="back" aria-label="뒤로가기">‹</div>
+            <div class="title">🎉 한 세션 완료!</div>
+            <div class="more" aria-label="더보기">⋯</div>
+          </div>
+
+          <div class="book-strip">
+            <div class="cover"></div>
+            <div class="meta">
+              <div class="t">한밤의 도서관</div>
+              <div class="a">매트 헤이그 · 261 / 384쪽</div>
+            </div>
+            <span class="pgs">68%</span>
+          </div>
+
+          <div class="reward">
+            <span class="plus">+1 🫘</span>
+            <span class="deco-emoji" style="top:12px;left:16px;font-size:20px;transform:rotate(-14deg)">🎉</span>
+            <span class="deco-emoji" style="bottom:14px;right:84px;font-size:16px;transform:rotate(20deg)">✨</span>
+            <div class="row">
+              <div class="bean-prize">
+                <img src="/mascot-happy.png" alt="기뻐하는 방긋이" />
+              </div>
+              <div class="txt">
+                <div class="top">25분 집중 성공!</div>
+                <div class="big"><em>콩알 1개</em> 획득 🫘</div>
+              </div>
+            </div>
+
+            <div class="page-input">
+              <span class="lbl">몇 쪽까지 봤어요?</span>
+              <span class="inp">261</span>
+              <span class="suffix">쪽 (+25)</span>
+            </div>
+          </div>
+
+          <div class="stickers" role="group" aria-label="이번 세션으로 업데이트된 통계">
+            <span class="sticker mint r-neg delta">
+              <span class="ico">🕐</span> 오늘 <b>50분</b>
+              <span class="chip up">+25</span>
+            </span>
+            <span class="sticker honey r-pos1 delta">
+              <span class="ico">💛</span> 누적 <b>3h 0m</b>
+              <span class="chip up">+25</span>
+            </span>
+            <span class="sticker peach r-neg1 delta">
+              <span class="ico">🌿</span> ETA <b>3.13</b>
+              <span class="chip down">-2일</span>
+            </span>
+          </div>
+
+          <!-- 이번 주 캘린더 — 오늘 칸에 방긋이 도장 펑! -->
+          <div class="cal-strip" style="margin-top: 14px; position: relative;">
+            <span class="deco-emoji" style="top:-10px;right:14px;font-size:18px;transform:rotate(14deg)">⭐</span>
+            <div class="hd">
+              <span class="t">이번 주 · 방긋이 도장</span>
+              <span class="m"><b>5</b>/7일 · <span style="color:var(--mint)">새 기록!</span></span>
+            </div>
+            <div class="cal-days">
+              <div class="day"><span class="lbl">월</span><div class="dot read">18</div><span class="min">22분</span></div>
+              <div class="day"><span class="lbl">화</span><div class="dot read">19</div><span class="min">34분</span></div>
+              <div class="day"><span class="lbl">수</span><div class="dot">20</div><span class="min muted">·</span></div>
+              <div class="day"><span class="lbl">목</span><div class="dot read">21</div><span class="min">25분</span></div>
+              <div class="day"><span class="lbl">금</span><div class="dot read">22</div><span class="min">18분</span></div>
+              <div class="day"><span class="lbl">토</span><div class="dot today fresh">23</div><span class="min" style="color:var(--sage)">50분 🎉</span></div>
+              <div class="day"><span class="lbl">일</span><div class="dot">24</div><span class="min muted">·</span></div>
+            </div>
+          </div>
+
+          <button class="cta done" style="margin-top: 12px;">
+            <span class="ico">✓</span>
+            <span>기록 저장하기</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ Notes ═══ -->
+  <div class="notes">
+    <h3>🛠 구현 가이드 — 방긋이 통합 포인트</h3>
+
+    <h4>마스코트 매핑</h4>
+    <ul>
+      <li><code>FocusSessionCard</code> idle 상태 → <code>/mascot-morning.png</code> (또는 시간대별 자동 전환: 밤=sleep, 새벽=morning, 낮=read)</li>
+      <li><code>FocusSessionCard</code> running 상태 → <code>/mascot-read.png</code> (<code>@keyframes breath</code> scale 1→1.03)</li>
+      <li><code>FocusSessionCard</code> done 상태 → <code>/mascot-happy.png</code> + cheer 애니 (pop up)</li>
+      <li><code>BookFocusCalendar</code> 도장 → <code>dot.read::before</code>에 <code>/mascot-happy.png</code> 16px, rotate(8deg)</li>
+      <li><code>BookFocusCalendar</code> 오늘 완료 시 → <code>dot.today.fresh::before</code>에 22px + <code>@keyframes stamp</code> 0.5→1.4→1 스케일</li>
+    </ul>
+
+    <h4>새 컴포넌트 (v5 확정 버전)</h4>
+    <ul>
+      <li><code>components/book-detail/FocusMascot.tsx</code> — props: <code>state: "idle" | "running" | "done"</code>, 내부에서 이미지+애니 결정</li>
+      <li><code>components/book-detail/FocusStatsRow.tsx</code> — 스티커 3종 (honey/mint/peach) + optional <code>showDelta</code></li>
+      <li><code>components/book-detail/BookFocusCalendar.tsx</code> — 주간 스트립 + 방긋이 도장 + 완료 시 stamp 애니</li>
+      <li><code>lib/reading-pace.ts</code> — <code>computeETA(book, sessions)</code> 유틸</li>
+    </ul>
+
+    <h4>이미지 최적화 주의</h4>
+    <ul>
+      <li>마스코트 PNG 원본 ~800KB → <code>next/image</code>로 로드 (자동 webp 변환, lazy loading)</li>
+      <li>캘린더 도장은 CSS <code>background-image</code>가 아닌 <code>&lt;img loading="lazy"&gt;</code>로 바꿔야 Next 캐시 활용 가능</li>
+      <li>SVG 대안 필요하면 <code>logo-banggut.svg</code>를 흑백 처리해서 워터마크 도장처럼 쓸 수도 (톤 조정 옵션)</li>
+    </ul>
+
+    <h4>시간대별 자동 마스코트 (옵션)</h4>
+    <ul>
+      <li>05-11시: <code>mascot-morning</code> · 11-18시: <code>mascot-read</code> · 18-22시: <code>mascot-read</code> · 22시 이후: <code>mascot-sleep</code></li>
+      <li>세션 완료는 시간 무관 <code>mascot-happy</code> 고정</li>
+      <li>반납일 임박한 책이면 idle 상태를 <code>mascot-worried</code>로 바꿔서 부드럽게 환기</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>

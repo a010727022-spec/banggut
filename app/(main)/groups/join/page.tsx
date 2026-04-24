@@ -145,7 +145,7 @@ function JoinContent() {
     return (
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "60vh", gap: 12 }}>
         <Loader2 size={24} color="var(--ac)" strokeWidth={1.5} className="animate-spin" />
-        <p style={{ fontSize: 13, color: "var(--ts)" }}>모임 정보를 불러오는 중...</p>
+        <p style={{ fontSize: 13, color: "var(--ts)" }}>모임 정보를 불러오는 중</p>
       </div>
     );
   }

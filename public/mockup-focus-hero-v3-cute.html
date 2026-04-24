@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>방긋 · 뽀모도로 Hero v3 · 🫘 콩이 에디션</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Gaegu:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#F7F3ED; --sf:#FFFDF9; --sf2:#F1EBE0; --sf3:#E8E1D4;
+    --tp:#2B2420; --ts:#6B5E52; --tm:#8C7D6F;
+    --ac:#5FA48E; --ac2:#4E8A77; --acc:#FFFDF9;
+    --bd:rgba(43,36,32,0.08); --bd2:rgba(43,36,32,0.16);
+    --ink:#2B2420;
+    --honey:#D4A056; --honey2:#B5803E; --honey-soft:#FFE9B9;
+    --peach:#F4B8A0; --peach-soft:#FFE3D2;
+    --rose:#E89D9D; --rose-soft:#FCE1E1;
+    --lavender:#B4A7DB; --lavender-soft:#EDE7FB;
+    --sage:#A7C9B3; --sage-soft:#E0F0E4;
+    --kong:#F5D88F; --kong-deep:#E6B851;
+    --shadow-sticker:3px 4px 0 rgba(43,36,32,0.12);
+    --shadow-sticker-sm:2px 3px 0 rgba(43,36,32,0.1);
+    --font-serif:"Fraunces",Georgia,serif;
+    --font-sans:"Pretendard Variable",Pretendard,system-ui,sans-serif;
+    --font-write:"Gaegu",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--tp);font-family:var(--font-sans);letter-spacing:-0.01em;-webkit-font-smoothing:antialiased;
+    background-image:
+      radial-gradient(circle at 12% 18%, rgba(212,160,86,0.08), transparent 40%),
+      radial-gradient(circle at 88% 72%, rgba(95,164,142,0.07), transparent 45%),
+      radial-gradient(var(--bd) 1px, transparent 1px);
+    background-size: auto,auto,18px 18px;
+  }
+  .wrap{max-width:1320px;margin:0 auto;padding:36px 24px 80px}
+  .hdr{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:30px;gap:16px;flex-wrap:wrap}
+  .hdr h1{margin:0;font-family:var(--font-serif);font-size:32px;font-weight:700;letter-spacing:-0.5px}
+  .hdr h1 em{font-style:normal;background:linear-gradient(180deg,transparent 55%,var(--honey-soft) 55%,var(--honey-soft) 88%,transparent 88%);padding:0 4px}
+  .hdr p{margin:6px 0 0;font-size:13.5px;color:var(--tm);line-height:1.6;max-width:680px}
+  .hdr .concept{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:100px;background:#fff;color:var(--honey2);font-size:11px;font-weight:800;letter-spacing:0.3px;box-shadow:var(--shadow-sticker-sm);border:1.5px solid var(--ink);transform:rotate(-2deg)}
+  .hdr .concept::before{content:"🫘"}
+
+  .phones{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+  @media (max-width:1100px){.phones{grid-template-columns:1fr;max-width:420px;margin:0 auto}}
+  .phone{background:var(--bg);border:2px solid var(--ink);border-radius:38px;padding:14px 12px;box-shadow:6px 8px 0 rgba(43,36,32,0.14);position:relative;overflow:hidden}
+  .phone-label{position:absolute;top:16px;left:0;right:0;text-align:center;font-family:var(--font-write);font-size:14px;font-weight:700;color:var(--tp);letter-spacing:1px;pointer-events:none;z-index:0}
+  .phone-state{position:absolute;top:46px;left:14px;padding:4px 11px;border-radius:100px;font-size:10px;font-weight:800;letter-spacing:0.5px;z-index:5;text-transform:uppercase;border:1.5px solid var(--ink);box-shadow:var(--shadow-sticker-sm);transform:rotate(-3deg)}
+  .s-idle{background:var(--honey-soft);color:var(--honey2)}
+  .s-run{background:var(--sage-soft);color:var(--ac2)}
+  .s-done{background:var(--peach-soft);color:#B8684B}
+  .screen{margin-top:62px;position:relative;z-index:1}
+
+  /* ── Hero ── */
+  .hero{position:relative;height:108px;border-radius:16px;overflow:hidden;margin:0 6px 12px;background:linear-gradient(135deg,#3a4e46,#5a766a);border:2px solid var(--ink);box-shadow:var(--shadow-sticker-sm)}
+  .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,0.58))}
+  .hero-cover{position:absolute;left:12px;bottom:-18px;width:62px;height:90px;border-radius:5px;background:#1c1a17;border:1.5px solid var(--ink);box-shadow:0 8px 14px -6px rgba(0,0,0,0.6);z-index:3;overflow:hidden;transform:rotate(-3deg)}
+  .hero-cover::before{content:"심리학자가";position:absolute;top:10px;left:0;right:0;text-align:center;font-family:var(--font-serif);font-size:7px;font-weight:700;color:#f3e4c7}
+  .hero-cover::after{content:"";position:absolute;top:26px;left:12px;right:12px;height:32px;background:radial-gradient(circle,#8d6a3a 20%,transparent 60%);border:0.5px solid rgba(255,255,255,0.15);border-radius:50%;opacity:0.6}
+  .hero-meta{position:absolute;left:90px;right:12px;bottom:12px;z-index:3;color:#fff}
+  .hero-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:100px;background:#fff;color:var(--ac2);font-size:9px;font-weight:800;margin-bottom:4px;border:1.5px solid var(--ink);box-shadow:1px 2px 0 rgba(0,0,0,0.25)}
+  .hero-badge::before{content:"📖"}
+  .hero-title{font-family:var(--font-serif);font-size:13.5px;font-weight:700;letter-spacing:-0.2px;line-height:1.2;text-shadow:0 2px 10px rgba(0,0,0,0.5);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .hero-author{font-size:9px;color:rgba(255,255,255,0.7);margin-top:3px;font-family:var(--font-write)}
+
+  /* ── progress strip ── */
+  .strip{display:flex;align-items:center;gap:8px;margin:0 12px 12px;padding:8px 12px;background:#fff;border-radius:14px;border:1.5px solid var(--ink);box-shadow:var(--shadow-sticker-sm);position:relative}
+  .strip-fmt{display:inline-flex;gap:2px;background:var(--sf2);padding:2px;border-radius:100px;border:1px solid var(--bd2)}
+  .strip-fmt button{padding:3px 8px;border:none;border-radius:100px;background:transparent;font-size:9.5px;font-weight:700;color:var(--tm);font-family:inherit;cursor:pointer}
+  .strip-fmt button.on{background:var(--ink);color:var(--bg)}
+  .strip-bar{flex:1;height:5px;background:var(--sf3);border-radius:3px;overflow:hidden;border:0.5px solid var(--bd2)}
+  .strip-bar > div{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:3px}
+  .strip-pct{font-family:var(--font-serif);font-size:13px;font-weight:700;color:var(--ac);letter-spacing:-0.3px;min-width:34px;text-align:right}
+  .strip-num{font-family:var(--font-write);font-size:11px;color:var(--tm);font-weight:700;letter-spacing:0}
+
+  /* ════════════ Focus HERO ════════════ */
+  .focus{position:relative;margin:0 10px 14px;padding:18px 16px 16px;border-radius:24px;background:
+    radial-gradient(circle at 18% 12%, rgba(244,184,160,0.28), transparent 45%),
+    radial-gradient(circle at 82% 85%, rgba(180,167,219,0.22), transparent 50%),
+    linear-gradient(165deg,#FFF9EC 0%,#FFF3D8 100%);
+    overflow:visible;border:2px solid var(--ink);box-shadow:4px 6px 0 rgba(43,36,32,0.14);
+  }
+  .focus.mint{background:
+    radial-gradient(circle at 18% 12%, rgba(167,201,179,0.32), transparent 45%),
+    radial-gradient(circle at 82% 85%, rgba(180,167,219,0.18), transparent 50%),
+    linear-gradient(165deg,#F0F9F1 0%,#E0F0E4 100%);
+  }
+  .focus.done{background:
+    radial-gradient(circle at 18% 12%, rgba(255,225,170,0.5), transparent 45%),
+    radial-gradient(circle at 82% 85%, rgba(244,184,160,0.4), transparent 50%),
+    linear-gradient(165deg,#FFF1CE 0%,#FFE1C2 100%);
+  }
+
+  /* 카드 위 스티커 라벨들 */
+  .sticker{position:absolute;padding:5px 11px;border-radius:100px;font-size:10.5px;font-weight:800;border:1.5px solid var(--ink);box-shadow:var(--shadow-sticker-sm);letter-spacing:-0.1px;white-space:nowrap;z-index:4}
+  .sticker-streak{background:var(--peach-soft);color:#B8684B;top:-10px;left:12px;transform:rotate(-4deg)}
+  .sticker-tag{background:var(--sage-soft);color:var(--ac2);top:-10px;right:14px;transform:rotate(3deg)}
+  .sticker-hush{background:var(--lavender-soft);color:#6B5CA8;top:-10px;left:50%;transform:translateX(-50%) rotate(-2deg)}
+  .sticker-bean{background:var(--honey);color:#fff;top:-12px;left:12px;transform:rotate(-5deg);font-family:var(--font-write);font-size:13px;padding:5px 13px}
+  .sticker-today{background:#fff;color:var(--honey2);top:-10px;right:14px;transform:rotate(4deg);font-family:var(--font-write);font-size:12px}
+
+  /* 데코 장식 */
+  .deco{position:absolute;font-size:16px;pointer-events:none;z-index:3}
+  .deco.f1{top:24px;right:18px;font-size:18px;transform:rotate(12deg)}
+  .deco.f2{bottom:60px;left:14px;font-size:14px;transform:rotate(-16deg)}
+  .deco.f3{top:90px;left:8px;font-size:13px;transform:rotate(20deg)}
+  .deco.f4{bottom:20px;right:10px;font-size:15px;transform:rotate(-8deg)}
+  .deco.star{font-size:11px;opacity:0.85}
+  .deco-sparkle{position:absolute;inset:0;pointer-events:none;z-index:3}
+
+  /* ── Ring + 콩이 ── */
+  .ring-wrap{position:relative;width:180px;height:180px;margin:14px auto 6px;filter:drop-shadow(0 6px 10px rgba(181,128,62,0.2))}
+  .ring{position:absolute;inset:0}
+  .ring-inside{position:absolute;inset:18px;border-radius:50%;background:#fff;border:2px solid var(--ink);box-shadow:inset 0 4px 10px rgba(0,0,0,0.04);display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .ring-inside.mint{background:#fff}
+  .ring-inside.honey{background:linear-gradient(180deg,#fff 60%,var(--honey-soft))}
+  .bean{width:92px;height:92px}
+  .bean-wiggle{animation:wiggle 3.5s ease-in-out infinite;transform-origin:50% 80%}
+  @keyframes wiggle{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+  .ring-pulse{position:absolute;inset:-6px;border-radius:50%;border:2px dashed rgba(95,164,142,0.4);animation:pulse 3s ease-out infinite}
+  @keyframes pulse{0%{transform:scale(0.95);opacity:0.8}100%{transform:scale(1.12);opacity:0}}
+  @media (prefers-reduced-motion:reduce){.bean-wiggle,.ring-pulse,.focus{animation:none}}
+
+  .time-cap{position:absolute;top:-4px;left:50%;transform:translateX(-50%) rotate(-2deg);background:var(--ink);color:#fff;padding:5px 12px;border-radius:100px;font-family:var(--font-serif);font-size:14px;font-weight:700;letter-spacing:-0.3px;z-index:5;border:1.5px solid var(--ink);box-shadow:2px 2px 0 rgba(0,0,0,0.15)}
+  .time-cap.honey{background:var(--honey);color:#fff}
+  .time-cap.mint{background:var(--ac);color:#fff}
+  .time-cap.peach{background:var(--peach);color:#fff}
+
+  .focus-label{text-align:center;margin:12px 0 14px;position:relative;z-index:2}
+  .focus-title{font-family:var(--font-write);font-size:22px;font-weight:700;color:var(--tp);line-height:1.1;letter-spacing:-0.3px}
+  .focus-title em{font-style:normal;color:var(--honey2);background:linear-gradient(180deg,transparent 58%,var(--honey-soft) 58%,var(--honey-soft) 90%,transparent 90%);padding:0 2px}
+  .focus-sub{font-size:11px;color:var(--ts);margin-top:3px;line-height:1.4}
+
+  /* CTA 큰 스티커 버튼 */
+  .cta-big{display:flex;align-items:center;justify-content:center;gap:8px;width:calc(100% - 8px);margin:2px 4px 0;padding:15px;border-radius:18px;background:linear-gradient(180deg,var(--honey) 0%,var(--honey2) 100%);color:#fff;font-size:15px;font-weight:800;border:2px solid var(--ink);letter-spacing:-0.3px;cursor:pointer;box-shadow:3px 4px 0 rgba(43,36,32,0.18);position:relative;z-index:2;font-family:inherit}
+  .cta-big.mint{background:linear-gradient(180deg,var(--ac) 0%,var(--ac2) 100%)}
+  .cta-big.peach{background:linear-gradient(180deg,var(--peach) 0%,#E09775 100%)}
+  .cta-big::before{content:"";position:absolute;top:3px;left:8px;right:8px;height:30%;background:linear-gradient(180deg,rgba(255,255,255,0.28),transparent);border-radius:14px 14px 0 0;pointer-events:none}
+  .cta-row{display:flex;gap:8px;margin:2px 4px 0;position:relative;z-index:2}
+  .cta-row > .cta-big{flex:1;margin:0;font-size:13px;padding:12px}
+  .cta-ghost{padding:12px;border-radius:18px;border:2px solid var(--ink);background:#fff;color:var(--tp);font-weight:800;font-size:13px;letter-spacing:-0.2px;font-family:inherit;cursor:pointer;box-shadow:3px 4px 0 rgba(43,36,32,0.14)}
+
+  .tiny-link{display:block;text-align:center;margin:10px 0 0;font-family:var(--font-write);font-size:13px;color:var(--tm);text-decoration:underline;text-underline-offset:3px;background:transparent;border:none;width:100%;cursor:pointer;position:relative;z-index:2}
+
+  /* Running mini stats */
+  .mini-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 4px 0;position:relative;z-index:2}
+  .mini-stats > div{padding:8px 10px;background:#fff;border-radius:12px;border:1.5px solid var(--ink);text-align:center;box-shadow:2px 2px 0 rgba(43,36,32,0.1)}
+  .mini-stats b{display:block;font-family:var(--font-serif);font-size:17px;font-weight:700;color:var(--tp);letter-spacing:-0.5px;line-height:1}
+  .mini-stats p{margin:4px 0 0;font-family:var(--font-write);font-size:11px;color:var(--tm);font-weight:700}
+
+  /* Done recap fields */
+  .recap{margin-top:14px;padding:14px;background:#fff;border-radius:16px;border:1.5px solid var(--ink);position:relative;z-index:2;box-shadow:2px 3px 0 rgba(43,36,32,0.1)}
+  .recap h5{margin:0 0 10px;font-family:var(--font-write);font-size:15px;font-weight:700;color:var(--tp);display:flex;align-items:center;gap:6px}
+  .recap h5::before{content:"📖"}
+  .recap-row{display:flex;gap:10px;align-items:center}
+  .recap-row .input{flex:1;padding:10px 10px;border:1.5px solid var(--ink);border-radius:12px;background:var(--sf);font-family:var(--font-serif);font-size:17px;color:var(--tp);font-weight:700;text-align:center;outline:none;box-shadow:inset 0 2px 0 rgba(0,0,0,0.03)}
+  .recap-row .arrow{font-size:16px;color:var(--honey2);font-weight:700}
+  .recap-row .unit{font-family:var(--font-write);font-size:13px;color:var(--tm);font-weight:700}
+  .recap-save{margin-top:10px;width:100%;padding:12px;border-radius:14px;background:var(--ink);color:var(--bg);font-size:13px;font-weight:800;border:2px solid var(--ink);letter-spacing:-0.2px;font-family:inherit;cursor:pointer;box-shadow:3px 4px 0 rgba(43,36,32,0.2);display:flex;align-items:center;justify-content:center;gap:6px}
+  .recap-save::before{content:"🌿"}
+
+  /* ── below focus ── */
+  .qa-row{display:flex;gap:8px;padding:0 12px 12px}
+  .qa-btn{flex:1;padding:11px 0;border-radius:14px;font-size:11.5px;font-weight:800;border:1.5px solid var(--ink);background:#fff;color:var(--tp);display:flex;align-items:center;justify-content:center;gap:5px;font-family:inherit;cursor:pointer;box-shadow:var(--shadow-sticker-sm);letter-spacing:-0.2px}
+  .qa-btn.peach{background:var(--peach-soft);color:#B8684B}
+  .qa-btn.lock{background:var(--sf2);color:var(--tm);opacity:0.75}
+  .qa-btn svg{width:13px;height:13px}
+
+  .completion{margin:0 12px 14px;padding:13px;border-radius:16px;background:#fff;border:2px dashed #2B4C3F;color:#2B4C3F;font-size:13px;font-weight:800;text-align:center;letter-spacing:-0.3px;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+  .completion::before{content:"✋"}
+  .detail-accordion{margin:0 12px 14px;background:var(--sf);border-radius:14px;border:1.5px solid var(--bd2)}
+  .detail-head{padding:10px 14px;display:flex;align-items:center;justify-content:space-between;font-family:var(--font-write);font-size:13px;color:var(--tm);font-weight:700}
+
+  /* Notes */
+  .notes{margin-top:44px;background:#fff;border:2px solid var(--ink);border-radius:22px;padding:26px 30px;box-shadow:5px 6px 0 rgba(43,36,32,0.12)}
+  .notes h2{margin:0 0 8px;font-family:var(--font-serif);font-size:20px;font-weight:700;letter-spacing:-0.3px}
+  .notes h2 em{font-style:normal;background:linear-gradient(180deg,transparent 55%,var(--sage-soft) 55%,var(--sage-soft) 88%,transparent 88%);padding:0 4px}
+  .notes h3{margin:18px 0 6px;font-family:var(--font-write);font-size:16px;font-weight:700;color:var(--honey2);letter-spacing:0.5px}
+  .notes p,.notes li{font-size:13px;color:var(--ts);line-height:1.7;margin:0 0 6px}
+  .notes ul{padding-left:18px;margin:4px 0 10px}
+  .notes code{background:var(--sf2);padding:1px 7px;border-radius:5px;font-size:12px;color:var(--ac2);font-family:ui-monospace,"SF Mono",Menlo,monospace;border:0.5px solid var(--bd2)}
+  .palette{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+  .palette .s{display:inline-flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;color:var(--tm);font-family:var(--font-write);font-weight:700}
+  .palette .s i{display:block;width:36px;height:36px;border-radius:10px;border:1.5px solid var(--ink);box-shadow:var(--shadow-sticker-sm)}
+  .palette .s.honey i{background:var(--honey)}
+  .palette .s.mint i{background:var(--ac)}
+  .palette .s.peach i{background:var(--peach)}
+  .palette .s.rose i{background:var(--rose)}
+  .palette .s.lav i{background:var(--lavender)}
+  .palette .s.sage i{background:var(--sage)}
+  .palette .s.kong i{background:var(--kong)}
+  .palette .s.cream i{background:var(--bg)}
+
+  .mini-ring{display:inline-block;width:14px;height:14px;border-radius:50%;border:3px solid var(--honey);vertical-align:middle;margin-right:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hdr">
+    <div>
+      <span class="concept">완독콩 · 콩이 에디션</span>
+      <h1 style="margin-top:10px">책 상세 · 뽀모도로 <em>Hero</em> v3 🌱</h1>
+      <p>콩이가 책 옆에서 같이 독서해요. 페이지는 세션이 끝나면 알아서 물어봐요. 종이 배경 · 스티커 라벨 · 살짝 기울기 · 손글씨(Gaegu) · pastel pop.</p>
+    </div>
+  </header>
+
+  <div class="phones">
+
+    <!-- ═══════════════ PHONE A · Idle (시작 전) ═══════════════ -->
+    <div class="phone">
+      <div class="phone-label">· 시작 전</div>
+      <div class="phone-state s-idle">🌱 Idle</div>
+      <div class="screen">
+        <div class="hero">
+          <div class="hero-cover"></div>
+          <div class="hero-meta">
+            <div class="hero-badge">읽는 중</div>
+            <div class="hero-title">시 심리학자가 종이책을 읽는다</div>
+            <div class="hero-author">린다 N. 애셔스타인</div>
+          </div>
+        </div>
+
+        <div class="strip">
+          <div class="strip-fmt"><button class="on">📘</button><button>📱</button></div>
+          <div class="strip-bar"><div style="width:23%"></div></div>
+          <span class="strip-pct">23%</span>
+          <span class="strip-num">124p</span>
+        </div>
+
+        <div class="focus">
+          <span class="sticker sticker-streak">🔥 8일째</span>
+          <span class="sticker sticker-tag">🌱 오늘 첫 집중</span>
+
+          <!-- decorations -->
+          <span class="deco f1">🌼</span>
+          <span class="deco f2">✨</span>
+          <span class="deco f3 star">⭐</span>
+          <span class="deco f4">🌿</span>
+
+          <div class="ring-wrap">
+            <svg class="ring" viewBox="0 0 200 200" width="180" height="180">
+              <defs>
+                <linearGradient id="honeyG" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#E6B851"/>
+                  <stop offset="100%" stop-color="#B5803E"/>
+                </linearGradient>
+              </defs>
+              <circle cx="100" cy="100" r="86" fill="none" stroke="rgba(43,36,32,0.9)" stroke-width="2"/>
+              <circle cx="100" cy="100" r="86" fill="none" stroke="rgba(212,160,86,0.2)" stroke-width="9"/>
+              <circle cx="100" cy="100" r="86" fill="none" stroke="url(#honeyG)" stroke-width="9" stroke-linecap="round" stroke-dasharray="540" stroke-dashoffset="0" transform="rotate(-90 100 100)"/>
+            </svg>
+            <div class="ring-inside honey">
+              <!-- 콩이 (Idle — 반짝눈, 책 들고 대기) -->
+              <svg class="bean bean-wiggle" viewBox="0 0 120 120">
+                <!-- bean body -->
+                <path d="M60 18 C35 18, 22 40, 28 62 C34 90, 86 90, 92 62 C98 40, 85 18, 60 18 Z" fill="#F5D88F" stroke="#2B2420" stroke-width="3"/>
+                <!-- body highlight -->
+                <path d="M40 28 C33 33, 30 42, 32 50" stroke="rgba(255,255,255,0.6)" stroke-width="3" fill="none" stroke-linecap="round"/>
+                <!-- eyes open sparkle -->
+                <circle cx="48" cy="48" r="3.2" fill="#2B2420"/>
+                <circle cx="72" cy="48" r="3.2" fill="#2B2420"/>
+                <circle cx="49" cy="47" r="1" fill="#fff"/>
+                <circle cx="73" cy="47" r="1" fill="#fff"/>
+                <!-- cheeks -->
+                <circle cx="40" cy="60" r="4" fill="#F4B8A0" opacity="0.7"/>
+                <circle cx="80" cy="60" r="4" fill="#F4B8A0" opacity="0.7"/>
+                <!-- smile -->
+                <path d="M50 64 Q60 70 70 64" stroke="#2B2420" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                <!-- tiny book in hand -->
+                <rect x="44" y="78" width="32" height="20" rx="2" fill="#fff" stroke="#2B2420" stroke-width="2"/>
+                <line x1="60" y1="80" x2="60" y2="96" stroke="#2B2420" stroke-width="1.5"/>
+                <line x1="48" y1="84" x2="56" y2="84" stroke="#2B2420" stroke-width="0.8"/>
+                <line x1="48" y1="88" x2="56" y2="88" stroke="#2B2420" stroke-width="0.8"/>
+                <line x1="64" y1="84" x2="72" y2="84" stroke="#2B2420" stroke-width="0.8"/>
+                <line x1="64" y1="88" x2="72" y2="88" stroke="#2B2420" stroke-width="0.8"/>
+                <!-- leaf on head -->
+                <path d="M60 14 Q55 6 65 4 Q68 10 60 14" fill="#7FB68C" stroke="#2B2420" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <div class="time-cap honey">25:00</div>
+          </div>
+
+          <div class="focus-label">
+            <div class="focus-title">콩이랑 <em>같이 읽을까</em>요?</div>
+            <div class="focus-sub">방해 없이 25분, 책과 둘만의 시간</div>
+          </div>
+
+          <button class="cta-big">▶ 집중 시작!</button>
+          <button class="tiny-link">· 바로 페이지만 적기</button>
+        </div>
+
+        <div class="qa-row">
+          <button class="qa-btn peach"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 17l6-6 4 4 8-8"/></svg>문장 긋기</button>
+          <button class="qa-btn lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>서평 (완독 후)</button>
+        </div>
+
+        <button class="completion">꾹 눌러서 · 다 읽었어요!</button>
+
+        <div class="detail-accordion">
+          <div class="detail-head"><span>· 책 정보 수정</span><span>›</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ PHONE B · Running (집중 중) ═══════════════ -->
+    <div class="phone">
+      <div class="phone-label">· 집중 중</div>
+      <div class="phone-state s-run">📖 Running</div>
+      <div class="screen">
+        <div class="hero" style="opacity:0.8">
+          <div class="hero-cover"></div>
+          <div class="hero-meta">
+            <div class="hero-badge">읽는 중</div>
+            <div class="hero-title">시 심리학자가 종이책을 읽는다</div>
+            <div class="hero-author">린다 N. 애셔스타인</div>
+          </div>
+        </div>
+
+        <div class="strip" style="opacity:0.6">
+          <div class="strip-fmt"><button class="on">📘</button><button>📱</button></div>
+          <div class="strip-bar"><div style="width:23%"></div></div>
+          <span class="strip-pct">23%</span>
+          <span class="strip-num">124p</span>
+        </div>
+
+        <div class="focus mint">
+          <span class="sticker sticker-hush">🌙 쉿… 콩이 독서 중</span>
+          <span class="deco f1">💤</span>
+          <span class="deco f2 star">✨</span>
+          <span class="deco f3">🌿</span>
+
+          <div class="ring-wrap" style="animation:breathe 4s ease-in-out infinite">
+            <svg class="ring" viewBox="0 0 200 200" width="180" height="180">
+              <defs>
+                <linearGradient id="mintG" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#7EC2AB"/>
+                  <stop offset="100%" stop-color="#4E8A77"/>
+                </linearGradient>
+              </defs>
+              <circle cx="100" cy="100" r="86" fill="none" stroke="rgba(43,36,32,0.9)" stroke-width="2"/>
+              <circle cx="100" cy="100" r="86" fill="none" stroke="rgba(78,138,119,0.18)" stroke-width="10"/>
+              <!-- 10:28 out of 25 min = 42% -->
+              <circle cx="100" cy="100" r="86" fill="none" stroke="url(#mintG)" stroke-width="10" stroke-linecap="round" stroke-dasharray="540" stroke-dashoffset="313" transform="rotate(-90 100 100)"/>
+            </svg>
+            <div class="ring-pulse"></div>
+            <div class="ring-inside mint">
+              <!-- 콩이 (Running — 눈 감고 평온, 책과 함께) -->
+              <svg class="bean" viewBox="0 0 120 120">
+                <path d="M60 18 C35 18, 22 40, 28 62 C34 90, 86 90, 92 62 C98 40, 85 18, 60 18 Z" fill="#F5D88F" stroke="#2B2420" stroke-width="3"/>
+                <path d="M40 28 C33 33, 30 42, 32 50" stroke="rgba(255,255,255,0.6)" stroke-width="3" fill="none" stroke-linecap="round"/>
+                <!-- closed eyes (~~) peaceful -->
+                <path d="M43 48 Q48 52 53 48" stroke="#2B2420" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                <path d="M67 48 Q72 52 77 48" stroke="#2B2420" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                <!-- cheeks -->
+                <circle cx="40" cy="60" r="4" fill="#F4B8A0" opacity="0.7"/>
+                <circle cx="80" cy="60" r="4" fill="#F4B8A0" opacity="0.7"/>
+                <!-- calm smile -->
+                <path d="M52 64 Q60 68 68 64" stroke="#2B2420" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <!-- tiny book in hand -->
+                <rect x="44" y="78" width="32" height="20" rx="2" fill="#fff" stroke="#2B2420" stroke-width="2"/>
+                <line x1="60" y1="80" x2="60" y2="96" stroke="#2B2420" stroke-width="1.5"/>
+                <line x1="48" y1="84" x2="56" y2="84" stroke="#2B2420" stroke-width="0.8"/>
+                <line x1="48" y1="88" x2="56" y2="88" stroke="#2B2420" stroke-width="0.8"/>
+                <line x1="64" y1="84" x2="72" y2="84" stroke="#2B2420" stroke-width="0.8"/>
+                <line x1="64" y1="88" x2="72" y2="88" stroke="#2B2420" stroke-width="0.8"/>
+                <!-- Z Z floating -->
+                <text x="90" y="30" font-family="Gaegu" font-size="11" fill="#4E8A77" font-weight="700">z</text>
+                <text x="98" y="22" font-family="Gaegu" font-size="9" fill="#4E8A77" font-weight="700">z</text>
+              </svg>
+            </div>
+            <div class="time-cap mint">14:32</div>
+          </div>
+
+          <div class="focus-label">
+            <div class="focus-title" style="font-size:20px">조용히, <em style="background:linear-gradient(180deg,transparent 58%,var(--sage-soft) 58%,var(--sage-soft) 90%,transparent 90%)">고요하게</em> ~</div>
+            <div class="focus-sub">10분 28초째 함께하고 있어요 🌿</div>
+          </div>
+
+          <div class="cta-row">
+            <button class="cta-big mint">❚❚ 일시정지</button>
+            <button class="cta-ghost">중단</button>
+          </div>
+
+          <div class="mini-stats">
+            <div><b>10:28</b><p>지난 시간</p></div>
+            <div><b>14:32</b><p>남은 시간</p></div>
+          </div>
+        </div>
+
+        <div class="detail-accordion" style="opacity:0.45">
+          <div class="detail-head"><span>· 집중 중엔 알림을 줄여요</span><span>·</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ PHONE C · Done (리캡) ═══════════════ -->
+    <div class="phone">
+      <div class="phone-label">· 방금 완료</div>
+      <div class="phone-state s-done">🙌 Done</div>
+      <div class="screen">
+        <div class="hero">
+          <div class="hero-cover"></div>
+          <div class="hero-meta">
+            <div class="hero-badge">읽는 중</div>
+            <div class="hero-title">시 심리학자가 종이책을 읽는다</div>
+            <div class="hero-author">린다 N. 애셔스타인</div>
+          </div>
+        </div>
+
+        <div class="strip">
+          <div class="strip-fmt"><button class="on">📘</button><button>📱</button></div>
+          <div class="strip-bar"><div style="width:31%"></div></div>
+          <span class="strip-pct">31%</span>
+          <span class="strip-num">160p</span>
+        </div>
+
+        <div class="focus done">
+          <span class="sticker sticker-bean">🫘 콩알 +1!</span>
+          <span class="sticker sticker-today">오늘 2번째</span>
+
+          <span class="deco f1">🌼</span>
+          <span class="deco f2">🎉</span>
+          <span class="deco f3">✨</span>
+          <span class="deco f4">🌿</span>
+          <span class="deco" style="top:50px;left:32px;font-size:12px;transform:rotate(-25deg)">⭐</span>
+          <span class="deco" style="top:60px;right:40px;font-size:13px;transform:rotate(18deg)">💛</span>
+
+          <div class="ring-wrap" style="width:150px;height:150px">
+            <svg class="ring" viewBox="0 0 200 200" width="150" height="150">
+              <circle cx="100" cy="100" r="86" fill="none" stroke="rgba(43,36,32,0.9)" stroke-width="2"/>
+              <circle cx="100" cy="100" r="86" fill="none" stroke="rgba(181,128,62,0.22)" stroke-width="10"/>
+              <circle cx="100" cy="100" r="86" fill="none" stroke="#D4A056" stroke-width="10" stroke-linecap="round" stroke-dasharray="540" stroke-dashoffset="0" transform="rotate(-90 100 100)"/>
+              <!-- sparkle stars -->
+              <text x="30" y="50" font-family="Gaegu" font-size="18" fill="#D4A056" font-weight="700">✦</text>
+              <text x="160" y="160" font-family="Gaegu" font-size="14" fill="#D4A056" font-weight="700">✦</text>
+              <text x="170" y="60" font-family="Gaegu" font-size="12" fill="#B5803E" font-weight="700">✦</text>
+            </svg>
+            <div class="ring-inside" style="background:linear-gradient(180deg,#FFF8E5,#FFECB8)">
+              <!-- 콩이 (Done — 만세) -->
+              <svg class="bean" viewBox="0 0 120 120">
+                <!-- arms raised first (behind body) -->
+                <path d="M30 55 Q20 38 26 24" stroke="#2B2420" stroke-width="3" fill="none" stroke-linecap="round"/>
+                <path d="M90 55 Q100 38 94 24" stroke="#2B2420" stroke-width="3" fill="none" stroke-linecap="round"/>
+                <!-- hands -->
+                <circle cx="26" cy="24" r="5" fill="#F5D88F" stroke="#2B2420" stroke-width="2"/>
+                <circle cx="94" cy="24" r="5" fill="#F5D88F" stroke="#2B2420" stroke-width="2"/>
+                <!-- body -->
+                <path d="M60 28 C38 28, 26 48, 32 68 C38 92, 82 92, 88 68 C94 48, 82 28, 60 28 Z" fill="#F5D88F" stroke="#2B2420" stroke-width="3"/>
+                <path d="M42 36 C36 41, 34 48, 36 55" stroke="rgba(255,255,255,0.6)" stroke-width="3" fill="none" stroke-linecap="round"/>
+                <!-- happy eyes ^^ -->
+                <path d="M44 54 Q48 48 52 54" stroke="#2B2420" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                <path d="M68 54 Q72 48 76 54" stroke="#2B2420" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                <!-- cheeks -->
+                <circle cx="38" cy="66" r="4" fill="#F4B8A0" opacity="0.85"/>
+                <circle cx="82" cy="66" r="4" fill="#F4B8A0" opacity="0.85"/>
+                <!-- big smile -->
+                <path d="M48 72 Q60 82 72 72" stroke="#2B2420" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                <!-- leaf -->
+                <path d="M60 22 Q55 12 66 11 Q69 18 60 22" fill="#7FB68C" stroke="#2B2420" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <div class="time-cap peach">+25분</div>
+          </div>
+
+          <div class="focus-label">
+            <div class="focus-title">25분 잘 <em style="background:linear-gradient(180deg,transparent 58%,var(--peach-soft) 58%,var(--peach-soft) 90%,transparent 90%)">다녀왔어요</em>!</div>
+            <div class="focus-sub">오늘 2번째 · 누적 50분 · 이번 주 3일 꾸준</div>
+          </div>
+
+          <div class="recap">
+            <h5>어디까지 읽으셨나요?</h5>
+            <div class="recap-row">
+              <div class="input">124</div>
+              <span class="arrow">→</span>
+              <div class="input">160</div>
+              <span class="unit">p</span>
+            </div>
+            <button class="recap-save">기록하고 덮기</button>
+          </div>
+
+          <button class="tiny-link">· 페이지 기록은 건너뛸게요</button>
+        </div>
+
+        <div class="qa-row">
+          <button class="qa-btn peach"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 17l6-6 4 4 8-8"/></svg>방금 문장 긋기</button>
+          <button class="qa-btn lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>서평 (완독 후)</button>
+        </div>
+
+        <button class="completion">꾹 눌러서 · 다 읽었어요!</button>
+      </div>
+    </div>
+
+  </div>
+
+  <section class="notes">
+    <h2>🫘 완독콩 <em>귀여움 재료</em></h2>
+    <p>"세상의 모든 귀여운 UI" 를 완독콩 정체성에 녹였어요. 스티커 그림자 · 콩이 캐릭터 · 손글씨 포인트 · 종이 배경 · pastel pop · ±3deg 기울기.</p>
+
+    <h3>🎨 팔레트</h3>
+    <div class="palette">
+      <span class="s cream"><i></i>cream</span>
+      <span class="s honey"><i></i>honey</span>
+      <span class="s mint"><i></i>mint</span>
+      <span class="s peach"><i></i>peach</span>
+      <span class="s rose"><i></i>rose</span>
+      <span class="s lav"><i></i>lavender</span>
+      <span class="s sage"><i></i>sage</span>
+      <span class="s kong"><i></i>콩알</span>
+    </div>
+
+    <h3>🫘 콩이 3포즈</h3>
+    <ul>
+      <li><b>Idle</b> — 반짝눈 · 책 펼쳐 들고 대기 · 작게 wiggle 회전 애니메이션 · 머리 위 🌱</li>
+      <li><b>Running</b> — 눈 감은 평온 ~~ · 책 읽는 중 · 주변에 z z 떠다님 · 링 breathing + ring-pulse wave</li>
+      <li><b>Done</b> — 만세 🙌 · 큰 미소 ^ ^ · 주변 ✦ 컨페티 · 🫘 콩알 +1 스티커</li>
+    </ul>
+
+    <h3>✨ 귀여움 장치들</h3>
+    <ul>
+      <li><b>스티커 그림자</b>: 3px/4px offset, 검정 톤 (neo-brutal cute). 라벨은 ±3deg 기울여 '붙인 듯' 연출</li>
+      <li><b>손글씨 포인트</b>: Gaegu로 제목·라벨·숫자 서브 ("같이 읽을까요?", "10분 28초째 함께")</li>
+      <li><b>Fraunces 세리프</b>: 시간 숫자(25:00)와 진행률(23%)에만 강조</li>
+      <li><b>종이 배경</b>: 18px radial-dot pattern + 두 개 pastel radial glow (허니 좌상 · 민트 우하)</li>
+      <li><b>콩알 보상</b>: 세션 완료 = 🫘 +1 스티커 팡파레. 프로필에 누적 콩알 배지로 연결 여지</li>
+      <li><b>데코 이모지</b>: 🌼 ✨ ⭐ 🌿 💤 💛 🎉 — 카드당 3~5개, 모서리 살짝 밖으로 삐져나와 스티커 느낌</li>
+      <li><b>상태 배지</b>: 좌상단 phone-state 라벨도 ±3deg 기울어진 스티커</li>
+      <li><b>말풍선 형태</b>: 시간 캡슐 <code>25:00</code> 이 링 위에 툭 걸친 라벨로 들어감</li>
+      <li><b>prefers-reduced-motion</b>: wiggle · pulse · breathe 모두 static으로 돌아감</li>
+    </ul>
+
+    <h3>🧩 구현 매핑 (Dan)</h3>
+    <ul>
+      <li><code>components/book-detail/FocusSessionCard.tsx</code> 의 3-state 렌더를 이 hero 구조로 확장</li>
+      <li>콩이 3종 SVG는 <code>components/book-detail/KongyBean.tsx</code> (idle / running / done variant prop)</li>
+      <li>스티커 라벨은 <code>&lt;Sticker variant="streak|tag|bean|today"&gt;</code> 재사용 컴포넌트</li>
+      <li>Done state 리캡 input → <code>saveField({ current_page: N })</code> 로 저장. 여기가 유일한 페이지 업데이트 경로</li>
+      <li>기존 <code>showTodayModal</code> 바텀시트 · <code>showProgress</code> 카드 · 퀵액션 <code>진행률 업데이트</code> · 큰 CTA <code>오늘 읽었어요</code> → 모두 삭제</li>
+      <li>진행률 카드(L1502-)는 한 줄 strip 으로 압축 · 포맷 토글 내장</li>
+      <li>접기 accordion 에 전체 페이지 수정 · 시작/완독일 · (optionally) 포맷 전환 상세</li>
+      <li>Gaegu · Fraunces 는 <code>app/layout.tsx</code> 에서 <code>next/font/google</code> 로 로드 (이미 Gaegu 있으면 재사용)</li>
+    </ul>
+
+    <h3>🧪 세부 체크</h3>
+    <ul>
+      <li>접근성: 스티커 라벨에 <code>aria-hidden</code> or <code>role="img" aria-label</code> 적절 부여</li>
+      <li>다크모드/프라다 테마: honey / mint 그라디언트는 <code>var(--ac)</code>, <code>var(--honey)</code> 로 참조, 하드코딩 #값 최소화</li>
+      <li>모바일 터치 타겟: CTA 최소 44px 높이 유지</li>
+      <li>tilt/rotate는 <code>-3deg ~ +3deg</code> 내로만 — 과하면 엔터프라이즈 아님 · 방긋 아님</li>
+    </ul>
+  </section>
+</div>
+</body>
+</html>

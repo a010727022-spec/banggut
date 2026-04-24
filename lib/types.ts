@@ -5,8 +5,14 @@ export interface User {
   created_at: string;
   preferred_genres?: string[];
   reading_frequency?: string;
-  discussion_style?: string;
+  discussion_style?: string; // @deprecated — use discussion_styles
+  discussion_styles?: string[];
   onboarding_completed?: boolean;
+  favorite_library_code?: string | null;
+  favorite_library_name?: string | null;
+  yearly_goal?: number | null;
+  daily_page_goal?: number | null;
+  stats_widget?: "today_goal" | "yearly_ring";
 }
 
 export interface TopicMap {
@@ -37,6 +43,8 @@ export interface Book {
   reading_status: ReadingStatus;
   started_at: string | null;
   finished_at: string | null;
+  plan_to_start_at: string | null;
+  is_favorite?: boolean | null;
   format: "paper" | "ebook";
   current_page: number | null;
   total_pages: number | null;
@@ -185,6 +193,25 @@ export interface ReadingSession {
   user_id: string;
   date: string; // YYYY-MM-DD
   pages_read: number | null;
+  created_at: string;
+}
+
+/**
+ * 집중 읽기 세션 로그 (v9 · 뽀모도로 + 스톱워치).
+ * 기존 ReadingSession(일별 스냅샷)과 다르게, 개별 집중 블록을 저장해요.
+ */
+export type FocusMode = "pomodoro" | "stopwatch";
+
+export interface FocusSession {
+  id: string;
+  book_id: string;
+  user_id: string;
+  mode: FocusMode; // 'pomodoro' = 25분 고정, 'stopwatch' = 자유 카운트업
+  started_at: string; // ISO
+  ended_at: string | null; // ISO — 완료 또는 중단 시점
+  duration_seconds: number; // 실제 경과 (일시정지 제외)
+  pages_read_delta: number; // 이 세션 동안 읽은 쪽수
+  completed: boolean; // true = 사용자가 끝까지 완료, false = 중간 중단
   created_at: string;
 }
 

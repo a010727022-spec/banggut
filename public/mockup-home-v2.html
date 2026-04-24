@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>완독콩 홈 화면 · 테마 비교</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#F7F3ED; --cream-sub:#EFE9DF; --paper:#FEFCF6; --paper-sub:#F5EEE1;
+  --mint:#5FA48E; --mint-dark:#4A8873; --mint-soft:#E7F1EC; --mint-muted:#BFD9CD;
+  --ink:#0F0E0C; --ink-sub:#5A544C; --ink-soft:#8A8177;
+  --bd:rgba(15,14,12,0.08); --bd2:rgba(15,14,12,0.12);
+  --danger:#C8604F; --wish:#D69E52;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{font-family:'Pretendard Variable',Pretendard,-apple-system,sans-serif;background:#141414;color:var(--ink);-webkit-font-smoothing:antialiased}
+body{min-height:100vh;padding:40px 16px 80px}
+
+.page-head{text-align:center;margin-bottom:30px}
+.page-title{color:#E7E2D9;font-size:20px;font-weight:700;letter-spacing:-0.02em;margin-bottom:10px;display:inline-flex;align-items:center;gap:8px;justify-content:center}
+.page-title .v{color:var(--mint);font-family:'Gaegu',cursive;margin-left:4px;font-size:20px}
+.page-sub{color:#b5afa4;font-size:13px;line-height:1.6;margin-bottom:6px}
+.page-sub b{color:#E7E2D9;font-weight:600}
+.page-hint{color:#7a746a;font-size:11px;line-height:1.55;display:inline-flex;align-items:center;gap:6px;background:#1c1c1c;padding:6px 14px;border-radius:100px;border:1px solid #2a2a2a;margin-top:10px}
+.page-hint svg{width:13px;height:13px;stroke:var(--mint);fill:none;stroke-width:2}
+.page-hint b{color:var(--mint);font-weight:700}
+
+.phones-row{display:flex;gap:28px;justify-content:center;flex-wrap:wrap;max-width:1360px;margin:50px auto 0;padding:0 10px}
+
+/* Theme selection wrapper — clickable */
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;cursor:pointer;padding:18px 18px 22px;border-radius:58px;transition:all .3s;border:2px solid transparent;position:relative}
+.phone-wrap:hover{background:rgba(255,255,255,0.02)}
+.phone-wrap.selected{border-color:var(--mint);background:rgba(95,164,142,0.07);box-shadow:0 0 60px rgba(95,164,142,0.25),inset 0 0 0 1px rgba(95,164,142,0.15)}
+.theme-badge{display:flex;align-items:center;gap:8px;padding:9px 18px;background:#1c1c1c;border:1.5px solid #2a2a2a;border-radius:100px;transition:all .3s}
+.phone-wrap.selected .theme-badge{background:var(--mint);border-color:var(--mint)}
+.theme-radio{width:18px;height:18px;border-radius:50%;border:2px solid #4a4a4a;background:transparent;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.phone-wrap.selected .theme-radio{border-color:var(--paper);background:var(--paper)}
+.theme-radio::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--mint);opacity:0;transition:opacity .2s}
+.phone-wrap.selected .theme-radio::after{opacity:1}
+.theme-name{color:#E7E2D9;font-size:13px;font-weight:700;letter-spacing:-0.01em;transition:color .3s}
+.phone-wrap.selected .theme-name{color:var(--paper)}
+.theme-name .tag{color:var(--mint);font-family:'Gaegu',cursive;font-size:12px;margin-right:6px;font-weight:700}
+.phone-wrap.selected .theme-name .tag{color:var(--paper);opacity:0.9}
+.theme-desc{color:#8a8177;font-size:11px;line-height:1.55;text-align:center;max-width:330px;letter-spacing:-0.01em}
+.theme-desc b{color:#b5afa4;font-weight:600}
+.phone-wrap.selected .theme-desc{color:#a5a095}
+
+/* Phone shell */
+.phone{width:360px;height:812px;background:#000;border-radius:44px;padding:10px;position:relative;border:1px solid #2a2a2a;box-shadow:0 24px 80px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.04)}
+.phone-inner{width:100%;height:100%;background:var(--cream);border-radius:34px;overflow:hidden;position:relative;display:flex;flex-direction:column}
+.notch{position:absolute;top:18px;left:50%;transform:translateX(-50%);width:100px;height:26px;background:#000;border-radius:100px;z-index:10}
+
+.sb{height:44px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 28px 8px;font-size:14px;font-weight:600;color:var(--ink);flex-shrink:0}
+.sb .icons{display:flex;gap:5px;align-items:center}
+.sb svg{width:15px;height:15px;stroke:var(--ink);fill:none;stroke-width:2}
+
+.ab{padding:8px 20px 10px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.brand{display:inline-flex;align-items:baseline;font-family:'Gaegu',cursive;font-size:20px;font-weight:700;color:var(--ink);line-height:1;letter-spacing:0}
+.brand .dot{color:var(--mint);margin-left:1px}
+.ab-icons{display:flex;gap:10px;align-items:center}
+.ab-ic{width:38px;height:38px;min-width:38px;border-radius:50%;background:var(--paper);display:flex;align-items:center;justify-content:center;border:1px solid var(--bd);cursor:pointer;position:relative;transition:background .2s}
+.ab-ic:hover{background:var(--paper-sub)}
+.ab-ic svg{width:17px;height:17px;stroke:var(--ink);fill:none;stroke-width:2}
+.ab-ic .bdot{position:absolute;top:7px;right:8px;width:8px;height:8px;background:var(--mint);border-radius:50%;border:1.5px solid var(--paper)}
+
+.content{flex:1;overflow-y:auto;padding:0 20px 100px;-ms-overflow-style:none;scrollbar-width:none}
+.content::-webkit-scrollbar{display:none}
+
+.tabbar{position:absolute;bottom:10px;left:10px;right:10px;height:72px;background:rgba(254,252,246,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--bd);border-bottom-left-radius:34px;border-bottom-right-radius:34px;display:flex;align-items:flex-start;justify-content:space-around;padding:10px 8px 16px}
+.tab{display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px 14px;min-width:48px;cursor:pointer}
+.tab svg{width:22px;height:22px;stroke:var(--ink-soft);fill:none;stroke-width:2}
+.tab span{font-size:10px;color:var(--ink-soft);font-weight:500}
+.tab.on svg{stroke:var(--mint);fill:var(--mint-soft)}
+.tab.on span{color:var(--mint);font-weight:700}
+
+/* ========== Greeting (shared) ========== */
+.greet{display:flex;align-items:center;gap:12px;padding:8px 2px 18px}
+.mascot-wrap{width:56px;height:56px;min-width:56px;border-radius:50%;background:var(--mint-soft);border:1px solid rgba(95,164,142,0.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.mascot{width:50px;height:50px;object-fit:contain;display:block}
+.greet-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.greet-hi{font-size:15px;color:var(--ink);font-weight:600;letter-spacing:-0.015em;line-height:1.35}
+.greet-hi b{font-weight:700;color:var(--mint-dark)}
+.greet-date{font-size:11.5px;color:var(--ink-sub);line-height:1.4}
+
+/* ========== Theme A: 이어 읽기 HERO ========== */
+.cch{background:linear-gradient(155deg,var(--mint) 0%,var(--mint-dark) 100%);border-radius:22px;padding:18px;color:var(--paper);margin-bottom:14px;position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(95,164,142,0.22)}
+.cch::before{content:'';position:absolute;top:-60px;right:-40px;width:180px;height:180px;background:rgba(255,255,255,0.06);border-radius:50%;pointer-events:none}
+.cch::after{content:'';position:absolute;bottom:-80px;left:-30px;width:140px;height:140px;background:rgba(255,255,255,0.04);border-radius:50%;pointer-events:none}
+.cch-badge{font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;opacity:0.85;margin-bottom:12px;position:relative;display:inline-flex;align-items:center;gap:6px}
+.cch-badge svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.5}
+.cch-main{display:flex;gap:14px;margin-bottom:12px;position:relative}
+.cch-info{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between;padding:2px 0}
+.cch-ttl{font-size:19px;font-weight:700;line-height:1.25;letter-spacing:-0.02em;margin-bottom:4px}
+.cch-auth{font-size:12px;opacity:0.8;margin-bottom:12px}
+.cch-stats{display:flex;gap:14px;font-size:11px}
+.cch-stat b{font-size:15px;font-weight:700;display:block;font-family:'Gaegu',cursive;line-height:1;margin-bottom:2px}
+.cch-stat span{opacity:0.78;font-size:10px}
+.cch-ctx{background:rgba(255,255,255,0.12);border-radius:12px;padding:11px 13px;font-family:'Gaegu',cursive;font-size:14px;line-height:1.5;margin-bottom:12px;position:relative}
+.cch-ctx-lbl{font-size:9px;font-weight:700;letter-spacing:0.1em;opacity:0.75;margin-bottom:4px;font-family:'Pretendard Variable',sans-serif;text-transform:uppercase;display:flex;align-items:center;gap:5px}
+.cch-ctx-lbl svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2.5}
+.cch-cta{background:var(--paper);color:var(--mint-dark);border:none;width:100%;padding:13px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;min-height:44px;transition:transform .2s}
+.cch-cta:hover{transform:translateY(-1px)}
+.cch-cta svg{width:15px;height:15px;stroke:var(--mint-dark);fill:none;stroke-width:2.5}
+
+/* Cover (shared) */
+.cover{border-radius:5px;flex-shrink:0;position:relative;overflow:hidden;box-shadow:2px 4px 10px rgba(0,0,0,0.18)}
+.cover::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,0.12),transparent 28%)}
+.cover.md{width:84px;height:120px}
+.cover.sm{width:78px;height:108px}
+.cover .c-ttl{position:absolute;top:12%;left:10%;right:10%;color:#F5EEE1;font-weight:700;line-height:1.15;font-family:'Gaegu',cursive;z-index:1;font-size:13px}
+.cover.sm .c-ttl{font-size:12px}
+.cover .c-auth{position:absolute;bottom:8%;left:10%;color:rgba(245,238,225,0.7);font-weight:500;font-size:9px;z-index:1}
+.cover-sonyeon{background:linear-gradient(135deg,#8A6A3F,#4A3520)}
+
+/* Segmented tabs (Theme A) */
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--cream-sub);padding:4px;border-radius:14px;margin-bottom:14px}
+.seg-btn{padding:10px 8px;border-radius:10px;font-size:12px;font-weight:600;color:var(--ink-soft);text-align:center;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .2s;border:none;background:transparent;font-family:inherit;min-height:40px;letter-spacing:-0.01em}
+.seg-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.seg-btn.on{background:var(--paper);color:var(--ink);font-weight:700;box-shadow:0 1px 3px rgba(15,14,12,0.08)}
+.seg-btn.on svg{stroke:var(--mint-dark)}
+.panel{display:none}
+.panel.on{display:block;animation:fadeIn .25s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* ========== Calendar card (shared both themes) ========== */
+.cal{background:var(--paper);border-radius:18px;border:1px solid var(--bd);padding:18px 16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(15,14,12,0.03)}
+.cal-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.cal-mo{font-size:15px;font-weight:700;color:var(--ink);letter-spacing:-0.01em}
+.cal-mo span{color:var(--ink-soft);font-weight:500;font-size:12px;margin-left:4px}
+.streak{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--mint-dark);font-weight:700;background:var(--mint-soft);padding:6px 11px;border-radius:100px}
+.streak b{font-size:13px;font-family:'Gaegu',cursive;line-height:1}
+.streak svg{width:13px;height:13px;fill:var(--mint-dark)}
+.cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:16px}
+.cd{display:flex;flex-direction:column;align-items:center;gap:6px;padding:2px 0}
+.cd-lbl{font-size:10px;color:var(--ink-soft);font-weight:600;letter-spacing:0.04em}
+.cd-dot{width:28px;height:28px;border-radius:50%;background:var(--cream-sub);font-size:11px;font-weight:600;color:var(--ink-soft);display:flex;align-items:center;justify-content:center}
+.cd-dot.read{background:var(--mint);color:var(--paper)}
+.cd-dot.read svg{width:13px;height:13px;stroke:var(--paper);fill:none;stroke-width:3}
+.cd-dot.today{background:var(--paper);border:2px solid var(--mint);color:var(--mint-dark);font-weight:700}
+.cal-events{border-top:1px dashed var(--bd2);padding-top:14px;display:flex;flex-direction:column;gap:13px}
+.ev{display:flex;align-items:center;gap:11px}
+.ev-ic{width:36px;height:36px;min-width:36px;border-radius:11px;background:var(--mint-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ev-ic svg{width:18px;height:18px;stroke:var(--mint-dark);fill:none;stroke-width:2}
+.ev-ic.wish{background:rgba(214,158,82,0.15)}
+.ev-ic.wish svg{stroke:var(--wish)}
+.ev-ic.lib{background:rgba(200,96,79,0.12)}
+.ev-ic.lib svg{stroke:var(--danger)}
+.ev-body{flex:1;min-width:0}
+.ev-ttl{font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-0.01em}
+.ev-meta{font-size:11px;color:var(--ink-sub);margin-top:2px}
+.ev-dday{font-size:10px;font-weight:700;color:var(--mint-dark);background:var(--mint-soft);padding:4px 9px;border-radius:8px;flex-shrink:0}
+.ev-dday.wish{color:var(--wish);background:rgba(214,158,82,0.15)}
+.ev-dday.warn{color:var(--danger);background:rgba(200,96,79,0.1)}
+
+/* ========== Theme B: 컴팩트 이어 읽기 ========== */
+.cc{background:var(--paper);border-radius:18px;border:1px solid var(--bd);padding:16px;margin-bottom:8px;box-shadow:0 2px 8px rgba(15,14,12,0.03)}
+.cc-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.cc-lbl{font-size:12px;color:var(--ink-sub);font-weight:600;letter-spacing:-0.01em}
+.cc-pct{font-size:12px;color:var(--mint-dark);font-weight:700}
+.cc-pct b{font-family:'Gaegu',cursive;font-size:14px;margin-right:3px}
+.cc-body{display:flex;gap:13px;margin-bottom:14px}
+.cc-info{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between;padding:2px 0}
+.cc-ttl{font-size:18px;font-weight:700;letter-spacing:-0.02em;line-height:1.25;margin-bottom:3px;color:var(--ink)}
+.cc-auth{font-size:12px;color:var(--ink-sub)}
+.cc-stats{font-size:12px;color:var(--ink);font-weight:600;margin-top:12px;display:flex;align-items:baseline;gap:4px}
+.cc-stats b{font-family:'Gaegu',cursive;font-size:17px;color:var(--ink);font-weight:700}
+.cc-bar{height:5px;background:var(--cream-sub);border-radius:100px;overflow:hidden;margin-top:6px;width:100%}
+.cc-fill{height:100%;background:linear-gradient(90deg,var(--mint),var(--mint-dark));border-radius:100px;transition:width 0.3s}
+.cc-cta{background:var(--mint);color:var(--paper);border:none;width:100%;padding:15px;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;min-height:48px;transition:background .2s,transform .2s}
+.cc-cta:hover{background:var(--mint-dark);transform:translateY(-1px)}
+.cc-cta svg{width:17px;height:17px;stroke:var(--paper);fill:none;stroke-width:2.5}
+
+/* Section header (Theme B) */
+.sec-hd{display:flex;justify-content:space-between;align-items:center;padding:16px 2px 10px}
+.sec-hd .title{font-size:14px;font-weight:700;color:var(--ink);letter-spacing:-0.01em}
+.sec-hd .more{font-size:11px;color:var(--ink-soft);font-weight:600;display:flex;align-items:center;gap:3px;text-decoration:none;cursor:pointer}
+.sec-hd .more svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2.5}
+
+/* Community feed (shared) */
+.feed{background:var(--paper);border-radius:18px;border:1px solid var(--bd);padding:4px 14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(15,14,12,0.03)}
+.fd{display:flex;gap:11px;padding:13px 0;border-bottom:1px solid var(--bd)}
+.fd:last-child{border-bottom:none}
+.av{width:36px;height:36px;min-width:36px;border-radius:50%;background:var(--mint-soft);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--mint-dark);flex-shrink:0;font-family:'Gaegu',cursive}
+.fd-body{flex:1;min-width:0}
+.fd-hd{display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap}
+.fd-nm{font-size:13px;font-weight:700;color:var(--ink);letter-spacing:-0.01em}
+.fd-vb{font-size:11px;color:var(--ink-sub)}
+.fd-tm{font-size:10px;color:var(--ink-soft);margin-left:auto;flex-shrink:0}
+.fd-bk{font-size:11px;color:var(--mint-dark);font-weight:600;margin-bottom:6px;letter-spacing:-0.01em}
+.fd-qt{background:var(--cream-sub);border-radius:10px;padding:9px 12px;font-family:'Gaegu',cursive;font-size:13px;line-height:1.5;color:var(--ink);margin-bottom:7px;position:relative}
+.fd-qt::before{content:'\201C';position:absolute;left:5px;top:-4px;font-size:22px;color:var(--mint-muted);font-family:Georgia,serif;line-height:1}
+.fd-act{display:flex;gap:14px;font-size:11px;color:var(--ink-soft)}
+.fa{display:flex;align-items:center;gap:4px;cursor:pointer;min-height:28px;padding:2px 0}
+.fa svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.fa.on{color:var(--mint-dark);font-weight:700}
+.fa.on svg{fill:var(--mint);stroke:var(--mint)}
+
+/* ========== Theme Picker Modal (in-app selection UI) ========== */
+.modal-hd{padding:10px 16px 14px;display:flex;align-items:center;gap:8px;flex-shrink:0;border-bottom:1px solid var(--bd)}
+.modal-back{width:36px;height:36px;min-width:36px;border-radius:50%;background:transparent;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);transition:background .2s}
+.modal-back:hover{background:var(--paper-sub)}
+.modal-back svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.2}
+.modal-ttl{flex:1;font-size:16px;font-weight:700;color:var(--ink);letter-spacing:-0.02em;text-align:center}
+.modal-close{width:36px;height:36px;min-width:36px;border-radius:50%;background:var(--paper);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft)}
+.modal-close svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5}
+
+.tp-hero{padding:22px 4px 20px;text-align:center}
+.tp-hero-mascot{display:flex;justify-content:center;margin-bottom:14px}
+.tp-hero-mascot .mascot-wrap{width:68px;height:68px;min-width:68px}
+.tp-hero-mascot .mascot{width:60px;height:60px}
+.tp-hero h2{font-size:20px;font-weight:700;color:var(--ink);line-height:1.3;letter-spacing:-0.02em;margin-bottom:8px}
+.tp-hero p{font-size:12.5px;color:var(--ink-sub);line-height:1.5}
+
+.tp-opts{display:flex;flex-direction:column;gap:12px;margin-bottom:18px}
+.tp-opt{background:var(--paper);border:2px solid var(--bd);border-radius:16px;padding:14px;display:grid;grid-template-columns:72px 1fr 22px;gap:14px;align-items:center;cursor:pointer;transition:all .25s;font-family:inherit;text-align:left;width:100%}
+.tp-opt:hover{background:var(--paper-sub)}
+.tp-opt.on{border-color:var(--mint);background:var(--mint-soft)}
+.tp-opt.on .tp-opt-tag{background:var(--mint);color:var(--paper)}
+.tp-opt-meta{display:flex;flex-direction:column;gap:4px;min-width:0}
+.tp-opt-name{font-size:14px;font-weight:700;color:var(--ink);letter-spacing:-0.015em;display:flex;align-items:center;gap:6px}
+.tp-opt-tag{font-family:'Gaegu',cursive;font-size:11px;font-weight:700;background:var(--cream-sub);color:var(--ink-sub);padding:2px 8px;border-radius:100px;transition:all .25s;line-height:1.4}
+.tp-opt-desc{font-size:11px;color:var(--ink-sub);line-height:1.5}
+.tp-opt-rd{width:22px;height:22px;border-radius:50%;border:2px solid var(--bd2);background:var(--paper);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .25s}
+.tp-opt.on .tp-opt-rd{background:var(--mint);border-color:var(--mint)}
+.tp-opt-rd svg{width:12px;height:12px;stroke:var(--paper);fill:none;stroke-width:3;opacity:0;transition:opacity .2s}
+.tp-opt.on .tp-opt-rd svg{opacity:1}
+
+/* Mini preview (abstract layout thumbnail) */
+.tp-prev{width:72px;height:104px;border-radius:9px;background:var(--cream);border:1px solid var(--bd);padding:7px 6px;display:flex;flex-direction:column;gap:4px;overflow:hidden;position:relative}
+.mn-bar{height:4px;border-radius:100px;background:var(--cream-sub)}
+.mn-bar.m{width:60%}
+.mn-bar.s{width:36%}
+.tp-prev.a .mn-hero{flex:1.6;background:linear-gradient(155deg,var(--mint),var(--mint-dark));border-radius:5px;position:relative}
+.tp-prev.a .mn-hero::after{content:'';position:absolute;left:6px;bottom:5px;right:6px;height:7px;background:var(--paper);border-radius:2px;opacity:0.92}
+.tp-prev.a .mn-seg{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--cream-sub);padding:2px;border-radius:3px;min-height:10px}
+.tp-prev.a .mn-seg-btn{background:var(--paper);border-radius:2px}
+.tp-prev.a .mn-seg-btn.off{background:transparent}
+.tp-prev.b .mn-cal{flex:1.2;background:var(--paper);border:1px solid var(--bd);border-radius:5px;padding:4px;display:flex;flex-direction:column;gap:3px;justify-content:space-around}
+.tp-prev.b .mn-cal-dots{display:flex;gap:2px;justify-content:space-between}
+.tp-prev.b .mn-cal-dot{width:5px;height:5px;border-radius:50%;background:var(--mint)}
+.tp-prev.b .mn-cal-dot.last{background:transparent;border:1px solid var(--mint)}
+.tp-prev.b .mn-cc{background:var(--paper);border:1px solid var(--bd);border-radius:4px;padding:3px 4px;display:flex;gap:3px;align-items:center;min-height:20px}
+.tp-prev.b .mn-cover{width:9px;height:13px;background:linear-gradient(135deg,#8A6A3F,#4A3520);border-radius:1px;flex-shrink:0}
+.tp-prev.b .mn-cc-right{flex:1;display:flex;flex-direction:column;gap:2px}
+.tp-prev.b .mn-cta{height:8px;border-radius:3px;background:var(--mint);margin-top:1px}
+
+.tp-apply{width:100%;padding:15px;border-radius:14px;background:var(--mint);color:var(--paper);border:none;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;min-height:48px;transition:background .2s,transform .2s;display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:6px}
+.tp-apply:hover{background:var(--mint-dark);transform:translateY(-1px)}
+.tp-apply svg{width:16px;height:16px;stroke:var(--paper);fill:none;stroke-width:2.5}
+.tp-note{text-align:center;font-size:10.5px;color:var(--ink-soft);line-height:1.5}
+
+/* Entrance animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+.content>*{animation:fadeUp .5s ease-out both}
+.content>*:nth-child(1){animation-delay:.05s}
+.content>*:nth-child(2){animation-delay:.12s}
+.content>*:nth-child(3){animation-delay:.2s}
+.content>*:nth-child(4){animation-delay:.28s}
+.content>*:nth-child(5){animation-delay:.36s}
+.mascot{animation:bob 3.5s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.content>*,.mascot,.phone-wrap{animation:none;transition:none}}
+</style>
+</head>
+<body>
+<div class="page-head">
+  <div class="page-title">
+    완독콩 홈 화면
+    <span class="v">테마 비교</span>
+  </div>
+  <div class="page-sub">두 테마를 모두 구현하고, 사용자가 <b>설정에서 자유롭게 전환</b>할 수 있어요</div>
+  <div class="page-hint">
+    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    <span>왼쪽 두 폰은 <b>각 테마 적용 시</b>, 세 번째는 <b>실제 선택 UI</b></span>
+  </div>
+</div>
+
+<div class="phones-row">
+<!-- ============ THEME A · 이어 읽기 HERO ============ -->
+<div class="phone-wrap" data-theme="A">
+  <div class="theme-badge">
+    <div class="theme-radio"></div>
+    <div class="theme-name"><span class="tag">테마 A</span>이어 읽기 HERO</div>
+  </div>
+  <div class="theme-desc"><b>책과 이어지는 순간</b>이 가장 크게. 어제 멈춘 곳·마지막 문장이 한눈에,<br>캘린더 ↔ 커뮤니티는 아래 탭으로 전환해요.</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="phone-inner">
+      <div class="sb">
+        <span>9:41</span>
+        <div class="icons">
+          <svg viewBox="0 0 24 24"><path d="M2 20h.01M7 20v-4M12 20v-8M17 20V8M22 4v16"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
+          <svg viewBox="0 0 24 24"><rect x="1" y="6" width="18" height="12" rx="2"/><line x1="23" y1="13" x2="23" y2="11"/></svg>
+        </div>
+      </div>
+      <div class="ab">
+        <div class="brand"><span>완독콩<span class="dot">.</span></span></div>
+        <div class="ab-icons">
+          <div class="ab-ic" aria-label="알림">
+            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span class="bdot"></span>
+          </div>
+          <div class="ab-ic" aria-label="내 프로필">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="greet">
+          <div class="mascot-wrap"><img src="/mascot-morning.png" class="mascot" alt="아침 인사를 하는 완독콩"></div>
+          <div class="greet-txt">
+            <div class="greet-hi">좋은 아침이에요, <b>지선</b>님</div>
+            <div class="greet-date">오늘은 4월 22일 수요일이에요</div>
+          </div>
+        </div>
+
+        <div class="cch">
+          <div class="cch-badge">
+            <svg viewBox="0 0 24 24"><polyline points="12 6 12 12 16 14"/><circle cx="12" cy="12" r="10"/></svg>
+            어제 멈춘 곳
+          </div>
+          <div class="cch-main">
+            <div class="cover md cover-sonyeon"><div class="c-ttl">소년이<br>온다</div><div class="c-auth">한강</div></div>
+            <div class="cch-info">
+              <div>
+                <div class="cch-ttl">소년이 온다</div>
+                <div class="cch-auth">한강 · 창비</div>
+              </div>
+              <div class="cch-stats">
+                <div class="cch-stat"><b>218</b><span>쪽 / 404</span></div>
+                <div class="cch-stat"><b>54%</b><span>완독률</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="cch-ctx">
+            <div class="cch-ctx-lbl">
+              <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h12M4 17h10"/></svg>
+              어제 마지막 문장
+            </div>
+            "그 밤, 우리는 모두 말을 잃었다. 남은 건 서로의 숨소리뿐이었다."
+          </div>
+          <button class="cch-cta" type="button">
+            이어 읽기
+            <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+
+        <div class="seg" role="tablist">
+          <button class="seg-btn on" role="tab" aria-selected="true" type="button">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            캘린더
+          </button>
+          <button class="seg-btn" role="tab" aria-selected="false" type="button">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            커뮤니티
+          </button>
+        </div>
+
+        <div class="panel on">
+          <div class="cal">
+            <div class="cal-hd">
+              <div class="cal-mo">2026. 4<span>· 이번 주</span></div>
+              <div class="streak">
+                <svg viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+                <b>12</b> 일 연속
+              </div>
+            </div>
+            <div class="cal-days">
+              <div class="cd"><span class="cd-lbl">목</span><div class="cd-dot read"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+              <div class="cd"><span class="cd-lbl">금</span><div class="cd-dot read"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+              <div class="cd"><span class="cd-lbl">토</span><div class="cd-dot read"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+              <div class="cd"><span class="cd-lbl">일</span><div class="cd-dot read"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+              <div class="cd"><span class="cd-lbl">월</span><div class="cd-dot read"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+              <div class="cd"><span class="cd-lbl">화</span><div class="cd-dot read"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+              <div class="cd"><span class="cd-lbl">수</span><div class="cd-dot today">22</div></div>
+            </div>
+            <div class="cal-events">
+              <div class="ev">
+                <div class="ev-ic"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+                <div class="ev-body"><div class="ev-ttl">4월 독서모임 · 동백꽃 필 무렵</div><div class="ev-meta">내일 19:00 · 홍대 카페 테마</div></div>
+                <div class="ev-dday">D-1</div>
+              </div>
+              <div class="ev">
+                <div class="ev-ic wish"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M2 7l2-4h16l2 4M8 11h8"/></svg></div>
+                <div class="ev-body"><div class="ev-ttl">파친코 1권 도착 예정</div><div class="ev-meta">4/25 토 · 위시 리스트</div></div>
+                <div class="ev-dday wish">D-3</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="feed">
+            <div class="fd">
+              <div class="av">민</div>
+              <div class="fd-body">
+                <div class="fd-hd"><span class="fd-nm">민지</span><span class="fd-vb">· 문장을 그었어요</span><span class="fd-tm">2h</span></div>
+                <div class="fd-bk">소년이 온다 · 한강</div>
+                <div class="fd-qt">우리는 너를 기억해. 네 얼굴 하나하나, 네가 남긴 말 하나하나까지.</div>
+                <div class="fd-act">
+                  <div class="fa on"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> 7</div>
+                  <div class="fa"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 3</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tabbar">
+        <div class="tab on"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>홈</span></div>
+        <div class="tab"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 3v18"/></svg><span>서재</span></div>
+        <div class="tab"><svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4z"/></svg><span>쓰기</span></div>
+        <div class="tab"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>친구</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- END THEME A -->
+
+<!-- ============ THEME B · 캘린더 First ============ -->
+<div class="phone-wrap" data-theme="B">
+  <div class="theme-badge">
+    <div class="theme-radio"></div>
+    <div class="theme-name"><span class="tag">테마 B</span>캘린더 First</div>
+  </div>
+  <div class="theme-desc"><b>오늘 일정부터 확인</b>. 이어 읽기는 진행률로 담백하게,<br>친구들의 오늘은 아래 섹션에서 천천히 살펴요.</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="phone-inner">
+      <div class="sb">
+        <span>9:41</span>
+        <div class="icons">
+          <svg viewBox="0 0 24 24"><path d="M2 20h.01M7 20v-4M12 20v-8M17 20V8M22 4v16"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
+          <svg viewBox="0 0 24 24"><rect x="1" y="6" width="18" height="12" rx="2"/><line x1="23" y1="13" x2="23" y2="11"/></svg>
+        </div>
+      </div>
+      <div class="ab">
+        <div class="brand"><span>완독콩<span class="dot">.</span></span></div>
+        <div class="ab-icons">
+          <div class="ab-ic" aria-label="알림">
+            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span class="bdot"></span>
+          </div>
+          <div class="ab-ic" aria-label="내 프로필">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="greet">
+          <div class="mascot-wrap"><img src="/mascot-morning.png" class="mascot" alt="아침 인사를 하는 완독콩"></div>
+          <div class="greet-txt">
+            <div class="greet-hi">좋은 아침이에요, <b>지선</b>님</div>
+            <div class="greet-date">오늘은 4월 22일 수요일이에요</div>
+          </div>
+        </div>
+        <div class="cal">
+          <div class="cal-hd">
+            <div class="cal-mo">2026. 4<span>· 이번 주</span></div>
+            <div class="streak">
+              <svg viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+              <b>12</b> 일 연속
+            </div>
+          </div>
+          <div class="cal-days">
+            <div class="cd"><span class="cd-lbl">목</span><div class="cd-dot read"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+            <div class="cd"><span class="cd-lbl">금</span><div class="cd-dot read"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+            <div class="cd"><span class="cd-lbl">토</span><div class="cd-dot read"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+            <div class="cd"><span class="cd-lbl">일</span><div class="cd-dot read"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+            <div class="cd"><span class="cd-lbl">월</span><div class="cd-dot read"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+            <div class="cd"><span class="cd-lbl">화</span><div class="cd-dot read"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+            <div class="cd"><span class="cd-lbl">수</span><div class="cd-dot today">22</div></div>
+          </div>
+          <div class="cal-events">
+            <div class="ev">
+              <div class="ev-ic"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+              <div class="ev-body"><div class="ev-ttl">4월 독서모임 · 동백꽃 필 무렵</div><div class="ev-meta">내일 19:00 · 홍대 카페 테마</div></div>
+              <div class="ev-dday">D-1</div>
+            </div>
+            <div class="ev">
+              <div class="ev-ic wish"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M2 7l2-4h16l2 4M8 11h8"/></svg></div>
+              <div class="ev-body"><div class="ev-ttl">파친코 1권 도착 예정</div><div class="ev-meta">4/25 토 · 위시 리스트 주문</div></div>
+              <div class="ev-dday wish">D-3</div>
+            </div>
+            <div class="ev">
+              <div class="ev-ic lib"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+              <div class="ev-body"><div class="ev-ttl">작별하지 않는다 · 반납일</div><div class="ev-meta">4/28 화 · 강남도서관</div></div>
+              <div class="ev-dday warn">D-6</div>
+            </div>
+          </div>
+        </div>
+        <div class="cc">
+          <div class="cc-hd"><span class="cc-lbl">이어 읽기</span><span class="cc-pct"><b>54%</b>완독</span></div>
+          <div class="cc-body">
+            <div class="cover sm cover-sonyeon"><div class="c-ttl">소년이<br>온다</div><div class="c-auth">한강</div></div>
+            <div class="cc-info">
+              <div><div class="cc-ttl">소년이 온다</div><div class="cc-auth">한강 · 창비</div></div>
+              <div><div class="cc-stats"><b>218</b> / 404쪽</div><div class="cc-bar"><div class="cc-fill" style="width:54%"></div></div></div>
+            </div>
+          </div>
+          <button class="cc-cta" type="button">이어 읽기<svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>
+        </div>
+        <div class="sec-hd">
+          <span class="title">친구들의 오늘</span>
+          <a class="more">더보기 <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></a>
+        </div>
+        <div class="feed">
+          <div class="fd">
+            <div class="av">민</div>
+            <div class="fd-body">
+              <div class="fd-hd"><span class="fd-nm">민지</span><span class="fd-vb">· 문장을 그었어요</span><span class="fd-tm">2h</span></div>
+              <div class="fd-bk">소년이 온다 · 한강</div>
+              <div class="fd-qt">우리는 너를 기억해. 네 얼굴 하나하나, 네가 남긴 말 하나하나까지.</div>
+              <div class="fd-act">
+                <div class="fa on"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> 7</div>
+                <div class="fa"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 3</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tabbar">
+        <div class="tab on"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>홈</span></div>
+        <div class="tab"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 3v18"/></svg><span>서재</span></div>
+        <div class="tab"><svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4z"/></svg><span>쓰기</span></div>
+        <div class="tab"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>친구</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- END THEME B -->
+
+<!-- ============ PHONE C · 실제 선택 UI (설정 > 홈 화면 테마) ============ -->
+<div class="phone-wrap demo" data-theme="C">
+  <div class="theme-badge">
+    <div class="theme-radio"></div>
+    <div class="theme-name"><span class="tag">실제 화면</span>설정 · 홈 화면 테마</div>
+  </div>
+  <div class="theme-desc"><b>앱 안에서 직접 고르는 UI</b>. 미니 프리뷰로 한눈에 비교하고,<br>언제든 설정에서 다른 테마로 바꿀 수 있어요.</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="phone-inner">
+      <div class="sb">
+        <span>9:41</span>
+        <div class="icons">
+          <svg viewBox="0 0 24 24"><path d="M2 20h.01M7 20v-4M12 20v-8M17 20V8M22 4v16"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
+          <svg viewBox="0 0 24 24"><rect x="1" y="6" width="18" height="12" rx="2"/><line x1="23" y1="13" x2="23" y2="11"/></svg>
+        </div>
+      </div>
+      <div class="modal-hd">
+        <button class="modal-back" type="button" aria-label="뒤로 가기">
+          <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <div class="modal-ttl">홈 화면 테마</div>
+        <button class="modal-close" type="button" aria-label="닫기">
+          <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="content">
+        <div class="tp-hero">
+          <div class="tp-hero-mascot">
+            <div class="mascot-wrap"><img src="/mascot-happy.png" class="mascot" alt="웃고 있는 완독콩"></div>
+          </div>
+          <h2>나에게 맞는 홈을<br>골라보세요</h2>
+          <p>언제든 설정에서 다시 바꿀 수 있어요</p>
+        </div>
+
+        <div class="tp-opts">
+          <button class="tp-opt on" type="button" data-opt="A">
+            <div class="tp-prev a">
+              <div class="mn-hero"></div>
+              <div class="mn-seg">
+                <div class="mn-seg-btn"></div>
+                <div class="mn-seg-btn off"></div>
+              </div>
+              <div class="mn-bar m"></div>
+              <div class="mn-bar s"></div>
+            </div>
+            <div class="tp-opt-meta">
+              <div class="tp-opt-name">이어 읽기 HERO <span class="tp-opt-tag">책 중심</span></div>
+              <div class="tp-opt-desc">어제 멈춘 곳·마지막 문장을 크게. 캘린더·커뮤니티는 탭으로 전환.</div>
+            </div>
+            <div class="tp-opt-rd">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </button>
+
+          <button class="tp-opt" type="button" data-opt="B">
+            <div class="tp-prev b">
+              <div class="mn-cal">
+                <div class="mn-cal-dots">
+                  <div class="mn-cal-dot"></div>
+                  <div class="mn-cal-dot"></div>
+                  <div class="mn-cal-dot"></div>
+                  <div class="mn-cal-dot"></div>
+                  <div class="mn-cal-dot"></div>
+                  <div class="mn-cal-dot"></div>
+                  <div class="mn-cal-dot last"></div>
+                </div>
+                <div class="mn-bar m"></div>
+                <div class="mn-bar s"></div>
+              </div>
+              <div class="mn-cc">
+                <div class="mn-cover"></div>
+                <div class="mn-cc-right">
+                  <div class="mn-bar m"></div>
+                  <div class="mn-bar s"></div>
+                </div>
+              </div>
+              <div class="mn-cta"></div>
+            </div>
+            <div class="tp-opt-meta">
+              <div class="tp-opt-name">캘린더 First <span class="tp-opt-tag">일정 중심</span></div>
+              <div class="tp-opt-desc">오늘 일정부터 한눈에. 이어 읽기는 진행률로 담백하게.</div>
+            </div>
+            <div class="tp-opt-rd">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </button>
+        </div>
+
+        <button class="tp-apply" type="button">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          테마 적용하기
+        </button>
+        <div class="tp-note">설정 &gt; 앱 설정 &gt; 홈 화면에서 다시 바꿀 수 있어요</div>
+      </div>
+      <div class="tabbar">
+        <div class="tab"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>홈</span></div>
+        <div class="tab"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 3v18"/></svg><span>서재</span></div>
+        <div class="tab"><svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4z"/></svg><span>쓰기</span></div>
+        <div class="tab"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>친구</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- END PHONE C -->
+</div>
+
+<script>
+// Phone-wrap outer selection — visual comparison tool
+document.querySelectorAll('.phone-wrap').forEach(function(wrap){
+  wrap.addEventListener('click',function(e){
+    // Don't trigger wrap selection if clicking interactive elements inside the phone
+    if(e.target.closest('.seg-btn')||e.target.closest('.cch-cta')||e.target.closest('.cc-cta')||e.target.closest('.ab-ic')||e.target.closest('.tab')||e.target.closest('.more')||e.target.closest('.fa')||e.target.closest('.tp-opt')||e.target.closest('.tp-apply')||e.target.closest('.modal-back')||e.target.closest('.modal-close'))return;
+    document.querySelectorAll('.phone-wrap').forEach(function(w){w.classList.remove('selected');});
+    wrap.classList.add('selected');
+  });
+});
+
+// Segmented tabs inside Theme A
+document.querySelectorAll('.phone').forEach(function(phone){
+  var btns=phone.querySelectorAll('.seg-btn');
+  var panels=phone.querySelectorAll('.panel');
+  btns.forEach(function(btn,i){
+    btn.addEventListener('click',function(e){
+      e.stopPropagation();
+      btns.forEach(function(b){b.classList.remove('on');b.setAttribute('aria-selected','false');});
+      panels.forEach(function(p){p.classList.remove('on');});
+      btn.classList.add('on');
+      btn.setAttribute('aria-selected','true');
+      if(panels[i])panels[i].classList.add('on');
+    });
+  });
+});
+
+// Theme picker inside Phone C — real in-app selection UI
+document.querySelectorAll('.tp-opts').forEach(function(group){
+  var opts=group.querySelectorAll('.tp-opt');
+  opts.forEach(function(opt){
+    opt.addEventListener('click',function(e){
+      e.stopPropagation();
+      opts.forEach(function(o){o.classList.remove('on');});
+      opt.classList.add('on');
+    });
+  });
+});
+</script>
+</body>
+</html>

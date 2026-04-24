@@ -1,6 +1,35 @@
 import { NextResponse } from "next/server";
 import { getApiUser, unauthorized, tooManyRequests } from "@/lib/supabase/api-auth";
 import { rateLimit } from "@/lib/rate-limit";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
+import { normalizeKey } from "@/lib/normalize-key";
+
+const CACHE_TTL_DAYS = 7; // 신간 반영 위해 너무 길게는 안 함
+
+function getSupabase() {
+  const cookieStore = cookies();
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        async getAll() {
+          return (await cookieStore).getAll();
+        },
+        async setAll(cookiesToSet) {
+          try {
+            for (const { name, value, options } of cookiesToSet) {
+              (await cookieStore).set(name, value, options);
+            }
+          } catch {
+            // ignore
+          }
+        },
+      },
+    },
+  );
+}
 
 export async function POST(req: Request) {
   const user = await getApiUser(req);
@@ -15,6 +44,25 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid query" }, { status: 400 });
   }
 
+  const supabase = getSupabase();
+  const queryNorm = normalizeKey(query);
+
+  // ═══ 캐시 확인 ═══
+  const { data: cached } = await supabase
+    .from("aladin_search_cache")
+    .select("books, expires_at")
+    .eq("query_normalized", queryNorm)
+    .single();
+
+  if (cached && new Date(cached.expires_at) > new Date()) {
+    console.log("[search-book] 캐시 히트:", query);
+    // hit_count 증가 (비동기, 실패해도 무시)
+    supabase
+      .rpc("increment_aladin_search_hits", { p_query: queryNorm })
+      .then(() => {}, () => {});
+    return NextResponse.json({ books: cached.books, cached: true });
+  }
+
   try {
     const ttbKey = process.env.ALADIN_TTB_KEY;
     if (!ttbKey) {
@@ -23,8 +71,10 @@ export async function POST(req: Request) {
     }
 
     // 1) ItemSearch로 검색
+    // ⚠️ Aladin API는 헤더 인증을 지원하지 않아 URL query 방식 불가피
+    // 대신 HTTPS로 전송하여 중간자 공격(MITM) 방지
     const searchUrl =
-      `http://www.aladin.co.kr/ttb/api/ItemSearch.aspx?` +
+      `https://www.aladin.co.kr/ttb/api/ItemSearch.aspx?` +
       `ttbkey=${ttbKey}` +
       `&Query=${encodeURIComponent(query)}` +
       `&QueryType=Keyword` +
@@ -61,7 +111,7 @@ export async function POST(req: Request) {
           if (isbn) {
             try {
               const lookupUrl =
-                `http://www.aladin.co.kr/ttb/api/ItemLookUp.aspx?` +
+                `https://www.aladin.co.kr/ttb/api/ItemLookUp.aspx?` +
                 `ttbkey=${ttbKey}` +
                 `&itemIdType=ISBN13` +
                 `&ItemId=${isbn}` +
@@ -104,6 +154,24 @@ export async function POST(req: Request) {
         },
       ),
     );
+
+    // ═══ 캐시 저장 (결과가 있을 때만) ═══
+    if (books.length > 0) {
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + CACHE_TTL_DAYS);
+      await supabase
+        .from("aladin_search_cache")
+        .upsert(
+          {
+            query_normalized: queryNorm,
+            books,
+            expires_at: expiresAt.toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "query_normalized" },
+        );
+      console.log("[search-book] 캐시 저장:", query, `(${books.length}개, ${CACHE_TTL_DAYS}일 유효)`);
+    }
 
     return NextResponse.json({ books });
   } catch (error) {

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { getProfile } from "@/lib/supabase/queries";
 import { useEffect } from "react";
+import { identifyUser, resetAnalytics, track, EVENTS } from "@/lib/analytics";
 
 function makeFallbackUser(userId: string, email?: string | null) {
   return {
@@ -22,14 +23,14 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
     const supabase = createClient();
     let resolved = false;
 
-    // 3초 안전장치 (5초 → 3초로 단축)
+    // 8초 안전장치 (느린 네트워크 대응)
     const safetyTimeout = setTimeout(() => {
       const { isLoading } = useAuthStore.getState();
       if (isLoading) {
         console.warn("[Auth] safety timeout — forcing loading=false");
         setLoading(false);
       }
-    }, 3000);
+    }, 8000);
 
     const resolveUser = async (userId: string, email: string | undefined) => {
       if (resolved) return;
@@ -44,6 +45,14 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
 
         const user = profile || makeFallbackUser(userId, email);
         setUser(user);
+
+        // PostHog 유저 식별
+        identifyUser(userId, {
+          nickname: user.nickname,
+          emoji: user.emoji,
+          email: email || undefined,
+        });
+        track(EVENTS.APP_OPENED);
 
         // 미들웨어용 프로필 쿠키 세팅
         if (profile) {
@@ -75,6 +84,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
             resolved = false;
             setUser(null);
             setLoading(false);
+            resetAnalytics();
             // 프로필 쿠키 제거
             document.cookie = "banggut-has-profile=;path=/;max-age=0";
           }

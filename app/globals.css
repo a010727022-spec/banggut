@@ -5,12 +5,203 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════
-   방긋 v4 디자인 시스템 — 5 테마
+   방긋 v6 디자인 시스템 — 민트 / 프라다 2 테마 + Playful 토큰
    ═══════════════════════════════════════════ */
 
-/* ── 밤숲 (기본 다크) ── */
-/* Gail: sf 레이어 간격 확대, accent 채도 +8% */
+/* ── 공용 토큰 (테마 불변) ── */
+:root {
+  /* Spacing — 4px base */
+  --space-0: 0; --space-1: 2px; --space-2: 4px; --space-3: 8px;
+  --space-4: 12px; --space-5: 16px; --space-6: 20px; --space-7: 24px;
+  --space-8: 32px; --space-9: 48px; --space-10: 64px;
+
+  /* Typography */
+  --font-body: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-playful: "Gaegu", "Pretendard Variable", cursive;
+
+  --text-xs: 10px; --text-sm: 11.5px; --text-base: 13px; --text-md: 14px;
+  --text-lg: 16px; --text-xl: 18px; --text-2xl: 22px; --text-3xl: 28px; --text-4xl: 36px;
+
+  --fw-normal: 400; --fw-medium: 500; --fw-semibold: 600; --fw-bold: 700; --fw-extrabold: 800;
+
+  --lh-tight: 1.2; --lh-snug: 1.35; --lh-normal: 1.5; --lh-relaxed: 1.7;
+  --ls-tight: -0.3px; --ls-normal: 0; --ls-gaegu: 0.02em; --ls-wide: 0.8px;
+
+  /* Radius */
+  --r-xs: 4px; --r-sm: 8px; --r-md: 14px; --r-lg: 18px; --r-xl: 24px;
+  --r-pill: 100px; --r-circle: 50%;
+
+  /* Motion */
+  --duration-instant: 100ms; --duration-fast: 180ms; --duration-normal: 260ms;
+  --duration-slow: 400ms; --duration-slower: 600ms;
+  --easing-default: cubic-bezier(0.22, 1, 0.36, 1);
+  --easing-in: cubic-bezier(0.4, 0, 1, 1);
+  --easing-out: cubic-bezier(0, 0, 0.2, 1);
+  --easing-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Layout */
+  --max-w-page: 512px;
+  --page-gutter: 20px;
+  --nav-height: 60px;
+  --header-height: 64px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── 민트 (기본) — Fresh Mint · mockup-home-v2.html 소스 오브 트루스 ──
+   크림 베이스 + 페이퍼 톤 카드 + 세이지 민트 액센트. 웜 잉크 텍스트(그린 톤 없음). */
 :root,
+[data-theme="mint"],
+[data-theme="cream"] {
+  /* 베이스 (크림 + 페이퍼) */
+  --bg: #F7F3ED;       /* cream */
+  --sf: #FEFCF6;       /* paper — 카드 배경 (밝은 페이퍼) */
+  --sf2: #EFE9DF;      /* cream-sub — 세그먼트/서브 배경 */
+  --sf3: #F5EEE1;      /* paper-sub — 카드 내부 더 깊은 레이어 */
+  --bd: rgba(15,14,12,0.08);
+  --bd2: rgba(15,14,12,0.12);
+
+  /* 텍스트 (웜 잉크, 그린 섞임 없음) */
+  --tp: #0F0E0C;       /* ink — 본문 */
+  --ts: #5A544C;       /* ink-sub — 보조 */
+  --tm: #8A8177;       /* ink-soft — 약한 */
+
+  /* 액센트 (3단 세이지 민트) */
+  --ac: #5FA48E;       /* mint — 프라이머리 */
+  --ac2: #4A8873;      /* mint-dark — CTA 그라디언트 끝 */
+  --ac3: #E7F1EC;      /* mint-soft — 뱃지/아바타 배경 */
+  --acc: #FEFCF6;      /* ac 버튼 위 텍스트 = 페이퍼 톤 */
+  --theme-deep: #4A8873;
+  --milestone: #D69E52; /* wish — 골드 옐로우 */
+  --mint-muted: #BFD9CD;
+
+  /* v9 · 스톱워치 모드 액센트 (뽀모도로=민트, 스톱워치=허니) */
+  --honey: #D4A056;    /* stopwatch primary */
+  --honey2: #B5803E;   /* stopwatch CTA 그라디언트 끝 */
+
+  /* 확장 토큰 */
+  --sf-tinted: color-mix(in srgb, var(--ac) 6%, var(--sf));
+  --overlay: rgba(15,14,12,0.45);
+  --tf: rgba(15,14,12,0.35);
+  --bd-focus: var(--ac);
+  --ac-deep: #4A8873;
+  --warm: #C8604F;     /* danger/경고 — 도서관 반납 */
+  --success: var(--ac);
+  --error: #C8604F;
+
+  /* 방긋이 전용 */
+  --mascot-body: #C8D9CE;
+  --mascot-speech-bg: #FFFFFF;
+  --mascot-speech-border: var(--bd2);
+  --mascot-glow: color-mix(in srgb, var(--ac) 20%, transparent);
+
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(15,14,12,0.04);
+  --shadow-md: 0 6px 18px color-mix(in srgb, var(--ac) 15%, rgba(15,14,12,0.08));
+  --shadow-lg: 0 12px 32px rgba(15,14,12,0.12);
+  --shadow-focus: 0 0 0 3px color-mix(in srgb, var(--ac) 30%, transparent);
+  --shadow-mascot: 0 8px 24px color-mix(in srgb, var(--ac) 20%, transparent);
+
+  /* 프라다 전용 — 민트에서는 비활성 */
+  --saff-pattern: none;
+  --silver-plaque: linear-gradient(140deg, var(--sf) 0%, var(--sf2) 100%);
+}
+
+/* ── 프라다 — Saffiano · mockup-home-prada-v1.html 소스 오브 트루스 ──
+   비스코토 베이지(사피아노 정식) + 잉크 블랙 + 브라스 골드 하드웨어 + 프라다 그린 액센트 + 리네아 로사 레드 */
+[data-theme="prada"] {
+  /* 베이스 (사피아노 비스코토) */
+  --bg: #EBD9B0;       /* Saffiano Biscotto — 진한 베이지 본 */
+  --sf: #F6EAC8;       /* ivory — 밝은 카드 */
+  --sf2: #F2E4C2;      /* saff-cream-light */
+  --sf3: #D4BE8E;      /* saff-deep — 사피아노 섀도우 */
+  --bd: rgba(13,13,13,0.12);
+  --bd2: rgba(13,13,13,0.24);
+
+  /* 텍스트 (프라다 블랙 + 웜 잉크 그레이) */
+  --tp: #0D0D0D;       /* Prada black */
+  --ts: #3A352B;       /* ink-sub */
+  --tm: #7A6E55;       /* ink-mute — 웜 그레이 */
+
+  /* 액센트 (잉크 프라이머리 + 프라다 그린 포인트) */
+  --ac: #0D0D0D;       /* 프라이머리 = 잉크 블랙 (CTA/텍스트) */
+  --ac2: #8E7345;      /* hardware 딥 골드 — 메탈 하드웨어 */
+  --ac3: #E1D4B2;      /* 소프트 크림 — 배지/칩 배경 */
+  --acc: #F6EAC8;      /* ac 버튼 위 텍스트 = ivory */
+  --theme-deep: #1C5535; /* 프라다 그린 — Currently Reading 라벨/성공 액센트 */
+  --theme-deep-soft: #2E6039; /* prada green soft */
+  --milestone: #D4BE8E;  /* saff-deep — 마일스톤 */
+  --linea-rossa: #C8102E; /* 리네아 로사 — 극소량 포인트(책갈피 등) */
+  --hw-gold: #8E7345;
+
+  /* v9 · 스톱워치 모드 액센트 (프라다에선 hw-gold 재해석) */
+  --honey: #8E7345;   /* stopwatch primary — 프라다 브라스 골드 */
+  --honey2: #6E5833;  /* stopwatch CTA 그라디언트 끝 */
+
+  /* 확장 토큰 */
+  --sf-tinted: color-mix(in srgb, var(--theme-deep) 5%, var(--sf));
+  --overlay: rgba(13,13,13,0.50);
+  --tf: rgba(13,13,13,0.38);
+  --bd-focus: var(--theme-deep); /* 잉크 위엔 프라다 그린으로 포커스 */
+  --ac-deep: #1C5535;
+  --warm: #C8102E;               /* linea rossa */
+  --success: #1C5535;            /* 프라다 그린 */
+  --error: #C8102E;
+
+  /* 방긋이 전용 */
+  --mascot-body: #E1D4B2;
+  --mascot-speech-bg: #FEFBEE;
+  --mascot-speech-border: var(--bd2);
+  --mascot-glow: color-mix(in srgb, var(--theme-deep) 20%, transparent);
+
+  /* Shadows — 잉크 기반 깊은 그림자 */
+  --shadow-sm: 0 2px 8px rgba(13,13,13,0.06);
+  --shadow-md: 0 6px 18px rgba(13,13,13,0.10);
+  --shadow-lg: 0 12px 32px rgba(13,13,13,0.18);
+  --shadow-focus: 0 0 0 3px color-mix(in srgb, var(--theme-deep) 35%, transparent);
+  --shadow-mascot: 0 8px 24px rgba(13,13,13,0.18);
+
+  /* 프라다 시그니처 — Saffiano 크로스해치 (목업 opacity 0.072) */
+  --saff-pattern:
+    repeating-linear-gradient(45deg,
+      transparent 0, transparent 3px,
+      rgba(78,60,30,0.072) 3px, rgba(78,60,30,0.072) 3.6px),
+    repeating-linear-gradient(-45deg,
+      transparent 0, transparent 3px,
+      rgba(78,60,30,0.072) 3px, rgba(78,60,30,0.072) 3.6px);
+  --saff-pattern-light:
+    repeating-linear-gradient(45deg,
+      transparent 0, transparent 3px,
+      rgba(78,60,30,0.048) 3px, rgba(78,60,30,0.048) 3.6px),
+    repeating-linear-gradient(-45deg,
+      transparent 0, transparent 3px,
+      rgba(78,60,30,0.048) 3px, rgba(78,60,30,0.048) 3.6px);
+  /* 실버 메탈 플라크 (프라다 트라이앵글 재해석) */
+  --silver-plaque:
+    linear-gradient(140deg,
+      #F4EEE0 0%,
+      #C5BDA9 34%,
+      #7A7464 52%,
+      #E0D9C4 74%,
+      #524D42 100%);
+}
+
+/* ── 프라다 테마 시그니처 레이어 ── */
+/* 앱 전체 배경에 사피아노 패턴 얹기 */
+[data-theme="prada"] body {
+  background-image: var(--saff-pattern);
+  background-attachment: fixed;
+}
+
+/* ── 추가 테마 (다크 · 네이비 · 세피아 · 로제) ── */
+/* 민트/프라다 외 대안 테마 — 테마 스위처에서 선택 가능 */
+
+/* 밤숲 (다크) */
 [data-theme="dark"] {
   --bg: #0c0f0d;
   --sf: #151d18;
@@ -27,27 +218,7 @@
   --acc: #0c1a12;
 }
 
-/* ── 크림 ── */
-/* Gail: bg 살짝 밝고 따뜻하게, sf 톤 조정 */
-[data-theme="cream"] {
-  --bg: #F7F3ED;
-  --sf: #EDE7DF;
-  --sf2: #E0D9D0;
-  --sf3: #D0C8BC;
-  --bd: rgba(90,110,95,0.13);
-  --bd2: rgba(90,110,95,0.26);
-  --tp: #1c201d;
-  --ts: #556058;
-  --tm: #9aab9e;
-  --ac: #4d8a72;
-  --ac2: #6B9E8A;
-  --ac3: #8FB8A4;
-  --acc: #f7f3ed;
-}
-
-/* ── 네이비 (심야 독서) ── */
-/* Tasha: 블루 accent → 앰버 골드 "심야 독서등" 감성 */
-/* Gail: tm 가독성 확보, tp 따뜻하게 */
+/* 네이비 (심야 독서) */
 [data-theme="navy"] {
   --bg: #080c18;
   --sf: #0e1422;
@@ -64,8 +235,7 @@
   --acc: #0a0806;
 }
 
-/* ── 세피아 ── */
-/* Gail: acc만 미세 조정 — CTA 텍스트 대비 강화 */
+/* 세피아 */
 [data-theme="sepia"] {
   --bg: #191410;
   --sf: #231c16;
@@ -82,9 +252,7 @@
   --acc: #130c06;
 }
 
-/* ── 로제 (구 블러썸) ── */
-/* Tasha: 핫핑크→더스티로즈, "르 라보" 무드. 성숙한 MZ 감성 */
-/* Gail: sf2 탁함 제거, tm 가독성 확보 */
+/* 로제 (구 블러썸) — 더스티 로즈 */
 [data-theme="blossom"] {
   --bg: #faf5f7;
   --sf: #f5eff2;
@@ -282,6 +450,23 @@
 @keyframes pulseDot {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.2; }
+}
+@keyframes drawLine {
+  0% { transform: scaleX(0); transform-origin: left; }
+  50% { transform: scaleX(1); transform-origin: left; }
+  55% { transform: scaleX(1); transform-origin: right; }
+  100% { transform: scaleX(0); transform-origin: right; }
+}
+.animate-draw-line {
+  animation: drawLine 3s ease-in-out infinite;
+}
+@keyframes bounceSoft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .skeleton {

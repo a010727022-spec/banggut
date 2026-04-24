@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>방긋 · Tamagotchi Rose — Vivid Dusty Rose 홈</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=VT323&display=swap" rel="stylesheet" />
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<style>
+  :root {
+    /* Tamagotchi Rose 팔레트 */
+    --bg: #F0EBE2;
+    --sf: #E5DFD2;
+    --sf2: #FBF6EC;
+    --sf3: #F8F1E2;
+    --tp: #1E1A16;            /* 딥 잉크 */
+    --ts: #3F3A32;
+    --tm: #847C70;
+    --bd: #1E1A1628;          /* 잉크 아웃라인 (다마고치 = 찐한 선) */
+    --bd-thick: #1E1A163A;
+    --bd2: #1E1A1614;
+    --ac: #E85A7A;            /* 비비드 dusty rose */
+    --ac2: #F2849E;
+    --ac3: #F5C6D0;
+    --ac-deep: #8E2E48;
+    --ac-shadow: rgba(142,46,72,0.32);
+    --butter: #E8B84F;        /* LCD 버터 옐로 */
+    --butter-deep: #9E7A1F;
+    --book1: #2B2320;         /* 차콜 북커버 */
+    --book2: #0F0D0C;
+    --font-body: "Pretendard Variable", Pretendard, -apple-system, system-ui, sans-serif;
+    --font-playful: "Gaegu", "Pretendard Variable", cursive;
+    --font-lcd: "VT323", monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { font-family: var(--font-body); -webkit-font-smoothing: antialiased; color: var(--tp); }
+
+  body {
+    background: #1A1512;
+    padding: 40px 24px 60px;
+    min-height: 100vh;
+    color: #E8DED0;
+  }
+
+  .page-hdr { max-width: 1280px; margin: 0 auto 28px; text-align: center; }
+  .page-hdr h1 {
+    font-family: var(--font-playful);
+    font-size: 30px;
+    color: #F5C6D0;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .page-hdr p {
+    font-size: 13px;
+    color: #A89078;
+    line-height: 1.55;
+  }
+
+  /* 팔레트 스와치 */
+  .palette-strip {
+    max-width: 560px;
+    margin: 0 auto 30px;
+    display: flex;
+    gap: 6px;
+    padding: 12px 14px;
+    background: #261F1B;
+    border: 1px solid #3A302B;
+    border-radius: 12px;
+  }
+  .sw {
+    flex: 1;
+    height: 40px;
+    border-radius: 6px;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 4px;
+    font-family: monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+
+  /* 메인 레이아웃: 폰 + 디테일 카드 */
+  .stage {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+
+  .phone-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  /* 폰 프레임 */
+  .phone {
+    width: 360px;
+    height: 812px;
+    background: var(--bg);
+    border-radius: 38px;
+    border: 10px solid #0F0D0C;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 20px 50px rgba(142,46,72,0.18),
+      0 6px 18px rgba(0,0,0,0.45);
+  }
+  .statusbar {
+    height: 44px;
+    padding: 0 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--tp);
+    position: relative;
+  }
+  .statusbar .notch {
+    position: absolute;
+    left: 50%;
+    top: 8px;
+    transform: translateX(-50%);
+    width: 84px;
+    height: 24px;
+    background: #0F0D0C;
+    border-radius: 100px;
+    z-index: 5;
+  }
+  .statusbar .right { display: flex; gap: 5px; align-items: center; }
+  .statusbar .right svg { width: 14px; height: 14px; }
+
+  .screen {
+    height: calc(812px - 44px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 80px;
+    position: relative;
+  }
+  .screen::-webkit-scrollbar { display: none; }
+
+  /* ─────────── 앱 헤더 (tamagotchi vibe) ─────────── */
+  .app-hdr {
+    padding: 8px 20px 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-family: var(--font-playful);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--tp);
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  /* LCD 픽셀 하트 옆에 배지 */
+  .logo-badge {
+    width: 20px;
+    height: 12px;
+    background: var(--butter);
+    border: 1.5px solid var(--tp);
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-lcd);
+    font-size: 11px;
+    color: var(--tp);
+    letter-spacing: 0.5px;
+    line-height: 1;
+    padding-top: 1px;
+    box-shadow: 1.5px 1.5px 0 var(--tp);
+  }
+
+  .icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;           /* squircle! */
+    background: var(--sf2);
+    border: 1.5px solid var(--tp);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--tp);
+    position: relative;
+    box-shadow: 2px 2px 0 var(--tp);
+    cursor: pointer;
+  }
+  .icon-btn svg { width: 16px; height: 16px; }
+  .icon-btn.dot::after {
+    content: "";
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: var(--ac);
+    border: 1.5px solid var(--tp);
+    border-radius: 2px;
+    top: -3px;
+    right: -3px;
+  }
+
+  /* ─────────── 인사말 스트립 ─────────── */
+  .greet {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px 6px;
+  }
+  .greet-mascot {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;           /* squircle! */
+    background: linear-gradient(135deg, #C8E8D6, #7ABBA4 60%, #3A6B56);
+    border: 1.5px solid var(--tp);
+    box-shadow: 2px 2px 0 var(--tp);
+    flex-shrink: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+  }
+  .greet-mascot img { width: 100%; height: 100%; object-fit: cover; }
+  .greet-txt { flex: 1; min-width: 0; }
+  .greet-hello {
+    font-size: 11px;
+    color: var(--tm);
+    line-height: 1.3;
+    font-family: var(--font-lcd);
+    font-size: 14px;
+    letter-spacing: 0.5px;
+  }
+  .greet-name {
+    font-family: var(--font-playful);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--tp);
+    line-height: 1.2;
+    margin-top: 0;
+  }
+  .greet-heart {
+    color: var(--ac);
+    margin-left: 2px;
+  }
+
+  /* ─────────── 이어읽기 히어로 (다마고치 디바이스 느낌) ─────────── */
+  .hero-read {
+    margin: 14px 20px 0;
+    border-radius: 18px;
+    padding: 14px;
+    background: var(--sf2);
+    border: 1.5px solid var(--tp);
+    position: relative;
+    box-shadow: 3px 3px 0 var(--tp);
+  }
+  /* 상단 "LCD" 라벨 */
+  .hero-lcd-tag {
+    position: absolute;
+    top: -8px;
+    left: 16px;
+    background: var(--butter);
+    border: 1.5px solid var(--tp);
+    border-radius: 4px;
+    padding: 2px 8px 1px;
+    font-family: var(--font-lcd);
+    font-size: 12px;
+    color: var(--tp);
+    letter-spacing: 0.8px;
+    line-height: 1;
+    box-shadow: 1.5px 1.5px 0 var(--tp);
+  }
+  /* 우상단 픽셀 도트 장식 (다마고치 speaker 느낌) */
+  .hero-pixel-grid {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    display: grid;
+    grid-template-columns: repeat(3, 3px);
+    gap: 2px;
+  }
+  .hero-pixel-grid div {
+    width: 3px;
+    height: 3px;
+    background: var(--tp);
+    opacity: 0.35;
+    border-radius: 1px;
+  }
+
+  .hero-read-row {
+    display: flex;
+    gap: 14px;
+    margin-top: 4px;
+  }
+  .book-cover {
+    width: 76px;
+    height: 108px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, var(--book1), var(--book2));
+    border: 1.5px solid var(--tp);
+    box-shadow: 2.5px 2.5px 0 var(--tp);
+    position: relative;
+    overflow: hidden;
+  }
+  .book-cover::before {
+    content: "";
+    position: absolute;
+    left: 4px; top: 0; bottom: 0;
+    width: 1px;
+    background: rgba(255,255,255,0.15);
+  }
+  .book-cover-title {
+    position: absolute;
+    top: 14px; left: 10px; right: 8px;
+    font-family: var(--font-playful);
+    font-size: 11px;
+    color: var(--ac3);
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    line-height: 1.2;
+  }
+  .book-cover-author {
+    position: absolute;
+    bottom: 8px; left: 10px; right: 8px;
+    font-family: var(--font-lcd);
+    font-size: 10px;
+    color: rgba(245,198,208,0.6);
+    letter-spacing: 1px;
+  }
+  .hero-info { flex: 1; min-width: 0; padding-top: 4px; }
+  .hero-kicker {
+    font-family: var(--font-lcd);
+    font-size: 14px;
+    color: var(--ac-deep);
+    letter-spacing: 1.5px;
+    margin-bottom: 3px;
+    line-height: 1;
+  }
+  .hero-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--tp);
+    line-height: 1.2;
+    margin-bottom: 2px;
+  }
+  .hero-author { font-size: 11.5px; color: var(--tm); margin-bottom: 10px; }
+
+  /* progress - pixel blocks */
+  .progress-pixel {
+    display: flex;
+    gap: 2px;
+    height: 8px;
+    margin-bottom: 5px;
+  }
+  .progress-pixel .cell {
+    flex: 1;
+    background: var(--ac3);
+    border-radius: 2px;
+  }
+  .progress-pixel .cell.on {
+    background: var(--ac);
+  }
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10.5px;
+    color: var(--ts);
+    font-family: var(--font-lcd);
+    letter-spacing: 0.8px;
+  }
+  .progress-meta b { color: var(--tp); font-family: var(--font-body); }
+
+  .hero-context {
+    margin-top: 12px;
+    padding: 9px 11px;
+    background: var(--sf3);
+    border-radius: 8px;
+    border: 1.5px solid var(--tp);
+    border-left-width: 4px;
+    border-left-color: var(--butter);
+    font-size: 11.5px;
+    color: var(--ts);
+    line-height: 1.45;
+  }
+  .hero-context b { color: var(--tp); font-weight: 700; }
+
+  .hero-cta {
+    margin-top: 12px;
+    width: 100%;
+    padding: 13px 14px;
+    border: 1.5px solid var(--tp);
+    border-radius: 12px;
+    background: var(--ac);
+    color: #fff;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: -0.1px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    box-shadow: 3px 3px 0 var(--tp);
+    transition: all 0.08s;
+    position: relative;
+  }
+  .hero-cta:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--tp);
+  }
+  .hero-cta svg { width: 14px; height: 14px; }
+
+  /* ─────────── 주간 캘린더 (pixel dots) ─────────── */
+  .cal-card {
+    margin: 14px 20px 0;
+    background: var(--sf2);
+    border: 1.5px solid var(--tp);
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 3px 3px 0 var(--tp);
+    position: relative;
+  }
+  .cal-hdr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .cal-ttl-row { display: flex; align-items: center; gap: 8px; }
+  .cal-ttl {
+    font-family: var(--font-playful);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--tp);
+  }
+  .cal-streak-badge {
+    font-family: var(--font-lcd);
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--tp);
+    background: var(--butter);
+    border: 1.5px solid var(--tp);
+    padding: 2px 8px 1px;
+    border-radius: 4px;
+    letter-spacing: 0.6px;
+    line-height: 1;
+    box-shadow: 1.5px 1.5px 0 var(--tp);
+  }
+  .cal-see-all {
+    font-family: var(--font-lcd);
+    font-size: 13px;
+    color: var(--ac-deep);
+    font-weight: 400;
+    letter-spacing: 0.8px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+  .cal-see-all svg { width: 12px; height: 12px; }
+
+  .cal-days {
+    display: flex;
+    justify-content: space-between;
+    gap: 4px;
+    margin-bottom: 14px;
+  }
+  .cal-day {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+  .cal-day-label {
+    font-family: var(--font-lcd);
+    font-size: 12px;
+    color: var(--tm);
+    letter-spacing: 0.6px;
+    line-height: 1;
+  }
+  .cal-day-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;       /* squircle 다마고치 */
+    border: 1.5px solid var(--tp);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--sf);
+    color: var(--tm);
+  }
+  .cal-day-dot.read {
+    background: var(--ac);
+    color: #fff;
+    box-shadow: 1.5px 1.5px 0 var(--tp);
+  }
+  .cal-day-dot.today {
+    background: var(--butter);
+    color: var(--tp);
+    box-shadow: 1.5px 1.5px 0 var(--tp);
+  }
+
+  /* 이벤트 리스트 — 픽셀 카드 */
+  .evt-list { display: flex; flex-direction: column; gap: 8px; }
+  .evt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 11px;
+    background: var(--sf3);
+    border: 1.5px solid var(--tp);
+    border-radius: 10px;
+  }
+  .evt-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    border: 1.5px solid var(--tp);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .evt-icon.rose { background: var(--ac); }
+  .evt-icon.butter { background: var(--butter); }
+  .evt-icon svg { width: 11px; height: 11px; color: #fff; }
+  .evt-icon.butter svg { color: var(--tp); }
+  .evt-info { flex: 1; min-width: 0; }
+  .evt-ttl {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--tp);
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .evt-meta {
+    font-size: 10.5px;
+    color: var(--tm);
+    margin-top: 1px;
+    font-family: var(--font-lcd);
+    letter-spacing: 0.5px;
+  }
+  .evt-dday {
+    font-family: var(--font-lcd);
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--tp);
+    background: var(--ac3);
+    border: 1.5px solid var(--tp);
+    padding: 2px 7px 1px;
+    border-radius: 4px;
+    line-height: 1;
+    letter-spacing: 0.6px;
+    box-shadow: 1.5px 1.5px 0 var(--tp);
+  }
+  .evt-dday.urgent {
+    background: var(--ac);
+    color: #fff;
+  }
+
+  /* ─────────── 커뮤니티 피드 ─────────── */
+  .feed-card {
+    margin: 14px 20px 0;
+    background: var(--sf2);
+    border: 1.5px solid var(--tp);
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 3px 3px 0 var(--tp);
+  }
+  .feed-hdr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .feed-ttl {
+    font-family: var(--font-playful);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--tp);
+  }
+  .feed-item {
+    display: flex;
+    gap: 10px;
+    padding: 10px 11px;
+    background: var(--sf3);
+    border: 1.5px solid var(--tp);
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+  .feed-item:last-child { margin-bottom: 0; }
+  .feed-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;         /* squircle */
+    border: 1.5px solid var(--tp);
+    background: linear-gradient(135deg, #F0C394, #D18F58);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    box-shadow: 1.5px 1.5px 0 var(--tp);
+  }
+  .feed-avatar.b { background: linear-gradient(135deg, #A6D3D9, #6A9BA8); }
+  .feed-body { flex: 1; min-width: 0; }
+  .feed-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--tp);
+    margin-bottom: 2px;
+  }
+  .feed-name span {
+    font-weight: 400;
+    color: var(--tm);
+    margin-left: 4px;
+    font-family: var(--font-lcd);
+    font-size: 11px;
+    letter-spacing: 0.4px;
+  }
+  .feed-text {
+    font-size: 12px;
+    color: var(--ts);
+    line-height: 1.4;
+  }
+  .feed-quote {
+    font-family: var(--font-playful);
+    font-size: 13px;
+    color: var(--tp);
+    line-height: 1.45;
+    padding: 7px 9px;
+    background: #fff;
+    border: 1.5px solid var(--tp);
+    border-left-width: 4px;
+    border-left-color: var(--ac);
+    border-radius: 7px;
+    margin-top: 6px;
+    margin-bottom: 2px;
+  }
+  .feed-stats {
+    display: flex;
+    gap: 12px;
+    margin-top: 7px;
+    font-family: var(--font-lcd);
+    font-size: 13px;
+    color: var(--tm);
+    letter-spacing: 0.5px;
+    align-items: center;
+  }
+  .feed-stats span { display: flex; align-items: center; gap: 3px; }
+  .feed-stats svg { width: 12px; height: 12px; }
+
+  /* 탭바 */
+  .tabbar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 72px;
+    padding: 10px 16px 20px 16px;
+    background: var(--bg);
+    border-top: 1.5px solid var(--tp);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+  .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    color: var(--tm);
+    font-family: var(--font-lcd);
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    padding: 4px 10px;
+    border-radius: 8px;
+  }
+  .tab.active {
+    color: var(--tp);
+    background: var(--ac3);
+    border: 1.5px solid var(--tp);
+    padding: 3px 9px;
+  }
+  .tab svg { width: 20px; height: 20px; }
+
+  /* ─────────── 디테일 사이드 패널 ─────────── */
+  .detail-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    color: #D8CFBE;
+    font-size: 13px;
+    line-height: 1.65;
+  }
+  .detail-card {
+    background: #2A211C;
+    border: 1px solid #3C2F29;
+    border-radius: 14px;
+    padding: 20px 22px;
+  }
+  .detail-card h3 {
+    font-family: var(--font-playful);
+    font-size: 18px;
+    color: #F5C6D0;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .detail-card ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .detail-card li {
+    padding-left: 18px;
+    position: relative;
+    font-size: 12.5px;
+  }
+  .detail-card li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 8px;
+    height: 8px;
+    background: #E85A7A;
+    border: 1.5px solid #F5C6D0;
+    border-radius: 2px;
+  }
+  .detail-card code {
+    background: #1A1512;
+    color: #E8B84F;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 11.5px;
+  }
+  .detail-card b { color: #F5C6D0; }
+
+  .phone-label {
+    font-family: var(--font-playful);
+    font-size: 17px;
+    color: #F5C6D0;
+    font-weight: 700;
+  }
+  .phone-sub {
+    font-size: 11.5px;
+    color: #A89078;
+    text-align: center;
+    margin-top: -6px;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-hdr">
+  <h1>방긋 · Tamagotchi Rose</h1>
+  <p>비비드 더스티 로즈 시그니처 + 다마고치 감성 · 두꺼운 잉크 아웃라인 + chunky shadow + squircle + LCD 픽셀 디테일</p>
+</div>
+
+<!-- 팔레트 스트립 -->
+<div class="palette-strip">
+  <div class="sw" style="background:#E85A7A;color:#fff;">E85A7A</div>
+  <div class="sw" style="background:#8E2E48;color:#fff;">8E2E48</div>
+  <div class="sw" style="background:#F5C6D0;color:#8E2E48;">F5C6D0</div>
+  <div class="sw" style="background:#E8B84F;color:#1E1A16;">E8B84F</div>
+  <div class="sw" style="background:#F0EBE2;color:#1E1A16;">F0EBE2</div>
+  <div class="sw" style="background:#1E1A16;color:#F5C6D0;">1E1A16</div>
+</div>
+
+<div class="stage">
+
+  <!-- 폰 -->
+  <div class="phone-col">
+    <div class="phone-label">A · 이어읽기 중심 (Tamagotchi Rose)</div>
+    <div class="phone-sub">비비드 로즈 + 잉크 아웃라인 + chunky shadow</div>
+    <div class="phone">
+      <div class="statusbar">
+        <div class="notch"></div>
+        <div>9:41</div>
+        <div class="right">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 12h1v2H2zm2-2h1v4H4zm2-2h1v6H6zm2-2h1v8H8zm2-2h1v10h-1zm2-2h1v12h-1z"/></svg>
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 3a7 7 0 1 0 0 10 7 7 0 0 0 0-10zm0 1.5A5.5 5.5 0 1 1 8 15 5.5 5.5 0 0 1 8 4.5z"/></svg>
+          <svg viewBox="0 0 20 10" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="17" height="9" rx="2"/><rect x="2" y="2" width="14" height="6" fill="currentColor"/><rect x="18" y="3" width="1.5" height="4" fill="currentColor"/></svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <!-- 앱 헤더 -->
+        <div class="app-hdr">
+          <div class="logo">
+            방긋
+            <div class="logo-badge">LV7</div>
+          </div>
+          <div class="icon-btn dot">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>
+          </div>
+        </div>
+
+        <!-- 인사말 -->
+        <div class="greet">
+          <div class="greet-mascot">
+            <img src="mascot-morning.png" alt="방긋이" onerror="this.style.display='none';this.parentNode.innerHTML='🌱'"/>
+          </div>
+          <div class="greet-txt">
+            <div class="greet-hello">GOOD MORNING</div>
+            <div class="greet-name">민지님, 오늘도 한 쪽<span class="greet-heart">♡</span></div>
+          </div>
+        </div>
+
+        <!-- 이어읽기 히어로 -->
+        <div class="hero-read">
+          <div class="hero-lcd-tag">NOW READING</div>
+          <div class="hero-pixel-grid">
+            <div></div><div></div><div></div>
+            <div></div><div></div><div></div>
+            <div></div><div></div><div></div>
+          </div>
+
+          <div class="hero-read-row">
+            <div class="book-cover">
+              <div class="book-cover-title">작별하지<br/>않는다</div>
+              <div class="book-cover-author">한강</div>
+            </div>
+            <div class="hero-info">
+              <div class="hero-kicker">CH. 3 / 7</div>
+              <div class="hero-title">작별하지 않는다</div>
+              <div class="hero-author">한강</div>
+              <div class="progress-pixel">
+                <div class="cell on"></div>
+                <div class="cell on"></div>
+                <div class="cell on"></div>
+                <div class="cell on"></div>
+                <div class="cell on"></div>
+                <div class="cell on"></div>
+                <div class="cell on"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+              </div>
+              <div class="progress-meta">
+                <span><b>152</b> / 264 쪽</span>
+                <span>58%</span>
+              </div>
+            </div>
+          </div>
+          <div class="hero-context">
+            어제는 <b>눈 덮인 제주 집 앞</b>에서 멈추셨어요.<br/>오늘 목표는 <b>170쪽</b>까지 · 약 18쪽
+          </div>
+          <button class="hero-cta">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l14 9-14 9V3z"/></svg>
+            152쪽부터 이어 읽기
+          </button>
+        </div>
+
+        <!-- 주간 캘린더 -->
+        <div class="cal-card">
+          <div class="cal-hdr">
+            <div class="cal-ttl-row">
+              <div class="cal-ttl">이번 주</div>
+              <div class="cal-streak-badge">STREAK 7</div>
+            </div>
+            <div class="cal-see-all">
+              ALL
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+          <div class="cal-days">
+            <div class="cal-day"><div class="cal-day-label">MON</div><div class="cal-day-dot read">15</div></div>
+            <div class="cal-day"><div class="cal-day-label">TUE</div><div class="cal-day-dot read">16</div></div>
+            <div class="cal-day"><div class="cal-day-label">WED</div><div class="cal-day-dot read">17</div></div>
+            <div class="cal-day"><div class="cal-day-label">THU</div><div class="cal-day-dot read">18</div></div>
+            <div class="cal-day"><div class="cal-day-label">FRI</div><div class="cal-day-dot read">19</div></div>
+            <div class="cal-day"><div class="cal-day-label">SAT</div><div class="cal-day-dot read">20</div></div>
+            <div class="cal-day"><div class="cal-day-label">SUN</div><div class="cal-day-dot today">21</div></div>
+          </div>
+          <div class="evt-list">
+            <div class="evt">
+              <div class="evt-icon butter">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <div class="evt-info">
+                <div class="evt-ttl">독서모임 · 작별하지 않는다</div>
+                <div class="evt-meta">04.24 WED · 19:00</div>
+              </div>
+              <div class="evt-dday">D-3</div>
+            </div>
+            <div class="evt">
+              <div class="evt-icon rose">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              </div>
+              <div class="evt-info">
+                <div class="evt-ttl">도서관 반납 · 소년이 온다</div>
+                <div class="evt-meta">중앙도서관</div>
+              </div>
+              <div class="evt-dday urgent">D-2</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 커뮤니티 -->
+        <div class="feed-card">
+          <div class="feed-hdr">
+            <div class="feed-ttl">방긋 친구들</div>
+            <div class="cal-see-all">
+              MORE
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+          <div class="feed-item">
+            <div class="feed-avatar">수</div>
+            <div class="feed-body">
+              <div class="feed-name">수민 <span>3 MIN AGO</span></div>
+              <div class="feed-text">『파친코』 4부 시작!</div>
+              <div class="feed-quote">시간이 사람을 만든다고, 할머니는 자주 말했다.</div>
+              <div class="feed-stats">
+                <span><svg viewBox="0 0 24 24" fill="currentColor" style="color:#E85A7A;"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 11c0 5.5-7 10-7 10z"/></svg>12</span>
+                <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12c0 4-4 7-9 7-1.3 0-2.5-.2-3.5-.5L3 20l1.5-4C3.5 15 3 13.5 3 12c0-4 4-7 9-7s9 3 9 7z"/></svg>3</span>
+              </div>
+            </div>
+          </div>
+          <div class="feed-item">
+            <div class="feed-avatar b">준</div>
+            <div class="feed-body">
+              <div class="feed-name">준호 <span>1 HR AGO</span></div>
+              <div class="feed-text">오늘 30분 읽기 완료 · 7일째 ♡</div>
+              <div class="feed-stats">
+                <span><svg viewBox="0 0 24 24" fill="currentColor" style="color:#E85A7A;"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 11c0 5.5-7 10-7 10z"/></svg>24</span>
+                <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12c0 4-4 7-9 7-1.3 0-2.5-.2-3.5-.5L3 20l1.5-4C3.5 15 3 13.5 3 12c0-4 4-7 9-7s9 3 9 7z"/></svg>5</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="height: 20px;"></div>
+      </div>
+
+      <!-- 탭바 -->
+      <div class="tabbar">
+        <div class="tab active">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/></svg>
+          HOME
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          책장
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 11c0 5.5-7 10-7 10z"/></svg>
+          위시
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
+          친구
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
+          나
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 디테일 사이드 -->
+  <div class="detail-col">
+    <div class="detail-card">
+      <h3>🌸 시그니처 컬러</h3>
+      <ul>
+        <li><b>비비드 더스티 로즈</b> <code>#E85A7A</code> — CTA, 하이라이트, 읽음 표시. 브랜드 메인 기억 컬러.</li>
+        <li><b>딥 로즈</b> <code>#8E2E48</code> — 키커 텍스트, 강조. 로즈의 진중한 면.</li>
+        <li><b>블러쉬</b> <code>#F5C6D0</code> — 소프트 포인트, 진행바 미색.</li>
+        <li><b>버터 옐로</b> <code>#E8B84F</code> — <i>다마고치 LCD 킥</i>. 스트릭 배지, 이벤트 아이콘.</li>
+        <li><b>웜 페이퍼 그레이</b> <code>#F0EBE2</code> — 캔버스 배경. 눈 편안.</li>
+        <li><b>딥 잉크</b> <code>#1E1A16</code> — 모든 아웃라인 (다마고치 디자인 코어).</li>
+      </ul>
+    </div>
+
+    <div class="detail-card">
+      <h3>🎮 다마고치 디자인 언어</h3>
+      <ul>
+        <li><b>아웃라인 1.5px 잉크</b> — 모든 카드·버튼·아바타에 또렷한 잉크 테두리. 픽셀 게임기 느낌.</li>
+        <li><b>Chunky shadow 3px</b> — 카드 우하단 잉크 그림자. 물리적 무게감.</li>
+        <li><b>Squircle (12~14px radius)</b> — 원 대신 둥근 사각형. <code>icon-btn</code>, <code>mascot</code>, <code>avatar</code>, <code>day-dot</code> 전부.</li>
+        <li><b>픽셀 progress</b> — 부드러운 bar → 12개 블록. 게임기 HP 게이지.</li>
+        <li><b>LCD 폰트 (VT323)</b> — 메타 정보, 배지, 시간 라벨. 디지털 전자 느낌.</li>
+        <li><b>LCD 태그</b> — "NOW READING" 같은 라벨을 버터 배지로 카드 모서리에 붙임.</li>
+        <li><b>픽셀 dot 장식</b> — 카드 모서리 3×3 점 (스피커 그릴).</li>
+      </ul>
+    </div>
+
+    <div class="detail-card">
+      <h3>❌ 없앤 것</h3>
+      <ul>
+        <li><b>개구체(orb) 전부 제거</b> — 히어로 카드 상단의 blur halo, streak orb 모두 삭제.</li>
+        <li><b>민트 완전 제거</b> — 방긋이 캐릭터 이미지는 그대로(민트 초록)지만, UI 토큰엔 민트 없음.</li>
+        <li><b>원형 장식 없음</b> — 동그란 decorative circles 전부 squircle 또는 pixel dot으로 대체.</li>
+        <li><b>그라디언트 halo</b> — 안 씀. 플랫 색면 + 아웃라인만.</li>
+      </ul>
+    </div>
+
+    <div class="detail-card">
+      <h3>🔧 실제 앱 통합 파일</h3>
+      <ul>
+        <li><code>app/globals.css</code> <code>[data-theme="cream"]</code> 블록 토큰 전면 교체</li>
+        <li><code>components/shared/MascotHero.tsx</code> → 컴팩트 greeting 으로 간소화 (또는 <code>GreetingStrip.tsx</code> 신규)</li>
+        <li><code>components/shared/ContinueReadingHero.tsx</code> <b>신규</b> (북커버 + 픽셀 진행바 + LCD 태그 + chunky CTA)</li>
+        <li><code>components/shared/StreakCard.tsx</code> 리스킨 (주간 7도트 squircle + LCD 배지 + 이벤트)</li>
+        <li><code>components/shared/CommunityFeedSnippet.tsx</code> <b>신규</b></li>
+        <li><code>app/(main)/page.tsx</code> 재배열 + VT323 폰트 추가</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

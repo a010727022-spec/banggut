@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>책 상세 · 읽는 중 리디자인</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;word-break:keep-all}
+:root{
+  --bg:#F7F3ED; --sf:#EDE7DF; --sf2:#E0D9D0; --sf3:#D0C8BC;
+  --bd:rgba(95,164,142,0.14); --bd2:rgba(95,164,142,0.28);
+  --tp:#1c201d; --ts:#4a5550; --tm:#7a8b7e;
+  --ac:#5FA48E; --ac2:#7ABBA4; --ac3:#A4D4C0; --acc:#f7f3ed;
+  --milestone:#B79556;
+}
+body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:#DCD5CA;padding:32px 20px;min-height:100vh;color:var(--tp)}
+.wrap{max-width:1400px;margin:0 auto}
+.title{font-family:'Gaegu',cursive;font-size:30px;font-weight:700;letter-spacing:0.02em;text-align:center;margin-bottom:6px}
+.sub{color:var(--ts);font-size:13px;text-align:center;margin-bottom:36px;font-weight:500}
+.sub em{font-style:normal;color:var(--ac);font-weight:700}
+
+.phones{display:flex;gap:24px;justify-content:center;flex-wrap:wrap}
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;max-width:400px}
+.phone-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:100px;background:#FFFFFF;border:1px solid var(--bd2);font-size:11px;font-weight:700;color:var(--ac);letter-spacing:0.5px}
+.phone-badge.current{color:#c05a48;border-color:rgba(192,90,72,0.3);background:rgba(192,90,72,0.05)}
+.phone-badge.recommend{background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 15%,#FFFFFF),#FFFFFF);border-color:var(--ac);color:var(--ac)}
+.phone{width:380px;height:900px;background:var(--bg);border-radius:44px;box-shadow:0 0 0 3px #1a1a1a,0 0 24px rgba(0,0,0,0.1);overflow:auto;position:relative;padding-bottom:40px}
+.phone::-webkit-scrollbar{width:0}
+.phone-desc{font-size:11px;color:var(--ts);text-align:center;line-height:1.6;max-width:380px;font-weight:500}
+.phone-desc strong{color:var(--ac)}
+
+.cur-hero{position:relative;height:260px;overflow:hidden;background:linear-gradient(135deg,#1a3a2a,#2d5a3f 70%)}
+.cur-nav{position:absolute;top:14px;left:0;right:0;display:flex;justify-content:space-between;padding:0 18px;z-index:10}
+.cur-nav-btn{width:40px;height:40px;border-radius:50%;background:var(--sf);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--ts);box-shadow:0 2px 6px rgba(0,0,0,0.04)}
+.cur-cover{position:absolute;bottom:20px;left:20px;width:88px;height:126px;border-radius:10px;background:linear-gradient(135deg,#c89060,#806040);box-shadow:0 8px 28px rgba(0,0,0,0.6);display:flex;align-items:flex-end;padding:6px;font-size:10px;font-weight:700;color:#f4efe8;line-height:1.2;z-index:5}
+.cur-info{position:absolute;bottom:20px;left:124px;right:20px;z-index:5}
+.cur-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:100px;background:rgba(95,164,142,0.3);color:#A4D4C0;font-size:9px;font-weight:800;margin-bottom:6px}
+.cur-title{font-size:17px;font-weight:800;color:#fff;line-height:1.2;text-shadow:0 2px 12px rgba(0,0,0,0.6);margin-bottom:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cur-author{font-size:10.5px;color:rgba(255,255,255,0.6)}
+.cur-qa{display:flex;gap:8px;padding:14px 18px 10px}
+.cur-qa-btn{flex:1;padding:10px 0;border-radius:12px;font-size:11px;font-weight:700;text-align:center;border:0.5px solid var(--bd2);background:var(--sf);color:var(--ac2)}
+.cur-qa-btn.primary{background:var(--ac);color:var(--acc);border-color:var(--ac)}
+.cur-prog{margin:4px 18px 12px;background:var(--sf);border:0.5px solid var(--bd);border-radius:16px;overflow:hidden}
+.cur-prog-top{display:flex;align-items:center;justify-content:space-between;padding:13px 14px 10px}
+.cur-prog-label{font-size:10px;font-weight:800;color:var(--tm);letter-spacing:1px;text-transform:uppercase}
+.cur-prog-pct{font-size:22px;font-weight:800;color:var(--ac);letter-spacing:-1px}
+.cur-prog-bar{height:6px;background:var(--sf3);border-radius:3px;overflow:hidden;margin:0 14px}
+.cur-prog-bar-fill{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:3px;width:72%}
+.cur-prog-stats{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:0.5px solid var(--bd);margin-top:10px}
+.cur-prog-stat{padding:10px 0;text-align:center;border-right:0.5px solid var(--bd)}
+.cur-prog-stat:last-child{border-right:none}
+.cur-prog-stat-v{font-size:15px;font-weight:800;color:var(--tp);letter-spacing:-0.5px}
+.cur-prog-stat-l{font-size:9px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px}
+.cur-prog-input{padding:10px 14px;border-top:0.5px solid var(--bd);display:flex;align-items:center;gap:10px}
+.cur-prog-range{flex:1;height:4px;background:var(--sf3);border-radius:2px}
+.cur-prog-num{width:52px;background:var(--sf2);border:0.5px solid var(--bd2);border-radius:8px;padding:5px 8px;font-size:12px;font-weight:700;text-align:center}
+.cur-prog-save{padding:6px 14px;background:var(--ac);color:var(--acc);border-radius:100px;font-size:11px;font-weight:800;border:none}
+.cur-big-btn{margin:8px 16px;padding:13px;border-radius:14px;background:#2B4C3F;color:#fff;font-size:15px;font-weight:800;text-align:center}
+.cur-second-btn{margin:0 16px 8px;padding:13px;border-radius:14px;background:var(--sf);color:var(--tm);font-size:13px;font-weight:600;text-align:center;border:0.5px solid var(--bd)}
+
+.new-nav{padding:52px 18px 10px;display:flex;justify-content:space-between;align-items:center}
+.nav-btn{width:38px;height:38px;border-radius:50%;background:var(--sf);border:0.5px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ts)}
+.nav-btn svg{width:15px;height:15px}
+.nav-right{display:flex;gap:6px}
+.new-hero{margin:8px 20px 0;padding:28px 20px 20px;background:linear-gradient(180deg,color-mix(in srgb,var(--ac) 10%,var(--sf)) 0%,var(--sf) 70%);border:0.5px solid var(--bd);border-radius:24px;text-align:center;position:relative;overflow:hidden}
+.new-hero::before{content:"";position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:300px;height:200px;background:radial-gradient(ellipse,color-mix(in srgb,var(--ac) 25%,transparent),transparent 65%);pointer-events:none}
+.new-hero-cover{position:relative;z-index:2;width:130px;height:190px;margin:0 auto 16px;border-radius:10px;overflow:hidden;background:linear-gradient(135deg,#c89060,#806040);color:#f4efe8;display:flex;align-items:flex-end;padding:10px;font-size:12px;font-weight:800;line-height:1.2;box-shadow:0 16px 36px rgba(0,0,0,0.2)}
+.new-hero-badge{position:relative;z-index:2;display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:100px;background:var(--bg);border:0.5px solid var(--bd2);font-family:'Gaegu',cursive;font-size:11px;font-weight:700;color:var(--ac);margin-bottom:10px;letter-spacing:0.02em}
+.new-hero-title{position:relative;z-index:2;font-size:19px;font-weight:800;color:var(--tp);letter-spacing:-0.3px;line-height:1.3;margin-bottom:4px}
+.new-hero-author{position:relative;z-index:2;font-size:12px;color:var(--tm);margin-bottom:2px}
+
+.new-prog{margin:16px 20px 0;padding:18px;background:var(--sf);border:0.5px solid var(--bd);border-radius:18px}
+.new-prog-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.new-prog-big{font-family:'Gaegu',cursive;font-size:30px;font-weight:700;color:var(--ac);letter-spacing:-0.02em;line-height:1}
+.new-prog-label{font-size:12px;color:var(--tm);font-weight:600}
+.new-prog-bar{height:8px;background:var(--sf2);border-radius:100px;overflow:hidden;margin-bottom:14px}
+.new-prog-bar-fill{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:100px;width:72%;box-shadow:0 2px 6px color-mix(in srgb,var(--ac) 25%,transparent)}
+.new-prog-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--bd);border-radius:12px;overflow:hidden;margin-bottom:14px}
+.new-prog-stat{padding:10px 0;text-align:center;background:var(--bg)}
+.new-prog-stat-v{font-size:14px;font-weight:800;color:var(--tp);letter-spacing:-0.3px;line-height:1}
+.new-prog-stat-l{font-size:9.5px;color:var(--tm);font-weight:600;margin-top:4px;letter-spacing:0.3px}
+.new-prog-cta{width:100%;padding:13px;border-radius:100px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:var(--acc);font-family:'Gaegu',cursive;font-size:16px;font-weight:700;letter-spacing:0.04em;border:none;cursor:pointer;box-shadow:0 6px 18px color-mix(in srgb,var(--ac) 25%,transparent);display:flex;align-items:center;justify-content:center;gap:6px}
+
+.new-actions{display:flex;gap:8px;padding:14px 20px 0}
+.new-act{flex:1;padding:14px 8px;border-radius:16px;background:var(--sf);border:0.5px solid var(--bd);display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer}
+.new-act-icon{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;background:color-mix(in srgb,var(--ac) 12%,var(--bg))}
+.new-act-label{font-size:11px;font-weight:700;color:var(--tp)}
+.new-act.primary{background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 14%,var(--sf)),var(--sf));border-color:var(--bd2)}
+.new-act.primary .new-act-icon{background:color-mix(in srgb,var(--ac) 22%,var(--bg))}
+.new-act.primary .new-act-label{color:var(--ac)}
+
+.new-ai{margin:12px 20px 0;padding:16px;background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 12%,var(--sf)),var(--sf));border:0.5px solid var(--bd2);border-radius:18px;display:flex;align-items:center;gap:14px;cursor:pointer;position:relative;overflow:hidden}
+.new-ai::before{content:"";position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:radial-gradient(circle,color-mix(in srgb,var(--ac) 20%,transparent),transparent 70%);pointer-events:none}
+.new-ai img{width:44px;height:44px;flex-shrink:0;position:relative;z-index:2;object-fit:contain}
+.new-ai-body{flex:1;position:relative;z-index:2}
+.new-ai-t{font-family:'Gaegu',cursive;font-size:14px;font-weight:700;color:var(--tp);letter-spacing:0.02em;line-height:1.3;margin-bottom:2px}
+.new-ai-s{font-size:11px;color:var(--tm);line-height:1.4}
+.new-ai-s em{font-style:normal;color:var(--ac);font-weight:700}
+
+.new-tabs{margin:20px 0 0;padding:0 20px;display:flex;gap:20px;border-bottom:0.5px solid var(--bd)}
+.new-tab{padding:12px 0;font-size:13px;font-weight:500;color:var(--tm);background:transparent;border:none;cursor:pointer;position:relative;letter-spacing:-0.01em}
+.new-tab.on{color:var(--tp);font-weight:700}
+.new-tab.on::after{content:"";position:absolute;bottom:-0.5px;left:0;right:0;height:2.5px;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:2px;box-shadow:0 2px 6px color-mix(in srgb,var(--ac) 35%,transparent)}
+
+.new-desc{padding:20px;color:var(--ts);font-size:13px;line-height:1.7}
+.new-desc-label{font-size:10px;color:var(--tm);font-weight:700;letter-spacing:0.5px;margin-bottom:8px}
+
+.new-links{display:flex;gap:6px;padding:0 20px 20px}
+.new-link{flex:1;padding:8px 0;border-radius:100px;border:0.5px solid var(--bd2);background:transparent;font-size:10.5px;font-weight:600;color:var(--ts);text-align:center;cursor:pointer}
+
+.note{margin:40px auto 0;padding:24px 28px;background:#FFFFFF;border:1px solid var(--bd2);border-radius:18px;color:var(--tp);font-size:12px;line-height:1.85;max-width:820px}
+.note-title{font-family:'Gaegu',cursive;font-size:17px;font-weight:700;color:var(--ac);margin-bottom:12px}
+.note h4{font-family:'Gaegu',cursive;font-size:14px;font-weight:700;color:var(--tp);letter-spacing:0.02em;margin:12px 0 4px}
+.note strong{color:var(--ac);font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title">책 상세 · 읽는 중 리디자인</div>
+  <div class="sub">현재 vs <em>리디자인</em> (밝은 히어로 + 통합 진행률 + AI 토론 강조)</div>
+
+  <div class="phones">
+
+    <div class="phone-wrap">
+      <div class="phone-badge current">❌ 현재</div>
+      <div class="phone">
+        <div class="cur-hero">
+          <div class="cur-nav">
+            <div class="cur-nav-btn">←</div>
+            <div style="display:flex;gap:6px">
+              <div class="cur-nav-btn">↗</div>
+              <div class="cur-nav-btn">♡</div>
+              <div class="cur-nav-btn">⋯</div>
+            </div>
+          </div>
+          <div class="cur-cover">캐릭터<br>심리<br>사전</div>
+          <div class="cur-info">
+            <div class="cur-badge">📖 읽는 중</div>
+            <div class="cur-title">캐릭터 심리 사전 - 선인부터 악인까지</div>
+            <div class="cur-author">린다 N. 에델스타인</div>
+          </div>
+        </div>
+        <div class="cur-qa">
+          <button class="cur-qa-btn primary">⚡ 진행률</button>
+          <button class="cur-qa-btn">✏️ 문장 긋기</button>
+          <button class="cur-qa-btn">✏️ 서평</button>
+        </div>
+        <div class="cur-prog">
+          <div class="cur-prog-top">
+            <div class="cur-prog-label">나의 진행률</div>
+            <div class="cur-prog-pct">72%</div>
+          </div>
+          <div class="cur-prog-bar"><div class="cur-prog-bar-fill"></div></div>
+          <div class="cur-prog-stats">
+            <div class="cur-prog-stat"><div class="cur-prog-stat-v">245p</div><div class="cur-prog-stat-l">현재</div></div>
+            <div class="cur-prog-stat"><div class="cur-prog-stat-v">340p</div><div class="cur-prog-stat-l">전체</div></div>
+            <div class="cur-prog-stat"><div class="cur-prog-stat-v">12일</div><div class="cur-prog-stat-l">기간</div></div>
+          </div>
+          <div class="cur-prog-input">
+            <input type="range" class="cur-prog-range">
+            <input type="text" class="cur-prog-num" value="245">
+            <button class="cur-prog-save">저장</button>
+          </div>
+        </div>
+        <div class="cur-big-btn">오늘 읽었어요</div>
+        <div class="cur-second-btn">꾹 눌러서 완독 처리</div>
+        <div style="padding:12px 18px;color:#c05a48;font-size:11px;text-align:center;font-weight:600">↑ CTA 6개, 어두운 히어로</div>
+      </div>
+      <div class="phone-desc">어두운 히어로 · 작은 커버 · 진행률+오늘 읽었어요 중복 · 액션 많음</div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone-badge recommend">💚 리디자인</div>
+      <div class="phone">
+        <div class="new-nav">
+          <div class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></div>
+          <div class="nav-right">
+            <div class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
+            <div class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
+            <div class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></div>
+          </div>
+        </div>
+
+        <div class="new-hero">
+          <div class="new-hero-badge">📖 읽는 중 · 12일째</div>
+          <div class="new-hero-cover">캐릭터<br>심리<br>사전</div>
+          <div class="new-hero-title">캐릭터 심리 사전</div>
+          <div class="new-hero-author">린다 N. 에델스타인 · 지여울 옮김</div>
+        </div>
+
+        <div class="new-prog">
+          <div class="new-prog-top">
+            <div>
+              <div class="new-prog-big">72%</div>
+              <div class="new-prog-label" style="margin-top:3px">진행률</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:15px;font-weight:800;color:var(--tp);letter-spacing:-0.3px">245 / 340<span style="font-size:11px;color:var(--tm);margin-left:2px">쪽</span></div>
+              <div class="new-prog-label" style="margin-top:2px">12일 째 읽는 중</div>
+            </div>
+          </div>
+          <div class="new-prog-bar"><div class="new-prog-bar-fill"></div></div>
+          <div class="new-prog-stats">
+            <div class="new-prog-stat">
+              <div class="new-prog-stat-v">20쪽</div>
+              <div class="new-prog-stat-l">일 평균</div>
+            </div>
+            <div class="new-prog-stat">
+              <div class="new-prog-stat-v">4일</div>
+              <div class="new-prog-stat-l">남은 예상</div>
+            </div>
+            <div class="new-prog-stat">
+              <div class="new-prog-stat-v">8개</div>
+              <div class="new-prog-stat-l">글귀</div>
+            </div>
+          </div>
+          <button class="new-prog-cta">📖 오늘 읽은 쪽 기록</button>
+        </div>
+
+        <div class="new-ai">
+          <img src="/mascot-read.png" alt="">
+          <div class="new-ai-body">
+            <div class="new-ai-t">방긋이와 5분 대화</div>
+            <div class="new-ai-s">방금 읽은 구절에 대해 <em>소크라테스식 →</em></div>
+          </div>
+        </div>
+
+        <div class="new-actions">
+          <div class="new-act primary">
+            <div class="new-act-icon">✏️</div>
+            <div class="new-act-label">글귀 긋기</div>
+          </div>
+          <div class="new-act">
+            <div class="new-act-icon">📝</div>
+            <div class="new-act-label">서평 쓰기</div>
+          </div>
+          <div class="new-act">
+            <div class="new-act-icon">✓</div>
+            <div class="new-act-label">완독 처리</div>
+          </div>
+        </div>
+
+        <div class="new-tabs">
+          <button class="new-tab on">책 정보</button>
+          <button class="new-tab">서평</button>
+          <button class="new-tab">상태 변경</button>
+        </div>
+
+        <div class="new-desc">
+          <div class="new-desc-label">줄거리</div>
+          <div>심리학자 린다 N. 에델스타인이 400개 인간 성격을 풀어낸 캐릭터 작성 안내서. 선인부터 악인, 평범부터 극단까지 모든 인간 군상의 심리 지도를 제공한다.</div>
+        </div>
+
+        <div class="new-links">
+          <button class="new-link">알라딘</button>
+          <button class="new-link">eBook</button>
+          <button class="new-link">🏛 도서관</button>
+        </div>
+      </div>
+      <div class="phone-desc">밝은 히어로 카드 · <strong>큰 커버 중앙</strong> · 통합 진행률 + CTA 1개 · AI토론 강조 · 액션 3칩</div>
+    </div>
+
+  </div>
+
+  <div class="note">
+    <div class="note-title">🎯 바뀐 것</div>
+
+    <h4>1. 히어로 카드</h4>
+    어둡고 답답한 280px → <strong>밝은 민트 글로우 카드</strong>. 커버 130x190px 중앙 정렬. 가독성 ↑
+
+    <h4>2. 진행률 통합</h4>
+    진행률 섹션 + 퀵 액션 + 오늘 읽었어요 → <strong>1개 카드</strong>. 큰 % + 바 + 3칸 통계 + <strong>"오늘 읽은 쪽 기록"</strong> CTA 하나만.
+
+    <h4>3. AI 토론 (킥!)</h4>
+    방긋이 이미지 + <strong>"5분 대화" CTA</strong> 눈에 띄게. 방금 그은 구절과 연결.
+
+    <h4>4. 액션 3칩</h4>
+    글귀 긋기 · 서평 쓰기 · 완독 처리. 아이콘 있는 3개 카드.
+
+    <h4>5. 구매 링크 하단</h4>
+    알라딘 / eBook / 도서관 → 작은 pill로 스크롤 최하단.
+
+    <br><br>
+    <strong>결과</strong>: CTA 6개 → <strong>3개 + AI토론</strong>. 계층 명확. 밝고 세련.
+    <br><br>
+    <strong>OK면 바로 코드 적용할게요!</strong>
+  </div>
+</div>
+</body>
+</html>

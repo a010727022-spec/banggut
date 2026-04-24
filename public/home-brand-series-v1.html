@@ -1,0 +1,1819 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>방긋 · 7 Maisons Brand Studies</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;0,6..96,800;1,6..96,400;1,6..96,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;1,9..144,400;1,9..144,700&family=Inter:wght@300;400;500;600;700&family=Italiana&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Space+Grotesk:wght@300;400;500;600;700&family=Archivo+Black&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500;600&family=Unbounded:wght@700;800&display=swap" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css" />
+<style>
+/* ═══ GLOBAL ═══ */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  font-family: 'Pretendard Variable', -apple-system, sans-serif;
+  background: #0A0A0A;
+  color: #EFE8D9;
+  padding: 48px 24px;
+  min-height: 100vh;
+}
+
+.lab-hero { max-width: 1400px; margin: 0 auto 40px; text-align: center; }
+.lab-hero h1 {
+  font-family: 'Italiana', serif;
+  font-size: 72px; letter-spacing: 0.2em; text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.lab-hero .wave {
+  display: inline-block;
+  font-family: 'Fraunces', serif; font-style: italic;
+  font-size: 17px; color: #B5904D; letter-spacing: 0.08em;
+  padding: 10px 0;
+}
+.lab-hero .wave::before, .lab-hero .wave::after {
+  content: ""; display: inline-block; width: 50px; height: 1px;
+  background: #B5904D; vertical-align: middle; margin: 0 18px;
+}
+.lab-hero .sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; color: #7A7068; margin-top: 8px; letter-spacing: 0.14em;
+}
+
+/* ═══ GRID ═══ */
+.phones-grid {
+  max-width: 1400px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 48px 40px; justify-items: center;
+}
+.phone-col { display: flex; flex-direction: column; gap: 16px; align-items: center; }
+.phone-label {
+  font-family: 'Italiana', serif;
+  font-size: 18px; letter-spacing: 0.22em; text-transform: uppercase;
+  text-align: center; color: #EFE8D9;
+}
+.phone-label em {
+  display: block;
+  font-family: 'Fraunces', serif; font-style: italic; font-weight: 400;
+  font-size: 11px; letter-spacing: 0.05em; color: #7A7068;
+  text-transform: none; margin-top: 4px;
+}
+.palette-strip {
+  display: flex; gap: 4px; padding: 4px;
+  background: rgba(255,255,255,0.03); border: 1px solid #2A2218;
+}
+.palette-strip .sw { width: 24px; height: 24px; border: 1px solid rgba(255,255,255,0.08); }
+
+/* ═══ PHONE BASE ═══ */
+.phone {
+  width: 360px; height: 812px;
+  background: var(--bg);
+  border-radius: 44px;
+  overflow: hidden;
+  position: relative;
+  display: flex; flex-direction: column;
+  box-shadow: 0 30px 70px rgba(0,0,0,0.55), 0 0 0 10px #050505;
+  color: var(--tp);
+}
+.status { height: 44px; padding: 14px 28px 0; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; flex-shrink: 0; color: var(--mono); }
+.scroll { flex: 1; overflow-y: auto; padding: 0 0 16px; }
+.scroll::-webkit-scrollbar { display: none; }
+
+/* ════════════════════════════════════════════════════ */
+/*  1. CHANEL                                           */
+/* ════════════════════════════════════════════════════ */
+.phone.chanel {
+  --bg: #FAF7EE;
+  --sf2: #FFFFFF;
+  --tp: #0A0A0A;
+  --mono: #46433D;
+  --gold: #B5904D;
+  --gold2: #D4B878;
+  --pearl: #EBE4D0;
+  --quilt: #F2EDD8;
+}
+.chanel .header-plate {
+  padding: 18px 24px 10px; text-align: center;
+  border-bottom: 0.5px solid var(--tp);
+  background:
+    /* quilted diamond pattern */
+    repeating-linear-gradient(45deg,
+      transparent 0, transparent 24px,
+      rgba(181,144,77,0.06) 24px, rgba(181,144,77,0.06) 25px,
+      transparent 25px, transparent 49px),
+    repeating-linear-gradient(-45deg,
+      transparent 0, transparent 24px,
+      rgba(181,144,77,0.06) 24px, rgba(181,144,77,0.06) 25px,
+      transparent 25px, transparent 49px),
+    var(--bg);
+}
+.chanel .header-plate h1 {
+  font-family: 'Bodoni Moda', serif; font-weight: 800;
+  font-size: 30px; letter-spacing: 0.28em; color: var(--tp);
+  line-height: 1;
+}
+.chanel .header-plate .sub {
+  font-family: 'Bodoni Moda', serif; font-style: italic; font-weight: 400;
+  font-size: 11px; letter-spacing: 0.22em; color: var(--mono);
+  margin-top: 6px; text-transform: uppercase;
+}
+.chanel .header-plate .sub::before,
+.chanel .header-plate .sub::after {
+  content: ""; display: inline-block; width: 20px; height: 1px;
+  background: var(--gold); vertical-align: middle; margin: 0 8px;
+}
+
+/* Interlocking CC-adjacent logo — custom BB */
+.chanel .brand-emblem {
+  width: 44px; height: 30px; margin: 12px auto 0;
+  position: relative;
+}
+.chanel .brand-emblem::before,
+.chanel .brand-emblem::after {
+  content: ""; position: absolute; top: 0;
+  width: 26px; height: 26px; border: 1.5px solid var(--tp);
+  border-radius: 50%;
+}
+.chanel .brand-emblem::before { left: 0; border-right-color: transparent; }
+.chanel .brand-emblem::after { right: 0; border-left-color: transparent; transform: scaleX(-1); }
+
+/* Greeting */
+.chanel .greet {
+  padding: 22px 28px 16px; text-align: center;
+}
+.chanel .greet .hi {
+  font-family: 'Bodoni Moda', serif; font-style: italic;
+  font-size: 26px; font-weight: 400; color: var(--tp); line-height: 1.1;
+}
+.chanel .greet .date {
+  font-family: 'Bodoni Moda', serif; font-size: 10px;
+  letter-spacing: 0.28em; text-transform: uppercase; color: var(--gold);
+  margin-top: 10px;
+}
+.chanel .greet .streak {
+  margin-top: 14px; display: inline-block;
+  padding: 6px 16px;
+  border-top: 1px solid var(--gold); border-bottom: 1px solid var(--gold);
+  font-family: 'Bodoni Moda', serif; font-style: italic;
+  font-size: 12px; letter-spacing: 0.08em; color: var(--tp);
+}
+.chanel .greet .streak strong {
+  font-family: 'Bodoni Moda', serif; font-style: normal; font-weight: 800;
+  font-size: 16px; color: var(--gold); margin-right: 4px; letter-spacing: 0.02em;
+}
+
+/* Hero card — compact box */
+.chanel .hero {
+  margin: 0 24px 18px; padding: 20px;
+  background: var(--sf2);
+  border: 1px solid var(--tp);
+  position: relative;
+}
+.chanel .hero::before,
+.chanel .hero::after {
+  content: ""; position: absolute;
+  left: 6px; right: 6px; height: 1px;
+  background: var(--gold);
+}
+.chanel .hero::before { top: 6px; }
+.chanel .hero::after { bottom: 6px; }
+.chanel .hero .no {
+  text-align: center;
+  font-family: 'Bodoni Moda', serif; font-weight: 400;
+  font-size: 10px; letter-spacing: 0.32em; color: var(--gold);
+  text-transform: uppercase; margin-bottom: 14px;
+}
+.chanel .book-row { display: flex; gap: 14px; margin-bottom: 14px; }
+.chanel .cover {
+  width: 80px; height: 114px;
+  background: var(--tp); border: 1px solid var(--tp);
+  box-shadow: inset 0 0 0 2px var(--tp), inset 0 0 0 3px var(--gold);
+  position: relative; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.chanel .cover .mono {
+  font-family: 'Bodoni Moda', serif; font-weight: 800;
+  font-size: 34px; color: var(--gold2); letter-spacing: 0.02em;
+}
+.chanel .cover .camellia {
+  position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+  font-size: 16px; color: var(--pearl);
+}
+.chanel .info { flex: 1; display: flex; flex-direction: column; gap: 3px; padding-top: 2px; }
+.chanel .info .title {
+  font-family: 'Bodoni Moda', serif; font-style: italic; font-weight: 700;
+  font-size: 20px; line-height: 1.1; color: var(--tp);
+}
+.chanel .info .author {
+  font-family: 'Bodoni Moda', serif; font-size: 10px;
+  letter-spacing: 0.22em; text-transform: uppercase; color: var(--mono);
+  margin-top: 6px;
+}
+.chanel .info .meta {
+  margin-top: auto;
+  font-family: 'Bodoni Moda', serif; font-style: italic;
+  font-size: 11px; color: var(--gold);
+}
+
+/* Pearl progress */
+.chanel .pearls {
+  display: flex; gap: 4px; justify-content: center; align-items: center;
+  margin: 14px 0 8px;
+  padding: 8px 0;
+  border-top: 0.5px solid var(--gold); border-bottom: 0.5px solid var(--gold);
+}
+.chanel .pearls .p {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, var(--pearl) 70%, var(--mono));
+  box-shadow: 0 0 0 0.5px rgba(0,0,0,0.2);
+}
+.chanel .pearls .p.dim { background: radial-gradient(circle at 30% 30%, #fff, #E0D8C0 70%, #AAA); opacity: 0.4; }
+.chanel .pearls .p.now { background: radial-gradient(circle at 30% 30%, #fff, var(--gold2) 70%, var(--gold)); box-shadow: 0 0 0 1px var(--gold); }
+.chanel .pct {
+  text-align: center;
+  font-family: 'Bodoni Moda', serif; font-style: italic;
+  font-size: 11px; color: var(--mono); letter-spacing: 0.08em;
+  margin-bottom: 12px;
+}
+.chanel .pct strong {
+  font-family: 'Bodoni Moda', serif; font-style: normal; font-weight: 800;
+  color: var(--tp); margin-right: 2px; font-size: 13px;
+}
+
+.chanel .cta {
+  width: 100%; padding: 14px;
+  background: var(--tp); color: var(--sf2);
+  border: 1px solid var(--tp);
+  font-family: 'Bodoni Moda', serif; font-weight: 700;
+  font-size: 11px; letter-spacing: 0.34em; text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 3px var(--tp), inset 0 0 0 4px var(--gold2);
+}
+
+/* Week mini */
+.chanel .section {
+  margin: 0 24px 14px; padding: 16px 0 0;
+  border-top: 0.5px solid var(--tp);
+}
+.chanel .section h3 {
+  font-family: 'Bodoni Moda', serif; font-weight: 800;
+  font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--tp); text-align: center; margin-bottom: 12px;
+}
+.chanel .section h3::before, .chanel .section h3::after {
+  content: "◇"; margin: 0 8px; color: var(--gold); font-size: 8px; vertical-align: 1px;
+}
+.chanel .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 12px; }
+.chanel .day { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.chanel .day .lbl {
+  font-family: 'Bodoni Moda', serif; font-size: 9px;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--mono);
+}
+.chanel .day .sq {
+  width: 30px; height: 30px; border: 0.5px solid var(--tp);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Bodoni Moda', serif; font-size: 12px; color: var(--mono);
+  background: var(--sf2);
+}
+.chanel .day.read .sq { background: var(--tp); color: var(--gold2); border-color: var(--tp); }
+.chanel .day.today .sq { background: var(--gold); color: var(--sf2); border-color: var(--gold); font-weight: 700; }
+
+/* Community */
+.chanel .circle {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 8px;
+}
+.chanel .circle .av {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1px solid var(--gold); background: var(--pearl);
+  font-family: 'Bodoni Moda', serif; font-style: italic;
+  font-size: 13px; color: var(--tp);
+  display: flex; align-items: center; justify-content: center;
+  margin-left: -8px;
+}
+.chanel .circle .av:first-child { margin-left: 0; }
+.chanel .circle .av:nth-child(2) { background: var(--tp); color: var(--gold2); }
+.chanel .circle .av:nth-child(3) { background: var(--sf2); }
+.chanel .circle-note {
+  font-family: 'Bodoni Moda', serif; font-style: italic;
+  font-size: 11.5px; line-height: 1.5; color: var(--mono); margin-left: 4px;
+}
+.chanel .circle-note strong {
+  font-family: 'Bodoni Moda', serif; font-style: normal; font-weight: 800;
+  color: var(--tp); letter-spacing: 0.04em;
+}
+
+.chanel .foot {
+  padding: 12px 24px 0;
+  text-align: center;
+  font-family: 'Bodoni Moda', serif; font-size: 9px;
+  letter-spacing: 0.32em; text-transform: uppercase; color: var(--gold);
+  border-top: 0.5px solid var(--tp);
+  margin: 0 24px;
+}
+
+/* ════════════════════════════════════════════════════ */
+/*  2. BOTTEGA VENETA                                   */
+/* ════════════════════════════════════════════════════ */
+.phone.bottega {
+  --bg: #D5C598;
+  --sf2: #E3D5A8;
+  --sf3: #C2B283;
+  --tp: #1E1C16;
+  --mono: #474230;
+  --green: #2A4231;
+  --green-deep: #162318;
+  --camel: #8B6F41;
+  --weave: #B8A668;
+}
+
+/* Intrecciato weave pattern — woven leather */
+.bottega .weave-bg {
+  background:
+    repeating-linear-gradient(45deg,
+      transparent 0, transparent 10px,
+      rgba(30,28,22,0.07) 10px, rgba(30,28,22,0.07) 11px,
+      transparent 11px, transparent 20px),
+    repeating-linear-gradient(-45deg,
+      transparent 0, transparent 10px,
+      rgba(30,28,22,0.07) 10px, rgba(30,28,22,0.07) 11px,
+      transparent 11px, transparent 20px);
+}
+
+.bottega .header-plate {
+  padding: 28px 24px 14px;
+  background:
+    repeating-linear-gradient(45deg,
+      var(--sf2) 0, var(--sf2) 14px,
+      var(--sf3) 14px, var(--sf3) 16px,
+      var(--sf2) 16px, var(--sf2) 30px),
+    repeating-linear-gradient(-45deg,
+      transparent 0, transparent 14px,
+      rgba(30,28,22,0.1) 14px, rgba(30,28,22,0.1) 16px,
+      transparent 16px, transparent 30px);
+  border-bottom: 1px solid var(--tp);
+}
+.bottega .header-plate .name {
+  font-family: 'Inter', sans-serif; font-weight: 700;
+  font-size: 10px; letter-spacing: 0.5em; text-transform: uppercase;
+  color: var(--tp); text-align: center;
+}
+.bottega .header-plate .name span { color: var(--green); }
+
+.bottega .greet {
+  padding: 22px 24px 14px;
+  display: flex; justify-content: space-between; align-items: flex-end;
+  border-bottom: 1px solid rgba(30,28,22,0.15);
+  margin: 0 24px;
+}
+.bottega .greet .hi {
+  font-family: 'Inter', sans-serif; font-weight: 600;
+  font-size: 24px; letter-spacing: -0.03em; color: var(--tp);
+  line-height: 1;
+}
+.bottega .greet .hi em {
+  font-family: 'Fraunces', serif; font-style: italic; font-weight: 400;
+  color: var(--green);
+}
+.bottega .greet .sub {
+  font-family: 'Inter', sans-serif; font-size: 11px;
+  color: var(--mono); margin-top: 4px; font-weight: 400;
+}
+.bottega .greet .streak-num {
+  font-family: 'Inter', sans-serif; font-weight: 300;
+  font-size: 40px; color: var(--green); letter-spacing: -0.04em;
+  line-height: 0.9;
+}
+.bottega .greet .streak-txt {
+  font-family: 'Inter', sans-serif; font-size: 9px;
+  color: var(--mono); letter-spacing: 0.14em; text-transform: uppercase;
+  text-align: right;
+}
+
+/* Hero — woven card */
+.bottega .hero {
+  margin: 18px 24px;
+  padding: 18px;
+  background: var(--sf2);
+  border: 1px solid var(--tp);
+  position: relative;
+}
+.bottega .hero::before {
+  content: ""; position: absolute; inset: 4px;
+  background:
+    repeating-linear-gradient(45deg,
+      transparent 0, transparent 12px,
+      rgba(42,66,49,0.06) 12px, rgba(42,66,49,0.06) 13px,
+      transparent 13px, transparent 24px);
+  pointer-events: none;
+}
+.bottega .hero-inner { position: relative; }
+.bottega .hero .cat {
+  font-family: 'Inter', sans-serif; font-weight: 500;
+  font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase;
+  color: var(--green); margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.bottega .hero .cat::before {
+  content: ""; flex: 1; height: 1px; background: var(--green); max-width: 20px;
+}
+.bottega .hero .cat::after { content: ""; flex: 1; height: 1px; background: var(--green); }
+
+.bottega .book-row { display: flex; gap: 14px; margin-bottom: 16px; }
+.bottega .cover {
+  width: 86px; height: 118px;
+  background:
+    repeating-linear-gradient(45deg,
+      var(--green) 0, var(--green) 4px,
+      var(--green-deep) 4px, var(--green-deep) 8px),
+    repeating-linear-gradient(-45deg,
+      transparent 0, transparent 4px,
+      rgba(0,0,0,0.15) 4px, rgba(0,0,0,0.15) 8px);
+  border: 1px solid var(--tp);
+  position: relative; flex-shrink: 0;
+  display: flex; align-items: flex-end; padding: 10px;
+}
+.bottega .cover .label {
+  font-family: 'Inter', sans-serif; font-weight: 300;
+  font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase;
+  color: var(--bg); opacity: 0.92;
+}
+
+.bottega .info { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.bottega .info .title {
+  font-family: 'Inter', sans-serif; font-weight: 600;
+  font-size: 22px; line-height: 1.05; color: var(--tp);
+  letter-spacing: -0.03em;
+}
+.bottega .info .author {
+  font-family: 'Inter', sans-serif; font-size: 11px;
+  color: var(--mono); margin-top: 4px; font-weight: 400;
+}
+.bottega .info .quote {
+  font-family: 'Fraunces', serif; font-style: italic; font-weight: 400;
+  font-size: 12px; line-height: 1.5; color: var(--tp);
+  margin-top: auto; padding-top: 8px;
+}
+
+/* Woven band progress */
+.bottega .progress {
+  margin-bottom: 14px;
+}
+.bottega .progress .meta {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 6px;
+  font-family: 'Inter', sans-serif; font-size: 11px; color: var(--mono);
+}
+.bottega .progress .pct {
+  font-family: 'Inter', sans-serif; font-weight: 500;
+  font-size: 14px; color: var(--tp); letter-spacing: -0.02em;
+}
+.bottega .progress .band {
+  height: 10px; position: relative;
+  background: var(--sf3);
+  border: 1px solid var(--tp);
+}
+.bottega .progress .band .fill {
+  position: absolute; inset: 0 auto 0 0; width: 47%;
+  background:
+    repeating-linear-gradient(45deg,
+      var(--green) 0, var(--green) 3px,
+      var(--green-deep) 3px, var(--green-deep) 6px);
+}
+
+.bottega .cta {
+  width: 100%; padding: 14px;
+  background: var(--green); color: var(--bg);
+  border: 1px solid var(--green);
+  font-family: 'Inter', sans-serif; font-weight: 500;
+  font-size: 13px; letter-spacing: 0.04em;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.bottega .cta svg { width: 14px; height: 14px; }
+
+/* Week */
+.bottega .section {
+  margin: 0 24px 14px; padding: 16px 0 0;
+  border-top: 1px solid var(--tp);
+}
+.bottega .section .head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 12px;
+}
+.bottega .section h3 {
+  font-family: 'Inter', sans-serif; font-weight: 500;
+  font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--tp);
+}
+.bottega .section .more {
+  font-family: 'Inter', sans-serif; font-size: 10px;
+  color: var(--green); letter-spacing: 0.14em; text-transform: uppercase;
+}
+
+.bottega .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.bottega .day { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.bottega .day .lbl {
+  font-family: 'Inter', sans-serif; font-size: 9px;
+  color: var(--mono); letter-spacing: 0.1em; text-transform: uppercase;
+}
+.bottega .day .sq {
+  width: 32px; height: 32px; border: 1px solid var(--tp);
+  background: var(--sf2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Inter', sans-serif; font-size: 11px;
+  color: var(--mono); font-weight: 500;
+  position: relative;
+}
+.bottega .day.read .sq {
+  background:
+    repeating-linear-gradient(45deg,
+      var(--green) 0, var(--green) 3px,
+      var(--green-deep) 3px, var(--green-deep) 6px);
+  color: var(--bg); border-color: var(--green-deep);
+}
+.bottega .day.today .sq {
+  background: var(--bg); border: 1.5px solid var(--green);
+  color: var(--green); font-weight: 700;
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px var(--green);
+}
+
+/* Community */
+.bottega .circle { display: flex; align-items: center; gap: 4px; margin-bottom: 10px; }
+.bottega .circle .av {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 1px solid var(--tp); background: var(--sf3);
+  font-family: 'Inter', sans-serif; font-weight: 500;
+  font-size: 13px; color: var(--tp);
+  display: flex; align-items: center; justify-content: center;
+  margin-left: -6px;
+}
+.bottega .circle .av:first-child { margin-left: 0; }
+.bottega .circle .av:nth-child(2) { background: var(--green); color: var(--bg); border-color: var(--green-deep); }
+.bottega .circle .av:nth-child(3) { background: var(--camel); color: var(--bg); border-color: var(--tp); }
+
+.bottega .circle-note {
+  font-family: 'Inter', sans-serif; font-size: 12px;
+  line-height: 1.55; color: var(--tp); margin-left: 6px;
+  padding-top: 10px; border-top: 1px solid rgba(30,28,22,0.15);
+}
+.bottega .circle-note strong { font-weight: 600; color: var(--green); }
+
+.bottega .foot {
+  padding: 12px 24px; text-align: center;
+  font-family: 'Inter', sans-serif; font-weight: 300;
+  font-size: 9px; letter-spacing: 0.32em; text-transform: uppercase;
+  color: var(--mono);
+}
+
+/* ════════════════════════════════════════════════════ */
+/*  3. THOM BROWNE                                      */
+/* ════════════════════════════════════════════════════ */
+.phone.thom {
+  --bg: #EDEAE3;
+  --sf2: #FFFFFF;
+  --sf3: #E3DFD6;
+  --tp: #121212;
+  --mono: #5B6670;
+  --flannel: #7B8691;
+  --pin: #C4C2BC;
+  --red: #B91E32;
+  --navy: #1E2761;
+}
+
+/* Signature four-bar tag (red-white-navy-white) */
+.thom .fourbar {
+  display: flex; width: 36px; height: 16px;
+  border: 1px solid var(--tp); flex-shrink: 0;
+}
+.thom .fourbar .b { flex: 1; }
+.thom .fourbar .b.r { background: var(--red); }
+.thom .fourbar .b.w { background: #fff; }
+.thom .fourbar .b.n { background: var(--navy); }
+
+.thom .header-plate {
+  padding: 20px 24px 14px;
+  background:
+    repeating-linear-gradient(180deg,
+      transparent 0, transparent 3px,
+      rgba(18,18,18,0.05) 3px, rgba(18,18,18,0.05) 4px),
+    var(--bg);
+  border-bottom: 2px solid var(--tp);
+  text-align: center;
+  position: relative;
+}
+.thom .header-plate h1 {
+  font-family: 'Playfair Display', serif; font-weight: 900;
+  font-size: 22px; letter-spacing: 0.08em; color: var(--tp);
+  line-height: 1;
+}
+.thom .header-plate h1::after {
+  content: "."; color: var(--red);
+}
+.thom .header-plate .sub {
+  font-family: 'Courier Prime', monospace; font-weight: 700;
+  font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase;
+  color: var(--mono); margin-top: 6px;
+}
+.thom .header-plate .fourbar-center {
+  width: 48px; height: 18px; margin: 10px auto 0;
+}
+.thom .header-plate .fourbar-center .b { flex: 1; }
+.thom .header-plate .fourbar-center {
+  display: flex; border: 1px solid var(--tp);
+}
+.thom .header-plate .fourbar-center .r { background: var(--red); }
+.thom .header-plate .fourbar-center .w { background: var(--sf2); }
+.thom .header-plate .fourbar-center .n { background: var(--navy); }
+
+/* Greeting */
+.thom .greet {
+  padding: 18px 24px 14px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid var(--tp);
+  margin: 0 24px;
+}
+.thom .greet .hi {
+  font-family: 'Playfair Display', serif; font-weight: 900;
+  font-size: 22px; letter-spacing: -0.01em; color: var(--tp);
+  line-height: 1;
+}
+.thom .greet .hi em {
+  font-family: 'Playfair Display', serif; font-style: italic; font-weight: 700;
+  color: var(--navy);
+}
+.thom .greet .date {
+  font-family: 'Courier Prime', monospace; font-size: 10px;
+  color: var(--mono); letter-spacing: 0.1em;
+  margin-top: 4px;
+}
+.thom .greet .streak {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+}
+.thom .greet .streak .fourbar { width: 42px; }
+.thom .greet .streak .n {
+  font-family: 'Courier Prime', monospace; font-weight: 700;
+  font-size: 10px; color: var(--red); letter-spacing: 0.1em;
+}
+
+/* Hector the dachshund mascot */
+.thom .hector {
+  position: absolute; top: 14px; right: 24px;
+  width: 38px; height: 22px;
+}
+
+/* Hero card — like a name tag */
+.thom .hero {
+  margin: 16px 24px; background: var(--sf2);
+  border: 1.5px solid var(--tp);
+  position: relative;
+  padding: 16px;
+}
+.thom .hero::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 6px;
+  background: var(--sf2);
+  border-bottom: 1px solid var(--tp);
+  background:
+    linear-gradient(90deg,
+      var(--red) 0%, var(--red) 16.66%,
+      var(--sf2) 16.66%, var(--sf2) 33.33%,
+      var(--navy) 33.33%, var(--navy) 50%,
+      var(--sf2) 50%, var(--sf2) 66.66%,
+      var(--red) 66.66%, var(--red) 83.33%,
+      var(--sf2) 83.33%, var(--sf2) 100%);
+}
+.thom .hero .cat {
+  font-family: 'Courier Prime', monospace; font-weight: 700;
+  font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--mono); margin: 4px 0 14px;
+  display: flex; justify-content: space-between;
+}
+.thom .hero .cat .num { color: var(--red); }
+
+.thom .book-row { display: flex; gap: 14px; margin-bottom: 14px; }
+.thom .cover {
+  width: 84px; height: 118px;
+  background:
+    repeating-linear-gradient(180deg,
+      var(--flannel) 0, var(--flannel) 4px,
+      var(--pin) 4px, var(--pin) 5px);
+  border: 1.5px solid var(--tp);
+  position: relative; flex-shrink: 0;
+  display: flex; align-items: flex-end; padding: 10px 8px;
+}
+.thom .cover::before {
+  content: ""; position: absolute; top: 16px; left: 8px; right: 8px; height: 2px;
+  background: var(--red);
+}
+.thom .cover::after {
+  content: ""; position: absolute; top: 22px; left: 8px; right: 8px; height: 2px;
+  background: var(--navy);
+}
+.thom .cover .tag {
+  font-family: 'Playfair Display', serif; font-style: italic; font-weight: 700;
+  font-size: 11px; color: var(--sf2); letter-spacing: 0.02em;
+  text-align: center; width: 100%;
+}
+.thom .cover .pin-badge {
+  position: absolute; top: 50%; right: -8px; transform: translateY(-50%);
+  width: 16px; height: 22px;
+}
+
+.thom .info { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.thom .info .title {
+  font-family: 'Playfair Display', serif; font-weight: 900;
+  font-size: 21px; line-height: 1.05; color: var(--tp);
+  letter-spacing: -0.01em;
+}
+.thom .info .author {
+  font-family: 'Courier Prime', monospace; font-weight: 700;
+  font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--mono); margin-top: 4px;
+}
+.thom .info .quote {
+  font-family: 'Playfair Display', serif; font-style: italic; font-weight: 400;
+  font-size: 12px; line-height: 1.45; color: var(--tp);
+  margin-top: auto; padding-top: 6px;
+  border-top: 0.5px solid var(--mono);
+}
+
+/* Progress: pinstripe with tricolor marker */
+.thom .progress {
+  margin-bottom: 14px;
+}
+.thom .progress .meta {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 6px;
+  font-family: 'Courier Prime', monospace; font-weight: 700;
+  font-size: 10px; color: var(--mono); letter-spacing: 0.1em; text-transform: uppercase;
+}
+.thom .progress .meta .pct {
+  font-family: 'Playfair Display', serif; font-weight: 900;
+  font-size: 16px; color: var(--tp); letter-spacing: 0;
+  text-transform: none;
+}
+.thom .progress .track {
+  height: 14px; position: relative;
+  background:
+    repeating-linear-gradient(90deg,
+      var(--flannel) 0, var(--flannel) 3px,
+      var(--pin) 3px, var(--pin) 4px);
+  border: 1px solid var(--tp);
+}
+.thom .progress .track .fill {
+  position: absolute; top: 0; bottom: 0; left: 0; width: 47%;
+  background:
+    repeating-linear-gradient(90deg,
+      var(--tp) 0, var(--tp) 3px,
+      var(--sf2) 3px, var(--sf2) 4px);
+  border-right: 1px solid var(--tp);
+}
+.thom .progress .track .marker {
+  position: absolute; top: -2px; bottom: -2px; left: 47%; width: 6px;
+  background: var(--red); border: 1px solid var(--tp);
+  transform: translateX(-50%);
+  box-shadow: -5px 0 0 var(--navy), 5px 0 0 var(--navy);
+}
+
+.thom .cta {
+  width: 100%; padding: 14px;
+  background: var(--tp); color: var(--sf2);
+  border: 1.5px solid var(--tp);
+  font-family: 'Playfair Display', serif; font-weight: 900;
+  font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+}
+.thom .cta::before {
+  content: ""; position: absolute; top: 4px; left: 4px; right: 4px; height: 2px;
+  background: linear-gradient(90deg,
+    var(--red) 0%, var(--red) 33%,
+    var(--sf2) 33%, var(--sf2) 66%,
+    var(--navy) 66%, var(--navy) 100%);
+}
+
+/* Week */
+.thom .section {
+  margin: 0 24px 14px; padding: 14px;
+  background: var(--sf2);
+  border: 1.5px solid var(--tp);
+  position: relative;
+}
+.thom .section .head {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 12px; padding-bottom: 8px;
+  border-bottom: 0.5px solid var(--tp);
+}
+.thom .section h3 {
+  font-family: 'Playfair Display', serif; font-weight: 900;
+  font-size: 13px; letter-spacing: 0.04em; color: var(--tp);
+  text-transform: uppercase;
+}
+.thom .section h3::after { content: "."; color: var(--red); }
+.thom .section .more {
+  font-family: 'Courier Prime', monospace; font-weight: 700;
+  font-size: 9px; letter-spacing: 0.16em; color: var(--mono); text-transform: uppercase;
+}
+
+.thom .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.thom .day { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.thom .day .lbl {
+  font-family: 'Courier Prime', monospace; font-weight: 700;
+  font-size: 9px; color: var(--mono); letter-spacing: 0.08em; text-transform: uppercase;
+}
+.thom .day .sq {
+  width: 32px; height: 32px; border: 1.5px solid var(--tp);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif; font-weight: 900;
+  font-size: 12px; color: var(--tp);
+  background: var(--sf2);
+  position: relative;
+}
+.thom .day.read .sq {
+  background:
+    repeating-linear-gradient(90deg,
+      var(--navy) 0, var(--navy) 3px,
+      var(--sf2) 3px, var(--sf2) 4px);
+  color: var(--sf2);
+}
+.thom .day.today .sq {
+  background: var(--sf2);
+  border: 2px solid var(--red);
+  color: var(--red);
+}
+.thom .day.today .sq::after {
+  content: ""; position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%);
+  width: 10px; height: 2px; background: var(--navy);
+}
+
+/* Community */
+.thom .circle { display: flex; gap: 4px; align-items: center; margin-bottom: 10px; }
+.thom .circle .av {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 1.5px solid var(--tp); background: var(--sf3);
+  font-family: 'Playfair Display', serif; font-weight: 900;
+  font-size: 13px; color: var(--tp);
+  display: flex; align-items: center; justify-content: center;
+}
+.thom .circle .av.a { background: var(--red); color: var(--sf2); border-color: var(--tp); }
+.thom .circle .av.b { background: var(--sf2); }
+.thom .circle .av.c { background: var(--navy); color: var(--sf2); border-color: var(--tp); }
+
+.thom .circle-note {
+  font-family: 'Playfair Display', serif; font-size: 12px;
+  line-height: 1.5; color: var(--tp);
+  padding-top: 10px; border-top: 0.5px solid var(--mono);
+}
+.thom .circle-note strong {
+  font-family: 'Playfair Display', serif; font-weight: 900;
+  color: var(--red); margin-right: 3px;
+}
+.thom .circle-note em {
+  font-family: 'Playfair Display', serif; font-style: italic; font-weight: 700;
+}
+
+/* ════════════════════════════════════════════════════ */
+/*  4. CELINE (Hedi era)                                */
+/* ════════════════════════════════════════════════════ */
+.phone.celine {
+  --bg: #F7F3E8;
+  --sf2: #FFFFFF;
+  --sf3: #EBE5D4;
+  --tp: #0A0A08;
+  --mono: #888374;
+  --bone: #EBE5D4;
+}
+.celine .scroll { padding: 0 0 28px; }
+
+/* Top hairline + Triomphe emblem */
+.celine .header-plate {
+  padding: 28px 24px 40px; text-align: center;
+  position: relative;
+}
+.celine .header-plate::before {
+  content: ""; position: absolute; top: 0; left: 24px; right: 24px; height: 0.5px;
+  background: var(--tp);
+}
+.celine .triomphe {
+  width: 34px; height: 34px; margin: 0 auto 18px;
+  border: 0.5px solid var(--tp); border-radius: 50%;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 500;
+  font-size: 14px; letter-spacing: -0.04em; color: var(--tp);
+}
+.celine .triomphe::before, .celine .triomphe::after {
+  content: ""; position: absolute;
+  width: 1px; background: var(--tp);
+}
+.celine .triomphe::before { top: -5px; bottom: -5px; left: 50%; }
+.celine .triomphe::after { left: -5px; right: -5px; top: 50%; height: 1px; width: auto; }
+
+.celine .header-plate h1 {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 500;
+  font-size: 32px; letter-spacing: 0.2em; color: var(--tp);
+  text-transform: uppercase; line-height: 1;
+}
+.celine .header-plate .addr {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 400;
+  font-size: 9px; letter-spacing: 0.32em; text-transform: uppercase;
+  color: var(--mono); margin-top: 14px;
+}
+
+/* Greeting */
+.celine .greet {
+  padding: 0 24px 32px; text-align: center;
+  border-bottom: 0.5px solid var(--tp);
+  margin: 0 24px 32px;
+}
+.celine .greet .hi {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 400;
+  font-size: 42px; letter-spacing: -0.04em; color: var(--tp);
+  line-height: 1; text-transform: uppercase;
+}
+.celine .greet .date {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 400;
+  font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase;
+  color: var(--mono); margin-top: 22px;
+}
+.celine .greet .streak {
+  margin-top: 10px;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 300;
+  font-size: 72px; color: var(--tp); line-height: 0.8;
+  letter-spacing: -0.06em;
+}
+.celine .greet .streak::after {
+  content: " /07 ";
+  display: block;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 400;
+  font-size: 9px; letter-spacing: 0.32em; text-transform: uppercase;
+  color: var(--mono); margin-top: 4px;
+}
+
+/* Hero — maximum white space */
+.celine .hero {
+  margin: 0 24px 36px;
+  padding: 0 0 20px;
+  border-bottom: 0.5px solid var(--tp);
+}
+.celine .hero .cat {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 400;
+  font-size: 9px; letter-spacing: 0.32em; text-transform: uppercase;
+  color: var(--mono); margin-bottom: 18px;
+  display: flex; justify-content: space-between;
+}
+.celine .book-row { display: flex; gap: 20px; margin-bottom: 24px; }
+.celine .cover {
+  width: 84px; height: 120px;
+  background: var(--tp);
+  position: relative; flex-shrink: 0;
+}
+.celine .cover::before {
+  content: "CELINE"; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Space Grotesk', sans-serif; font-weight: 500;
+  font-size: 9px; letter-spacing: 0.28em; color: var(--bg);
+  text-transform: uppercase;
+}
+.celine .cover .pg {
+  position: absolute; bottom: 10px; left: 0; right: 0;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 300;
+  font-size: 9px; letter-spacing: 0.16em; color: var(--mono);
+  text-align: center;
+}
+
+.celine .info { flex: 1; display: flex; flex-direction: column; gap: 2px; padding-top: 4px; }
+.celine .info .title {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 500;
+  font-size: 22px; letter-spacing: -0.03em; color: var(--tp);
+  line-height: 1.05;
+}
+.celine .info .author {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 400;
+  font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--mono); margin-top: 8px;
+}
+.celine .info .meta {
+  margin-top: auto;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 300;
+  font-size: 10px; letter-spacing: 0.04em; color: var(--mono);
+}
+.celine .info .meta strong {
+  font-weight: 500; color: var(--tp);
+}
+
+/* Progress — single thin line */
+.celine .progress {
+  margin-bottom: 20px;
+}
+.celine .progress .line {
+  height: 1px; background: var(--sf3); position: relative;
+}
+.celine .progress .line .fill {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 47%;
+  background: var(--tp);
+}
+.celine .progress .line .dot {
+  position: absolute; left: 47%; top: 50%; transform: translate(-50%, -50%);
+  width: 6px; height: 6px; background: var(--tp); border-radius: 50%;
+}
+.celine .progress .meta {
+  display: flex; justify-content: space-between;
+  margin-top: 8px;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 400;
+  font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--mono);
+}
+.celine .progress .pct { color: var(--tp); font-weight: 500; letter-spacing: -0.02em; font-size: 14px; text-transform: none; }
+
+.celine .cta {
+  width: 100%; padding: 16px;
+  background: var(--tp); color: var(--bg);
+  border: none;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 500;
+  font-size: 10px; letter-spacing: 0.34em; text-transform: uppercase;
+  cursor: pointer;
+}
+
+/* Week */
+.celine .section {
+  margin: 0 24px 28px;
+  padding-bottom: 20px;
+  border-bottom: 0.5px solid var(--tp);
+}
+.celine .section h3 {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 400;
+  font-size: 9px; letter-spacing: 0.32em; text-transform: uppercase;
+  color: var(--mono); margin-bottom: 18px;
+  display: flex; justify-content: space-between;
+}
+.celine .section h3 span { color: var(--tp); font-weight: 500; }
+
+.celine .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0; }
+.celine .day { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.celine .day .lbl {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 400;
+  font-size: 8px; color: var(--mono); letter-spacing: 0.22em; text-transform: uppercase;
+}
+.celine .day .sq {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 400;
+  font-size: 11px; color: var(--mono);
+  background: transparent;
+  border: 0.5px solid var(--mono);
+}
+.celine .day.read .sq {
+  background: var(--tp); color: var(--bg); border-color: var(--tp);
+}
+.celine .day.today .sq {
+  background: var(--bg); border: 1px solid var(--tp); color: var(--tp); font-weight: 500;
+  box-shadow: 0 0 0 3px var(--bg), 0 0 0 4px var(--tp);
+}
+
+/* Community */
+.celine .circle { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; }
+.celine .circle .av {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 0.5px solid var(--tp); background: var(--bg);
+  font-family: 'Space Grotesk', sans-serif; font-weight: 400;
+  font-size: 11px; color: var(--tp); letter-spacing: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.celine .circle .av.a { background: var(--tp); color: var(--bg); border-color: var(--tp); }
+.celine .circle .av.b { background: var(--sf3); border-color: var(--tp); }
+.celine .circle-note {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 400;
+  font-size: 12px; line-height: 1.6; color: var(--tp);
+}
+.celine .circle-note strong { font-weight: 500; }
+
+/* Foot */
+.celine .foot {
+  padding: 0 24px;
+  text-align: center;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 400;
+  font-size: 8px; letter-spacing: 0.4em; text-transform: uppercase;
+  color: var(--mono);
+}
+
+/* ════════════════════════════════════════════════════ */
+/*  5. GUCCI                                            */
+/* ════════════════════════════════════════════════════ */
+.phone.gucci {
+  --bg: #F3ECDC;
+  --sf2: #FBF5E7;
+  --sf3: #E8DFC8;
+  --tp: #1A1510;
+  --mono: #5D4E36;
+  --ancora: #73163E;
+  --ancora-deep: #4A0E27;
+  --green: #00573B;
+  --red: #9A180C;
+  --gold: #A58630;
+  --gold2: #D4B06C;
+}
+
+/* Web stripe (green-red-green) — iconic */
+.gucci .web {
+  height: 12px;
+  background: linear-gradient(90deg,
+    transparent 0%, transparent 12%,
+    var(--green) 12%, var(--green) 38%,
+    var(--red) 38%, var(--red) 62%,
+    var(--green) 62%, var(--green) 88%,
+    transparent 88%, transparent 100%);
+}
+
+.gucci .header-plate {
+  padding: 20px 24px 14px;
+  background: var(--sf2);
+  border-bottom: 1px solid var(--tp);
+  text-align: center;
+  position: relative;
+}
+.gucci .header-plate h1 {
+  font-family: 'EB Garamond', serif; font-weight: 600;
+  font-size: 28px; letter-spacing: 0.18em; color: var(--tp);
+  line-height: 1;
+}
+.gucci .header-plate h1 em {
+  font-family: 'EB Garamond', serif; font-style: italic; font-weight: 400;
+  letter-spacing: 0.04em; color: var(--ancora);
+}
+.gucci .header-plate .sub {
+  font-family: 'EB Garamond', serif; font-style: italic; font-weight: 400;
+  font-size: 11px; letter-spacing: 0.06em; color: var(--mono);
+  margin-top: 6px;
+}
+/* Horsebit logo */
+.gucci .horsebit {
+  width: 54px; height: 18px; margin: 10px auto 0;
+  position: relative;
+}
+.gucci .horsebit::before,
+.gucci .horsebit::after {
+  content: ""; position: absolute;
+  width: 18px; height: 18px;
+  border: 1.5px solid var(--gold);
+  border-radius: 50%;
+  top: 0;
+}
+.gucci .horsebit::before { left: 0; }
+.gucci .horsebit::after { right: 0; }
+.gucci .horsebit span {
+  position: absolute; top: 8px; left: 12px; right: 12px; height: 2px;
+  background: var(--gold);
+}
+
+/* Greeting */
+.gucci .greet {
+  padding: 18px 24px 14px;
+  display: flex; justify-content: space-between; align-items: flex-end;
+  border-bottom: 1px solid var(--gold);
+  margin: 0 24px;
+}
+.gucci .greet .hi {
+  font-family: 'EB Garamond', serif; font-style: italic; font-weight: 500;
+  font-size: 26px; color: var(--ancora); line-height: 1;
+}
+.gucci .greet .hi strong {
+  font-family: 'EB Garamond', serif; font-style: normal; font-weight: 600;
+  color: var(--tp); letter-spacing: 0.02em;
+}
+.gucci .greet .date {
+  font-family: 'EB Garamond', serif; font-size: 10px;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold);
+  margin-top: 4px;
+}
+.gucci .greet .streak {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 4px 12px;
+  background: var(--ancora); color: var(--gold2);
+  border: 1px solid var(--gold);
+  font-family: 'EB Garamond', serif; font-style: italic;
+  font-size: 10px; letter-spacing: 0.08em;
+}
+.gucci .greet .streak strong {
+  font-family: 'EB Garamond', serif; font-style: normal; font-weight: 700;
+  font-size: 18px; color: var(--gold2); letter-spacing: 0;
+}
+
+/* Hero card — ornate */
+.gucci .hero {
+  margin: 16px 24px;
+  background: var(--sf2);
+  border: 1px solid var(--tp);
+  padding: 16px;
+  position: relative;
+}
+.gucci .hero::before {
+  content: ""; position: absolute; inset: 4px;
+  border: 0.5px solid var(--gold);
+  pointer-events: none;
+}
+.gucci .hero .cat-top {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 14px; padding-bottom: 8px;
+  border-bottom: 0.5px solid var(--gold);
+}
+.gucci .hero .cat-top .cat {
+  font-family: 'EB Garamond', serif; font-style: italic; font-weight: 500;
+  font-size: 13px; color: var(--ancora); letter-spacing: 0.02em;
+}
+.gucci .hero .cat-top .num {
+  font-family: 'EB Garamond', serif; font-weight: 500;
+  font-size: 11px; letter-spacing: 0.2em; color: var(--gold); text-transform: uppercase;
+}
+
+.gucci .book-row { display: flex; gap: 14px; margin-bottom: 12px; }
+.gucci .cover {
+  width: 86px; height: 118px;
+  background: var(--ancora-deep);
+  border: 1px solid var(--tp);
+  position: relative; flex-shrink: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.gucci .cover::before {
+  content: ""; position: absolute; inset: 4px;
+  border: 1px solid var(--gold);
+}
+.gucci .cover .mono {
+  font-family: 'EB Garamond', serif; font-weight: 600;
+  font-size: 32px; color: var(--gold2); letter-spacing: -0.02em;
+  position: relative; z-index: 1;
+}
+.gucci .cover .year {
+  position: absolute; bottom: 10px; left: 0; right: 0;
+  text-align: center;
+  font-family: 'EB Garamond', serif; font-style: italic;
+  font-size: 9px; color: var(--gold); letter-spacing: 0.12em;
+  z-index: 1;
+}
+
+.gucci .info { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.gucci .info .title {
+  font-family: 'EB Garamond', serif; font-style: italic; font-weight: 600;
+  font-size: 22px; line-height: 1.05; color: var(--tp);
+}
+.gucci .info .author {
+  font-family: 'EB Garamond', serif; font-weight: 500;
+  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--mono); margin-top: 4px;
+}
+.gucci .info .quote {
+  font-family: 'EB Garamond', serif; font-style: italic;
+  font-size: 12.5px; line-height: 1.45; color: var(--ancora);
+  margin-top: auto; padding-top: 6px;
+}
+
+/* Web stripe progress */
+.gucci .progress { margin-bottom: 14px; }
+.gucci .progress .meta {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 6px;
+  font-family: 'EB Garamond', serif; font-style: italic;
+  font-size: 11px; color: var(--mono);
+}
+.gucci .progress .pct {
+  font-family: 'EB Garamond', serif; font-weight: 600; font-style: normal;
+  font-size: 15px; color: var(--ancora);
+}
+.gucci .progress .bar {
+  height: 10px; position: relative;
+  background: var(--sf3);
+  border: 1px solid var(--tp);
+}
+.gucci .progress .bar .fill {
+  position: absolute; top: 0; bottom: 0; left: 0; width: 47%;
+  background: linear-gradient(90deg,
+    var(--green) 0%, var(--green) 30%,
+    var(--red) 30%, var(--red) 70%,
+    var(--green) 70%, var(--green) 100%);
+  border-right: 1px solid var(--tp);
+}
+
+.gucci .cta {
+  width: 100%; padding: 14px;
+  background: var(--ancora); color: var(--gold2);
+  border: 1px solid var(--tp);
+  font-family: 'EB Garamond', serif; font-weight: 600;
+  font-size: 12px; letter-spacing: 0.28em; text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+}
+.gucci .cta::before {
+  content: ""; position: absolute; inset: 3px;
+  border: 0.5px solid var(--gold2);
+}
+
+/* Sections */
+.gucci .section {
+  margin: 0 24px 14px; padding: 14px;
+  background: var(--sf2);
+  border: 1px solid var(--tp);
+}
+.gucci .section .head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 12px; padding-bottom: 6px;
+  border-bottom: 0.5px solid var(--gold);
+}
+.gucci .section h3 {
+  font-family: 'EB Garamond', serif; font-style: italic; font-weight: 600;
+  font-size: 15px; color: var(--ancora);
+}
+.gucci .section .more {
+  font-family: 'EB Garamond', serif; font-weight: 500;
+  font-size: 10px; letter-spacing: 0.2em; color: var(--gold); text-transform: uppercase;
+}
+
+.gucci .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.gucci .day { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.gucci .day .lbl {
+  font-family: 'EB Garamond', serif; font-style: italic;
+  font-size: 10px; color: var(--mono);
+}
+.gucci .day .sq {
+  width: 30px; height: 30px; border: 1px solid var(--tp);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'EB Garamond', serif; font-weight: 500;
+  font-size: 11px; color: var(--mono);
+  background: var(--bg);
+}
+.gucci .day.read .sq {
+  background: linear-gradient(90deg,
+    var(--green) 0%, var(--green) 30%,
+    var(--red) 30%, var(--red) 70%,
+    var(--green) 70%, var(--green) 100%);
+  color: transparent;
+}
+.gucci .day.today .sq {
+  background: var(--ancora); color: var(--gold2); border-color: var(--ancora-deep);
+  font-weight: 600;
+}
+
+/* Community */
+.gucci .circle { display: flex; gap: 4px; align-items: center; margin-bottom: 8px; }
+.gucci .circle .av {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 1.5px solid var(--gold); background: var(--sf3);
+  font-family: 'EB Garamond', serif; font-style: italic; font-weight: 600;
+  font-size: 14px; color: var(--tp);
+  display: flex; align-items: center; justify-content: center;
+  margin-left: -8px;
+}
+.gucci .circle .av:first-child { margin-left: 0; }
+.gucci .circle .av.a { background: var(--ancora); color: var(--gold2); border-color: var(--gold); }
+.gucci .circle .av.c { background: var(--green); color: var(--gold2); border-color: var(--gold); }
+.gucci .circle-note {
+  font-family: 'EB Garamond', serif; font-size: 12.5px;
+  line-height: 1.55; color: var(--tp);
+  padding-top: 10px; margin-left: 4px;
+}
+.gucci .circle-note strong {
+  font-family: 'EB Garamond', serif; font-style: italic; font-weight: 700;
+  color: var(--ancora);
+}
+.gucci .circle-note em {
+  font-family: 'EB Garamond', serif; font-style: italic; font-weight: 600;
+}
+
+.gucci .foot {
+  padding: 10px 24px; text-align: center;
+  font-family: 'EB Garamond', serif; font-style: italic;
+  font-size: 10px; letter-spacing: 0.18em; color: var(--gold);
+}
+
+/* ═══ placeholder for sections to be appended ═══ */
+
+/* ═══ NOTES ═══ */
+.notes { max-width: 1400px; margin: 52px auto 0; background: #151210; border: 1px solid #2A2218; padding: 28px; }
+.notes h2 { font-family: 'Italiana', serif; font-size: 22px; letter-spacing: 0.22em; color: #EFE8D9; margin-bottom: 6px; text-align: center; text-transform: uppercase; }
+.notes > .caption { font-family: 'Fraunces', serif; font-style: italic; text-align: center; color: #B5904D; margin-bottom: 28px; letter-spacing: 0.04em; }
+.notes .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+.notes .col { color: #C4B9A2; padding: 0 4px; }
+.notes .col h4 { font-family: 'Italiana', serif; font-size: 14px; letter-spacing: 0.22em; color: #EFE8D9; margin-bottom: 4px; padding-bottom: 4px; border-bottom: 1px solid currentColor; }
+.notes .col .tagline { font-family: 'Fraunces', serif; font-style: italic; font-size: 11.5px; color: #B5904D; margin-bottom: 10px; letter-spacing: 0.02em; }
+.notes .col p { font-family: 'Pretendard Variable', sans-serif; font-size: 12.5px; line-height: 1.7; margin-bottom: 5px; color: #B8AC93; }
+.notes .col p strong { color: #EFE8D9; font-family: 'Italiana', serif; font-weight: 400; font-size: 11px; letter-spacing: 0.14em; margin-right: 4px; text-transform: uppercase; }
+.notes .col .pal { display: flex; gap: 4px; margin-top: 12px; }
+.notes .col .pal .s { width: 22px; height: 22px; border: 1px solid #2A2218; }
+
+/* ═══ MEMORY NOTE ═══ */
+.mem-note {
+  max-width: 900px; margin: 32px auto; padding: 20px 24px;
+  background: rgba(181,144,77,0.08);
+  border-left: 3px solid #B5904D;
+}
+.mem-note h3 {
+  font-family: 'Italiana', serif; font-size: 14px; letter-spacing: 0.2em; color: #EFE8D9;
+  margin-bottom: 8px; text-transform: uppercase;
+}
+.mem-note p {
+  font-family: 'Pretendard Variable', sans-serif; font-size: 13px; line-height: 1.7; color: #B8AC93;
+}
+.mem-note code { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #D4B878; background: rgba(0,0,0,0.3); padding: 1px 5px; }
+</style>
+</head>
+<body>
+
+<div class="lab-hero">
+  <h1>Seven Maisons</h1>
+  <div class="wave">brand studies · banggut reading home</div>
+  <div class="sub">2026.04.21 · LAB/BRAND-SERIES/V1</div>
+</div>
+
+<div class="mem-note">
+  <h3>📎 memory</h3>
+  <p>이 목업 시리즈는 실험용이라 기본적으로 임시예요. 나중에 특정 메종이 당첨되면 (1) <code>docs/brand-studies.md</code>에 결정+이유 기록, (2) ui-ux-pro-max 스킬의 <code>--persist</code> 플래그로 <code>design-system/MASTER.md</code> 생성, (3) MEMORY.md에 <code>banggut_brand_direction.md</code> 한 줄 추가 — 이 3단으로 박제할 수 있어요.</p>
+</div>
+
+<div class="phones-grid">
+
+  <!-- ═══════════ 2. BOTTEGA VENETA ═══════════ -->
+  <!-- (placed after Chanel in order below) -->
+
+  <!-- ═══════════ 1. CHANEL ═══════════ -->
+  <div class="phone-col">
+    <div class="phone chanel">
+      <div class="status"><span>9:41</span><span>◉ 4G · 82%</span></div>
+      <div class="scroll">
+        <div class="header-plate">
+          <h1>BANGGUT</h1>
+          <div class="sub">Le Livre — N° 07</div>
+          <div class="brand-emblem"></div>
+        </div>
+
+        <div class="greet">
+          <div class="hi">Une page,<br>au moins.</div>
+          <div class="date">Dimanche · 21 Avril MMXXVI</div>
+          <div class="streak"><strong>VII</strong>jours consécutifs</div>
+        </div>
+
+        <div class="hero">
+          <div class="no">— Lecture · N° 003 —</div>
+          <div class="book-row">
+            <div class="cover">
+              <div class="mono">B</div>
+              <div class="camellia">✿</div>
+            </div>
+            <div class="info">
+              <div class="title">달까지<br>가자</div>
+              <div class="author">Jang Ryu-Jin</div>
+              <div class="meta">Chapitre 3 · p.148</div>
+            </div>
+          </div>
+          <div class="pearls">
+            <span class="p"></span><span class="p"></span><span class="p"></span><span class="p"></span><span class="p"></span><span class="p now"></span><span class="p dim"></span><span class="p dim"></span><span class="p dim"></span><span class="p dim"></span><span class="p dim"></span><span class="p dim"></span>
+          </div>
+          <div class="pct"><strong>47</strong>% · 어제 멈춘 148쪽부터</div>
+          <button class="cta">Reprendre</button>
+        </div>
+
+        <div class="section">
+          <h3>La Semaine</h3>
+          <div class="days">
+            <div class="day read"><span class="lbl">L</span><span class="sq">15</span></div>
+            <div class="day read"><span class="lbl">M</span><span class="sq">16</span></div>
+            <div class="day read"><span class="lbl">M</span><span class="sq">17</span></div>
+            <div class="day read"><span class="lbl">J</span><span class="sq">18</span></div>
+            <div class="day read"><span class="lbl">V</span><span class="sq">19</span></div>
+            <div class="day read"><span class="lbl">S</span><span class="sq">20</span></div>
+            <div class="day today"><span class="lbl">D</span><span class="sq">21</span></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Le Cercle</h3>
+          <div class="circle">
+            <div class="av">S</div>
+            <div class="av">J</div>
+            <div class="av">M</div>
+          </div>
+          <div class="circle-note"><strong>SUJIN</strong> 님이 <em>시선으로부터</em>를 완독.</div>
+        </div>
+
+        <div class="foot">Fait à Séoul · MMXXVI</div>
+      </div>
+    </div>
+
+    <div class="phone-label">
+      CHANEL
+      <em>Didot · quilt · pearl · N°</em>
+    </div>
+    <div class="palette-strip">
+      <div class="sw" style="background:#FAF7EE"></div>
+      <div class="sw" style="background:#0A0A0A"></div>
+      <div class="sw" style="background:#B5904D"></div>
+      <div class="sw" style="background:#EBE4D0"></div>
+      <div class="sw" style="background:#F2EDD8"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ 2. BOTTEGA VENETA ═══════════ -->
+  <div class="phone-col">
+    <div class="phone bottega">
+      <div class="status"><span>9:41</span><span>◉ 4G · 82%</span></div>
+      <div class="scroll">
+        <div class="header-plate">
+          <div class="name">방긋 <span>·</span> BOTTEGA</div>
+        </div>
+
+        <div class="greet">
+          <div>
+            <div class="hi">오늘도<br><em>한 장</em>.</div>
+            <div class="sub">4월 21일 일요일</div>
+          </div>
+          <div>
+            <div class="streak-num">07</div>
+            <div class="streak-txt">days in a row</div>
+          </div>
+        </div>
+
+        <div class="hero">
+          <div class="hero-inner">
+            <div class="cat">Now Reading</div>
+            <div class="book-row">
+              <div class="cover">
+                <div class="label">Aller<br>à la lune</div>
+              </div>
+              <div class="info">
+                <div class="title">달까지<br>가자</div>
+                <div class="author">장류진 · 창비</div>
+                <div class="quote">"그건 정말 꿈 같은 얘기였지만, 나는 그 꿈을 믿어보기로 했다."</div>
+              </div>
+            </div>
+
+            <div class="progress">
+              <div class="meta">
+                <span>Chapter 3 · 148 / 312</span>
+                <span class="pct">47%</span>
+              </div>
+              <div class="band"><div class="fill"></div></div>
+            </div>
+
+            <button class="cta">
+              Continue Reading
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 12 L19 12 M13 6 L19 12 L13 18"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="head">
+            <h3>This Week</h3>
+            <span class="more">ALL →</span>
+          </div>
+          <div class="days">
+            <div class="day read"><span class="lbl">M</span><span class="sq">15</span></div>
+            <div class="day read"><span class="lbl">T</span><span class="sq">16</span></div>
+            <div class="day read"><span class="lbl">W</span><span class="sq">17</span></div>
+            <div class="day read"><span class="lbl">T</span><span class="sq">18</span></div>
+            <div class="day read"><span class="lbl">F</span><span class="sq">19</span></div>
+            <div class="day read"><span class="lbl">S</span><span class="sq">20</span></div>
+            <div class="day today"><span class="lbl">S</span><span class="sq">21</span></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="head">
+            <h3>Friends</h3>
+            <span class="more">OPEN →</span>
+          </div>
+          <div class="circle">
+            <div class="av">S</div>
+            <div class="av">J</div>
+            <div class="av">M</div>
+          </div>
+          <div class="circle-note"><strong>수진</strong>님이 『시선으로부터』를 완독했어요.</div>
+        </div>
+
+        <div class="foot">— Crafted in Seoul —</div>
+      </div>
+    </div>
+
+    <div class="phone-label">
+      BOTTEGA VENETA
+      <em>no logo · intrecciato · silent luxury</em>
+    </div>
+    <div class="palette-strip">
+      <div class="sw" style="background:#D5C598"></div>
+      <div class="sw" style="background:#2A4231"></div>
+      <div class="sw" style="background:#162318"></div>
+      <div class="sw" style="background:#8B6F41"></div>
+      <div class="sw" style="background:#1E1C16"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ 3. THOM BROWNE ═══════════ -->
+  <div class="phone-col">
+    <div class="phone thom">
+      <div class="status"><span>9:41</span><span>◉ 4G · 82%</span></div>
+      <div class="scroll">
+        <div class="header-plate">
+          <h1>BANGGUT</h1>
+          <div class="sub">Reading Club · Est. 2025</div>
+          <div class="fourbar-center">
+            <div class="b r"></div><div class="b w"></div><div class="b n"></div><div class="b w"></div>
+          </div>
+        </div>
+
+        <div class="greet">
+          <div>
+            <div class="hi">A Page, <em>at Least.</em></div>
+            <div class="date">Sun · Apr 21 · 2026</div>
+          </div>
+          <div class="streak">
+            <div class="fourbar">
+              <div class="b r"></div><div class="b w"></div><div class="b n"></div><div class="b w"></div>
+            </div>
+            <div class="n">07 DAYS</div>
+          </div>
+        </div>
+
+        <div class="hero">
+          <div class="cat">
+            <span>Now Reading</span>
+            <span class="num">No. 003</span>
+          </div>
+
+          <div class="book-row">
+            <div class="cover">
+              <div class="tag">달까지<br>가자</div>
+            </div>
+            <div class="info">
+              <div class="title">달까지<br>가자</div>
+              <div class="author">Jang Ryu-Jin</div>
+              <div class="quote">"그건 정말 꿈 같은 얘기였지만, 나는 그 꿈을 믿어보기로 했다."</div>
+            </div>
+          </div>
+
+          <div class="progress">
+            <div class="meta">
+              <span>Ch. 3 · 148/312</span>
+              <span class="pct">47%</span>
+            </div>
+            <div class="track"><div class="fill"></div><div class="marker"></div></div>
+          </div>
+
+          <button class="cta">Continue</button>
+        </div>
+
+        <div class="section">
+          <div class="head">
+            <h3>This Week</h3>
+            <span class="more">VIEW ALL</span>
+          </div>
+          <div class="days">
+            <div class="day read"><span class="lbl">MON</span><span class="sq">15</span></div>
+            <div class="day read"><span class="lbl">TUE</span><span class="sq">16</span></div>
+            <div class="day read"><span class="lbl">WED</span><span class="sq">17</span></div>
+            <div class="day read"><span class="lbl">THU</span><span class="sq">18</span></div>
+            <div class="day read"><span class="lbl">FRI</span><span class="sq">19</span></div>
+            <div class="day read"><span class="lbl">SAT</span><span class="sq">20</span></div>
+            <div class="day today"><span class="lbl">SUN</span><span class="sq">21</span></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="head">
+            <h3>The Club</h3>
+            <span class="more">OPEN</span>
+          </div>
+          <div class="circle">
+            <div class="av a">S</div>
+            <div class="av b">J</div>
+            <div class="av c">M</div>
+          </div>
+          <div class="circle-note"><strong>SUJIN</strong>님이 <em>시선으로부터</em>를 완독했어요.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone-label">
+      THOM BROWNE
+      <em>four-bar · flannel · preppy</em>
+    </div>
+    <div class="palette-strip">
+      <div class="sw" style="background:#EDEAE3"></div>
+      <div class="sw" style="background:#7B8691"></div>
+      <div class="sw" style="background:#B91E32"></div>
+      <div class="sw" style="background:#1E2761"></div>
+      <div class="sw" style="background:#121212"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ 4. CELINE ═══════════ -->
+  <div class="phone-col">
+    <div class="phone celine">
+      <div class="status"><span>9:41</span><span>◉ 4G · 82%</span></div>
+      <div class="scroll">
+        <div class="header-plate">
+          <div class="triomphe">B</div>
+          <h1>BANGGUT</h1>
+          <div class="addr">16, Rue Vivienne · Seoul</div>
+        </div>
+
+        <div class="greet">
+          <div class="hi">UNE PAGE</div>
+          <div class="date">21 · 04 · 2026</div>
+          <div class="streak">07</div>
+        </div>
+
+        <div class="hero">
+          <div class="cat">
+            <span>Now Reading</span>
+            <span>No. 003</span>
+          </div>
+          <div class="book-row">
+            <div class="cover">
+              <div class="pg">p. 148</div>
+            </div>
+            <div class="info">
+              <div class="title">달까지 가자</div>
+              <div class="author">Jang Ryu-Jin</div>
+              <div class="meta">Chapter 3 — <strong>148 / 312</strong></div>
+            </div>
+          </div>
+
+          <div class="progress">
+            <div class="line"><div class="fill"></div><div class="dot"></div></div>
+            <div class="meta">
+              <span>어제 148쪽에서 멈춤</span>
+              <span class="pct">47%</span>
+            </div>
+          </div>
+
+          <button class="cta">Continue</button>
+        </div>
+
+        <div class="section">
+          <h3><span>This Week</span><span>Apr 15—21</span></h3>
+          <div class="days">
+            <div class="day read"><span class="lbl">M</span><span class="sq">15</span></div>
+            <div class="day read"><span class="lbl">T</span><span class="sq">16</span></div>
+            <div class="day read"><span class="lbl">W</span><span class="sq">17</span></div>
+            <div class="day read"><span class="lbl">T</span><span class="sq">18</span></div>
+            <div class="day read"><span class="lbl">F</span><span class="sq">19</span></div>
+            <div class="day read"><span class="lbl">S</span><span class="sq">20</span></div>
+            <div class="day today"><span class="lbl">S</span><span class="sq">21</span></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3><span>Friends</span><span>3 online</span></h3>
+          <div class="circle">
+            <div class="av a">S</div>
+            <div class="av">J</div>
+            <div class="av b">M</div>
+          </div>
+          <div class="circle-note"><strong>Sujin</strong> — 시선으로부터 완독.</div>
+        </div>
+
+        <div class="foot">Celine · Reading · Paris</div>
+      </div>
+    </div>
+
+    <div class="phone-label">
+      CELINE
+      <em>Hedi era · extreme minimal · Triomphe</em>
+    </div>
+    <div class="palette-strip">
+      <div class="sw" style="background:#F7F3E8"></div>
+      <div class="sw" style="background:#FFFFFF"></div>
+      <div class="sw" style="background:#EBE5D4"></div>
+      <div class="sw" style="background:#888374"></div>
+      <div class="sw" style="background:#0A0A08"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="notes">
+  <h2>Brand DNA Notes</h2>
+  <div class="caption">— 각 메종이 책 앱을 만든다면 어떻게 풀지 —</div>
+  <div class="grid">
+
+    <div class="col">
+      <h4>CHANEL</h4>
+      <div class="tagline">Didot · quilt · pearl strings · camellia</div>
+      <p><strong>하이콘트라스트 세리프</strong> Bodoni Moda 800 대문자 + 자간 0.28em. N° 시리얼 넘버링(No.5 향수 오마주).</p>
+      <p><strong>퀼트 다이아</strong> 45°+135° 반복 라인으로 마틀라세 패턴. 배경에 6% 골드 오버레이.</p>
+      <p><strong>진주 스트링</strong> 진행바 = 12알 펄. 읽은 칸은 골드 펄, 현재는 골드 글로우.</p>
+      <p><strong>카멜리아</strong> 책 하단에 ✿ — Coco의 시그니처 꽃.</p>
+      <p><strong>엠블럼</strong> 상단에 오버랩 두 원 (CC의 방긋 버전). 과하지 않게 작게.</p>
+      <p><strong>불어 한 방울</strong> "Reprendre" / "Le Cercle" — 메종 DNA인 언어.</p>
+      <div class="pal">
+        <div class="s" style="background:#FAF7EE"></div>
+        <div class="s" style="background:#0A0A0A"></div>
+        <div class="s" style="background:#B5904D"></div>
+        <div class="s" style="background:#D4B878"></div>
+        <div class="s" style="background:#EBE4D0"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

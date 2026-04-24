@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>방긋 · Premium Session</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Fraunces:opsz,wght@9..144,300;9..144,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;word-break:keep-all}
+:root{
+  /* Refined palette — Kinfolk/Aesop 감성 */
+  --bg:#F5F1E8;
+  --paper:#FAF7F1;
+  --sf:#EEE8DC;
+  --sf2:#E1D9CA;
+  --sf3:#CDC4B2;
+  --bd:rgba(60,70,60,0.08);
+  --bd2:rgba(60,70,60,0.14);
+  --tp:#1A1E1B;
+  --ts:#434a42;
+  --tm:#797f77;
+  --tf:rgba(26,30,27,0.35);
+
+  /* 3단계 세이지 — 더 절제된 톤 */
+  --sage-soft:#C8D9CE;
+  --sage:#6B9786;
+  --sage-deep:#3F6152;
+
+  /* 악센트 골드 (milestone) - 무광 */
+  --gold:#A88352;
+  --gold-soft:#E5D5B8;
+}
+body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:#DCD5CA;padding:32px 20px;min-height:100vh;color:var(--tp);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1720px;margin:0 auto}
+
+.headline{font-family:'Fraunces',serif;font-weight:300;font-size:34px;letter-spacing:-0.02em;text-align:center;color:var(--tp);margin-bottom:8px}
+.sub{color:var(--ts);font-size:12px;text-align:center;margin-bottom:40px;letter-spacing:0.02em;font-weight:500}
+.sub em{font-style:normal;color:var(--sage-deep);font-weight:600}
+
+.phones{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;max-width:380px}
+.phone-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:2px;background:var(--paper);border:0.5px solid var(--bd2);font-size:10px;font-weight:500;color:var(--ts);letter-spacing:0.8px;text-transform:uppercase}
+.phone{width:360px;height:820px;background:var(--paper);border-radius:36px;box-shadow:0 0 0 3px #1a1a1a,0 0 40px rgba(60,70,60,0.12);overflow:auto;position:relative;-webkit-font-smoothing:antialiased}
+.phone::-webkit-scrollbar{width:0}
+.phone-desc{font-size:11px;color:var(--ts);text-align:center;line-height:1.7;max-width:360px;font-weight:500;letter-spacing:0.01em}
+.phone-desc strong{color:var(--sage-deep);font-weight:600}
+
+/* ═══ 1. 목표 선택 (Refined) ═══ */
+.s1{min-height:100%;padding:48px 24px 32px;display:flex;flex-direction:column;background:var(--paper)}
+
+.s1-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px}
+.s1-close{width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:var(--tm);cursor:pointer}
+.s1-close svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.5;fill:none}
+.s1-label{font-size:10px;font-weight:500;color:var(--tm);letter-spacing:1.5px;text-transform:uppercase}
+
+.s1-hero{margin-bottom:40px}
+.s1-hero-eyebrow{font-size:10px;font-weight:500;color:var(--tm);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+.s1-hero-title{font-family:'Fraunces',serif;font-weight:300;font-size:32px;letter-spacing:-0.02em;line-height:1.15;color:var(--tp);margin-bottom:10px}
+.s1-hero-sub{font-size:13px;color:var(--ts);line-height:1.6;letter-spacing:0.005em}
+
+.s1-book{margin-bottom:36px;padding:16px 18px;background:var(--bg);border-radius:14px;display:flex;gap:14px;align-items:center}
+.s1-book-cover{width:44px;height:62px;border-radius:3px;background:linear-gradient(145deg,#a87850,#7a5538);color:#efe4d4;display:flex;align-items:flex-end;padding:5px;font-size:8.5px;font-weight:600;line-height:1.15;flex-shrink:0;letter-spacing:-0.01em}
+.s1-book-info{flex:1;min-width:0}
+.s1-book-t{font-size:13.5px;font-weight:600;color:var(--tp);line-height:1.35;letter-spacing:-0.015em;margin-bottom:3px}
+.s1-book-s{font-size:11px;color:var(--tm);letter-spacing:0.01em}
+
+.s1-section-label{font-size:10px;font-weight:500;color:var(--tm);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px}
+
+.s1-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.s1-opt{padding:22px 18px;border-radius:12px;background:var(--bg);border:0.5px solid transparent;cursor:pointer;transition:all 0.25s cubic-bezier(0.4,0,0.2,1);text-align:left;position:relative}
+.s1-opt:hover{background:var(--sf)}
+.s1-opt.on{background:var(--paper);border-color:var(--sage-deep);box-shadow:0 0 0 1px var(--sage-deep)}
+.s1-opt-time{display:flex;align-items:baseline;gap:3px;margin-bottom:6px}
+.s1-opt-num{font-family:'Fraunces',serif;font-weight:300;font-size:32px;letter-spacing:-0.03em;color:var(--tp);line-height:1}
+.s1-opt.on .s1-opt-num{color:var(--sage-deep)}
+.s1-opt-unit{font-size:13px;color:var(--tm);font-weight:500;letter-spacing:0.02em}
+.s1-opt-label{font-size:11.5px;color:var(--ts);font-weight:500;letter-spacing:-0.005em}
+
+.s1-opt-free{grid-column:span 2;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.s1-opt-free-body{flex:1}
+.s1-opt-free-t{font-size:14px;font-weight:600;color:var(--tp);letter-spacing:-0.01em;margin-bottom:2px}
+.s1-opt-free-s{font-size:11px;color:var(--tm);line-height:1.5}
+.s1-opt-free-arrow{color:var(--tm);font-size:14px}
+
+.s1-start{margin-top:auto;padding:18px;border-radius:2px;background:var(--sage-deep);color:var(--paper);font-size:14px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;border:none;cursor:pointer;transition:background 0.25s}
+.s1-start:hover{background:var(--tp)}
+
+/* ═══ 2. 세션 진행 중 (Refined) ═══ */
+.s2{min-height:100%;background:var(--paper);padding:56px 24px 32px;display:flex;flex-direction:column}
+.s2-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:36px}
+.s2-section-label{font-size:10px;font-weight:500;color:var(--tm);letter-spacing:1.5px;text-transform:uppercase}
+.s2-live{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:2px;border:0.5px solid var(--bd2);background:var(--paper);font-size:9.5px;font-weight:600;color:var(--sage-deep);letter-spacing:2px;text-transform:uppercase}
+.s2-live::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--sage-deep);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+.s2-book{text-align:center;margin-bottom:40px}
+.s2-book-eyebrow{font-size:10px;font-weight:500;color:var(--tm);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+.s2-book-title{font-family:'Fraunces',serif;font-weight:300;font-size:22px;letter-spacing:-0.015em;color:var(--tp);margin-bottom:4px;line-height:1.3}
+.s2-book-page{font-size:11px;color:var(--tm);letter-spacing:0.02em}
+
+/* 미니멀 원형 타이머 */
+.s2-ring-wrap{display:flex;justify-content:center;margin-bottom:32px;position:relative}
+.s2-ring{position:relative;width:260px;height:260px}
+.s2-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.s2-ring circle{fill:none}
+.s2-ring .track{stroke:var(--sf2);stroke-width:1}
+.s2-ring .prog{stroke:var(--sage-deep);stroke-width:1.5;stroke-linecap:round;stroke-dasharray:460 790;transition:stroke-dasharray 1s cubic-bezier(0.4,0,0.2,1)}
+.s2-ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.s2-ring-time{font-family:'Fraunces',serif;font-weight:300;font-size:62px;letter-spacing:-0.04em;line-height:1;color:var(--tp);font-variant-numeric:tabular-nums}
+.s2-ring-time-sec{color:var(--sage);letter-spacing:-0.04em}
+.s2-ring-sub{font-size:10px;color:var(--tm);margin-top:10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:500}
+.s2-ring-progress{font-size:10px;color:var(--sage-deep);margin-top:4px;letter-spacing:0.05em;font-weight:500}
+
+.s2-mascot-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:28px}
+.s2-mascot-row img{width:32px;height:32px;object-fit:contain;opacity:0.9}
+.s2-mascot-text{font-size:11.5px;color:var(--ts);letter-spacing:0.01em;font-weight:500}
+.s2-mascot-text em{color:var(--sage-deep);font-style:normal;font-weight:600}
+
+.s2-actions{display:flex;gap:10px;margin-top:auto}
+.s2-act{flex:1;padding:17px;border-radius:2px;font-size:12.5px;font-weight:600;border:none;cursor:pointer;letter-spacing:0.15em;text-transform:uppercase;transition:all 0.25s}
+.s2-act-pause{background:var(--sf);color:var(--tp);border:0.5px solid var(--bd2)}
+.s2-act-pause:hover{background:var(--sf2)}
+.s2-act-end{background:var(--sage-deep);color:var(--paper)}
+.s2-act-end:hover{background:var(--tp)}
+
+/* ═══ 3. 목표 도달 ═══ */
+.s3{min-height:100%;background:linear-gradient(180deg,var(--paper) 0%,var(--bg) 100%);padding:56px 24px 32px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.s3-eyebrow{font-size:10px;font-weight:500;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:28px}
+.s3-mascot{width:100px;height:100px;margin-bottom:24px;animation:float 3s ease-in-out infinite}
+.s3-mascot img{width:100%;height:100%;object-fit:contain}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+
+.s3-title{font-family:'Fraunces',serif;font-weight:300;font-size:34px;letter-spacing:-0.025em;line-height:1.15;color:var(--tp);margin-bottom:12px}
+.s3-sub{font-size:13px;color:var(--ts);line-height:1.6;margin-bottom:36px;max-width:280px;letter-spacing:0.005em}
+.s3-sub em{font-style:normal;color:var(--tp);font-weight:600}
+
+.s3-stats{width:100%;display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--bd);border-radius:3px;overflow:hidden;margin-bottom:36px}
+.s3-stat{padding:18px 6px;background:var(--paper);text-align:center}
+.s3-stat-v{font-family:'Fraunces',serif;font-weight:300;font-size:26px;letter-spacing:-0.03em;color:var(--tp);line-height:1}
+.s3-stat-l{font-size:9.5px;color:var(--tm);font-weight:500;margin-top:6px;letter-spacing:1px;text-transform:uppercase}
+
+.s3-divider{width:40px;height:1px;background:var(--bd2);margin-bottom:20px}
+
+.s3-btns{width:100%;display:flex;gap:8px}
+.s3-continue{flex:1;padding:17px;border-radius:2px;background:var(--sf);border:0.5px solid var(--bd2);color:var(--tp);font-size:12.5px;font-weight:600;cursor:pointer;letter-spacing:0.15em;text-transform:uppercase}
+.s3-end{flex:1;padding:17px;border-radius:2px;background:var(--sage-deep);color:var(--paper);font-size:12.5px;font-weight:600;border:none;cursor:pointer;letter-spacing:0.15em;text-transform:uppercase}
+
+/* ═══ 4. 기록 시트 (Premium Form) ═══ */
+.s4{position:relative;min-height:100%;background:var(--paper);padding:48px 0 100px}
+.s4-close{position:absolute;top:20px;right:20px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:var(--tm);cursor:pointer;z-index:10}
+.s4-close svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.5;fill:none}
+
+.s4-hdr{padding:0 24px 28px;text-align:center}
+.s4-mascot{width:56px;height:56px;margin:0 auto 14px;object-fit:contain}
+.s4-title{font-family:'Fraunces',serif;font-weight:300;font-size:26px;letter-spacing:-0.02em;line-height:1.2;color:var(--tp);margin-bottom:8px}
+.s4-sub{font-size:12px;color:var(--tm);letter-spacing:0.01em}
+.s4-sub em{font-style:normal;color:var(--tp);font-weight:600}
+.s4-streak{display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:5px 12px;border-radius:2px;border:0.5px solid var(--gold);color:var(--gold);font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase}
+
+.s4-stats{margin:0 24px 28px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--bd);border-radius:3px;overflow:hidden}
+.s4-stat{padding:14px 6px;background:var(--bg);text-align:center}
+.s4-stat-v{font-family:'Fraunces',serif;font-weight:300;font-size:22px;letter-spacing:-0.02em;color:var(--tp);line-height:1}
+.s4-stat-l{font-size:9px;color:var(--tm);font-weight:500;margin-top:5px;letter-spacing:1px;text-transform:uppercase}
+
+.s4-field{margin:0 24px 22px}
+.s4-field-label{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.s4-field-l-text{font-size:10.5px;font-weight:600;color:var(--tp);letter-spacing:0.8px;text-transform:uppercase}
+.s4-field-l-opt{font-size:10px;color:var(--tm);font-weight:400;letter-spacing:0.02em;text-transform:none}
+
+.s4-page-row{display:flex;gap:8px;align-items:center}
+.s4-page-input{flex:1;padding:13px 16px;background:var(--bg);border:0.5px solid var(--bd);border-radius:2px;font-family:'Fraunces',serif;font-weight:300;font-size:18px;color:var(--tp);outline:none;letter-spacing:-0.01em;transition:border-color 0.25s}
+.s4-page-input:focus{border-color:var(--sage-deep)}
+.s4-page-arrow{color:var(--tm);font-size:12px;margin:0 2px}
+
+.s4-moods{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px}
+.s4-mood{padding:11px 4px 10px;border-radius:2px;background:var(--bg);border:0.5px solid var(--bd);text-align:center;cursor:pointer;transition:all 0.25s}
+.s4-mood.on{background:var(--paper);border-color:var(--sage-deep);box-shadow:0 0 0 0.5px var(--sage-deep)}
+.s4-mood-e{font-size:18px;margin-bottom:4px;filter:saturate(0.8)}
+.s4-mood-l{font-size:10px;color:var(--tp);font-weight:500;letter-spacing:0.02em}
+.s4-mood.on .s4-mood-l{color:var(--sage-deep);font-weight:600}
+
+.s4-scrap{padding:16px;background:var(--bg);border:0.5px solid var(--bd);border-left:2px solid var(--sage);border-radius:2px;font-family:'Fraunces',serif;font-weight:300;font-size:14.5px;color:var(--tp);letter-spacing:-0.005em;line-height:1.65;outline:none;resize:none;min-height:84px;width:100%}
+.s4-scrap::placeholder{color:var(--tm);font-style:italic;opacity:0.7}
+.s4-scrap-meta{display:flex;justify-content:space-between;align-items:center;margin-top:6px;padding:0 2px}
+.s4-scrap-page-input{width:90px;padding:7px 10px;background:var(--paper);border:0.5px solid var(--bd);border-radius:2px;font-size:11px;color:var(--tp);outline:none;font-family:inherit;font-variant-numeric:tabular-nums}
+.s4-scrap-hint{font-size:10px;color:var(--tm);letter-spacing:0.01em}
+
+.s4-feel{width:100%;padding:13px 16px;background:var(--bg);border:0.5px solid var(--bd);border-radius:2px;font-size:13px;color:var(--tp);outline:none;font-family:inherit;line-height:1.6;resize:none;min-height:56px;letter-spacing:0.005em;transition:border-color 0.25s}
+.s4-feel:focus{border-color:var(--sage-deep)}
+.s4-feel::placeholder{color:var(--tm);opacity:0.65}
+
+.s4-ai{margin:22px 24px 0;padding:18px;background:var(--bg);border:0.5px solid var(--bd);border-radius:3px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:background 0.25s}
+.s4-ai:hover{background:var(--sf)}
+.s4-ai img{width:38px;height:38px;flex-shrink:0;object-fit:contain}
+.s4-ai-body{flex:1}
+.s4-ai-t{font-size:13px;font-weight:600;color:var(--tp);letter-spacing:-0.005em;margin-bottom:3px}
+.s4-ai-s{font-size:11px;color:var(--tm);letter-spacing:0.005em;line-height:1.5}
+.s4-ai-s em{color:var(--sage-deep);font-style:normal;font-weight:500}
+.s4-ai-arrow{color:var(--tm);font-size:14px}
+
+.s4-cta{position:fixed;bottom:0;left:0;right:0;padding:18px 24px 28px;background:linear-gradient(to top,var(--paper) 72%,rgba(250,247,241,0));display:flex;gap:8px}
+/* phone 내 fixed 대신 sticky 처리 필요 */
+.s4-cta{position:sticky;bottom:0}
+.s4-skip{flex:0 0 auto;padding:16px 22px;border-radius:2px;background:transparent;border:0.5px solid var(--bd2);color:var(--tm);font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.12em;text-transform:uppercase}
+.s4-save{flex:1;padding:16px;border-radius:2px;background:var(--sage-deep);color:var(--paper);font-size:12.5px;font-weight:600;border:none;cursor:pointer;letter-spacing:0.15em;text-transform:uppercase;transition:background 0.25s}
+.s4-save:hover{background:var(--tp)}
+
+.note{margin:40px auto 0;padding:28px 32px;background:var(--paper);border:0.5px solid var(--bd2);border-radius:4px;color:var(--tp);font-size:12px;line-height:1.9;max-width:920px}
+.note-eyebrow{font-size:10px;font-weight:500;color:var(--tm);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.note-title{font-family:'Fraunces',serif;font-weight:300;font-size:22px;letter-spacing:-0.02em;color:var(--tp);margin-bottom:16px}
+.note h4{font-size:11px;font-weight:600;color:var(--sage-deep);letter-spacing:1.2px;text-transform:uppercase;margin:18px 0 6px}
+.note strong{color:var(--sage-deep);font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="headline">Premium Reading Session</h1>
+  <div class="sub">Fraunces Serif · Refined Sage · <em>Swiss Grid</em> · Micro Details</div>
+
+  <div class="phones">
+
+    <!-- 1. 목표 선택 -->
+    <div class="phone-wrap">
+      <div class="phone-badge">01 · Goal</div>
+      <div class="phone">
+        <div class="s1">
+          <div class="s1-top">
+            <div class="s1-label">Session</div>
+            <div class="s1-close">
+              <svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+            </div>
+          </div>
+
+          <div class="s1-hero">
+            <div class="s1-hero-eyebrow">Today</div>
+            <div class="s1-hero-title">얼마나<br>함께할까요</div>
+            <div class="s1-hero-sub">부담 없이, 지금 기분에 맞게 고르세요.</div>
+          </div>
+
+          <div class="s1-book">
+            <div class="s1-book-cover">캐릭터<br>심리 사전</div>
+            <div class="s1-book-info">
+              <div class="s1-book-t">캐릭터 심리 사전</div>
+              <div class="s1-book-s">245쪽부터 · 린다 N. 에델스타인</div>
+            </div>
+          </div>
+
+          <div class="s1-section-label">Duration</div>
+          <div class="s1-options">
+            <div class="s1-opt">
+              <div class="s1-opt-time"><div class="s1-opt-num">15</div><div class="s1-opt-unit">min</div></div>
+              <div class="s1-opt-label">가볍게</div>
+            </div>
+            <div class="s1-opt on">
+              <div class="s1-opt-time"><div class="s1-opt-num">25</div><div class="s1-opt-unit">min</div></div>
+              <div class="s1-opt-label">집중 한 세션</div>
+            </div>
+            <div class="s1-opt">
+              <div class="s1-opt-time"><div class="s1-opt-num">45</div><div class="s1-opt-unit">min</div></div>
+              <div class="s1-opt-label">깊게</div>
+            </div>
+            <div class="s1-opt">
+              <div class="s1-opt-time"><div class="s1-opt-num">60</div><div class="s1-opt-unit">min</div></div>
+              <div class="s1-opt-label">완전 몰입</div>
+            </div>
+            <div class="s1-opt s1-opt-free">
+              <div class="s1-opt-free-body">
+                <div class="s1-opt-free-t">자유 시간</div>
+                <div class="s1-opt-free-s">목표 없이 읽은 시간만 기록해요</div>
+              </div>
+              <div class="s1-opt-free-arrow">→</div>
+            </div>
+          </div>
+
+          <button class="s1-start">Begin Reading</button>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>Fraunces</strong> 세리프 숫자 · Swiss 2x2 그리드 · 2px radius · 업케이스 레이블. 미니멀하고 의도적.</div>
+    </div>
+
+    <!-- 2. 진행 중 -->
+    <div class="phone-wrap">
+      <div class="phone-badge">02 · In Session</div>
+      <div class="phone">
+        <div class="s2">
+          <div class="s2-top">
+            <div class="s2-section-label">Reading</div>
+            <div class="s2-live">Live</div>
+          </div>
+
+          <div class="s2-book">
+            <div class="s2-book-eyebrow">Current</div>
+            <div class="s2-book-title">캐릭터 심리 사전</div>
+            <div class="s2-book-page">from p. 245</div>
+          </div>
+
+          <div class="s2-ring-wrap">
+            <div class="s2-ring">
+              <svg viewBox="0 0 260 260">
+                <circle cx="130" cy="130" r="125" class="track"/>
+                <circle cx="130" cy="130" r="125" class="prog"/>
+              </svg>
+              <div class="s2-ring-center">
+                <div class="s2-ring-time">15<span class="s2-ring-time-sec">:</span>23</div>
+                <div class="s2-ring-sub">of 25 min</div>
+                <div class="s2-ring-progress">9:37 remaining</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="s2-mascot-row">
+            <img src="/mascot-read.png" alt="">
+            <div class="s2-mascot-text">조용히 <em>기다리고 있어요</em></div>
+          </div>
+
+          <div class="s2-actions">
+            <button class="s2-act s2-act-pause">Pause</button>
+            <button class="s2-act s2-act-end">End</button>
+          </div>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>62px Fraunces</strong> 타이머 · 1.5px 얇은 링 · 영문 마이크로카피 · 진동 없이 정적. <strong>읽기 방해 최소</strong></div>
+    </div>
+
+    <!-- 3. 목표 도달 -->
+    <div class="phone-wrap">
+      <div class="phone-badge">03 · Complete</div>
+      <div class="phone">
+        <div class="s3">
+          <div class="s3-eyebrow">Goal Reached</div>
+          <div class="s3-mascot"><img src="/mascot-happy.png" alt=""></div>
+          <div class="s3-title">오늘 목표,<br>이뤘어요.</div>
+          <div class="s3-sub"><em>25분</em> 동안 조용히 함께 읽었어요.<br>잠시 쉬거나, 조금 더 이어가도 좋아요.</div>
+
+          <div class="s3-stats">
+            <div class="s3-stat">
+              <div class="s3-stat-v">25</div>
+              <div class="s3-stat-l">Minutes</div>
+            </div>
+            <div class="s3-stat">
+              <div class="s3-stat-v">~22</div>
+              <div class="s3-stat-l">Pages</div>
+            </div>
+            <div class="s3-stat">
+              <div class="s3-stat-v">7</div>
+              <div class="s3-stat-l">Day Streak</div>
+            </div>
+          </div>
+
+          <div class="s3-divider"></div>
+
+          <div class="s3-btns">
+            <button class="s3-continue">+ 5 min</button>
+            <button class="s3-end">End Session</button>
+          </div>
+        </div>
+      </div>
+      <div class="phone-desc">골드 악센트 마일스톤. <strong>34px Fraunces</strong> 헤드라인. 얇은 디바이더로 섹션 구분. 절제된 기쁨.</div>
+    </div>
+
+    <!-- 4. 기록 (Premium) -->
+    <div class="phone-wrap">
+      <div class="phone-badge">04 · Record</div>
+      <div class="phone">
+        <div class="s4">
+          <div class="s4-close">
+            <svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+          </div>
+
+          <div class="s4-hdr">
+            <img src="/mascot-happy.png" class="s4-mascot" alt="">
+            <div class="s4-title">오늘 수고했어요</div>
+            <div class="s4-sub"><em>28 min</em> · 22 pages</div>
+            <div class="s4-streak">7 Day Streak</div>
+          </div>
+
+          <div class="s4-stats">
+            <div class="s4-stat">
+              <div class="s4-stat-v">28</div>
+              <div class="s4-stat-l">Minutes</div>
+            </div>
+            <div class="s4-stat">
+              <div class="s4-stat-v">22</div>
+              <div class="s4-stat-l">Pages</div>
+            </div>
+            <div class="s4-stat">
+              <div class="s4-stat-v">267</div>
+              <div class="s4-stat-l">Last Page</div>
+            </div>
+          </div>
+
+          <div class="s4-field">
+            <div class="s4-field-label">
+              <div class="s4-field-l-text">어디까지 읽었나요</div>
+              <div class="s4-field-l-opt">pages</div>
+            </div>
+            <div class="s4-page-row">
+              <input type="text" class="s4-page-input" value="245" readonly style="flex:0 0 auto;width:80px;text-align:center;background:var(--sf)">
+              <div class="s4-page-arrow">→</div>
+              <input type="text" class="s4-page-input" value="267" placeholder="267">
+            </div>
+          </div>
+
+          <div class="s4-field">
+            <div class="s4-field-label">
+              <div class="s4-field-l-text">오늘의 기분</div>
+            </div>
+            <div class="s4-moods">
+              <div class="s4-mood"><div class="s4-mood-e">📖</div><div class="s4-mood-l">몰입</div></div>
+              <div class="s4-mood on"><div class="s4-mood-e">🌿</div><div class="s4-mood-l">잔잔</div></div>
+              <div class="s4-mood"><div class="s4-mood-e">🌀</div><div class="s4-mood-l">복잡</div></div>
+              <div class="s4-mood"><div class="s4-mood-e">🌙</div><div class="s4-mood-l">졸림</div></div>
+            </div>
+          </div>
+
+          <div class="s4-field">
+            <div class="s4-field-label">
+              <div class="s4-field-l-text">기억에 남는 문장</div>
+              <div class="s4-field-l-opt">optional</div>
+            </div>
+            <textarea class="s4-scrap" placeholder="기억하고 싶은 한 문장을 남겨보세요.">우리는 서로의 눈을 보며 알고 있었다, 이것이 마지막이 아니라는 것을.</textarea>
+            <div class="s4-scrap-meta">
+              <input type="text" class="s4-scrap-page-input" value="p. 262">
+              <div class="s4-scrap-hint">스크랩에 자동 저장</div>
+            </div>
+          </div>
+
+          <div class="s4-field">
+            <div class="s4-field-label">
+              <div class="s4-field-l-text">느낌 한 줄</div>
+              <div class="s4-field-l-opt">optional</div>
+            </div>
+            <textarea class="s4-feel" placeholder="오늘 읽은 느낌이나 생각..."></textarea>
+          </div>
+
+          <div class="s4-ai">
+            <img src="/mascot-read.png" alt="">
+            <div class="s4-ai-body">
+              <div class="s4-ai-t">방긋이와 이야기</div>
+              <div class="s4-ai-s">방금 쓴 문장으로 <em>5분 대화</em></div>
+            </div>
+            <div class="s4-ai-arrow">→</div>
+          </div>
+
+          <div class="s4-cta">
+            <button class="s4-skip">Skip</button>
+            <button class="s4-save">Save</button>
+          </div>
+        </div>
+      </div>
+      <div class="phone-desc">Swiss 폼 레이아웃. 필드마다 <strong>eyebrow label + optional</strong>. 2px radius 인풋. 스크랩 자동 저장 힌트.</div>
+    </div>
+
+  </div>
+
+  <div class="note">
+    <div class="note-eyebrow">Design Principles</div>
+    <div class="note-title">절제된 세련됨 · Gail's Direction</div>
+
+    <h4>Typography</h4>
+    <strong>Fraunces (Serif)</strong> for display · 숫자/헤드라인 (Editorial magazine 감성)<br>
+    <strong>Pretendard</strong> for body · 본문/UI<br>
+    <strong>Gaegu</strong>는 제거 — 프리미엄 톤에 방해됨<br>
+    위계: 34/26/22/18/14/13/12/10 명확한 스케일
+
+    <h4>Color</h4>
+    배경: <code style="font-family:monospace;font-size:11px;background:var(--sf);padding:2px 6px;border-radius:2px">#FAF7F1 (Paper)</code> — 더 따뜻한 크림<br>
+    세이지 3단: <strong>Soft · Main · Deep</strong> — 맥락별 구분<br>
+    <strong>딥 세이지</strong>만 CTA에. 기존 그라데이션 제거<br>
+    골드 악센트는 무광 <code style="font-family:monospace;font-size:11px;background:var(--sf);padding:2px 6px;border-radius:2px">#A88352</code>
+
+    <h4>Spacing · Grid</h4>
+    Swiss 8-point grid: <strong>4/8/12/16/20/24/32</strong><br>
+    여백 풍성 · 패딩 일관성<br>
+    <strong>2px</strong> 샤프 radius (inputs, buttons) — 둥근 pill 없음<br>
+    라운드는 <strong>3~4px</strong>만 — 카드에 절제적으로
+
+    <h4>Details</h4>
+    <strong>0.5px borders</strong> — 얇고 정교<br>
+    <strong>uppercase eyebrow labels</strong> — 섹션 구분<br>
+    <strong>letter-spacing 1.5~2px</strong>로 레이블 트래킹<br>
+    이모지 사용 최소화 — 필요시 채도 낮춤 (<code style="font-family:monospace;font-size:11px;background:var(--sf);padding:2px 6px;border-radius:2px">filter: saturate(0.8)</code>)<br>
+    그라데이션 제거 — 플랫 솔리드 컬러로
+
+    <h4>Interactions</h4>
+    애니메이션: <strong>0.25s cubic-bezier(0.4,0,0.2,1)</strong> (Material standard)<br>
+    호버: 배경 미세 변화만<br>
+    애니메이션 최소 — 읽는 중엔 정적(still)이 최고
+
+    <br><br>
+    <strong style="color:var(--sage-deep)">이 방향 OK면</strong> 구현 시작하겠습니다!<br>
+    <strong>Fraunces 폰트</strong> layout에 추가 (이미 시스템에 있을 것, Google Fonts).
+  </div>
+</div>
+</body>
+</html>

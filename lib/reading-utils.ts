@@ -41,5 +41,18 @@ export function upgradeCoverUrl(url: string | null | undefined): string | null {
   return url.replace("/cover/", "/cover500/").replace("/cover200/", "/cover500/").replace("/coversum/", "/cover500/").replace("http://", "https://");
 }
 
-export const COVER_PALETTES = [["#90C4E4","#2B6CB0"],["#7FAF8A","#2B4C3F"],["#C4A35A","#8B6F3C"],["#F0A8C4","#B0557A"],["#94B8B0","#3D6B5A"],["#B8A9D4","#5B4A8A"]];
-export const coverPalette = (t: string) => COVER_PALETTES[t.charCodeAt(0) % COVER_PALETTES.length];
+/**
+ * 책 표지 fallback 그라데이션 팔레트.
+ * 모든 변형이 테마 토큰(--ac, --sf2, --milestone, --theme-deep 등)을 참조해
+ * 사용자가 선택한 테마와 항상 어우러지도록 설계됨. (Gail)
+ */
+export const COVER_PALETTES: [string, string][] = [
+  ["var(--ac2)", "var(--theme-deep)"],   // 악센트 라이트 → 딥
+  ["var(--sf3)", "var(--ac)"],           // 뉴트럴 → 악센트
+  ["var(--ac)", "var(--theme-deep)"],    // 악센트 → 딥
+  ["var(--milestone)", "var(--theme-deep)"], // 골드 마일스톤 → 딥
+  ["var(--ac3)", "var(--ac)"],           // 소프트 악센트
+  ["var(--sf2)", "var(--sf3)"],          // 순수 뉴트럴 듀오
+];
+export const coverPalette = (t: string): [string, string] =>
+  COVER_PALETTES[(t?.charCodeAt(0) ?? 0) % COVER_PALETTES.length];

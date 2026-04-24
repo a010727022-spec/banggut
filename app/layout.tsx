@@ -2,13 +2,14 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import "./globals.css";
 import { SupabaseProvider } from "@/components/providers/supabase-provider";
+import { PostHogProvider } from "@/components/providers/posthog-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "방긋 — 읽고, 긋고, 방긋.",
   description:
-    "방금 그은 문장에서 대화가 시작돼요. AI와 1:1 독서토론을 하고 나만의 서평을 완성하세요.",
+    "방금 그은 문장에서 대화가 시작돼요. AI와 1:1 토론을 하고 나만의 서평을 완성하세요.",
   manifest: "/manifest.json",
 };
 
@@ -35,6 +36,12 @@ export default function RootLayout({
           crossOrigin="anonymous"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
         />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700;900&family=Gaegu:wght@400;700&display=swap"
+          rel="stylesheet"
+        />
         {/* 테마 플래시 방지: hydrate 전에 localStorage에서 테마를 읽어 즉시 적용 */}
         <script dangerouslySetInnerHTML={{ __html: `
           (function(){
@@ -59,6 +66,7 @@ export default function RootLayout({
         <Script id="kakao-init" strategy="afterInteractive">
           {`if(window.Kakao&&!window.Kakao.isInitialized()){window.Kakao.init("${process.env.NEXT_PUBLIC_KAKAO_KEY||""}")}`}
         </Script>
+        <PostHogProvider>
         <SupabaseProvider>
           <ThemeProvider />
           <div className="mx-auto max-w-lg min-h-screen" style={{ background: "var(--bg)", transition: "background 0.4s" }}>
@@ -81,6 +89,7 @@ export default function RootLayout({
             }}
           />
         </SupabaseProvider>
+        </PostHogProvider>
       </body>
     </html>
   );

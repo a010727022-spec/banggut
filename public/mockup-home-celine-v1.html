@@ -1,0 +1,1186 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>방긋 · Celine home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+
+<style>
+  :root {
+    /* ── Celine palette (특색 강화) ──
+       기존 #F4EDDE 는 맑은 편. 살짝 더 따뜻한 본 톤으로.
+       추가: cognac 헤리티지 가죽색 (셀린느 하드캘프 레더 시그니처) */
+    --bone:      #F1E8CE;       /* 본 크림 (살짝 따뜻하게) */
+    --bone-deep: #E6DCBB;       /* 본 그림자 */
+    --off:       #F9F2DD;       /* 오프화이트 카드 */
+    --ink:       #0A0A08;       /* 셀린 블랙 */
+    --ink-sub:   #3D3831;       /* 본문 톤 */
+    --ink-mute:  #8A8067;       /* 약한 톤 (더 따뜻) */
+    --hairline:  rgba(10, 10, 8, 0.14);
+    --hairline-strong: rgba(10, 10, 8, 0.36);
+    --triomphe:  #A68156;       /* Triomphe 챔페인 골드 */
+    --cognac:    #8A5730;       /* 코냑 헤리티지 가죽 (액센트) */
+    --cognac-soft: rgba(138, 87, 48, 0.16);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    font-family: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
+    background: #12120E;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    min-height: 100vh;
+    padding: 56px 32px 96px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ─── Page header ─────────────────────────── */
+  .page-hero {
+    width: 100%;
+    max-width: 880px;
+    margin-bottom: 48px;
+    color: #C9C0A8;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    border-bottom: 1px solid #38352B;
+    padding-bottom: 28px;
+  }
+  .page-hero-left .kicker {
+    font-size: 10px;
+    letter-spacing: 0.38em;
+    color: #8E8262;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+  }
+  .page-hero-left h1 {
+    font-weight: 200;
+    font-size: 32px;
+    letter-spacing: -0.01em;
+    color: #EFE7CE;
+  }
+  .page-hero-left h1 b {
+    font-weight: 800;
+  }
+  .page-hero-right {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: #8E8262;
+    text-transform: uppercase;
+    text-align: right;
+    line-height: 1.8;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ─── Phone frame ─────────────────────────── */
+  .phone-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+  }
+  .phone {
+    width: 360px;
+    height: 812px;
+    border-radius: 40px;
+    background: var(--bone);
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 8px #07070A,
+      0 0 0 9px #1D1B17,
+      0 30px 60px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* status bar */
+  .status {
+    height: 40px;
+    padding: 12px 28px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .status-icons { display: flex; gap: 5px; }
+  .status-icons svg { width: 14px; height: 14px; }
+
+  .body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 24px 24px;
+  }
+  .body::-webkit-scrollbar { display: none; }
+
+  /* ─── Triomphe brand bar ──────────────────── */
+  .brand {
+    padding: 16px 0 26px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 0.5px solid var(--hairline);
+  }
+
+  .triomphe {
+    width: 52px;
+    height: 52px;
+    position: relative;
+  }
+  /* 바깥 원 (더블 링 - 셀린느 Triomphe 시그니처) */
+  .triomphe::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1.25px solid var(--ink);
+  }
+  .triomphe .inner-ring {
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    border: 0.5px solid var(--ink);
+  }
+  /* 체인 크로스 - 가로 + 세로 + 매듭 */
+  .triomphe::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 6px;
+    right: 6px;
+    height: 1px;
+    background: var(--ink);
+    transform: translateY(-0.5px);
+  }
+  .triomphe .v {
+    position: absolute;
+    left: 50%;
+    top: 6px;
+    bottom: 6px;
+    width: 1px;
+    background: var(--ink);
+    transform: translateX(-0.5px);
+  }
+  .triomphe .knot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    width: 10px;
+    height: 10px;
+    border: 1.25px solid var(--ink);
+    background: var(--bone);
+  }
+  .triomphe .knot::before {
+    /* 매듭 내부 코냑 점 */
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 3px;
+    height: 3px;
+    background: var(--cognac);
+    border-radius: 50%;
+  }
+
+  .brand-name-wrap {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 4px;
+  }
+  .brand-name {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.42em;
+    color: var(--ink);
+    padding-left: 0.42em; /* 시각적 센터링 */
+  }
+  .serif-ornament {
+    width: 22px;
+    height: 1px;
+    background: var(--ink);
+    position: relative;
+  }
+  .serif-ornament::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 3px;
+    background: var(--cognac);
+    border-radius: 50%;
+  }
+  .serif-ornament.left::before { right: -1.5px; }
+  .serif-ornament.right::before { left: -1.5px; }
+  .brand-sub {
+    font-size: 9px;
+    letter-spacing: 0.34em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ─── Greeting ────────────────────────────── */
+  .greet {
+    padding: 32px 0 28px;
+    text-align: center;
+  }
+  .greet .date {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    font-variant-numeric: tabular-nums;
+  }
+  .greet .hi {
+    font-size: 26px;
+    font-weight: 200;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+  }
+  .greet .hi b {
+    font-weight: 800;
+  }
+  .greet .hi .name {
+    font-weight: 400;
+  }
+  .greet .thin {
+    font-size: 13px;
+    color: var(--ink-sub);
+    margin-top: 14px;
+    font-weight: 400;
+    letter-spacing: -0.005em;
+    line-height: 1.6;
+  }
+
+  /* mascot (하단 떠있는 작은 원) */
+  .mascot-mini {
+    margin: 22px auto 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--off);
+    border: 0.5px solid var(--ink);
+    position: relative;
+  }
+  .mascot-mini::before,
+  .mascot-mini::after {
+    content: "";
+    position: absolute;
+    top: 10px;
+    width: 2.5px;
+    height: 2.5px;
+    background: var(--ink);
+    border-radius: 50%;
+  }
+  .mascot-mini::before { left: 8px; }
+  .mascot-mini::after  { right: 8px; }
+  .mascot-mini .s {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 7px;
+    height: 3.5px;
+    border: 0.8px solid var(--ink);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+  }
+
+  /* ─── Streak 큰 숫자 (미니멀 포인트) ─────── */
+  .streak {
+    border-top: 0.5px solid var(--hairline-strong);
+    border-bottom: 0.5px solid var(--hairline-strong);
+    padding: 24px 0 22px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-top: 14px;
+  }
+  .streak-label {
+    font-size: 10px;
+    letter-spacing: 0.26em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    font-weight: 600;
+    padding-bottom: 6px;
+  }
+  .streak-label .line {
+    display: block;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    color: var(--ink-mute);
+    margin-top: 6px;
+  }
+  .streak-num {
+    font-size: 56px;
+    font-weight: 200;
+    color: var(--ink);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+  }
+  .streak-num .unit {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    color: var(--cognac);
+    padding-bottom: 8px;
+    position: relative;
+  }
+  .streak-num .unit::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: -6px;
+    width: 14px;
+    height: 1px;
+    background: var(--cognac);
+  }
+
+  /* ─── Section ─────────────────────────────── */
+  .sec {
+    padding-top: 34px;
+  }
+  .sec-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 18px;
+    margin-bottom: 20px;
+    border-bottom: 0.5px solid var(--hairline);
+    position: relative;
+  }
+  .sec-head::before {
+    /* Triomphe 미니 마커 (작은 원 + 점) */
+    content: "";
+    position: absolute;
+    bottom: -3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--bone);
+    border: 0.5px solid var(--ink);
+  }
+  .sec-head .ttl {
+    font-size: 11px;
+    letter-spacing: 0.32em;
+    color: var(--ink);
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  .sec-head .more {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+  }
+
+  /* ─── Hero continue ──────────────────────── */
+  .hero {
+    padding: 0;
+    position: relative;
+  }
+  .hero-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 14px;
+    margin-bottom: 16px;
+    border-bottom: 0.5px solid var(--hairline);
+  }
+  .hero-top .label {
+    font-size: 9px;
+    letter-spacing: 0.28em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+  }
+  .hero-top .page {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--ink);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hero-body {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .hero-cover {
+    width: 84px;
+    height: 120px;
+    background: var(--ink);
+    position: relative;
+    flex-shrink: 0;
+  }
+  /* 코냑 헤리티지 북마크 리본 */
+  .hero-cover .ribbon {
+    position: absolute;
+    top: -3px;
+    right: 12px;
+    width: 3px;
+    height: 34px;
+    background: var(--cognac);
+  }
+  .hero-cover .ribbon::after {
+    content: "";
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 1.5px solid transparent;
+    border-right: 1.5px solid transparent;
+    border-top: 5px solid var(--cognac);
+  }
+  .hero-cover .ct {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--bone);
+    font-size: 10px;
+    font-weight: 200;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  .hero-cover .cline {
+    position: absolute;
+    top: 34px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 22px;
+    height: 0.5px;
+    background: var(--bone);
+    opacity: 0.6;
+  }
+  .hero-cover .cs {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--bone);
+    opacity: 0.5;
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+
+  .hero-info { flex: 1; min-width: 0; }
+  .hero-info .book {
+    font-size: 18px;
+    font-weight: 200;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+  .hero-info .author {
+    font-size: 10px;
+    color: var(--ink-mute);
+    margin-top: 6px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .hero-info .recall {
+    margin-top: 14px;
+    font-size: 12px;
+    color: var(--ink-sub);
+    line-height: 1.65;
+    padding-left: 10px;
+    border-left: 0.5px solid var(--ink);
+    letter-spacing: -0.005em;
+  }
+
+  .prog {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .prog-track {
+    flex: 1;
+    height: 0.5px;
+    background: var(--hairline-strong);
+    position: relative;
+  }
+  .prog-fill {
+    position: absolute;
+    left: 0;
+    top: -1px;
+    bottom: -1px;
+    width: 62%;
+    background: var(--ink);
+  }
+  .prog-pct {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: 0.06em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cta-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 22px;
+  }
+  .cta-primary {
+    flex: 1;
+    background: var(--ink);
+    color: var(--bone);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.34em;
+    padding: 15px 14px;
+    border: none;
+    cursor: pointer;
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .cta-ghost {
+    background: transparent;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    padding: 14px 18px;
+    border: 0.5px solid var(--ink);
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+
+  /* ─── Week rhythm ─────────────────────────── */
+  .week {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0;
+  }
+  .day {
+    padding: 14px 0 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    border-right: 0.5px solid var(--hairline);
+    position: relative;
+  }
+  .day:last-child { border-right: none; }
+  .day .dow {
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+  }
+  .day .dn {
+    font-size: 15px;
+    font-weight: 200;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+  .day .mark {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: transparent;
+    border: 0.5px solid var(--ink-mute);
+  }
+  .day.read .mark { background: var(--ink); border-color: var(--ink); }
+  .day.today .dn {
+    font-weight: 800;
+  }
+  .day.today .mark {
+    background: var(--triomphe);
+    border-color: var(--triomphe);
+    width: 4px;
+    height: 4px;
+  }
+  .day.today::after {
+    content: "";
+    position: absolute;
+    bottom: -0.5px;
+    left: 20%;
+    right: 20%;
+    height: 1px;
+    background: var(--ink);
+  }
+
+  .week-meta {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 16px;
+    margin-top: 16px;
+    border-top: 0.5px solid var(--hairline);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+  }
+  .week-meta b {
+    color: var(--ink);
+    font-weight: 800;
+  }
+
+  /* ─── Events ──────────────────────────────── */
+  .events { display: flex; flex-direction: column; }
+  .ev {
+    display: flex;
+    gap: 18px;
+    padding: 20px 0;
+    border-bottom: 0.5px solid var(--hairline);
+    align-items: flex-start;
+  }
+  .ev:last-child { border-bottom: none; }
+  .ev-date {
+    width: 52px;
+    flex-shrink: 0;
+    text-align: left;
+    font-variant-numeric: tabular-nums;
+  }
+  .ev-date .d {
+    font-size: 30px;
+    font-weight: 200;
+    color: var(--ink);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+  }
+  .ev-date .m {
+    display: block;
+    margin-top: 6px;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+  }
+  .ev-body { flex: 1; min-width: 0; }
+  .ev-body .cat {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.26em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 0.5px solid var(--ink-mute);
+  }
+  .ev-body .cat.meet {
+    color: var(--ink);
+    border-color: var(--cognac);
+    border-bottom-width: 1px;
+  }
+  .ev-body .cat.meet::before {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: var(--cognac);
+    border-radius: 50%;
+    margin-right: 6px;
+    transform: translateY(-2px);
+  }
+  .ev-body .ttl {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--ink);
+    letter-spacing: -0.015em;
+    line-height: 1.4;
+  }
+  .ev-body .sub {
+    font-size: 11px;
+    color: var(--ink-mute);
+    margin-top: 4px;
+    letter-spacing: 0.01em;
+  }
+  .ev-d {
+    flex-shrink: 0;
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: 0.18em;
+    font-variant-numeric: tabular-nums;
+    padding-top: 4px;
+  }
+
+  /* ─── Community ──────────────────────────── */
+  .posts { display: flex; flex-direction: column; }
+  .post {
+    padding: 20px 0;
+    border-bottom: 0.5px solid var(--hairline);
+  }
+  .post:last-child { border-bottom: none; }
+  .post-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .post-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--off);
+    border: 0.5px solid var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--ink);
+    flex-shrink: 0;
+  }
+  .post-info { flex: 1; }
+  .post-info .name {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+  }
+  .post-info .meta {
+    font-size: 9px;
+    color: var(--ink-mute);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-top: 3px;
+    font-variant-numeric: tabular-nums;
+  }
+  .post-body {
+    font-size: 13px;
+    color: var(--ink);
+    line-height: 1.65;
+    letter-spacing: -0.005em;
+    font-weight: 300;
+  }
+  .post-quote {
+    font-size: 12px;
+    color: var(--ink-sub);
+    line-height: 1.7;
+    padding: 14px 16px;
+    background: var(--off);
+    margin-top: 12px;
+    border-top: 0.5px solid var(--ink);
+    border-bottom: 0.5px solid var(--ink);
+    font-weight: 300;
+    letter-spacing: -0.005em;
+  }
+
+  /* ─── Footer mark ─────────────────────────── */
+  .foot {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 0.5px solid var(--hairline);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    font-size: 9px;
+    letter-spacing: 0.28em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+  }
+  .foot-dot {
+    width: 3px;
+    height: 3px;
+    background: var(--triomphe);
+    border-radius: 50%;
+  }
+
+  /* ─── Tab bar ─────────────────────────────── */
+  .tabbar {
+    height: 66px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-around;
+    padding: 12px 20px 0;
+    background: var(--bone);
+    border-top: 0.5px solid var(--hairline);
+    flex-shrink: 0;
+    position: relative;
+  }
+  .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    font-size: 9px;
+    color: var(--ink-mute);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    position: relative;
+  }
+  .tab.active { color: var(--ink); font-weight: 800; }
+  .tab svg { width: 20px; height: 20px; stroke-width: 1.2; }
+  .tab.active::before {
+    content: "";
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--ink);
+  }
+
+  /* ─── Notes ──────────────────────────────── */
+  .notes {
+    max-width: 880px;
+    margin-top: 64px;
+    padding-top: 36px;
+    border-top: 1px solid #38352B;
+    color: #C9C0A8;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    font-variant-numeric: tabular-nums;
+  }
+  @media (max-width: 780px) { .notes { grid-template-columns: 1fr; } }
+  .note .tag {
+    font-size: 10px;
+    letter-spacing: 0.28em;
+    color: #8E8262;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .note h4 {
+    color: #EFE7CE;
+    font-size: 15px;
+    font-weight: 200;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+  .note h4 b { font-weight: 800; }
+  .note p {
+    font-size: 12px;
+    line-height: 1.75;
+    font-weight: 300;
+  }
+
+  /* 비교 라인 */
+  .compare {
+    max-width: 880px;
+    margin: 40px auto 0;
+    color: #8E8262;
+    font-size: 10px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+</style>
+</head>
+<body>
+
+<header class="page-hero">
+  <div class="page-hero-left">
+    <div class="kicker">Banggut · Home · Celine</div>
+    <h1>셀린느 <b>관조의 여백</b></h1>
+  </div>
+  <div class="page-hero-right">
+    NO. 2026.04.22<br>ED. 1 / 1<br>KOR · UI
+  </div>
+</header>
+
+<div class="phone-col">
+  <div class="phone">
+    <div class="status">
+      <span>9:41</span>
+      <div class="status-icons">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21a9 9 0 100-18 9 9 0 000 18zm-1-4.41l4.3-4.3-1.42-1.42L11 13.76l-1.88-1.88-1.42 1.42L11 16.59z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 22h20V10H2v12zM6 4h12v4H6V4z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 8H4v8h16V8zm-2 6H6v-4h12v4z"/></svg>
+      </div>
+    </div>
+
+    <div class="body">
+
+      <!-- Triomphe 브랜드 마크 (더블 링 확대) -->
+      <div class="brand">
+        <div class="triomphe">
+          <span class="inner-ring"></span>
+          <span class="v"></span>
+          <span class="knot"></span>
+        </div>
+        <div class="brand-name-wrap">
+          <span class="serif-ornament left"></span>
+          <span class="brand-name">방긋</span>
+          <span class="serif-ornament right"></span>
+        </div>
+        <div class="brand-sub">Reading Journal · Est. 2026</div>
+      </div>
+
+      <!-- 인사 -->
+      <div class="greet">
+        <div class="date">2026 · 04 · 21 · Tuesday</div>
+        <div class="hi">
+          좋은 아침이에요<br>
+          <span class="name">지선</span> 님
+        </div>
+        <div class="thin">
+          어제 멈춘 대목에서 <b style="font-weight:700">p.137</b> 부터<br>
+          이어 읽어볼까요
+        </div>
+        <div class="mascot-mini"><span class="s"></span></div>
+      </div>
+
+      <!-- 스트릭 큰 숫자 -->
+      <div class="streak">
+        <div class="streak-label">
+          이번 주 함께 읽은 날
+          <span class="line">Reading streak</span>
+        </div>
+        <div class="streak-num">
+          12
+          <span class="unit">DAYS</span>
+        </div>
+      </div>
+
+      <!-- HERO 이어읽기 -->
+      <div class="sec">
+        <div class="sec-head">
+          <span class="ttl">이어서 읽기</span>
+          <span class="more">내 서재</span>
+        </div>
+
+        <div class="hero">
+          <div class="hero-top">
+            <span class="label">Currently Reading</span>
+            <span class="page">p. 137 / 221</span>
+          </div>
+
+          <div class="hero-body">
+            <div class="hero-cover">
+              <div class="ribbon"></div>
+              <div class="ct">채식주의자</div>
+              <div class="cline"></div>
+              <div class="cs">Han Kang</div>
+            </div>
+            <div class="hero-info">
+              <div class="book">채식주의자</div>
+              <div class="author">한강 · 창비</div>
+              <div class="recall">
+                꿈을 꾸었어. 어떤 얼굴이 내 안으로 천천히 떠오르고 있었어…
+              </div>
+            </div>
+          </div>
+
+          <div class="prog">
+            <div class="prog-track"><div class="prog-fill"></div></div>
+            <div class="prog-pct">62 %</div>
+          </div>
+
+          <div class="cta-row">
+            <button class="cta-primary">이어서 읽기</button>
+            <button class="cta-ghost">메모</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 이번 주 요일 리듬 -->
+      <div class="sec">
+        <div class="sec-head">
+          <span class="ttl">이번 주 리듬</span>
+          <span class="more">월간</span>
+        </div>
+
+        <div class="week">
+          <div class="day read"><span class="dow">일</span><span class="dn">19</span><span class="mark"></span></div>
+          <div class="day read"><span class="dow">월</span><span class="dn">20</span><span class="mark"></span></div>
+          <div class="day today"><span class="dow">화</span><span class="dn">21</span><span class="mark"></span></div>
+          <div class="day"><span class="dow">수</span><span class="dn">22</span><span class="mark"></span></div>
+          <div class="day"><span class="dow">목</span><span class="dn">23</span><span class="mark"></span></div>
+          <div class="day"><span class="dow">금</span><span class="dn">24</span><span class="mark"></span></div>
+          <div class="day"><span class="dow">토</span><span class="dn">25</span><span class="mark"></span></div>
+        </div>
+
+        <div class="week-meta">
+          <span>이번 주 · <b>4 일</b></span>
+          <span>연속 · <b>12 일</b></span>
+        </div>
+      </div>
+
+      <!-- 다가오는 일정 -->
+      <div class="sec">
+        <div class="sec-head">
+          <span class="ttl">다가오는 일정</span>
+          <span class="more">캘린더</span>
+        </div>
+
+        <div class="events">
+          <div class="ev">
+            <div class="ev-date"><div class="d">21</div><span class="m">Tue · 오늘</span></div>
+            <div class="ev-body">
+              <span class="cat meet">독서모임</span>
+              <div class="ttl">책 읽는 밤 · 4월 정기모임</div>
+              <div class="sub">20:00 · 성수동 책방 소담</div>
+            </div>
+            <div class="ev-d">D-0</div>
+          </div>
+
+          <div class="ev">
+            <div class="ev-date"><div class="d">22</div><span class="m">Wed</span></div>
+            <div class="ev-body">
+              <span class="cat">위시책 시작일</span>
+              <div class="ttl">작별하지 않는다 · 한강</div>
+              <div class="sub">예약한 날에 맞춰 시작해요</div>
+            </div>
+            <div class="ev-d">내일</div>
+          </div>
+
+          <div class="ev">
+            <div class="ev-date"><div class="d">25</div><span class="m">Sat</span></div>
+            <div class="ev-body">
+              <span class="cat">도서관 반납</span>
+              <div class="ttl">채식주의자 반납</div>
+              <div class="sub">중구립도서관 · 연장 1회 남음</div>
+            </div>
+            <div class="ev-d">D-4</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 커뮤니티 -->
+      <div class="sec">
+        <div class="sec-head">
+          <span class="ttl">모임 친구들</span>
+          <span class="more">전체</span>
+        </div>
+
+        <div class="posts">
+          <div class="post">
+            <div class="post-head">
+              <div class="post-avatar">유</div>
+              <div class="post-info">
+                <div class="name">유진</div>
+                <div class="meta">책 읽는 밤 · 2 H AGO</div>
+              </div>
+            </div>
+            <div class="post-body">
+              3부 끝나고 한참 멍하게 앉아있었어요.
+              <div class="post-quote">"누구도 그녀를 도울 수 없다는 것을 그는 알고 있었다."</div>
+            </div>
+          </div>
+
+          <div class="post">
+            <div class="post-head">
+              <div class="post-avatar">S</div>
+              <div class="post-info">
+                <div class="name">soop</div>
+                <div class="meta">모임 공지 · 5 H AGO</div>
+              </div>
+            </div>
+            <div class="post-body">
+              오늘 모임 전에 170쪽까지는 꼭 읽어가야지. 읽고 오시는 분은 댓글 남겨 주세요.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="foot">
+        <span>방긋 · 2026</span>
+        <span class="foot-dot"></span>
+        <span>Kor · SS 26</span>
+      </div>
+
+    </div>
+
+    <div class="tabbar">
+      <div class="tab active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/></svg>
+        홈
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="0.5"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        캘린더
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        서재
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        모임
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg>
+        내정보
+      </div>
+    </div>
+  </div>
+  <div style="font-size: 11px; letter-spacing: 0.28em; color: #8E8262; text-transform: uppercase; margin-top: 4px;">
+    CELINE · 본 크림 × 여백 × Triomphe 골드 1
+  </div>
+</div>
+
+<div class="compare">— Prada : 장부 · 블록 · 와이드 트래킹 /  Celine : 관조 · 헤어라인 · 씬 —</div>
+
+<section class="notes">
+  <div class="note">
+    <div class="tag">DNA · 타이포 대비</div>
+    <h4>Pretendard <b>200 × 800</b></h4>
+    <p>스트릭 숫자 "12" · 인사말 · 책 제목은 Pretendard Thin(200) 으로 공기처럼 얇게. 브랜드 마크 "방긋" · 섹션 타이틀 · 퍼센트만 Black(800) 으로 대비. 두 극단만 쓰고 중간 무게는 배제 — 프라다의 두꺼운 블록과 정반대 결.</p>
+  </div>
+  <div class="note">
+    <div class="tag">DNA · Triomphe</div>
+    <h4>원형 엠블럼 <b>한 번만</b></h4>
+    <p>상단 Triomphe 마크는 원 + 십자 체인 + 마름모 매듭 3요소로 CSS만으로 구성. 셀린느 시그니처답게 화면에 딱 한 번만 등장시키고 반복 패턴화는 피했어요. 골드 #A68156 은 오늘 마커 · 하단 dot 2곳에만 극소량.</p>
+  </div>
+  <div class="note">
+    <div class="tag">DNA · 여백 · 헤어라인</div>
+    <h4>카드 없는 <b>0.5px 분할</b></h4>
+    <p>카드·박스·그림자 전부 제거. 섹션 구분은 오직 hairline 0.5px 한 줄과 수직 여백만. 이어읽기 · 캘린더 · 일정 · 커뮤니티 네 블록이 종이 한 장 위에 얹힌 인쇄물처럼 읽혀요. 프라다의 박스형 기록 장부와 대비점.</p>
+  </div>
+  <div class="note">
+    <div class="tag">DNA · CTA</div>
+    <h4>긴 블록 + <b>넓은 트래킹</b></h4>
+    <p>"이어서 읽기" 는 블랙 사각 · 패딩 세로 15px로 납작하지 않게 충분히 · letter-spacing 0.34em 까지 넓혀 공간을 품도록 했어요. 프라다가 "DAL 1913" 식 인더스트리얼 라벨 무드라면, 셀린느는 부티크 쇼윈도 사이니지 무드.</p>
+  </div>
+  <div class="note">
+    <div class="tag">DNA · 4요소 배치</div>
+    <h4>위계 없는 <b>네 블록</b></h4>
+    <p>이어서 읽기 → 이번 주 리듬 → 다가오는 일정 → 모임 친구들. 프라다는 01·02·03·04 장부식 번호로 위계를 줬지만, 셀린느는 섹션 헤드에 번호 없이 한글 타이틀과 "더 보기" 링크만 남겨 네 블록을 평등하게 배치. "위계를 강조하지 않는 것이 셀린느의 위계".</p>
+  </div>
+  <div class="note">
+    <div class="tag">DNA · 한글 우선</div>
+    <h4>한국어 기본 + <b>영문은 메타만</b></h4>
+    <p>불어 · 이탈리아어 전량 배제. 영문은 날짜 "Tuesday", 메타 "Reading Journal", 시간 "2 H AGO" 같은 기록성 정보에만 남기고 나머지 카피·라벨·섹션은 모두 한글로. "UNE PAGE" 같은 프랑스어 허세 없이 셀린느 무드만 가져옴.</p>
+  </div>
+</section>
+
+</body>
+</html>

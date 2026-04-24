@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>방긋 · 통계 + 오늘/읽는중</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;word-break:keep-all;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#F7F3ED; --sf:#EDE7DF; --sf2:#E0D9D0; --sf3:#D0C8BC;
+  --bd:rgba(95,164,142,0.14); --bd2:rgba(95,164,142,0.28);
+  --tp:#1c201d; --ts:#4a5550; --tm:#7a8b7e; --tf:rgba(28,32,29,0.35);
+  --ac:#5FA48E; --ac2:#7ABBA4; --ac3:#A4D4C0; --acc:#f7f3ed;
+  --milestone:#B79556; --rose:#E09B8E; --sky:#8BA4C0;
+}
+body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:#DCD5CA;padding:32px 20px;min-height:100vh;color:var(--tp)}
+.wrap{max-width:1600px;margin:0 auto}
+.title{font-family:'Gaegu',cursive;font-size:28px;font-weight:700;letter-spacing:0.02em;text-align:center;margin-bottom:6px}
+.sub{color:var(--ts);font-size:13px;text-align:center;margin-bottom:36px;font-weight:500}
+.sub em{font-style:normal;color:var(--ac);font-weight:700}
+
+.section-hdr{font-family:'Gaegu',cursive;font-size:20px;font-weight:700;color:var(--tp);letter-spacing:0.02em;text-align:center;margin:40px 0 20px;padding-top:20px;border-top:1px dashed var(--bd2)}
+.section-hdr:first-of-type{margin-top:0;padding-top:0;border:none}
+
+.stat-compare{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
+.stat-demo{display:flex;flex-direction:column;align-items:center;gap:12px;max-width:340px}
+.stat-label{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:100px;background:#FFFFFF;border:1px solid var(--bd2);font-size:12px;font-weight:700;color:var(--ac);letter-spacing:0.5px}
+.stat-card{width:320px;background:var(--bg);border:0.5px solid var(--bd);border-radius:16px;padding:16px;box-shadow:0 4px 14px rgba(0,0,0,0.04)}
+.stat-caption{font-size:11px;color:var(--ts);text-align:center;line-height:1.6;max-width:320px}
+.stat-caption strong{color:var(--ac);font-weight:700}
+
+/* 옵션 A — 3칸 */
+.a-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;background:var(--sf);border-radius:14px;overflow:hidden}
+.a-cell{padding:14px 10px;text-align:center;background:var(--bg);cursor:pointer}
+.a-cell-v{font-family:'Gaegu',cursive;font-size:26px;font-weight:700;color:var(--tp);letter-spacing:0.02em;line-height:1;margin-bottom:3px;display:inline-flex;align-items:baseline;gap:3px}
+.a-cell-v em{font-style:normal;color:var(--ac)}
+.a-cell-v .unit{font-size:12px;font-weight:600;color:var(--tm)}
+.a-cell-l{font-size:10px;color:var(--tm);font-weight:600;letter-spacing:0.3px;margin-top:5px}
+.a-cell-l em{font-style:normal;color:var(--milestone);font-weight:700}
+
+/* 옵션 B — 오늘 목표 진행바 */
+.b-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.b-label{font-family:'Gaegu',cursive;font-size:14px;font-weight:700;color:var(--tp);letter-spacing:0.02em}
+.b-sub{font-size:11px;color:var(--tm);font-weight:600}
+.b-bar{height:10px;background:var(--sf2);border-radius:100px;overflow:hidden;margin-bottom:6px;position:relative}
+.b-fill{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:100px;width:60%;box-shadow:0 2px 8px color-mix(in srgb,var(--ac) 25%,transparent)}
+.b-detail{display:flex;justify-content:space-between;font-size:11px;color:var(--tm);font-weight:600;margin-bottom:14px}
+.b-detail em{font-style:normal;color:var(--ac);font-weight:800}
+.b-footer{display:flex;justify-content:space-between;padding-top:12px;border-top:0.5px solid var(--bd);align-items:center}
+.b-footer-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ts);font-weight:600}
+.b-footer-item em{font-style:normal;color:var(--tp);font-weight:800;font-size:14px}
+.b-footer-icon{width:24px;height:24px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px}
+.b-footer-icon.flame{background:color-mix(in srgb,var(--milestone) 18%,var(--sf))}
+.b-footer-icon.book{background:color-mix(in srgb,var(--ac) 15%,var(--sf))}
+
+/* 옵션 C — 챌린지 링 */
+.c-wrap{display:flex;gap:16px;align-items:center}
+.c-ring{position:relative;width:88px;height:88px;flex-shrink:0}
+.c-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.c-ring circle{fill:none;stroke-width:8}
+.c-ring .track{stroke:var(--sf2)}
+.c-ring .progress{stroke:url(#gradient);stroke-linecap:round;stroke-dasharray:0 240;animation:draw 1s ease-out forwards}
+@keyframes draw{to{stroke-dasharray:120 240}}
+.c-ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.c-ring-v{font-family:'Gaegu',cursive;font-size:20px;font-weight:700;color:var(--tp);line-height:1}
+.c-ring-l{font-size:9px;color:var(--tm);font-weight:700;letter-spacing:0.3px}
+.c-body{flex:1;min-width:0}
+.c-title{font-family:'Gaegu',cursive;font-size:14px;font-weight:700;color:var(--tp);letter-spacing:0.02em;margin-bottom:3px}
+.c-sub{font-size:11px;color:var(--tm);margin-bottom:10px}
+.c-sub em{font-style:normal;color:var(--ac);font-weight:700}
+.c-mini{display:flex;gap:12px;font-size:11px;color:var(--ts);font-weight:600}
+.c-mini span em{font-style:normal;color:var(--tp);font-weight:800}
+
+/* 폰 비교 */
+.phones{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;max-width:360px}
+.phone-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:100px;background:#FFFFFF;border:1px solid var(--bd2);font-size:11px;font-weight:700;color:var(--ac);letter-spacing:0.5px}
+.phone{width:340px;height:720px;background:var(--bg);border-radius:40px;box-shadow:0 0 0 3px #1a1a1a,0 0 24px rgba(0,0,0,0.1);overflow:auto;padding-bottom:68px;position:relative}
+.phone::-webkit-scrollbar{width:0}
+.phone-desc{font-size:11px;color:var(--ts);text-align:center;line-height:1.6;max-width:340px;font-weight:500}
+.phone-desc strong{color:var(--ac)}
+
+.phone-header{padding:48px 18px 10px;display:flex;align-items:center;gap:10px;border-bottom:0.5px solid var(--bd)}
+.phone-header img{width:36px;height:36px;flex-shrink:0}
+.phone-header-text{flex:1}
+.phone-header-greet{font-family:'Gaegu',cursive;font-size:15px;font-weight:700;color:var(--tp);letter-spacing:0.02em}
+.phone-header-greet em{font-style:normal;color:var(--ac)}
+.phone-header-sub{font-size:10.5px;color:var(--tm);margin-top:1px}
+
+.phone-tabs{display:flex;padding:6px 18px 8px;border-bottom:0.5px solid var(--bd);gap:4px;overflow-x:auto;scrollbar-width:none}
+.phone-tabs::-webkit-scrollbar{display:none}
+.phone-tab{padding:6px 10px;font-size:11.5px;font-weight:700;color:var(--tm);background:transparent;border:none;cursor:pointer;white-space:nowrap;position:relative}
+.phone-tab.on{color:var(--ac)}
+.phone-tab.on::after{content:"";position:absolute;bottom:-0.5px;left:10%;right:10%;height:2px;background:var(--ac);border-radius:2px}
+.phone-tab-count{font-size:9.5px;font-weight:800;background:var(--sf2);color:var(--tm);padding:1px 5px;border-radius:100px;margin-left:3px}
+.phone-tab.on .phone-tab-count{background:color-mix(in srgb,var(--ac) 15%,transparent);color:var(--ac)}
+
+.panel{padding:14px 18px 18px}
+.panel-label{font-family:'Gaegu',cursive;font-size:13px;font-weight:700;color:var(--tp);letter-spacing:0.02em;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.panel-label em{color:var(--tm);font-style:normal;font-size:10.5px;font-weight:500}
+
+/* 이어읽기 히어로 (오늘 탭용) */
+.hero{border-radius:18px;overflow:hidden;background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 8%,var(--sf)),var(--sf));border:0.5px solid var(--bd);padding:14px;position:relative;margin-bottom:12px}
+.hero::before{content:"";position:absolute;top:-20px;right:-20px;width:120px;height:120px;background:radial-gradient(circle,color-mix(in srgb,var(--ac) 20%,transparent),transparent 70%)}
+.hero-row{display:flex;gap:12px;margin-bottom:12px;position:relative;z-index:2}
+.hero-cover{width:68px;height:98px;border-radius:7px;flex-shrink:0;background:linear-gradient(135deg,#2d5a3f,#1a3a2a);color:#f4efe8;display:flex;align-items:flex-end;padding:5px;font-size:10px;font-weight:700;line-height:1.2;box-shadow:0 4px 12px color-mix(in srgb,var(--ac) 12%,rgba(0,0,0,0.08))}
+.hero-info{flex:1;min-width:0;padding-top:3px}
+.hero-bubble{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:100px;background:var(--bg);border:0.5px solid var(--bd2);font-family:'Gaegu',cursive;font-size:10.5px;font-weight:700;color:var(--ac);margin-bottom:6px}
+.hero-bubble img{width:11px;height:11px;object-fit:contain}
+.hero-title{font-size:14.5px;font-weight:800;color:var(--tp);line-height:1.3;letter-spacing:-0.2px;margin-bottom:1px}
+.hero-author{font-size:10.5px;color:var(--tm);margin-bottom:8px}
+.hero-bar{height:3.5px;background:color-mix(in srgb,var(--ac) 10%,var(--sf2));border-radius:2px;margin-bottom:4px;overflow:hidden}
+.hero-fill{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:2px;width:72%}
+.hero-stat{display:flex;justify-content:space-between;font-size:10px;color:var(--tm);font-weight:600}
+.hero-stat em{font-style:normal;color:var(--ac);font-weight:800}
+.hero-cta{width:100%;padding:11px;border-radius:100px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:var(--acc);font-family:'Gaegu',cursive;font-size:14px;font-weight:700;letter-spacing:0.04em;border:none;cursor:pointer;box-shadow:0 4px 14px color-mix(in srgb,var(--ac) 22%,transparent);position:relative;z-index:2}
+
+/* 다른 읽는 책 */
+.others{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none}
+.others::-webkit-scrollbar{height:0}
+.other-card{flex-shrink:0;width:86px;cursor:pointer}
+.other-cover{width:100%;aspect-ratio:7/10;border-radius:6px;background:linear-gradient(135deg,#8a6030,#4a3020);color:#f4efe8;display:flex;align-items:flex-end;padding:5px;font-size:9px;font-weight:700;line-height:1.2;margin-bottom:4px;box-shadow:0 2px 6px rgba(0,0,0,0.1)}
+.other-title{font-size:10px;font-weight:700;color:var(--tp);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.other-prog{font-size:9px;color:var(--ac);font-weight:700;margin-top:1px}
+
+/* AI 토론 카드 */
+.ai-card{padding:14px;background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 12%,var(--sf)),var(--sf));border:0.5px solid var(--bd2);border-radius:16px;display:flex;gap:12px;align-items:center;margin-bottom:12px;position:relative;overflow:hidden;cursor:pointer}
+.ai-card::before{content:"";position:absolute;top:-15px;right:-15px;width:90px;height:90px;background:radial-gradient(circle,color-mix(in srgb,var(--ac) 18%,transparent),transparent 70%)}
+.ai-card img{width:44px;height:44px;flex-shrink:0;object-fit:contain;position:relative;z-index:2}
+.ai-card-body{flex:1;min-width:0;position:relative;z-index:2}
+.ai-card-title{font-family:'Gaegu',cursive;font-size:13px;font-weight:700;color:var(--tp);line-height:1.3;margin-bottom:2px;letter-spacing:0.02em}
+.ai-card-sub{font-size:10.5px;color:var(--tm);line-height:1.4}
+.ai-card-sub em{font-style:normal;color:var(--ac);font-weight:700}
+
+/* 넛지 */
+.nudge{display:flex;gap:10px;padding:11px 12px;background:var(--sf);border:0.5px solid var(--bd);border-radius:12px;align-items:center;margin-bottom:6px;cursor:pointer}
+.nudge-e{width:26px;height:26px;border-radius:8px;background:color-mix(in srgb,var(--ac) 12%,var(--bg));display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.nudge-t{flex:1;font-size:11px;color:var(--tp);line-height:1.4;font-weight:500}
+.nudge-t em{font-style:normal;color:var(--ac);font-weight:700}
+
+/* 오늘의 글귀 (오늘 탭 전용) */
+.scrap{padding:12px 14px;background:var(--sf);border-radius:12px;border-left:3px solid var(--ac);margin-bottom:6px;cursor:pointer}
+.scrap-q{font-family:'Gaegu',cursive;font-size:12.5px;color:var(--tp);line-height:1.5;letter-spacing:0.01em;font-style:italic;margin-bottom:6px}
+.scrap-m{font-size:9.5px;color:var(--tm)}
+.scrap-m em{color:var(--tp);font-style:normal;font-weight:700}
+
+/* 읽는 중 탭 - 책 카드 리스트 */
+.sort-row{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none}
+.sort-row::-webkit-scrollbar{height:0}
+.sort-chip{padding:4px 11px;border-radius:100px;font-size:10.5px;font-weight:700;white-space:nowrap;border:0.5px solid var(--bd2);background:transparent;color:var(--tm);cursor:pointer}
+.sort-chip.on{background:var(--ac);color:var(--acc);border-color:var(--ac)}
+
+.book-card{padding:14px;background:var(--sf);border:0.5px solid var(--bd);border-radius:16px;margin-bottom:10px;cursor:pointer}
+.book-card-row{display:flex;gap:12px;margin-bottom:12px}
+.book-card-cover{width:54px;height:78px;border-radius:6px;background:linear-gradient(135deg,#2d5a3f,#1a3a2a);color:#f4efe8;display:flex;align-items:flex-end;padding:5px;font-size:9.5px;font-weight:700;line-height:1.2;flex-shrink:0;box-shadow:0 4px 10px rgba(0,0,0,0.08)}
+.book-card-info{flex:1;min-width:0}
+.book-card-title{font-size:13px;font-weight:800;color:var(--tp);line-height:1.3;margin-bottom:1px}
+.book-card-author{font-size:10.5px;color:var(--tm);margin-bottom:6px}
+.book-card-bar{height:3.5px;background:color-mix(in srgb,var(--ac) 10%,var(--sf2));border-radius:2px;overflow:hidden;margin-bottom:4px}
+.book-card-bar-fill{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:2px}
+.book-card-stat{font-size:10px;color:var(--tm);font-weight:600}
+.book-card-stat em{font-style:normal;color:var(--ac);font-weight:800}
+.book-card-actions{display:flex;gap:6px}
+.book-btn{padding:8px;border-radius:100px;font-size:11px;font-weight:700;cursor:pointer;border:none}
+.book-btn-p{flex:1;background:var(--ac);color:var(--acc)}
+.book-btn-s{padding:8px 11px;background:var(--bg);border:0.5px solid var(--bd2);color:var(--ac);display:flex;align-items:center;gap:4px}
+.book-btn-m{width:32px;height:32px;border-radius:50%;background:var(--bg);border:0.5px solid var(--bd2);color:var(--tm);font-size:12px}
+
+.bnav{position:absolute;bottom:0;left:0;right:0;background:rgba(247,243,237,0.95);backdrop-filter:blur(12px);border-top:0.5px solid var(--bd);padding:6px 4px 18px;display:flex;justify-content:space-around}
+.bnav-item{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;color:var(--tm);padding:4px 6px;border-radius:10px;min-width:44px;font-weight:600}
+.bnav-item.on{background:color-mix(in srgb,var(--ac) 10%,transparent);color:var(--ac)}
+.bnav-icon{font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title">통계 위젯 + 오늘/읽는중 구분</div>
+  <div class="sub">체온 위젯 교체 옵션 3가지 · <em>오늘 vs 읽는 중</em> 역할 분담</div>
+
+  <!-- ═══════ 통계 위젯 3가지 ═══════ -->
+  <div class="section-hdr">① 통계 위젯 교체 옵션</div>
+
+  <div class="stat-compare">
+
+    <!-- A: 3칸 -->
+    <div class="stat-demo">
+      <div class="stat-label">🎯 A · 3칸 대시보드</div>
+      <div class="stat-card">
+        <div class="a-row">
+          <div class="a-cell">
+            <div class="a-cell-v"><em>7</em><span class="unit">일</span></div>
+            <div class="a-cell-l">🔥 연속</div>
+          </div>
+          <div class="a-cell">
+            <div class="a-cell-v">22<span class="unit">쪽</span></div>
+            <div class="a-cell-l">📖 오늘</div>
+          </div>
+          <div class="a-cell">
+            <div class="a-cell-v">12<span class="unit">권</span></div>
+            <div class="a-cell-l">📚 <em>/ 24권</em></div>
+          </div>
+        </div>
+      </div>
+      <div class="stat-caption"><strong>스캔 쉬움</strong> · 정보 밀도 높음 · 공간 효율 · 탭 시 각 상세 페이지</div>
+    </div>
+
+    <!-- B: 오늘 목표 바 -->
+    <div class="stat-demo">
+      <div class="stat-label">🎯 B · 오늘 목표 진행바</div>
+      <div class="stat-card">
+        <div class="b-top">
+          <div class="b-label">오늘 목표 · 30분</div>
+          <div class="b-sub">60%</div>
+        </div>
+        <div class="b-bar"><div class="b-fill"></div></div>
+        <div class="b-detail">
+          <span><em>18분</em> 읽었어요</span>
+          <span>목표까지 12분</span>
+        </div>
+        <div class="b-footer">
+          <div class="b-footer-item">
+            <div class="b-footer-icon flame">🔥</div>
+            <span><em>7</em>일 연속</span>
+          </div>
+          <div class="b-footer-item">
+            <div class="b-footer-icon book">📚</div>
+            <span>올해 <em>12</em> / 24권</span>
+          </div>
+        </div>
+      </div>
+      <div class="stat-caption"><strong>행동 유도 최강</strong> · 오늘 목표 진행률이 메인 · 독서 시간 기록 필요</div>
+    </div>
+
+    <!-- C: 챌린지 링 -->
+    <div class="stat-demo">
+      <div class="stat-label">🎯 C · 연간 챌린지 링</div>
+      <div class="stat-card">
+        <div class="c-wrap">
+          <div class="c-ring">
+            <svg viewBox="0 0 80 80">
+              <defs>
+                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#5FA48E"/>
+                  <stop offset="100%" stop-color="#7ABBA4"/>
+                </linearGradient>
+              </defs>
+              <circle cx="40" cy="40" r="32" class="track"/>
+              <circle cx="40" cy="40" r="32" class="progress"/>
+            </svg>
+            <div class="c-ring-center">
+              <div class="c-ring-v">50%</div>
+              <div class="c-ring-l">연간 목표</div>
+            </div>
+          </div>
+          <div class="c-body">
+            <div class="c-title">2026년 <em style="color:var(--ac);font-style:normal">반환점!</em></div>
+            <div class="c-sub"><em>12권</em> 읽었어요 · 24권까지 반 왔어요</div>
+            <div class="c-mini">
+              <span>🔥 <em>7</em>일</span>
+              <span>📖 오늘 <em>22</em>쪽</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="stat-caption"><strong>장기 목표 성취감</strong> · 링 시각화 임팩트 · 연간 뷰 강조</div>
+    </div>
+
+  </div>
+
+  <div style="text-align:center;padding:16px 20px;background:#FFFFFF;border-radius:14px;max-width:660px;margin:8px auto 0;font-size:12px;color:var(--ts);line-height:1.7">
+    💚 <strong style="color:var(--ac);font-weight:700">제 추천: A</strong> — 가장 간결하고, 모든 유저(목표 설정 안 한 유저 포함)에게 의미 있는 숫자 제공.<br>
+    목표 없으면 3번째 칸은 "12권"만 표시. 목표 설정하면 "12 / 24권"으로 자동 변환.
+  </div>
+
+  <!-- ═══════ 오늘 vs 읽는 중 ═══════ -->
+  <div class="section-hdr">② 오늘 탭 vs 읽는 중 탭 — 역할 분리</div>
+
+  <div class="phones">
+
+    <!-- 오늘 탭 -->
+    <div class="phone-wrap">
+      <div class="phone-badge">🌅 오늘 탭 — 오늘의 행동 허브</div>
+      <div class="phone">
+        <div class="phone-header">
+          <img src="/mascot-read.png" alt="">
+          <div class="phone-header-text">
+            <div class="phone-header-greet">안녕, <em>지선</em>님</div>
+            <div class="phone-header-sub">어제 245쪽에서 멈췄어요</div>
+          </div>
+        </div>
+        <div class="phone-tabs">
+          <div class="phone-tab on">오늘</div>
+          <div class="phone-tab">읽는 중<span class="phone-tab-count">2</span></div>
+          <div class="phone-tab">완독<span class="phone-tab-count">12</span></div>
+          <div class="phone-tab">위시<span class="phone-tab-count">5</span></div>
+          <div class="phone-tab">스크랩</div>
+        </div>
+
+        <div class="panel">
+          <!-- 통계 A 적용 -->
+          <div class="a-row" style="margin-bottom:14px;cursor:pointer">
+            <div class="a-cell">
+              <div class="a-cell-v"><em>7</em><span class="unit">일</span></div>
+              <div class="a-cell-l">🔥 연속</div>
+            </div>
+            <div class="a-cell">
+              <div class="a-cell-v">22<span class="unit">쪽</span></div>
+              <div class="a-cell-l">📖 오늘</div>
+            </div>
+            <div class="a-cell">
+              <div class="a-cell-v">12<span class="unit">권</span></div>
+              <div class="a-cell-l">📚 <em>/ 24권</em></div>
+            </div>
+          </div>
+
+          <!-- 이어 읽기 히어로 -->
+          <div class="panel-label">오늘 이어서</div>
+          <div class="hero">
+            <div class="hero-row">
+              <div class="hero-cover">작별하지<br>않는다</div>
+              <div class="hero-info">
+                <div class="hero-bubble"><img src="/mascot-read.png" alt="">오늘도 한 장만 같이</div>
+                <div class="hero-title">작별하지 않는다</div>
+                <div class="hero-author">한강</div>
+                <div class="hero-bar"><div class="hero-fill"></div></div>
+                <div class="hero-stat"><span><em>245</em> / 340쪽</span><em>72%</em></div>
+              </div>
+            </div>
+            <button class="hero-cta">📖 지금 이어 읽기</button>
+          </div>
+
+          <!-- 다른 읽는 책 -->
+          <div class="panel-label">다른 읽는 책 <em>1권</em></div>
+          <div class="others">
+            <div class="other-card">
+              <div class="other-cover" style="background:linear-gradient(135deg,#8a6030,#4a3020)">이기적<br>유전자</div>
+              <div class="other-title">이기적 유전자</div>
+              <div class="other-prog">34%</div>
+            </div>
+          </div>
+
+          <!-- AI 토론 CTA -->
+          <div class="panel-label">💬 방긋이와 이야기</div>
+          <div class="ai-card">
+            <img src="/mascot-read.png" alt="">
+            <div class="ai-card-body">
+              <div class="ai-card-title">방금 그은 문장, 함께 곱씹어봐요</div>
+              <div class="ai-card-sub">한강과 5분 토론 <em>소크라테스식 →</em></div>
+            </div>
+          </div>
+
+          <!-- 오늘의 넛지 -->
+          <div class="panel-label">🌿 오늘의 넛지</div>
+          <div class="nudge">
+            <div class="nudge-e">📅</div>
+            <div class="nudge-t"><em>프로젝트 헤일메리</em> 내일부터 시작해요</div>
+          </div>
+          <div class="nudge">
+            <div class="nudge-e">💬</div>
+            <div class="nudge-t"><em>민지</em>가 새 질문을 던졌어요</div>
+          </div>
+          <div class="nudge">
+            <div class="nudge-e">🏛</div>
+            <div class="nudge-t"><em>양천도서관</em> 반납일 4일 남음</div>
+          </div>
+
+          <!-- 오늘의 글귀 (최근 스크랩) -->
+          <div class="panel-label" style="margin-top:14px">✏️ 최근 그은 문장</div>
+          <div class="scrap">
+            <div class="scrap-q">&ldquo;우리는 서로의 눈을 보며 알고 있었다, 이것이 마지막이 아니라는 것을.&rdquo;</div>
+            <div class="scrap-m"><em>작별하지 않는다</em> · p.142 · 오늘</div>
+          </div>
+        </div>
+        <div class="bnav">
+          <div class="bnav-item on"><span class="bnav-icon">🏠</span>홈</div>
+          <div class="bnav-item"><span class="bnav-icon">📅</span>달력</div>
+          <div class="bnav-item"><span class="bnav-icon">👥</span>모임</div>
+          <div class="bnav-item"><span class="bnav-icon">👤</span>MY</div>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>🌅 오늘</strong> = 진입점. 통계 + 메인 1권 + 다른 책 미니 + AI토론 + 넛지 + 최근 글귀. <strong>한 화면에 오늘 할 일 다 모음</strong>.</div>
+    </div>
+
+    <!-- 읽는 중 탭 -->
+    <div class="phone-wrap">
+      <div class="phone-badge">📖 읽는 중 탭 — 전체 책 관리</div>
+      <div class="phone">
+        <div class="phone-header">
+          <img src="/mascot-read.png" alt="">
+          <div class="phone-header-text">
+            <div class="phone-header-greet">지금 <em>2권</em> 읽고 있어요</div>
+            <div class="phone-header-sub">한 권씩 천천히</div>
+          </div>
+        </div>
+        <div class="phone-tabs">
+          <div class="phone-tab">오늘</div>
+          <div class="phone-tab on">읽는 중<span class="phone-tab-count">2</span></div>
+          <div class="phone-tab">완독<span class="phone-tab-count">12</span></div>
+          <div class="phone-tab">위시<span class="phone-tab-count">5</span></div>
+          <div class="phone-tab">스크랩</div>
+        </div>
+
+        <div class="panel">
+          <!-- 정렬 칩 -->
+          <div class="sort-row">
+            <div class="sort-chip on">최근 읽은 순</div>
+            <div class="sort-chip">진행률순</div>
+            <div class="sort-chip">추가순</div>
+          </div>
+
+          <!-- 책 카드들 -->
+          <div class="book-card">
+            <div class="book-card-row">
+              <div class="book-card-cover">작별하지<br>않는다</div>
+              <div class="book-card-info">
+                <div class="book-card-title">작별하지 않는다</div>
+                <div class="book-card-author">한강 · 어제 읽음</div>
+                <div class="book-card-bar"><div class="book-card-bar-fill" style="width:72%"></div></div>
+                <div class="book-card-stat"><em>245</em> / 340쪽 · <em>72%</em></div>
+              </div>
+            </div>
+            <div class="book-card-actions">
+              <button class="book-btn book-btn-p">이어 읽기</button>
+              <button class="book-btn book-btn-s">💬 토론</button>
+              <button class="book-btn book-btn-m">⋯</button>
+            </div>
+          </div>
+
+          <div class="book-card">
+            <div class="book-card-row">
+              <div class="book-card-cover" style="background:linear-gradient(135deg,#8a6030,#4a3020)">이기적<br>유전자</div>
+              <div class="book-card-info">
+                <div class="book-card-title">이기적 유전자</div>
+                <div class="book-card-author">도킨스 · 3일 전</div>
+                <div class="book-card-bar"><div class="book-card-bar-fill" style="width:34%"></div></div>
+                <div class="book-card-stat"><em>118</em> / 348쪽 · <em>34%</em></div>
+              </div>
+            </div>
+            <div class="book-card-actions">
+              <button class="book-btn book-btn-p" style="background:var(--bg);border:0.5px solid var(--bd2);color:var(--ac)">다시 읽기</button>
+              <button class="book-btn book-btn-s">💬 토론</button>
+              <button class="book-btn book-btn-m">⋯</button>
+            </div>
+          </div>
+        </div>
+        <div class="bnav">
+          <div class="bnav-item on"><span class="bnav-icon">🏠</span>홈</div>
+          <div class="bnav-item"><span class="bnav-icon">📅</span>달력</div>
+          <div class="bnav-item"><span class="bnav-icon">👥</span>모임</div>
+          <div class="bnav-item"><span class="bnav-icon">👤</span>MY</div>
+        </div>
+      </div>
+      <div class="phone-desc"><strong>📖 읽는 중</strong> = 관리. 정렬 칩 + 책별 큰 카드 + <strong>3버튼 (이어읽기/토론/⋯)</strong>. <strong>책을 한 권씩 관리하는 공간</strong>.</div>
+    </div>
+
+  </div>
+
+  <!-- 정리 -->
+  <div style="margin:48px auto 0;padding:24px 28px;background:#FFFFFF;border:1px solid var(--bd2);border-radius:18px;color:var(--tp);font-size:12px;line-height:1.85;max-width:780px">
+    <div style="font-family:'Gaegu',cursive;font-size:17px;font-weight:700;color:var(--ac);margin-bottom:12px">🎯 정리</div>
+
+    <strong style="color:var(--ac)">탭 역할 분리</strong><br>
+    <table style="width:100%;border-collapse:collapse;margin:8px 0 14px">
+      <tr style="border-bottom:0.5px solid var(--bd)"><td style="padding:4px 0;font-weight:700">구분</td><td style="padding:4px 0;font-weight:700">🌅 오늘</td><td style="padding:4px 0;font-weight:700">📖 읽는 중</td></tr>
+      <tr><td style="padding:4px 0">목적</td><td style="padding:4px 0">행동 진입</td><td style="padding:4px 0">책 관리</td></tr>
+      <tr><td style="padding:4px 0">주인공</td><td style="padding:4px 0">1권 (최근)</td><td style="padding:4px 0">N권 리스트</td></tr>
+      <tr><td style="padding:4px 0">CTA</td><td style="padding:4px 0">1개 대형</td><td style="padding:4px 0">책별 3버튼</td></tr>
+      <tr><td style="padding:4px 0">정렬</td><td style="padding:4px 0">자동 (최신)</td><td style="padding:4px 0">사용자 선택</td></tr>
+      <tr><td style="padding:4px 0">맥락</td><td style="padding:4px 0">넛지/스트릭/AI</td><td style="padding:4px 0">진행률만</td></tr>
+    </table>
+
+    <strong style="color:var(--ac)">통계 위젯</strong> A (3칸) 추천 — 스캔 쉽고 모든 유저에게 의미 있는 숫자<br><br>
+
+    <strong>결정 필요</strong>: A/B/C 중 통계 옵션 + 오늘 탭에 빠진 요소가 있는지
+  </div>
+</div>
+</body>
+</html>
