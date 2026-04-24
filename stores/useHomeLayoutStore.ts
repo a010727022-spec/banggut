@@ -18,18 +18,17 @@ interface HomeLayoutState {
 export const useHomeLayoutStore = create<HomeLayoutState>()(
   persist(
     (set) => ({
-      layout: "hero",
+      layout: "calendar",
       isHydrated: false,
       setLayout: (layout) => set({ layout }),
       setHydrated: () => set({ isHydrated: true }),
     }),
     {
       name: "banggut-home-layout",
-      // 잘못된 값으로 복원됐을 때 기본값으로 복구
       onRehydrateStorage: () => (state) => {
         if (state) {
           if (!VALID_LAYOUTS.includes(state.layout as HomeLayout)) {
-            state.layout = "hero";
+            state.layout = "calendar";
           }
           state.isHydrated = true;
         }
